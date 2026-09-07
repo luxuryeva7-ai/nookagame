@@ -2,278 +2,361 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#FDF7EC">
-<title>Стань тренером ИИ — Мастерская</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="theme-color" content="#0E0719">
+<title>Тренировочный лагерь — Nooka</title>
 <link href="/fonts/nooka-fonts.css" rel="stylesheet">
 <style>
-:root{--ink:#181228;--ink2:#5B5470;--ink3:#8A82A0;--purple:#7B2FFF;--sun:#FFC53D;--bg:#FDF7EC;--line:#E9E1F5;--ok:#12A47A;--rad:20px}
+:root{--ink:#F4EEFF;--ink2:#C0B0E0;--ink3:#8B7BAE;--bg:#0E0719;--card:#1A1232;--line:rgba(255,255,255,.09);--ok:#4ED99B;--bad:#FF6B6B;--acc:#FFD84D;--purple:#A98BFF}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--ink);font-family:'Nunito',system-ui,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
-.hdr{padding:14px 20px;display:flex;align-items:center;gap:10px;border-bottom:1.5px solid var(--line)}
-.back{font-size:14px;font-weight:800;color:var(--purple);text-decoration:none;display:flex;align-items:center;gap:4px}
-.hdr-title{font-size:13px;font-weight:900;color:var(--ink2)}
-.progress-bar{height:4px;background:var(--line);position:relative;flex:1}
-.progress-fill{height:4px;background:var(--purple);border-radius:2px;transition:width .4s cubic-bezier(.4,0,.2,1)}
-.wrap{max-width:580px;margin:0 auto;padding:28px 20px 60px}
-.step{display:none;animation:fadeUp .35s ease both}
-.step.active{display:block}
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-.step-label{font-size:11px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--purple);margin-bottom:8px}
-.step-title{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:clamp(20px,5vw,27px);line-height:1.25;margin-bottom:10px;letter-spacing:-.3px}
-.step-sub{font-size:15px;color:var(--ink2);line-height:1.6;margin-bottom:24px}
-.cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
-.card-opt{background:#fff;border:2px solid var(--line);border-radius:var(--rad);padding:18px 16px;cursor:pointer;transition:border-color .15s,transform .1s;text-align:left;position:relative;user-select:none}
-.card-opt:active{transform:scale(.97)}
-.card-opt.selected{border-color:var(--purple);background:#F7F2FF}
-.card-opt .ico{font-size:32px;margin-bottom:8px;display:block;line-height:1}
-.card-opt .lbl{font-weight:900;font-size:15px;color:var(--ink);display:block}
-.card-opt .sub{font-size:12px;color:var(--ink3);margin-top:3px}
-.check-mark{position:absolute;top:10px;right:10px;width:20px;height:20px;border-radius:50%;background:var(--purple);display:none;align-items:center;justify-content:center;color:#fff;font-size:11px}
-.card-opt.selected .check-mark{display:flex}
-.btn-next{width:100%;padding:16px;background:var(--purple);color:#fff;border:none;border-radius:var(--rad);font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:15px;cursor:pointer;transition:opacity .15s;letter-spacing:-.2px}
-.btn-next:disabled{opacity:.35;cursor:default}
-.btn-next:not(:disabled):active{opacity:.85}
-.chips{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px}
-.chip{border:2px solid var(--line);border-radius:999px;padding:9px 18px;font-size:14px;font-weight:800;color:var(--ink);cursor:pointer;transition:border-color .15s,background .15s;background:#fff;user-select:none}
-.chip:active{transform:scale(.96)}
-.chip.selected{border-color:var(--purple);background:#F0EAFF;color:var(--purple)}
-.data-types{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:24px}
-.data-card{background:#fff;border:2px solid var(--line);border-radius:var(--rad);padding:16px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:border-color .15s}
-.data-card.selected{border-color:var(--purple);background:#F7F2FF}
-.data-icon{font-size:28px;flex:none}
-.data-label{font-weight:900;font-size:14px}
-.data-ex{font-size:12px;color:var(--ink3)}
-.cases{display:flex;flex-direction:column;gap:14px;margin-bottom:24px}
-.case-card{background:#fff;border:1.5px solid var(--line);border-radius:var(--rad);padding:18px 20px}
-.case-text{font-size:14px;font-weight:800;margin-bottom:4px}
-.case-ex{font-size:13px;color:var(--ink2);margin-bottom:14px;line-height:1.5}
-.case-btns{display:flex;gap:10px}
-.case-btn{flex:1;padding:11px;border:2px solid var(--line);border-radius:12px;font-size:13px;font-weight:900;cursor:pointer;background:#fff;transition:border-color .12s,background .12s}
-.case-btn.ok{border-color:var(--ok);color:var(--ok);background:#F0FAF5}
-.case-btn.bad{border-color:#E8362A;color:#E8362A;background:#FEF2F2}
-.case-btn.selected-ok{background:var(--ok);color:#fff;border-color:var(--ok)}
-.case-btn.selected-bad{background:#E8362A;color:#fff;border-color:#E8362A}
-.case-result{margin-top:10px;font-size:13px;font-weight:800;padding:8px 12px;border-radius:10px;display:none}
-.case-result.show{display:block}
-.case-result.right{background:#F0FAF5;color:var(--ok)}
-.case-result.wrong{background:#FEF2F2;color:#E8362A}
+html,body{height:100%;background:var(--bg)}
+body{font-family:'Nunito',system-ui,sans-serif;-webkit-font-smoothing:antialiased;color:var(--ink);overflow:hidden}
+.root{height:100vh;max-width:480px;margin:0 auto;display:flex;flex-direction:column;overflow:hidden;background:linear-gradient(180deg,#161226 0%,#0F0B1E 60%,#090711 100%)}
 
-/* Диплом */
-.diploma{background:linear-gradient(135deg,#F7F2FF 0%,#EEF6FF 100%);border:3px solid var(--purple);border-radius:28px;padding:36px 28px;text-align:center}
-.diploma-badge{font-size:56px;margin-bottom:12px;display:block}
-.diploma-title{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:22px;color:var(--purple);margin-bottom:6px}
-.diploma-name{font-size:18px;font-weight:900;color:var(--ink);margin-bottom:16px}
-.diploma-details{background:#fff;border-radius:16px;padding:16px 20px;text-align:left;margin-bottom:20px}
+/* топбар */
+.topbar{flex:none;display:flex;align-items:center;gap:10px;padding:14px 16px 10px;border-bottom:1px solid var(--line)}
+.back{color:var(--purple);font-size:14px;font-weight:800;text-decoration:none;flex:none}
+.tb-title{flex:1;font-weight:900;font-size:13px;color:var(--ink2);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-steps{flex:none;font-size:12px;font-weight:800;color:var(--ink3)}
+
+/* прогресс-бар */
+.pbar-wrap{flex:none;height:3px;background:rgba(255,255,255,.07)}
+.pbar-fill{height:3px;background:var(--acc);transition:width .4s cubic-bezier(.4,0,.2,1)}
+
+/* тело */
+.body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 0 6px}
+
+/* фраза Нейро */
+.say{display:flex;gap:10px;align-items:flex-start;margin:14px 14px 0;padding:13px 15px;border-radius:18px;background:rgba(255,255,255,.055);box-shadow:inset 0 0 0 1px var(--line);animation:fadeUp .3s ease both}
+.say-icon{flex:none;font-size:28px;line-height:1}
+.say-text{font-weight:700;font-size:13.5px;line-height:1.5;color:#DDD2F2}
+.say-text b{color:var(--acc)}
+
+/* центральная сцена */
+.scene{margin:14px 14px 0;border-radius:22px;background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.015));box-shadow:inset 0 0 0 1.5px var(--line);display:flex;flex-direction:column;align-items:center;padding:20px 14px 16px;position:relative;min-height:200px;justify-content:center}
+.scene-tag{position:absolute;top:12px;left:12px;font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
+.scene-count{position:absolute;top:12px;right:12px;font-size:12px;font-weight:900;color:var(--acc)}
+
+/* существо */
+.creature{display:flex;flex-direction:column;align-items:center;gap:10px}
+.creature-svg{animation:pop .35s cubic-bezier(.2,.8,.3,1) both}
+@keyframes pop{from{transform:scale(.6);opacity:0}70%{transform:scale(1.08)}to{transform:scale(1);opacity:1}}
+.creature-name{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:17px;color:var(--ink)}
+.creature-tags{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.tag{background:rgba(255,255,255,.08);border-radius:999px;padding:4px 12px;font-size:12px;font-weight:800;color:var(--ink2)}
+
+/* действия разметки */
+.label-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 14px 0}
+.lbtn{padding:16px 10px;border:none;border-radius:18px;cursor:pointer;font-family:inherit;font-weight:900;font-size:14px;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform .1s}
+.lbtn:active{transform:scale(.95)}
+.lbtn-icon{font-size:26px;line-height:1}
+.lbtn--yes{background:rgba(78,217,155,.15);box-shadow:inset 0 0 0 2px rgba(78,217,155,.3);color:var(--ok)}
+.lbtn--no{background:rgba(255,107,107,.12);box-shadow:inset 0 0 0 2px rgba(255,107,107,.28);color:var(--bad)}
+.lbtn--yes:hover{background:rgba(78,217,155,.25)}
+.lbtn--no:hover{background:rgba(255,107,107,.2)}
+
+/* датасет */
+.dataset{margin:14px 14px 0;padding:13px 15px;border-radius:18px;background:rgba(255,255,255,.04);box-shadow:inset 0 0 0 1px var(--line)}
+.dataset-title{font-size:10.5px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:10px}
+.dataset-rows{display:flex;flex-direction:column;gap:6px}
+.ds-row{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:12px;background:rgba(255,255,255,.04)}
+.ds-row-ico{font-size:20px;flex:none;width:28px;text-align:center}
+.ds-row-name{flex:1;font-size:13px;font-weight:800;color:var(--ink2)}
+.ds-row-lbl{font-size:11px;font-weight:900;padding:4px 10px;border-radius:999px}
+.ds-lbl-yes{background:rgba(78,217,155,.2);color:var(--ok)}
+.ds-lbl-no{background:rgba(255,107,107,.18);color:var(--bad)}
+
+/* бар обучения */
+.train-bar-wrap{margin:14px 14px 0;padding:13px 15px;border-radius:18px;background:rgba(255,255,255,.04);box-shadow:inset 0 0 0 1px var(--line)}
+.train-bar-title{font-size:11px;font-weight:900;color:var(--ink3);margin-bottom:8px;display:flex;justify-content:space-between}
+.train-bar{height:10px;background:rgba(255,255,255,.07);border-radius:5px;overflow:hidden}
+.train-bar-fill{height:10px;border-radius:5px;transition:width .5s cubic-bezier(.4,0,.2,1);background:linear-gradient(90deg,#7B2FFF,#4ED99B)}
+
+/* тест */
+.test-q{margin:14px 14px 0;padding:14px;border-radius:18px;background:rgba(255,255,255,.04);box-shadow:inset 0 0 0 1px var(--line)}
+.test-q-title{font-size:12px;font-weight:900;color:var(--ink3);margin-bottom:12px;letter-spacing:.06em;text-transform:uppercase}
+.test-creature{display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:10px;border-radius:14px;background:rgba(255,255,255,.05)}
+.test-opts{display:flex;gap:8px}
+.test-opt{flex:1;padding:12px;border:none;border-radius:14px;cursor:pointer;font-family:inherit;font-weight:900;font-size:13px;transition:all .12s}
+.test-opt--yes{background:rgba(78,217,155,.1);box-shadow:inset 0 0 0 2px rgba(78,217,155,.25);color:var(--ok)}
+.test-opt--no{background:rgba(255,107,107,.1);box-shadow:inset 0 0 0 2px rgba(255,107,107,.22);color:var(--bad)}
+.test-opt.selected-ok{background:var(--ok);color:#0A1F15}
+.test-opt.selected-bad{background:var(--bad);color:#1F0A0A}
+.test-result{margin-top:10px;font-size:13px;font-weight:800;padding:10px 13px;border-radius:12px;animation:fadeUp .25s ease}
+.test-result.ok{background:rgba(78,217,155,.14);color:var(--ok)}
+.test-result.bad{background:rgba(255,107,107,.12);color:var(--bad)}
+
+/* финал-диплом */
+.diploma{margin:14px;background:linear-gradient(135deg,rgba(169,139,255,.15),rgba(78,217,155,.08));border:2px solid rgba(169,139,255,.35);border-radius:24px;padding:28px 22px;text-align:center;animation:fadeUp .4s ease}
+.diploma-star{font-size:52px;margin-bottom:10px;display:block}
+.diploma-badge{display:inline-block;background:var(--purple);color:#fff;border-radius:999px;padding:5px 16px;font-size:11px;font-weight:900;letter-spacing:.06em;margin-bottom:12px}
+.diploma-name{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:20px;color:var(--ink);margin-bottom:6px}
+.diploma-lvl{font-size:15px;color:var(--purple);font-weight:900;margin-bottom:18px}
+.diploma-stats{background:rgba(255,255,255,.06);border-radius:16px;padding:14px 16px;text-align:left;margin-bottom:16px}
 .diploma-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--line)}
 .diploma-row:last-child{border:none}
-.diploma-row-k{font-size:13px;color:var(--ink3);font-weight:700}
-.diploma-row-v{font-size:14px;font-weight:900;color:var(--ink)}
-.diploma-sub{font-size:13px;color:var(--ink2);line-height:1.5;margin-bottom:20px}
-.share-btn{width:100%;padding:14px;background:var(--purple);color:#fff;border:none;border-radius:16px;font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:14px;cursor:pointer;margin-bottom:10px}
-.back-btn{width:100%;padding:14px;background:#fff;color:var(--purple);border:2px solid var(--purple);border-radius:16px;font-weight:900;font-size:14px;cursor:pointer;text-decoration:none;display:block;text-align:center}
+.diploma-row-k{font-size:12px;color:var(--ink3);font-weight:700}
+.diploma-row-v{font-size:13px;font-weight:900;color:var(--ink)}
+.diploma-law{font-size:13px;color:var(--ink2);line-height:1.6;margin-bottom:18px}
+
+/* кнопки */
+.foot{flex:none;padding:10px 14px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(9,7,17,0),#090711 42%)}
+.btn-pri{width:100%;padding:16px;border:none;border-radius:18px;font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#0D0A18;background:var(--acc);transition:opacity .15s}
+.btn-pri:disabled{opacity:.3;cursor:default}
+.btn-sec{width:100%;padding:15px;border:2px solid var(--line);border-radius:18px;font-family:inherit;font-weight:900;font-size:14px;cursor:pointer;color:var(--ink2);background:transparent;margin-bottom:8px}
+.btn-ok{background:var(--ok);color:#081A10}
+
+/* интро */
+.intro-modal{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:28px 20px;text-align:center;animation:fadeUp .4s ease}
+.intro-emoji{font-size:64px;margin-bottom:20px;display:block}
+.intro-title{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:24px;line-height:1.25;margin-bottom:12px;color:var(--ink)}
+.intro-law{font-size:15px;color:var(--ink2);line-height:1.65;margin-bottom:8px;white-space:pre-line}
+.intro-tip{font-size:13px;color:var(--ink3);margin-bottom:28px;padding:12px;background:rgba(255,255,255,.05);border-radius:14px;line-height:1.5}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
-<div class="hdr">
-  <a class="back" href="index.html">← Мастерская</a>
-  <div class="progress-bar"><div class="progress-fill" id="pbar"></div></div>
+<div class="root">
+  <div class="topbar">
+    <a class="back" href="index.html">← Мастерская</a>
+    <div class="tb-title">Тренировочный лагерь</div>
+    <div class="tb-steps" id="tbSteps"></div>
+  </div>
+  <div class="pbar-wrap"><div class="pbar-fill" id="pbar" style="width:0%"></div></div>
+  <div class="body" id="body"></div>
+  <div class="foot" id="foot"></div>
 </div>
-<div class="wrap">
 
-  <!-- ШАГ 1: Профессия -->
-  <div class="step active" id="s1">
-    <div class="step-label">Шаг 1 из 5</div>
-    <h1 class="step-title">Выбери профессию</h1>
-    <p class="step-sub">Для кого будет работать твой ИИ? Это определит всё остальное.</p>
-    <div class="cards" id="profCards">
-      <div class="card-opt" data-v="doctor"><span class="ico">🩺</span><span class="lbl">Врач</span><span class="sub">Диагностика и здоровье</span><div class="check-mark">✓</div></div>
-      <div class="card-opt" data-v="game"><span class="ico">🎮</span><span class="lbl">Геймдизайнер</span><span class="sub">Игры и механики</span><div class="check-mark">✓</div></div>
-      <div class="card-opt" data-v="teacher"><span class="ico">📚</span><span class="lbl">Учитель</span><span class="sub">Обучение и задания</span><div class="check-mark">✓</div></div>
-      <div class="card-opt" data-v="detective"><span class="ico">🕵️</span><span class="lbl">Детектив</span><span class="sub">Улики и расследование</span><div class="check-mark">✓</div></div>
-      <div class="card-opt" data-v="chef"><span class="ico">👨‍🍳</span><span class="lbl">Повар</span><span class="sub">Рецепты и вкусы</span><div class="check-mark">✓</div></div>
-      <div class="card-opt" data-v="farmer"><span class="ico">🌾</span><span class="lbl">Фермер</span><span class="sub">Урожай и природа</span><div class="check-mark">✓</div></div>
-    </div>
-    <button class="btn-next" id="btn1" disabled onclick="go(2)">Выбрать профессию →</button>
-  </div>
-
-  <!-- ШАГ 2: Задача ИИ -->
-  <div class="step" id="s2">
-    <div class="step-label">Шаг 2 из 5</div>
-    <h1 class="step-title">Что будет уметь твой ИИ?</h1>
-    <p class="step-sub">Выбери одну задачу, которую ИИ будет решать в этой профессии.</p>
-    <div class="chips" id="taskChips"></div>
-    <button class="btn-next" id="btn2" disabled onclick="go(3)">Задача выбрана →</button>
-  </div>
-
-  <!-- ШАГ 3: Данные -->
-  <div class="step" id="s3">
-    <div class="step-label">Шаг 3 из 5</div>
-    <h1 class="step-title">Какие данные нужны ИИ?</h1>
-    <p class="step-sub">ИИ учится только на данных. Отметь все типы, которые помогут решить задачу.</p>
-    <div class="data-types" id="dataTypes">
-      <div class="data-card" data-v="photo" onclick="toggleData(this)"><div class="data-icon">📷</div><div><div class="data-label">Фотографии</div><div class="data-ex">Снимки, изображения</div></div></div>
-      <div class="data-card" data-v="text" onclick="toggleData(this)"><div class="data-icon">📝</div><div><div class="data-label">Тексты</div><div class="data-ex">Описания, отзывы</div></div></div>
-      <div class="data-card" data-v="numbers" onclick="toggleData(this)"><div class="data-icon">📊</div><div><div class="data-label">Числа</div><div class="data-ex">Показатели, статистика</div></div></div>
-      <div class="data-card" data-v="audio" onclick="toggleData(this)"><div class="data-icon">🎵</div><div><div class="data-label">Звуки</div><div class="data-ex">Речь, звуки природы</div></div></div>
-      <div class="data-card" data-v="video" onclick="toggleData(this)"><div class="data-icon">🎥</div><div><div class="data-label">Видео</div><div class="data-ex">Движения, действия</div></div></div>
-      <div class="data-card" data-v="sensor" onclick="toggleData(this)"><div class="data-icon">📡</div><div><div class="data-label">Датчики</div><div class="data-ex">Температура, давление</div></div></div>
-    </div>
-    <button class="btn-next" id="btn3" disabled onclick="go(4)">Данные собраны →</button>
-  </div>
-
-  <!-- ШАГ 4: Разметка -->
-  <div class="step" id="s4">
-    <div class="step-label">Шаг 4 из 5</div>
-    <h1 class="step-title">Проверь разметку</h1>
-    <p class="step-sub">Данные без правильных меток — бесполезны. Проверь, правильно ли размечены эти примеры.</p>
-    <div class="cases" id="casesArea"></div>
-    <button class="btn-next" id="btn4" disabled onclick="go(5)">Разметка проверена →</button>
-  </div>
-
-  <!-- ШАГ 5: Карточка тренера -->
-  <div class="step" id="s5">
-    <div class="diploma">
-      <span class="diploma-badge" id="d-badge">🧪</span>
-      <div class="diploma-title">Карточка тренера ИИ</div>
-      <div class="diploma-name" id="d-name">Тренер уровня: Профессионал</div>
-      <div class="diploma-details">
-        <div class="diploma-row"><span class="diploma-row-k">Профессия</span><span class="diploma-row-v" id="d-prof">—</span></div>
-        <div class="diploma-row"><span class="diploma-row-k">Задача ИИ</span><span class="diploma-row-v" id="d-task">—</span></div>
-        <div class="diploma-row"><span class="diploma-row-k">Типы данных</span><span class="diploma-row-v" id="d-data">—</span></div>
-        <div class="diploma-row"><span class="diploma-row-k">Разметка</span><span class="diploma-row-v" id="d-mark">—</span></div>
-      </div>
-      <p class="diploma-sub">Ты прошёл полный путь тренера: выбрал задачу, собрал данные и проверил их качество. Настоящий тренер ИИ!</p>
-      <button class="share-btn" onclick="shareCard()">📤 Поделиться карточкой</button>
-      <a class="back-btn" href="index.html">← Вернуться в Мастерскую</a>
-    </div>
-  </div>
-
-</div>
 <script>
-const TASKS = {
-  doctor:['Распознавать болезни по симптомам','Анализировать снимки МРТ','Предсказывать риск заболевания','Напоминать о приёме таблеток'],
-  game:['Генерировать новые уровни','Балансировать сложность','Предсказывать что понравится игроку','Создавать персонажей'],
-  teacher:['Проверять домашние задания','Объяснять сложные темы','Следить за прогрессом ученика','Подбирать задачи по уровню'],
-  detective:['Находить улики на фото','Анализировать показания свидетелей','Устанавливать личность по данным','Восстанавливать хронологию'],
-  chef:['Подбирать рецепт по ингредиентам','Предсказывать вкусовые сочетания','Адаптировать рецепт под аллергии','Оценивать качество блюда'],
-  farmer:['Распознавать болезни растений','Предсказывать урожай','Определять оптимальное время полива','Анализировать состав почвы']
-};
-const PROF_LABELS = {doctor:'🩺 Врач',game:'🎮 Геймдизайнер',teacher:'📚 Учитель',detective:'🕵️ Детектив',chef:'👨‍🍳 Повар',farmer:'🌾 Фермер'};
-const DATA_LABELS = {photo:'Фото',text:'Тексты',numbers:'Числа',audio:'Звуки',video:'Видео',sensor:'Датчики'};
-
-const CASES = [
-  {text:'Фотографии листьев с подписью «больной»',ex:'Каждый снимок подписан — видно что на нём.',correct:true,exp:'✓ Правильно! Каждый пример подписан — ИИ понимает что учить.'},
-  {text:'1000 снимков рентгена без подписей',ex:'Много данных, но никто не сказал — где болезнь, а где норма.',correct:false,exp:'✗ Неверно! Без меток ИИ не знает что правильно, а что нет.'},
-  {text:'Тексты отзывов с оценкой «позитивный / негативный»',ex:'Каждый отзыв помечен настроением.',correct:true,exp:'✓ Правильно! Метка показывает ИИ что учить определять.'}
+/* ─── данные ─── */
+const ANIMALS = [
+  {id:0,name:'Кот Пирог',ico:'🐱',tags:['острые уши','усы','мяукает'],cat:true},
+  {id:1,name:'Пёс Буран',ico:'🐶',tags:['висячие уши','хвост трубой','лает'],cat:false},
+  {id:2,name:'Кошка Люси',ico:'😸',tags:['острые уши','пушистая','мурлычет'],cat:true},
+  {id:3,name:'Пёс Крот',ico:'🐕',tags:['длинные уши','короткие лапы','носит'],cat:false},
+  {id:4,name:'Кот Рафаэль',ico:'🐈',tags:['острые уши','полосатый','щурится'],cat:true},
+  {id:5,name:'Пёс Шеф',ico:'🦮',tags:['стоячие уши','рыжий','охраняет'],cat:false},
+  {id:6,name:'Кот Лимон',ico:'🐈‍⬛',tags:['острые уши','чёрный','ночной'],cat:true},
+  {id:7,name:'Пёс Зефир',ico:'🐩',tags:['кудрявый','висячие уши','танцует'],cat:false},
 ];
+const TRAIN_COUNT = 6;
+const TEST_COUNT = 3;
 
-let state = {prof:null,task:null,data:[],caseAnswers:{},step:1};
+/* ─── состояние ─── */
+let phase = 'intro'; // intro | label | train_anim | test | done
+let dataset = [];      // {animal, isYes}
+let queue = shuffle([...ANIMALS]);
+let testQueue = [];
+let testIdx = 0;
+let testResults = [];
+let trainPct = 0;
+let trainTimer = null;
 
-function getProgress(){return state.step/5*100}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 
-function updateProgress(){
-  document.getElementById('pbar').style.width = getProgress()+'%';
-  for(let i=1;i<=5;i++){
-    document.getElementById('s'+i).classList.toggle('active',i===state.step);
+function render(){
+  document.getElementById('pbar').style.width = getPct()+'%';
+  const body = document.getElementById('body');
+  const foot = document.getElementById('foot');
+  const steps = document.getElementById('tbSteps');
+
+  if(phase==='intro'){
+    steps.textContent='';
+    body.innerHTML=`<div class="intro-modal">
+      <span class="intro-emoji">🧪</span>
+      <h1 class="intro-title">Тренировочный лагерь</h1>
+      <p class="intro-law">Я не умею различать котов и собак.\nПокажи мне примеры — и я научусь.</p>
+      <p class="intro-tip">Ты будешь показывать мне зверей и говорить «кот» или «не кот». Это называется <b>разметка данных</b> — главная работа тренера ИИ.</p>
+    </div>`;
+    foot.innerHTML=`<button class="btn-pri" onclick="startLabel()">Начать обучать →</button>`;
+    return;
   }
-}
 
-function go(n){
-  state.step=n;
-  updateProgress();
-  window.scrollTo(0,0);
-  if(n===2) renderTasks();
-  if(n===4) renderCases();
-  if(n===5) renderDiploma();
-  saveProgress();
-}
-
-document.querySelectorAll('.card-opt').forEach(c=>{
-  c.onclick=()=>{
-    document.querySelectorAll('.card-opt').forEach(x=>x.classList.remove('selected'));
-    c.classList.add('selected');
-    state.prof=c.dataset.v;
-    document.getElementById('btn1').disabled=false;
-  };
-});
-
-function renderTasks(){
-  const tasks=TASKS[state.prof]||[];
-  document.getElementById('taskChips').innerHTML=tasks.map(t=>`<div class="chip" onclick="selectTask(this,'${t}')">${t}</div>`).join('');
-  document.getElementById('btn2').disabled=true;
-}
-
-function selectTask(el,t){
-  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected'));
-  el.classList.add('selected');
-  state.task=t;
-  document.getElementById('btn2').disabled=false;
-}
-
-function toggleData(el){
-  el.classList.toggle('selected');
-  state.data=Array.from(document.querySelectorAll('.data-card.selected')).map(x=>x.dataset.v);
-  document.getElementById('btn3').disabled=state.data.length===0;
-}
-
-function renderCases(){
-  document.getElementById('casesArea').innerHTML=CASES.map((c,i)=>`
-    <div class="case-card" id="case${i}">
-      <div class="case-text">${c.text}</div>
-      <div class="case-ex">${c.ex}</div>
-      <div class="case-btns">
-        <button class="case-btn ok" onclick="answerCase(${i},true)">✓ Разметка правильная</button>
-        <button class="case-btn bad" onclick="answerCase(${i},false)">✗ Разметка неверная</button>
+  if(phase==='label'){
+    const cur = queue[dataset.length];
+    if(!cur){startTrainAnim();return;}
+    const n = dataset.length+1;
+    steps.textContent=n+'/'+TRAIN_COUNT;
+    body.innerHTML=`
+      <div class="say"><span class="say-icon">🤖</span><span class="say-text">${n===1?'Покажи мне первого зверя — <b>кот</b> это или нет?':n<=3?'Ещё один. Помечай внимательно — я запоминаю <b>каждый пример</b>.':'Почти готово. Моя память заполняется <b>твоими метками</b>.'}</span></div>
+      <div class="scene">
+        <div class="scene-tag">Пример ${n} из ${TRAIN_COUNT}</div>
+        <div class="creature">
+          <div style="font-size:80px;line-height:1;animation:pop .35s cubic-bezier(.2,.8,.3,1) both" key="${cur.id}">${cur.ico}</div>
+          <div class="creature-name">${cur.name}</div>
+          <div class="creature-tags">${cur.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+        </div>
       </div>
-      <div class="case-result" id="cr${i}"></div>
-    </div>`).join('');
-}
+      <div class="label-btns">
+        <button class="lbtn lbtn--yes" onclick="labelIt(true)"><span class="lbtn-icon">😸</span>Это кот!</button>
+        <button class="lbtn lbtn--no" onclick="labelIt(false)"><span class="lbtn-icon">🐕</span>Не кот</button>
+      </div>
+      ${dataset.length>0?`<div class="dataset">
+        <div class="dataset-title">Мой датасет · ${dataset.length} примеров</div>
+        <div class="dataset-rows">${dataset.slice(-3).reverse().map(d=>`
+          <div class="ds-row">
+            <span class="ds-row-ico">${d.animal.ico}</span>
+            <span class="ds-row-name">${d.animal.name}</span>
+            <span class="ds-row-lbl ${d.isYes?'ds-lbl-yes':'ds-lbl-no'}">${d.isYes?'КОТ':'НЕ КОТ'}</span>
+          </div>`).join('')}</div>
+      </div>`:''}
+    `;
+    foot.innerHTML='';
+    return;
+  }
 
-function answerCase(i,val){
-  const c=CASES[i];
-  state.caseAnswers[i]=val;
-  const res=document.getElementById('cr'+i);
-  const btns=document.querySelectorAll(`#case${i} .case-btn`);
-  btns.forEach(b=>b.classList.remove('selected-ok','selected-bad'));
-  btns[val?0:1].classList.add(val?'selected-ok':'selected-bad');
-  const right=(val===c.correct);
-  res.className='case-result show '+(right?'right':'wrong');
-  res.textContent=c.exp;
-  if(Object.keys(state.caseAnswers).length===CASES.length){
-    document.getElementById('btn4').disabled=false;
+  if(phase==='train_anim'){
+    steps.textContent='';
+    const pct = Math.min(100,trainPct);
+    body.innerHTML=`
+      <div class="say"><span class="say-icon">🤖</span><span class="say-text">${pct<30?'Загружаю твои примеры в память...':pct<70?'Ищу паттерны. Острые уши, висячие уши... <b>вижу разницу!</b>':pct<100?'Почти обучен. Проверяю на последних примерах...':'Готово! Я обучен на <b>'+TRAIN_COUNT+' примерах</b>. Давай проверим?'}</span></div>
+      <div class="scene" style="min-height:160px">
+        <div style="width:100%;text-align:center">
+          <div style="font-size:40px;margin-bottom:16px">${pct<100?'⚙️':'✅'}</div>
+          <div style="font-size:12px;font-weight:900;color:var(--ink3);margin-bottom:12px;letter-spacing:.06em;text-transform:uppercase">${pct<100?'Обучение...':'Готов!'}</div>
+          <div class="train-bar"><div class="train-bar-fill" style="width:${pct}%"></div></div>
+          <div style="margin-top:8px;font-size:13px;font-weight:800;color:var(--acc)">${Math.round(pct)}%</div>
+        </div>
+      </div>
+      <div class="dataset">
+        <div class="dataset-title">Использовано примеров · ${dataset.length}</div>
+        <div class="dataset-rows">${dataset.map(d=>`
+          <div class="ds-row">
+            <span class="ds-row-ico">${d.animal.ico}</span>
+            <span class="ds-row-name">${d.animal.name}</span>
+            <span class="ds-row-lbl ${d.isYes?'ds-lbl-yes':'ds-lbl-no'}">${d.isYes?'КОТ':'НЕ КОТ'}</span>
+          </div>`).join('')}</div>
+      </div>
+    `;
+    foot.innerHTML=pct>=100?`<button class="btn-pri" onclick="startTest()">Протестировать ИИ →</button>`:'';
+    return;
+  }
+
+  if(phase==='test'){
+    const cur = testQueue[testIdx];
+    const done = testResults.length > testIdx;
+    steps.textContent=(testIdx+1)+'/'+TEST_COUNT;
+    body.innerHTML=`
+      <div class="say"><span class="say-icon">🤖</span><span class="say-text">${done?testResults[testIdx]?'✓ <b>Верно!</b> Я угадал благодаря твоим меткам.':'✗ Ошибся. Но я учусь — чем больше примеров, тем точнее.':testIdx===0?'Теперь я сам! Давай проверим что я выучил. Попробую угадать — <b>кот или нет?</b>':'Ещё один тест. Уверен что научился.'}</span></div>
+      <div class="test-q">
+        <div class="test-q-title">Тест ${testIdx+1} из ${TEST_COUNT}</div>
+        <div class="test-creature">
+          <span style="font-size:42px">${cur.ico}</span>
+          <div>
+            <div style="font-weight:900;font-size:15px;color:var(--ink)">${cur.name}</div>
+            <div style="font-size:12px;color:var(--ink3);margin-top:3px">${cur.tags.join(' · ')}</div>
+          </div>
+        </div>
+        <div style="font-size:12px;font-weight:900;color:var(--ink3);margin-bottom:10px">Нейро думает, что это...</div>
+        <div class="test-opts" id="testOpts">
+          <button class="test-opt test-opt--yes" onclick="testAnswer(true)">😸 Кот</button>
+          <button class="test-opt test-opt--no" onclick="testAnswer(false)">🐕 Не кот</button>
+        </div>
+        ${done?`<div class="test-result ${testResults[testIdx]?'ok':'bad'}">${testResults[testIdx]?'✓ Нейро угадал! Правильно: '+(cur.cat?'это кот':'это не кот'):'✗ Нейро ошибся. На самом деле: '+(cur.cat?'это кот':'это не кот')}</div>`:''}
+      </div>
+    `;
+    foot.innerHTML=done?`<button class="btn-pri ${testIdx>=TEST_COUNT-1?'btn-ok':''}" onclick="nextTest()">${testIdx>=TEST_COUNT-1?'Посмотреть результат →':'Следующий тест →'}</button>`:'';
+    return;
+  }
+
+  if(phase==='done'){
+    steps.textContent='';
+    const correct=testResults.filter(Boolean).length;
+    const pct=Math.round(correct/TEST_COUNT*100);
+    const lvl=pct===100?'Мастер-тренер':pct>=67?'Старший тренер':'Тренер-стажёр';
+    const star=pct===100?'🥇':pct>=67?'🥈':'🎓';
+    body.innerHTML=`
+      <div class="diploma">
+        <span class="diploma-star">${star}</span>
+        <span class="diploma-badge">КАРТОЧКА ТРЕНЕРА ИИ</span>
+        <div class="diploma-name">Нейро успешно обучен</div>
+        <div class="diploma-lvl">Уровень: ${lvl}</div>
+        <div class="diploma-stats">
+          <div class="diploma-row"><span class="diploma-row-k">Примеров показано</span><span class="diploma-row-v">${dataset.length}</span></div>
+          <div class="diploma-row"><span class="diploma-row-k">Тест ИИ</span><span class="diploma-row-v">${correct} из ${TEST_COUNT} верно</span></div>
+          <div class="diploma-row"><span class="diploma-row-k">Точность</span><span class="diploma-row-v">${pct}%</span></div>
+        </div>
+        <p class="diploma-law">Настоящий ИИ учится точно так же — ты показываешь примеры с метками, он ищет паттерн. Чем больше и чище данные, тем умнее модель.</p>
+      </div>
+    `;
+    foot.innerHTML=`
+      <button class="btn-sec" onclick="restart()">🔄 Попробовать снова</button>
+      <a href="index.html" style="display:block;text-align:center;font-weight:900;font-size:14px;color:var(--purple);padding:10px">← Вернуться в Мастерскую</a>
+    `;
+    try{localStorage.setItem('nooka_proj_trainer',JSON.stringify({step:5}))}catch(e){}
+    return;
   }
 }
 
-function renderDiploma(){
-  const correct=Object.entries(state.caseAnswers).filter(([i,v])=>v===CASES[i].correct).length;
-  const pct=Math.round(correct/CASES.length*100);
-  const badges=['🥇','🥈','🥉','🎓'];
-  const levels=['Гений ИИ','Профи-тренер','Тренер ИИ','Новичок'];
-  const idx=pct>=100?0:pct>=67?1:pct>=33?2:3;
-  document.getElementById('d-badge').textContent=badges[idx];
-  document.getElementById('d-name').textContent='Тренер уровня: '+levels[idx];
-  document.getElementById('d-prof').textContent=PROF_LABELS[state.prof]||state.prof;
-  document.getElementById('d-task').textContent=state.task||'—';
-  document.getElementById('d-data').textContent=state.data.map(d=>DATA_LABELS[d]||d).join(', ')||'—';
-  document.getElementById('d-mark').textContent=correct+' из '+CASES.length+' верно ('+pct+'%)';
-  saveProgress();
+function getPct(){
+  if(phase==='intro') return 0;
+  if(phase==='label') return (dataset.length/TRAIN_COUNT)*40;
+  if(phase==='train_anim') return 40+(trainPct/100)*20;
+  if(phase==='test') return 60+(testIdx/TEST_COUNT)*30;
+  if(phase==='done') return 100;
+  return 0;
 }
 
-function shareCard(){
-  const text=`Я стал тренером ИИ в Мастерской Nooka!\n`+
-    `Профессия: ${PROF_LABELS[state.prof]}\n`+
-    `Задача: ${state.task}\n`+
-    `nookagame.ru`;
-  if(navigator.share){navigator.share({text})}
-  else{navigator.clipboard.writeText(text);alert('Скопировано!')}
+function startLabel(){phase='label';dataset=[];queue=shuffle([...ANIMALS]);render()}
+
+function labelIt(isYes){
+  const cur=queue[dataset.length];
+  dataset.push({animal:cur,isYes});
+  if(dataset.length>=TRAIN_COUNT){startTrainAnim();return}
+  render();
+  document.getElementById('body').scrollTo({top:0,behavior:'smooth'});
 }
 
-function saveProgress(){
-  try{localStorage.setItem('nooka_proj_trainer',JSON.stringify({step:state.step>=5?5:state.step}))}catch(e){}
+function startTrainAnim(){
+  phase='train_anim';trainPct=0;render();
+  const tgt=100;
+  const step=()=>{
+    trainPct+=Math.random()*8+3;
+    if(trainPct>=tgt){trainPct=tgt;render();return}
+    render();
+    setTimeout(step,120+Math.random()*80);
+  };
+  setTimeout(step,300);
 }
-try{const s=JSON.parse(localStorage.getItem('nooka_proj_trainer')||'{}');if(s.step>1&&s.step<5)state.step=1;}catch(e){}
-updateProgress();
+
+function startTest(){
+  // тест на зверях которых НЕ было в датасете (если есть) + часть из датасета
+  const used=new Set(dataset.map(d=>d.animal.id));
+  const fresh=ANIMALS.filter(a=>!used.has(a.id));
+  const pool=shuffle([...fresh,...dataset.map(d=>d.animal)]);
+  testQueue=pool.slice(0,TEST_COUNT);
+  testIdx=0;testResults=[];
+  phase='test';render();
+}
+
+function testAnswer(answer){
+  const cur=testQueue[testIdx];
+  // ИИ предсказывает по простой эвристике — смотрит на метки в датасете
+  const catExamples=dataset.filter(d=>d.isYes).map(d=>d.animal);
+  const isTagMatch=catExamples.some(a=>a.tags.some(t=>cur.tags.includes(t)));
+  const aiSaysCat=isTagMatch;
+  const correct=(aiSaysCat===cur.cat);
+  testResults.push(correct);
+  // показать кнопки как выбранные
+  const opts=document.querySelectorAll('.test-opt');
+  opts.forEach(b=>b.setAttribute('disabled',''));
+  opts[0].className='test-opt test-opt--yes'+(aiSaysCat?' selected-ok':'');
+  opts[1].className='test-opt test-opt--no'+(!aiSaysCat?' selected-bad':'');
+  render();
+  document.getElementById('body').scrollTo({top:999,behavior:'smooth'});
+}
+
+function nextTest(){
+  if(testIdx>=TEST_COUNT-1){phase='done';render();return}
+  testIdx++;render();
+  document.getElementById('body').scrollTo({top:0,behavior:'smooth'});
+}
+
+function restart(){phase='intro';dataset=[];testResults=[];testIdx=0;trainPct=0;render()}
+
+render();
 </script>
 </body>
 </html>
