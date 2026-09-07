@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#FDF7EC">
+<title>Твой проект — Nooka</title>
+<meta property="og:title" content="Твой проект — Nooka">
+<meta property="og:description" content="Финальный проект после каждой игры. Не тест — настоящая работа с ИИ которую ты создаёшь сам.">
+<link href="/fonts/nooka-fonts.css" rel="stylesheet">
+<style>
+:root{--ink:#181228;--ink2:#5B5470;--ink3:#8A82A0;--purple:#7B2FFF;--sun:#FFC53D;
+  --bg:#FDF7EC;--line:#E9E1F5;--ok:#12A47A}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:'Nunito',system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.6}
+.wrap{max-width:860px;margin:0 auto;padding:40px 20px 80px}
+h1{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:clamp(28px,5vw,44px);
+  line-height:1.14;margin:14px 0 16px;letter-spacing:-.01em}
+h1 em{font-style:normal;color:var(--purple)}
+h2{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:20px;margin:0 0 8px}
+h3{font-size:16px;font-weight:900;margin:0 0 6px}
+p{margin:0 0 12px}
+.kick{display:inline-block;padding:7px 15px;border-radius:999px;background:#F1EAFE;
+  font-weight:900;font-size:12.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--purple)}
+.kick--sun{background:#FFF3C4;color:#7A5E00}
+.lead{font-size:18px;color:var(--ink2);max-width:640px;margin-bottom:32px}
+.card{background:#fff;border:1.5px solid var(--line);border-radius:24px;padding:26px 28px;margin:18px 0}
+.card--sun{background:#FFF9E8;border-color:#F5E2B0}
+.card--purple{background:#F6F2FF;border-color:#DDD5F5}
+.card--dark{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+/* PROJECT CARDS */
+.project-grid{display:grid;grid-template-columns:1fr;gap:24px;margin-top:8px}
+.project-card{background:#fff;border:1.5px solid var(--line);border-radius:24px;overflow:hidden}
+.project-top{padding:24px 28px 20px;display:flex;align-items:flex-start;gap:18px}
+.project-emoji{font-size:40px;flex:none;line-height:1}
+.project-meta{}
+.project-label{font-size:12px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink3);margin-bottom:4px}
+.project-name{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:20px;
+  color:var(--ink);margin-bottom:6px}
+.project-desc{font-size:15px;color:var(--ink2)}
+.project-time{display:inline-flex;align-items:center;gap:6px;margin-top:8px;
+  font-size:13px;font-weight:900;color:var(--purple);background:#F1EAFE;
+  padding:4px 12px;border-radius:999px}
+
+.project-steps{border-top:1.5px solid var(--line);padding:20px 28px}
+.steps-title{font-size:13px;font-weight:900;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--ink3);margin-bottom:14px}
+.steps{margin:0;padding:0;list-style:none;counter-reset:s}
+.step{display:flex;gap:14px;padding:12px 0;border-top:1px solid var(--line)}
+.step:first-child{border-top:none;padding-top:0}
+.step-num{flex:none;width:28px;height:28px;border-radius:50%;background:#F1EAFE;
+  color:var(--purple);font-weight:900;font-size:13px;
+  display:flex;align-items:center;justify-content:center;margin-top:1px}
+.step-body{}
+.step-action{font-weight:900;font-size:15px;margin-bottom:2px}
+.step-hint{font-size:13.5px;color:var(--ink2)}
+.step-tool{display:inline-block;margin-top:4px;background:#F1EAFE;color:var(--purple);
+  font-weight:900;font-size:12px;padding:3px 10px;border-radius:6px}
+
+.project-result{border-top:1.5px solid var(--line);padding:16px 28px;
+  background:#FAFAFA;display:flex;align-items:center;gap:12px}
+.result-icon{font-size:22px;flex:none}
+.result-text{font-size:14px;color:var(--ink2)}
+.result-text b{color:var(--ink);font-weight:900}
+
+/* FINAL */
+.final-card{background:var(--ink);border-radius:24px;padding:32px 32px 28px;color:#fff;margin-top:32px}
+.final-kick{display:inline-block;padding:6px 14px;border-radius:999px;background:#3D2F6B;
+  font-weight:900;font-size:12px;letter-spacing:.05em;text-transform:uppercase;
+  color:#C4B0FF;margin-bottom:16px}
+.final-title{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:22px;
+  line-height:1.25;margin-bottom:10px}
+.final-title em{font-style:normal;color:var(--sun)}
+.final-desc{font-size:15px;color:#A89FC0;margin-bottom:20px;max-width:560px}
+.final-examples{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:22px}
+.final-ex{background:#2A1F4A;border-radius:14px;padding:14px 16px}
+.final-ex-title{font-weight:900;font-size:14px;margin-bottom:4px}
+.final-ex-desc{font-size:13px;color:#8A7DAA}
+.final-time{font-size:14px;color:#8A7DAA;margin-bottom:20px}
+.final-time b{color:var(--sun)}
+
+/* BTN */
+.btns{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px}
+.btn{display:inline-block;padding:14px 24px;border-radius:16px;text-decoration:none;
+  font-weight:900;font-size:15px;border:none;cursor:pointer;font-family:inherit}
+.btn--pri{background:var(--purple);color:#fff}
+.btn--soft{background:#fff;color:var(--purple);border:1.5px solid var(--line)}
+.btn--sun{background:var(--sun);color:var(--ink)}
+.btn--ghost{background:#2A1F4A;color:#C4B0FF}
+
+.sep{border:none;border-top:1.5px solid var(--line);margin:40px 0 0}
+.foot{margin-top:34px;padding-top:20px;border-top:1px solid var(--line);color:var(--ink3);font-size:14px}
+.foot a{color:var(--purple)}
+
+@media(max-width:600px){
+  .project-top{flex-direction:column;gap:10px}
+  .project-steps,.project-result{padding-left:20px;padding-right:20px}
+  .final-card{padding:22px 20px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="kick">Твой проект</span>
+  <h1>После игры —<br><em>создай своё</em></h1>
+  <p class="lead">Каждая игра заканчивается не тестом, а проектом. Ты применяешь всё что прошёл — и делаешь что-то настоящее. Это твоя работа, не чужая.</p>
+
+  <div class="card card--purple" style="padding:18px 24px">
+    <p style="margin:0;font-size:15px;color:var(--ink2)">
+      Проект начинается <b style="color:var(--ink)">после того как пройдена вся игра</b> — все 10 уровней. 
+      Не обязательно делать за один раз: можно возвращаться и продолжать.
+    </p>
+  </div>
+
+  <div class="project-grid" style="margin-top:32px">
+
+    <!-- PROJECT 1 -->
+    <div class="project-card">
+      <div class="project-top">
+        <span class="project-emoji">🧠</span>
+        <div class="project-meta">
+          <div class="project-label">После Игры 1 · Откуда ИИ знает</div>
+          <div class="project-name">Мой ИИ-помощник</div>
+          <div class="project-desc">Ты придумываешь своего ИИ с нуля: чему он будет учиться, как ты его обучишь, и где он ошибается.</div>
+          <span class="project-time">⏱ 2–3 часа</span>
+        </div>
+      </div>
+      <div class="project-steps">
+        <div class="steps-title">Шаги проекта</div>
+        <ul class="steps">
+          <li class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <div class="step-action">Выбери тему для своей модели</div>
+              <div class="step-hint">Кот vs. собака — слишком просто. Придумай своё: эмоции по фото, виды еды, погода по небу. Запиши почему это интересно.</div>
+            </div>
+          </li>
+          <li class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <div class="step-action">Собери датасет — минимум 30 примеров на класс</div>
+              <div class="step-hint">Нарисуй, сфотографируй или найди картинки. Важно: примеры должны быть разными, не похожими один на другой.</div>
+              <span class="step-tool">Teachable Machine · Google</span>
+            </div>
+          </li>
+          <li class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <div class="step-action">Обучи модель и проверь точность</div>
+              <div class="step-hint">Запусти обучение. Потом покажи модели 10 новых примеров которых она не видела — запиши сколько угадала правильно.</div>
+            </div>
+          </li>
+          <li class="step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+              <div class="step-action">Намеренно запутай свою модель</div>
+              <div class="step-hint">Найди пример на котором она ошибается и уверена в этом. Сфотографируй экран — это будет самая интересная часть презентации.</div>
+            </div>
+          </li>
+          <li class="step">
+            <div class="step-num">5</div>
+            <div class="step-body">
+              <div class="step-action">Расскажи о своём ИИ маме или другу</div>
+              <div class="step-hint">Покажи как работает, где ошибается, и почему. 3 минуты — без подготовки, своими словами.</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="project-result">
+        <span class="result-icon">📸</span>
+        <div class="result-text"><b>Результат:</b> скриншот обученной модели + скриншот ошибки + 3 минуты объяснения вслух</div>
+      </div>
+    </div>
+
+    <!-- PROJECT 2 -->
+    <div class="project-card">
+      <div class="project-top">
+        <span class="project-emoji">✍️</span>
+        <div class="project-meta">
+          <div class="project-label">После Игры 2 · Как управлять ИИ</div>
+          <div class="project-name">Мой промпт-сборник</div>
+          <div class="project-desc">Ты собираешь коллекцию промптов для реальной жизни — каждый протестирован, улучшен и работает.</div>
+          <span class="project-time">⏱ 2 часа</span>
+        </div>
+      </div>
+      <div class="project-steps">
+        <div class="steps-title">Шаги проекта</div>
+        <ul class="steps">
+          <li class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <div class="step-action">Выбери 5 задач из своей жизни</div>
+              <div class="step-hint">Домашнее задание, объяснение правила игры, идеи для подарка, помощь с рисунком, ответ на странный вопрос. Что тебе реально нужно от ИИ?</div>
+            </div>
+          </li>
+          <li class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <div class="step-action">Для каждой задачи: сначала плохой промпт</div>
+              <div class="step-hint">Напиши первое что пришло в голову. Получи ответ. Запиши почему ответ не подходит.</div>
+              <span class="step-tool">Claude · ChatGPT</span>
+            </div>
+          </li>
+          <li class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <div class="step-action">Улучши промпт — добавь детали, числа, роль</div>
+              <div class="step-hint">Кто ты, что нужно, в каком формате, какое ограничение. Получи новый ответ — он должен быть лучше.</div>
+            </div>
+          </li>
+          <li class="step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+              <div class="step-action">Оформи сборник из 5 промптов</div>
+              <div class="step-hint">Для каждого: задача → плохой вариант → хороший вариант → почему стало лучше. Можно в заметках телефона или на листе.</div>
+            </div>
+          </li>
+          <li class="step">
+            <div class="step-num">5</div>
+            <div class="step-body">
+              <div class="step-action">Поделись одним промптом с другом</div>
+              <div class="step-hint">Пусть он попробует — работает ли у него? Что пришлось изменить под его задачу?</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="project-result">
+        <span class="result-icon">📋</span>
+        <div class="result-text"><b>Результат:</b> сборник из 5 рабочих промптов с объяснением почему они работают</div>
+      </div>
+    </div>
+
+    <!-- PROJECT 3 -->
+    <div class="project-card">
+      <div class="project-top">
+        <span class="project-emoji">🔭</span>
+        <div class="project-meta">
+          <div class="project-label">После Игры 3 · Что у ИИ внутри</div>
+          <div class="project-name">Профессия будущего</div>
+          <div class="project-desc">Ты придумываешь профессию в мире с ИИ: что она делает, почему нужна человек, а не робот, и как выглядит один рабочий день.</div>
+          <span class="project-time">⏱ 2 часа</span>
+        </div>
+      </div>
+      <div class="project-steps">
+        <div class="steps-title">Шаги проекта</div>
+        <ul class="steps">
+          <li class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <div class="step-action">Выбери область — медицина, игры, спорт, музыка...</div>
+              <div class="step-hint">Что тебе интересно? ИИ уже есть везде — выбери то, про что хочется думать.</div>
+            </div>
+          </li>
+          <li class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <div class="step-action">Придумай название профессии</div>
+              <div class="step-hint">Не «программист» — что-то конкретное: тренер нейросети для музыкантов, детектив ИИ-ошибок, переводчик человек↔ИИ. Чем точнее — тем лучше.</div>
+            </div>
+          </li>
+          <li class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <div class="step-action">Опиши один рабочий день</div>
+              <div class="step-hint">Утром, днём, вечером — что конкретно делает этот человек? Что делает ИИ, а что — только человек и почему.</div>
+            </div>
+          </li>
+          <li class="step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+              <div class="step-action">Ответь на главный вопрос</div>
+              <div class="step-hint">Зачем здесь вообще нужен человек, если есть ИИ? Запиши честный ответ — это самое важное в проекте.</div>
+            </div>
+          </li>
+          <li class="step">
+            <div class="step-num">5</div>
+            <div class="step-body">
+              <div class="step-action">Нарисуй или опиши эту профессию</div>
+              <div class="step-hint">Как угодно: рисунок, схема, текст, презентация в 3 слайда. Главное — чтобы другой человек понял о чём это.</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="project-result">
+        <span class="result-icon">🗂️</span>
+        <div class="result-text"><b>Результат:</b> описание профессии + один рабочий день + ответ на вопрос «зачем здесь человек»</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FINAL PROJECT -->
+  <div class="final-card">
+    <div class="final-kick">После всего курса</div>
+    <div class="final-title">Итоговый проект:<br><em>Я и ИИ</em></div>
+    <p class="final-desc">Когда пройдены все три игры — ты сам решаешь что создать с помощью ИИ. Nooka даёт дорожную карту. Дальше — твоё.</p>
+    <div class="final-examples">
+      <div class="final-ex">
+        <div class="final-ex-title">ИИ-репетитор</div>
+        <div class="final-ex-desc">Набор промптов для изучения любого предмета — объяснение, задачи, проверка</div>
+      </div>
+      <div class="final-ex">
+        <div class="final-ex-title">Мой питомец-ИИ</div>
+        <div class="final-ex-desc">Обученная модель которая узнаёт тебя, твоих друзей или любимые вещи</div>
+      </div>
+      <div class="final-ex">
+        <div class="final-ex-title">Детектор правды</div>
+        <div class="final-ex-desc">Методичка как проверять ответы ИИ — 5 способов поймать ошибку</div>
+      </div>
+      <div class="final-ex">
+        <div class="final-ex-title">Своя идея</div>
+        <div class="final-ex-desc">Что тебе важно сделать с ИИ — расскажи и мы поможем</div>
+      </div>
+    </div>
+    <p class="final-time">Время: <b>3–4 часа</b></p>
+    <div class="btns">
+      <a class="btn btn--sun" href="https://nookagame.ru">Начать курс →</a>
+      <a class="btn btn--ghost" href="https://t.me/NookaGame">Рассказать о своей идее</a>
+    </div>
+  </div>
+
+  <div class="card card--sun" style="margin-top:32px;text-align:center">
+    <h2 style="font-size:20px">Тестовая страница</h2>
+    <p style="color:#7A6428;margin-bottom:18px">Страница на стадии проверки. На основной сайт появится после согласования.</p>
+    <div class="btns" style="justify-content:center">
+      <a class="btn btn--soft" href="/nookagame/lab/">Посмотреть Лаб →</a>
+      <a class="btn btn--soft" href="https://nookagame.ru">На основной сайт →</a>
+    </div>
+  </div>
+
+  <p class="foot">Nooka — курс ИИ-грамотности для детей 8–12 лет.
+  <a href="https://nookagame.ru">nookagame.ru</a> ·
+  <a href="https://nookagame.ru/teacher">Учителям</a> ·
+  <a href="https://t.me/NookaGame">Telegram</a></p>
+
+</div>
+</body>
+</html>
