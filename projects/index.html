@@ -2,130 +2,173 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#FDF7EC">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="theme-color" content="#0E0719">
 <title>Мастерская — Nooka</title>
 <link href="/fonts/nooka-fonts.css" rel="stylesheet">
 <style>
-:root{--ink:#181228;--ink2:#5B5470;--ink3:#8A82A0;--purple:#7B2FFF;--sun:#FFC53D;--bg:#FDF7EC;--line:#E9E1F5;--ok:#12A47A}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:'Nunito',system-ui,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
-.hdr{padding:16px 24px;display:flex;align-items:center;gap:12px;border-bottom:1.5px solid var(--line)}
-.logo{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:16px;color:var(--purple);text-decoration:none}
-.sep{color:var(--line);font-size:18px}
-.hdr-title{font-size:14px;font-weight:900;color:var(--ink2)}
-.wrap{max-width:640px;margin:0 auto;padding:32px 20px 48px}
-.hero{text-align:center;margin-bottom:40px}
-.hero-emoji{font-size:52px;display:block;margin-bottom:14px}
-.hero-title{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:clamp(24px,6vw,34px);line-height:1.2;margin:0 0 12px;letter-spacing:-.5px}
-.hero-title em{font-style:normal;color:var(--purple)}
-.hero-sub{font-size:16px;color:var(--ink2);margin:0;line-height:1.65;max-width:440px;margin:0 auto}
-.projects{display:flex;flex-direction:column;gap:16px;margin-bottom:32px}
-.project-card{background:#fff;border:2px solid var(--line);border-radius:24px;padding:22px 24px;
-  display:flex;gap:18px;align-items:flex-start;text-decoration:none;color:inherit;
-  transition:border-color .15s,box-shadow .15s;position:relative;overflow:hidden}
-.project-card:hover{border-color:var(--purple);box-shadow:0 4px 24px rgba(123,47,255,.08)}
-.project-card.done{border-color:var(--ok)}
-.project-icon{font-size:40px;flex:none;line-height:1}
-.project-body{flex:1;min-width:0}
-.project-game{font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;
-  color:var(--ink3);margin-bottom:4px}
-.project-name{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:18px;
-  line-height:1.25;margin-bottom:6px}
-.project-desc{font-size:14px;color:var(--ink2);line-height:1.5;margin-bottom:12px}
-.project-steps{display:flex;gap:4px;margin-bottom:10px}
-.step-dot{width:8px;height:8px;border-radius:50%;background:var(--line);flex:none}
-.step-dot.done{background:var(--ok)}
-.step-dot.cur{background:var(--purple)}
-.project-cta{display:inline-flex;align-items:center;gap:6px;font-weight:900;font-size:14px;
-  color:var(--purple);transition:gap .15s}
-.project-card:hover .project-cta{gap:10px}
-.project-card.done .project-cta{color:var(--ok)}
-.badge-done{position:absolute;top:16px;right:16px;background:var(--ok);color:#fff;
-  font-size:11px;font-weight:900;padding:3px 10px;border-radius:999px;letter-spacing:.04em}
-.badge-lock{position:absolute;top:16px;right:16px;background:var(--line);color:var(--ink3);
-  font-size:11px;font-weight:900;padding:3px 10px;border-radius:999px}
-.tip{background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:16px 20px;
-  display:flex;gap:12px;align-items:flex-start}
-.tip-icon{font-size:22px;flex:none}
-.tip-text{font-size:14px;color:var(--ink2);line-height:1.5}
-.tip-text strong{color:var(--ink)}
+:root{--ink:#F4EEFF;--ink2:#C0B0E0;--ink3:#8B7BAE;--bg:#0E0719;--line:rgba(255,255,255,.09);--acc:#FFD84D;--purple:#A98BFF;--ok:#4ED99B}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg)}
+body{font-family:'Nunito',system-ui,sans-serif;-webkit-font-smoothing:antialiased;color:var(--ink);min-height:100%}
+.root{max-width:480px;margin:0 auto;min-height:100vh;background:linear-gradient(180deg,#161226 0%,#0F0B1E 50%,#090711 100%);padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+
+/* шапка */
+.hero{padding:28px 18px 0;text-align:center}
+.hero-back{display:inline-flex;align-items:center;gap:6px;color:var(--purple);font-size:13px;font-weight:800;text-decoration:none;margin-bottom:20px}
+.hero-badge{display:inline-block;background:rgba(169,139,255,.15);border:1px solid rgba(169,139,255,.3);border-radius:999px;padding:6px 16px;font-size:11px;font-weight:900;letter-spacing:.08em;color:var(--purple);margin-bottom:12px}
+.hero-title{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:26px;line-height:1.2;color:var(--ink);margin-bottom:10px}
+.hero-sub{font-size:14px;color:var(--ink2);line-height:1.6;max-width:300px;margin:0 auto 24px}
+
+/* общий прогресс */
+.total-bar{margin:0 18px 28px;background:rgba(255,255,255,.06);border-radius:16px;padding:14px 16px}
+.tb-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.tb-label-k{font-size:11px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3)}
+.tb-label-v{font-size:13px;font-weight:900;color:var(--acc)}
+.bar-outer{height:8px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden}
+.bar-inner{height:8px;border-radius:4px;background:linear-gradient(90deg,var(--purple),var(--ok));transition:width .6s cubic-bezier(.4,0,.2,1)}
+
+/* карточки проектов */
+.projects{padding:0 14px;display:flex;flex-direction:column;gap:14px}
+.proj{display:flex;align-items:stretch;border-radius:22px;overflow:hidden;text-decoration:none;background:rgba(255,255,255,.04);box-shadow:inset 0 0 0 1.5px var(--line);transition:transform .15s,box-shadow .15s;position:relative}
+.proj:active{transform:scale(.97)}
+.proj.done{box-shadow:inset 0 0 0 1.5px rgba(78,217,155,.4)}
+.proj-accent{width:6px;flex:none}
+.proj-body{flex:1;padding:16px 14px}
+.proj-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.proj-ico{font-size:32px;line-height:1}
+.proj-status{font-size:10px;font-weight:900;letter-spacing:.07em;padding:4px 10px;border-radius:999px}
+.proj-status.done{background:rgba(78,217,155,.2);color:var(--ok)}
+.proj-status.new{background:rgba(169,139,255,.15);color:var(--purple)}
+.proj-num{font-size:10px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
+.proj-name{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:16px;color:var(--ink);margin-bottom:5px;line-height:1.25}
+.proj-desc{font-size:12.5px;color:var(--ink2);line-height:1.5;margin-bottom:10px}
+.proj-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tag{background:rgba(255,255,255,.07);border-radius:999px;padding:3px 10px;font-size:11px;font-weight:800;color:var(--ink3)}
+.proj-cta{display:inline-flex;align-items:center;gap:6px;font-weight:900;font-size:13px}
+.proj-arr{font-size:16px}
+
+/* знания */
+.know{margin:28px 14px 0;padding:16px;background:rgba(255,255,255,.04);border-radius:20px;box-shadow:inset 0 0 0 1px var(--line)}
+.know-title{font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:12px}
+.know-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.know-item{background:rgba(255,255,255,.04);border-radius:14px;padding:12px;display:flex;align-items:center;gap:8px}
+.know-ico{font-size:20px;flex:none}
+.know-text{font-size:12px;font-weight:800;color:var(--ink2);line-height:1.35}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.proj{animation:fadeUp .3s ease both}
+.proj:nth-child(2){animation-delay:.06s}
+.proj:nth-child(3){animation-delay:.12s}
 </style>
 </head>
 <body>
-<div class="hdr">
-  <a class="logo" href="https://nookagame.ru">Nooka</a>
-  <span class="sep">/</span>
-  <span class="hdr-title">Мастерская проектов</span>
-</div>
-<div class="wrap">
+<div class="root">
   <div class="hero">
-    <span class="hero-emoji">🛠️</span>
-    <h1 class="hero-title">Применяй то, что узнал — <em>создай что‑то своё</em></h1>
-    <p class="hero-sub">После каждого блока игр — твой проект. Не тест, не задание. Настоящее исследование.</p>
+    <a class="hero-back" href="/index.html">← Назад в игры</a>
+    <div class="hero-badge">МАСТЕРСКАЯ</div>
+    <h1 class="hero-title">Твои проекты</h1>
+    <p class="hero-sub">Создавай настоящие ИИ-системы — на основе того что ты уже изучил</p>
   </div>
-  <div class="projects" id="projectList"></div>
-  <div class="tip">
-    <span class="tip-icon">💡</span>
-    <div class="tip-text"><strong>Совет:</strong> проходи проекты по порядку — каждый строится на знаниях предыдущего блока.</div>
+
+  <div class="total-bar">
+    <div class="tb-label">
+      <span class="tb-label-k">Прогресс Мастерской</span>
+      <span class="tb-label-v" id="totalLabel">0 / 3</span>
+    </div>
+    <div class="bar-outer"><div class="bar-inner" id="totalBar" style="width:0%"></div></div>
+  </div>
+
+  <div class="projects">
+    <a class="proj" href="trainer.html" id="p-trainer">
+      <div class="proj-accent" style="background:linear-gradient(180deg,#FFD84D,#FF9ECF)"></div>
+      <div class="proj-body">
+        <div class="proj-top">
+          <span class="proj-ico">🧪</span>
+          <span class="proj-status new" id="s-trainer">Новое</span>
+        </div>
+        <div class="proj-num">Проект 1</div>
+        <div class="proj-name">Тренировочный лагерь</div>
+        <div class="proj-desc">Обучи ИИ различать котов и собак — покажи примеры и проверь результат</div>
+        <div class="proj-tags">
+          <span class="tag">Разметка данных</span>
+          <span class="tag">Обучение модели</span>
+          <span class="tag">Точность</span>
+        </div>
+        <div class="proj-cta" style="color:#FFD84D">Открыть <span class="proj-arr">→</span></div>
+      </div>
+    </a>
+
+    <a class="proj" href="assistant.html" id="p-assistant">
+      <div class="proj-accent" style="background:linear-gradient(180deg,#A98BFF,#FF9ECF)"></div>
+      <div class="proj-body">
+        <div class="proj-top">
+          <span class="proj-ico">🤖</span>
+          <span class="proj-status new" id="s-assistant">Новое</span>
+        </div>
+        <div class="proj-num">Проект 2</div>
+        <div class="proj-name">ИИ-ассистент</div>
+        <div class="proj-desc">Создай своего ИИ — выбери сферу, настрой характер и пообщайся с ним</div>
+        <div class="proj-tags">
+          <span class="tag">Промпт-инжиниринг</span>
+          <span class="tag">Характер модели</span>
+          <span class="tag">Диалог</span>
+        </div>
+        <div class="proj-cta" style="color:#A98BFF">Открыть <span class="proj-arr">→</span></div>
+      </div>
+    </a>
+
+    <a class="proj" href="startup.html" id="p-startup">
+      <div class="proj-accent" style="background:linear-gradient(180deg,#4ED99B,#A98BFF)"></div>
+      <div class="proj-body">
+        <div class="proj-top">
+          <span class="proj-ico">🚀</span>
+          <span class="proj-status new" id="s-startup">Новое</span>
+        </div>
+        <div class="proj-num">Проект 3</div>
+        <div class="proj-name">ИИ-лаборатория</div>
+        <div class="proj-desc">Собери настоящую ИИ-систему из компонентов: данные → модель → продукт</div>
+        <div class="proj-tags">
+          <span class="tag">ML-пайплайн</span>
+          <span class="tag">Архитектура</span>
+          <span class="tag">Деплой</span>
+        </div>
+        <div class="proj-cta" style="color:#4ED99B">Открыть <span class="proj-arr">→</span></div>
+      </div>
+    </a>
+  </div>
+
+  <div class="know">
+    <div class="know-title">Что ты освоишь</div>
+    <div class="know-grid">
+      <div class="know-item"><span class="know-ico">🏷</span><span class="know-text">Разметка и подготовка данных</span></div>
+      <div class="know-item"><span class="know-ico">⚙️</span><span class="know-text">Как ИИ учится на примерах</span></div>
+      <div class="know-item"><span class="know-ico">💬</span><span class="know-text">Промпты и характер модели</span></div>
+      <div class="know-item"><span class="know-ico">🔧</span><span class="know-text">Архитектура ИИ-продуктов</span></div>
+    </div>
   </div>
 </div>
+
 <script>
-const PROJECTS = [
-  {
-    id:'trainer', icon:'🧪', game:'После Игры 1 — Данные',
-    name:'Стань тренером ИИ', steps:5,
-    desc:'Выбери профессию, придумай задачу для ИИ, собери данные и проверь разметку. В конце получи карточку тренера.',
-    href:'trainer.html'
-  },
-  {
-    id:'assistant', icon:'🤖', game:'После Игры 2 — Промпты',
-    name:'Создай ИИ‑ассистента', steps:5,
-    desc:'Задай имя, характер и правила своему ИИ. Протестируй его на реальных ситуациях и получи паспорт.',
-    href:'assistant.html'
-  },
-  {
-    id:'startup', icon:'🚀', game:'После Игры 3 — Устройство',
-    name:'Запусти ИИ‑стартап', steps:5,
-    desc:'Выбери проблему, спроектируй решение, собери команду и сделай питч своего продукта.',
-    href:'startup.html'
-  }
-];
-
-function getProgress(id){
-  try{return JSON.parse(localStorage.getItem('nooka_proj_'+id)||'{"step":0}')}catch(e){return{step:0}}
-}
-
-function render(){
-  const list = document.getElementById('projectList');
-  list.innerHTML = PROJECTS.map((p,i)=>{
-    const prog = getProgress(p.id);
-    const done = prog.step >= p.steps;
-    const started = prog.step > 0 && !done;
-    const locked = i > 0 && getProgress(PROJECTS[i-1].id).step < PROJECTS[i-1].steps;
-
-    const dots = Array.from({length:p.steps},(_,j)=>{
-      const cls = j < prog.step ? 'done' : j === prog.step ? 'cur' : '';
-      return `<div class="step-dot ${cls}"></div>`;
-    }).join('');
-
-    const cta = done ? '✓ Готово — посмотреть' : started ? 'Продолжить →' : 'Начать →';
-    const badge = done ? `<span class="badge-done">Готово</span>` : locked ? `<span class="badge-lock">🔒 Скоро</span>` : '';
-
-    return `<a class="project-card${done?' done':''}" href="${locked?'#':p.href}">
-      <span class="project-icon">${p.icon}</span>
-      <div class="project-body">
-        <div class="project-game">${p.game}</div>
-        <div class="project-name">${p.name}</div>
-        <div class="project-desc">${p.desc}</div>
-        <div class="project-steps">${dots}</div>
-        <span class="project-cta">${cta}</span>
-      </div>
-      ${badge}
-    </a>`;
-  }).join('');
-}
-render();
+const KEYS=['nooka_proj_trainer','nooka_proj_assistant','nooka_proj_startup'];
+const IDS=['trainer','assistant','startup'];
+let done=0;
+try{
+  IDS.forEach((id,i)=>{
+    const raw=localStorage.getItem(KEYS[i]);
+    if(!raw)return;
+    const d=JSON.parse(raw);
+    if(d&&d.step>=5){
+      done++;
+      document.getElementById('p-'+id).classList.add('done');
+      const s=document.getElementById('s-'+id);
+      s.textContent='Пройдено ✓';
+      s.className='proj-status done';
+    }
+  });
+}catch(e){}
+document.getElementById('totalLabel').textContent=done+' / 3';
+document.getElementById('totalBar').style.width=Math.round(done/3*100)+'%';
 </script>
 </body>
 </html>
