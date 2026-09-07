@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#FDF7EC">
+<title>Лаб — сделай настоящее | Nooka</title>
+<meta property="og:title" content="Лаб — проект после каждого уровня">
+<meta property="og:description" content="Прошёл уровень в Nooka — теперь сделай то же самое в настоящем ИИ-инструменте. Не галочка, а артефакт.">
+<link href="/fonts/nooka-fonts.css" rel="stylesheet">
+<style>
+:root{--ink:#181228;--ink2:#5B5470;--ink3:#8A82A0;--purple:#7B2FFF;--sun:#FFC53D;
+  --bg:#FDF7EC;--line:#E9E1F5;--ok:#12A47A}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:'Nunito',system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.6}
+.wrap{max-width:860px;margin:0 auto;padding:40px 20px 80px}
+h1{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:clamp(28px,5vw,44px);
+  line-height:1.14;margin:14px 0 16px;letter-spacing:-.01em}
+h1 em{font-style:normal;color:var(--purple)}
+h2{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:20px;margin:0 0 8px}
+h3{font-size:16px;font-weight:900;margin:0 0 4px}
+p{margin:0 0 12px}
+.kick{display:inline-block;padding:7px 15px;border-radius:999px;background:#F1EAFE;
+  font-weight:900;font-size:12.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--purple)}
+.lead{font-size:18px;color:var(--ink2);max-width:660px;margin-bottom:28px}
+.card{background:#fff;border:1.5px solid var(--line);border-radius:24px;padding:26px 28px;margin:18px 0}
+.card--sun{background:#FFF9E8;border-color:#F5E2B0}
+.card--purple{background:#F6F2FF;border-color:#DDD5F5}
+
+/* FLOW */
+.flow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:24px 0 32px}
+.flow-step{background:#F1EAFE;color:var(--purple);font-weight:900;font-size:14px;
+  padding:10px 20px;border-radius:999px}
+.flow-step.sun{background:var(--sun);color:var(--ink)}
+.flow-arr{color:var(--ink3);font-size:20px}
+
+/* GAME SECTIONS */
+.game-section{margin-top:36px}
+.game-header{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.game-num{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:12px;
+  letter-spacing:.07em;text-transform:uppercase;color:var(--purple);background:#F1EAFE;
+  padding:5px 13px;border-radius:999px}
+.game-title{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:18px;color:var(--ink)}
+.game-sub{font-size:14px;color:var(--ink3)}
+
+/* LAB ITEMS */
+.lab-list{margin:0;padding:0;list-style:none}
+.lab-item{display:flex;gap:16px;padding:14px 0;border-top:1px solid var(--line)}
+.lab-item:first-child{border-top:none;padding-top:0}
+.lab-icon{flex:none;width:36px;height:36px;border-radius:10px;background:#F1EAFE;
+  display:flex;align-items:center;justify-content:center;font-size:18px;margin-top:1px}
+.lab-text{flex:1}
+.lab-action{font-weight:900;font-size:15.5px;color:var(--ink);margin-bottom:2px}
+.lab-desc{font-size:14px;color:var(--ink2)}
+.lab-tool{display:inline-block;margin-top:5px;background:#F1EAFE;color:var(--purple);
+  font-weight:900;font-size:12px;padding:3px 10px;border-radius:6px;letter-spacing:.03em}
+
+/* PRINCIPLE */
+.principle-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:20px}
+.principle-card{background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:18px 20px}
+.principle-n{font-family:'Unbounded','Nunito',sans-serif;font-weight:900;font-size:26px;
+  color:var(--purple);line-height:1;margin-bottom:8px}
+.principle-n.sun{color:#C9920A}
+.principle-label{font-weight:900;font-size:15px;margin-bottom:4px}
+.principle-desc{font-size:14px;color:var(--ink2)}
+
+/* SCIENCES */
+.sci-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:14px}
+.sci-card{background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:16px 18px;
+  display:flex;gap:12px;align-items:flex-start}
+.sci-icon{font-size:22px;flex:none;margin-top:2px}
+.sci-name{font-weight:900;font-size:15px;margin-bottom:3px}
+.sci-desc{font-size:13.5px;color:var(--ink2)}
+
+/* WHO */
+.who-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:14px}
+.who-card{background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:18px}
+.who-emoji{font-size:24px;margin-bottom:8px}
+.who-role{font-weight:900;font-size:15px;margin-bottom:10px}
+.who-list{margin:0;padding:0;list-style:none}
+.who-list li{font-size:14px;color:var(--ink2);padding-left:16px;position:relative;margin-bottom:6px}
+.who-list li::before{content:'→';position:absolute;left:0;color:var(--purple);font-weight:700}
+
+/* BTNS */
+.btns{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px}
+.btn{display:inline-block;padding:15px 26px;border-radius:16px;text-decoration:none;
+  font-weight:900;font-size:16px;border:none;cursor:pointer;font-family:inherit}
+.btn--pri{background:var(--purple);color:#fff}
+.btn--soft{background:#fff;color:var(--purple);border:1.5px solid var(--line)}
+.btn--sun{background:var(--sun);color:var(--ink)}
+
+.foot{margin-top:34px;padding-top:20px;border-top:1px solid var(--line);color:var(--ink3);font-size:14px}
+.foot a{color:var(--purple)}
+
+.sep{border:none;border-top:1.5px solid var(--line);margin:40px 0 0}
+
+@media(max-width:600px){
+  .principle-grid{grid-template-columns:1fr}
+  .game-header{flex-direction:column;align-items:flex-start;gap:6px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="kick">Лаб · Новая механика</span>
+  <h1>Прошёл уровень —<br>теперь <em>сделай сам</em></h1>
+  <p class="lead">Лаб — это задание после каждого уровня. Ребёнок берёт настоящий ИИ-инструмент и создаёт что-то своё. Не галочка — артефакт который можно показать.</p>
+
+  <div class="flow">
+    <span class="flow-step">Уровень в Nooka</span>
+    <span class="flow-arr">→</span>
+    <span class="flow-step">Лаб-задание</span>
+    <span class="flow-arr">→</span>
+    <span class="flow-step sun">Артефакт</span>
+  </div>
+
+  <!-- PRINCIPLE -->
+  <div class="card">
+    <h2>Почему это важно</h2>
+    <p style="color:var(--ink2)">Code.org, Scratch, Khan Academy — лучшие платформы мира объединяет одно: ребёнок уходит с чем-то реальным. Лаб идёт дальше — артефакт создаётся в настоящих ИИ-инструментах, а не только внутри игры.</p>
+    <div class="principle-grid">
+      <div class="principle-card">
+        <div class="principle-n">01</div>
+        <div class="principle-label">Уровень</div>
+        <div class="principle-desc">Ребёнок понял концепцию через игровую механику — руками, не читая.</div>
+      </div>
+      <div class="principle-card">
+        <div class="principle-n sun">02</div>
+        <div class="principle-label">Лаб</div>
+        <div class="principle-desc">Задание с конкретным инструментом и понятным результатом. 15 минут.</div>
+      </div>
+      <div class="principle-card">
+        <div class="principle-n">03</div>
+        <div class="principle-label">Артефакт</div>
+        <div class="principle-desc">Обученная модель, написанные промпты, схема — то что ребёнок сделал сам и может показать.</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="sep">
+
+  <!-- GAME 1 -->
+  <div class="game-section">
+    <div class="game-header">
+      <span class="game-num">Игра 1 · 8–10 лет</span>
+      <div>
+        <div class="game-title">Откуда ИИ знает</div>
+        <div class="game-sub">Данные и обучение · 10 уровней</div>
+      </div>
+    </div>
+    <div class="card">
+      <ul class="lab-list">
+        <li class="lab-item">
+          <div class="lab-icon">🧠</div>
+          <div class="lab-text">
+            <div class="lab-action">Обучи настоящую нейросеть своими рисунками</div>
+            <div class="lab-desc">Нарисуй 20 котов и 20 домов — обучи модель, протестируй на новых рисунках. Ты увидишь ровно то, что прошёл на уровне «Нарисуй — и научи».</div>
+            <span class="lab-tool">Teachable Machine · Google · бесплатно</span>
+          </div>
+        </li>
+        <li class="lab-item">
+          <div class="lab-icon">🔥</div>
+          <div class="lab-text">
+            <div class="lab-action">Намеренно сломай датасет</div>
+            <div class="lab-desc">Добавь плохие примеры — посмотри как падает точность. Запиши: почему нейросеть начала ошибаться.</div>
+          </div>
+        </li>
+        <li class="lab-item">
+          <div class="lab-icon">🎯</div>
+          <div class="lab-text">
+            <div class="lab-action">Поймай ИИ на уверенной ошибке</div>
+            <div class="lab-desc">Задай три вопроса — найди случай где ИИ отвечает уверенно, но неправильно. Объясни маме почему так вышло.</div>
+            <span class="lab-tool">ChatGPT · Claude · любой ИИ-ассистент</span>
+          </div>
+        </li>
+      </ul>
+      <div class="btns">
+        <a class="btn btn--soft" href="https://nookagame.ru/games/game.html?g=data">Играть в Игру 1 →</a>
+        <a class="btn btn--soft" href="https://teachablemachine.withgoogle.com" target="_blank" rel="noopener">Открыть Teachable Machine →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAME 2 -->
+  <div class="game-section">
+    <div class="game-header">
+      <span class="game-num">Игра 2 · 8–12 лет</span>
+      <div>
+        <div class="game-title">Как управлять ИИ</div>
+        <div class="game-sub">Промпты и практика · 10 уровней</div>
+      </div>
+    </div>
+    <div class="card">
+      <ul class="lab-list">
+        <li class="lab-item">
+          <div class="lab-icon">✍️</div>
+          <div class="lab-text">
+            <div class="lab-action">Плохой промпт → хороший промпт</div>
+            <div class="lab-desc">Напиши расплывчатое задание — получи плохой ответ. Перепиши точно — сравни результаты. Сфотографируй оба ответа рядом.</div>
+            <span class="lab-tool">Claude · ChatGPT</span>
+          </div>
+        </li>
+        <li class="lab-item">
+          <div class="lab-icon">📋</div>
+          <div class="lab-text">
+            <div class="lab-action">Инструкция для буквалиста</div>
+            <div class="lab-desc">Напиши пошаговый план «как приготовить бутерброд» так, чтобы робот-буквалист не налил масло на стол. Каждый шаг — конкретное число или действие.</div>
+          </div>
+        </li>
+        <li class="lab-item">
+          <div class="lab-icon">⚡</div>
+          <div class="lab-text">
+            <div class="lab-action">Реши настоящую задачу с помощью промпта</div>
+            <div class="lab-desc">Возьми любое домашнее задание — реши его с помощью ИИ через точный промпт. Проверь ответ сам. Сохрани промпт который сработал.</div>
+            <span class="lab-tool">Claude · ChatGPT</span>
+          </div>
+        </li>
+      </ul>
+      <div class="btns">
+        <a class="btn btn--soft" href="https://nookagame.ru/games/game.html?g=prompts">Играть в Игру 2 →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAME 3 -->
+  <div class="game-section">
+    <div class="game-header">
+      <span class="game-num">Игра 3 · 10–12 лет</span>
+      <div>
+        <div class="game-title">Что у ИИ внутри</div>
+        <div class="game-sub">Устройство и профессии · 10 уровней</div>
+      </div>
+    </div>
+    <div class="card">
+      <ul class="lab-list">
+        <li class="lab-item">
+          <div class="lab-icon">🔬</div>
+          <div class="lab-text">
+            <div class="lab-action">Нарисуй нейрон и объясни другу</div>
+            <div class="lab-desc">Схема от руки на листе: входы → сумма → решение → выход. Объясни соседу за 2 минуты без слова «нейрон».</div>
+          </div>
+        </li>
+        <li class="lab-item">
+          <div class="lab-icon">⛰️</div>
+          <div class="lab-text">
+            <div class="lab-action">Найди gradient descent в жизни</div>
+            <div class="lab-desc">«Шарик катится к яме» — найди три примера этого в реальной жизни: где что-то само находит минимум. Запиши или нарисуй.</div>
+          </div>
+        </li>
+        <li class="lab-item">
+          <div class="lab-icon">💼</div>
+          <div class="lab-text">
+            <div class="lab-action">Выбери профессию ИИ и объясни зачем</div>
+            <div class="lab-desc">Из трёх профессий — выбери одну и напиши: в какой реальной компании она нужна, что конкретно делает, почему без неё не обойтись.</div>
+          </div>
+        </li>
+      </ul>
+      <div class="btns">
+        <a class="btn btn--soft" href="https://nookagame.ru/games/game.html?g=inside">Играть в Игру 3 →</a>
+      </div>
+    </div>
+  </div>
+
+  <hr class="sep">
+
+  <!-- SCIENCES -->
+  <div class="game-section">
+    <span class="kick" style="margin-bottom:14px;display:inline-block">Науки</span>
+    <h2 style="margin-top:10px">Лаб для других предметов</h2>
+    <p style="color:var(--ink2)">Те же принципы для физики, химии и программирования — с реальными научными симуляторами.</p>
+    <div class="sci-grid">
+      <div class="sci-card">
+        <span class="sci-icon">⚛️</span>
+        <div>
+          <div class="sci-name">КвантУм · Физика</div>
+          <div class="sci-desc">Смоделируй рычаг или траекторию в PhET — интерактивные симуляторы Университета Колорадо. Бесплатно, работает в браузере.</div>
+        </div>
+      </div>
+      <div class="sci-card">
+        <span class="sci-icon">⚗️</span>
+        <div>
+          <div class="sci-name">Хемо Лаб · Химия</div>
+          <div class="sci-desc">Проведи реакцию в PhET Chemistry или запиши видео реального опыта: масло + вода, гашение уксусом и содой.</div>
+        </div>
+      </div>
+      <div class="sci-card">
+        <span class="sci-icon">💻</span>
+        <div>
+          <div class="sci-name">КодБот · Программирование</div>
+          <div class="sci-desc">Построй свою программу для робота в Scratch — опубликуй в галерею, поделись ссылкой с классом.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="sep">
+
+  <!-- WHO -->
+  <div class="game-section">
+    <h2>Ценность для каждого</h2>
+    <p style="color:var(--ink2)">Лаб решает разные задачи одновременно.</p>
+    <div class="who-grid">
+      <div class="who-card">
+        <div class="who-emoji">👾</div>
+        <div class="who-role">Ребёнок</div>
+        <ul class="who-list">
+          <li>Делает настоящее, а не проходит тест</li>
+          <li>Артефакт остаётся — можно гордиться</li>
+          <li>Инструменты как у взрослых</li>
+        </ul>
+      </div>
+      <div class="who-card">
+        <div class="who-emoji">👩‍👦</div>
+        <div class="who-role">Родитель</div>
+        <ul class="who-list">
+          <li>Видит реальный результат, не очки</li>
+          <li>«Покажи что сделал» — есть что показать</li>
+          <li>PDF-портфолио после курса</li>
+        </ul>
+      </div>
+      <div class="who-card">
+        <div class="who-emoji">🏫</div>
+        <div class="who-role">Учитель</div>
+        <ul class="who-list">
+          <li>Проектная деятельность по ФГОС</li>
+          <li>Лаб = домашнее задание после урока</li>
+          <li>Виден прогресс каждого ученика</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card--sun" style="margin-top:36px;text-align:center">
+    <h2 style="font-size:22px">Это тестовая страница</h2>
+    <p style="color:#7A6428;max-width:540px;margin:10px auto 22px">Концепция Лаб на стадии обсуждения. Когда всё согласовано — страница появится на основном сайте nookagame.ru.</p>
+    <div class="btns" style="justify-content:center">
+      <a class="btn btn--pri" href="https://nookagame.ru">На основной сайт →</a>
+      <a class="btn btn--soft" href="https://nookagame.ru/teacher">Час с ИИ для учителей →</a>
+    </div>
+  </div>
+
+  <p class="foot">Nooka — курс ИИ-грамотности для детей 8–12 лет.
+  <a href="https://nookagame.ru">nookagame.ru</a> ·
+  <a href="https://nookagame.ru/teacher">Учителям</a> ·
+  <a href="https://t.me/NookaGame">Telegram</a></p>
+
+</div>
+</body>
+</html>
