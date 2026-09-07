@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#F0FAF5">
+<title>ХемоЛаб — Лакмус-тест</title>
+<link href="/fonts/nooka-fonts.css" rel="stylesheet">
+<style>
+:root{
+  --ink:#181228;--ink2:#3A4A52;--ink3:#7A919A;
+  --bg:#F0FAF5;--card:#fff;--line:#C8E8D8;
+  --acid:#E8362A;--acid-light:#FDECEA;--acid-mid:#F8A09A;
+  --base:#1A6FD4;--base-light:#E3EFFE;--base-mid:#89B8F0;
+  --green:#12A47A;--purple:#7B2FFF;--sun:#FFC53D
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:'Nunito',system-ui,sans-serif;-webkit-font-smoothing:antialiased;
+  min-height:100vh;display:flex;flex-direction:column;user-select:none}
+
+.hdr{padding:14px 20px;display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1.5px solid var(--line);background:var(--bg)}
+.logo-wrap{display:flex;align-items:center;gap:10px}
+.logo{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:16px;
+  color:var(--green);text-decoration:none}
+.logo-tag{font-size:11px;font-weight:900;color:var(--ink3);letter-spacing:.07em;
+  text-transform:uppercase;background:#D6F5E8;padding:3px 9px;border-radius:6px}
+.score-chip{font-weight:900;font-size:13px;padding:4px 12px;border-radius:999px;
+  background:var(--card);border:1.5px solid var(--line);color:var(--ink3)}
+.score-chip.ok{color:var(--green);border-color:var(--green)}
+
+.progress-bar{height:4px;background:var(--line)}
+.progress-fill{height:100%;background:var(--green);border-radius:0 2px 2px 0;transition:width .5s ease}
+
+.main{flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:20px 16px}
+.screen{width:100%;max-width:540px}
+.screen-inner{animation:fadein .3s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+.eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:900;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin-bottom:12px}
+.eyebrow::before{content:'';display:block;width:14px;height:2px;background:var(--green)}
+h1{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;
+  font-size:clamp(20px,5vw,27px);line-height:1.2;margin:0 0 10px;letter-spacing:-.3px}
+h1 em{font-style:normal;color:var(--green)}
+.sub{font-size:15px;color:var(--ink2);margin:0 0 20px;line-height:1.6}
+
+/* PRESET CLASSES */
+.preset-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.preset-card{background:var(--card);border:2px solid var(--line);border-radius:18px;
+  padding:16px;text-align:center;cursor:pointer;transition:all .15s}
+.preset-card.sel-acid{border-color:var(--acid);background:var(--acid-light)}
+.preset-card.sel-base{border-color:var(--base);background:var(--base-light)}
+.preset-icon{font-size:30px;margin-bottom:6px}
+.preset-name{font-weight:900;font-size:15px;margin-bottom:2px}
+.preset-ex{font-size:12px;color:var(--ink3)}
+
+/* CREATOR */
+.creator-row{display:flex;gap:8px;margin-bottom:18px;align-items:center}
+.field-lbl{font-size:12px;font-weight:900;color:var(--ink3);text-transform:uppercase;
+  letter-spacing:.05em;white-space:nowrap}
+.cn-field{padding:11px 14px;border-radius:12px;background:var(--card);
+  border:2px solid var(--line);color:var(--ink);font-family:'Nunito',inherit;
+  font-size:15px;outline:none;transition:border-color .15s;width:100%}
+.cn-field:focus{border-color:var(--green)}
+
+/* DRAW */
+.draw-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.class-tag{display:inline-flex;align-items:center;gap:7px;font-weight:900;font-size:13px;
+  padding:6px 14px;border-radius:999px}
+.ct-acid{background:var(--acid-light);color:var(--acid)}
+.ct-base{background:var(--base-light);color:var(--base)}
+.ex-counter{font-size:12px;color:var(--ink3);font-weight:900}
+.ex-counter strong{color:var(--green)}
+
+.canvas-wrap{position:relative;margin-bottom:12px}
+.draw-canvas{display:block;width:100%;aspect-ratio:1;border-radius:20px;
+  background:var(--card);border:2px solid var(--line);cursor:crosshair;touch-action:none}
+.canvas-hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  text-align:center;pointer-events:none;transition:opacity .2s}
+.canvas-hint-icon{font-size:38px;display:block;margin-bottom:6px}
+.canvas-hint-text{font-size:14px;color:var(--ink3);font-weight:700}
+
+.thumbs-row{display:flex;flex-wrap:wrap;gap:6px;min-height:52px;margin-bottom:14px}
+.thumb{width:50px;height:50px;border-radius:10px;border:1.5px solid var(--line);
+  background:var(--card);overflow:hidden;flex:none}
+.thumb canvas{width:100%;height:100%}
+
+/* BTNS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  padding:13px 22px;border-radius:14px;font-weight:900;font-size:15px;
+  border:none;cursor:pointer;font-family:inherit;text-decoration:none;
+  transition:transform .1s,opacity .12s;white-space:nowrap}
+.btn:active{transform:scale(.96)}
+.btn:disabled{opacity:.35;cursor:default}
+.btn--pri{background:var(--green);color:#fff;flex:1}
+.btn--ghost{background:var(--card);color:var(--green);border:2px solid var(--line)}
+.btn--acid{background:var(--acid);color:#fff;flex:1}
+.btn--base{background:var(--base);color:#fff;flex:1}
+.btn--sun{background:var(--sun);color:var(--ink);flex:1}
+.toolbar{display:flex;gap:8px;margin-bottom:12px}
+
+/* TRAINING */
+.train-screen{text-align:center;padding:36px 0}
+.neurons{font-size:64px;display:block;margin-bottom:16px;animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+.train-title{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:22px;margin-bottom:8px}
+.train-bar-wrap{background:var(--line);border-radius:999px;height:8px;margin:14px 0;overflow:hidden}
+.train-bar{height:100%;background:linear-gradient(90deg,var(--base),var(--green),var(--acid));
+  border-radius:999px;transition:width .2s}
+.train-log{font-size:13px;color:var(--green);font-weight:900;
+  font-family:'Courier New',monospace;min-height:44px;line-height:2;text-align:left}
+.train-log span{display:block;animation:fadein .2s ease}
+
+/* SCORE */
+.score-panel{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+.sc-card{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:14px;text-align:center}
+.sc-num{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:26px}
+.sc-ok{color:var(--green)}.sc-fail{color:var(--acid)}.sc-trick{color:#E07B00}
+.sc-lbl{font-size:11px;color:var(--ink3);font-weight:900;letter-spacing:.04em;text-transform:uppercase}
+
+/* LAKMUS RESULT */
+.result-wrap{margin-top:14px}
+.lakmus-strip{width:100%;height:70px;border-radius:16px;border:3px solid var(--line);
+  background:var(--card);overflow:hidden;margin-bottom:12px;position:relative}
+.lakmus-fill{position:absolute;left:0;top:0;height:100%;width:0;transition:width 1s ease;border-radius:13px}
+.lakmus-fill.acid{background:linear-gradient(90deg,var(--acid-light),var(--acid))}
+.lakmus-fill.base{background:linear-gradient(90deg,var(--base-light),var(--base))}
+.lakmus-label{position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  font-weight:900;font-size:14px;opacity:0;transition:opacity .5s .6s}
+.lakmus-label.acid{color:var(--acid)}
+.lakmus-label.base{color:var(--base)}
+
+.result-card{padding:18px;border-radius:18px;text-align:center;border:2px solid}
+.rc-acid{background:var(--acid-light);border-color:var(--acid-mid)}
+.rc-base{background:var(--base-light);border-color:var(--base-mid)}
+.result-label{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:22px;margin-bottom:4px}
+.rc-acid .result-label{color:var(--acid)}.rc-base .result-label{color:var(--base)}
+.result-desc{font-size:13px;color:var(--ink2);margin-bottom:8px;line-height:1.5}
+.conf-bar-wrap{background:var(--line);border-radius:999px;height:6px;overflow:hidden}
+.conf-bar{height:100%;border-radius:999px;transition:width .5s ease}
+.cb-acid{background:var(--acid)}.cb-base{background:var(--base)}
+.verdict{display:inline-flex;align-items:center;gap:6px;font-weight:900;font-size:13px;
+  padding:6px 14px;border-radius:999px;margin-top:10px}
+.v-right{background:#E0F5EE;color:var(--green)}.v-wrong{background:var(--acid-light);color:var(--acid)}
+
+/* TRICK */
+.trick-toggle{display:flex;align-items:center;gap:10px;background:var(--card);
+  border:1.5px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:12px;cursor:pointer}
+.trick-toggle-label{flex:1;font-weight:900;font-size:13px;color:var(--ink2)}
+.trick-switch{width:36px;height:20px;background:var(--line);border-radius:999px;
+  position:relative;transition:background .2s;flex:none}
+.trick-switch.on{background:var(--sun)}
+.trick-switch::after{content:'';position:absolute;top:3px;left:3px;width:14px;height:14px;
+  border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.trick-switch.on::after{left:19px}
+.trick-banner{background:#FFF8DC;border:1.5px solid var(--sun);border-radius:14px;
+  padding:11px 14px;margin-bottom:12px;display:flex;align-items:center;gap:8px;
+  font-size:13px;color:#7A5000;font-weight:900;line-height:1.4}
+
+/* DIPLOMA */
+.diploma{background:var(--card);border:2px solid var(--line);border-radius:24px;overflow:hidden;margin-bottom:20px}
+.diploma-top{background:linear-gradient(135deg,var(--base-light),var(--acid-light));
+  padding:26px 24px;text-align:center;border-bottom:1.5px solid var(--line)}
+.diploma-icon{font-size:52px;margin-bottom:10px;display:block}
+.diploma-title{font-size:11px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--green);margin-bottom:8px}
+.diploma-name{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:22px;color:var(--ink)}
+.diploma-body{padding:18px 24px}
+.dip-row{display:flex;justify-content:space-between;align-items:center;
+  padding:10px 0;border-bottom:1px solid var(--line)}
+.dip-row:last-child{border-bottom:none}
+.dip-key{font-size:12px;color:var(--ink3);font-weight:900;text-transform:uppercase;letter-spacing:.04em}
+.dip-val{font-size:14px;color:var(--ink);font-weight:700;text-align:right}
+.dip-classes{display:flex;gap:5px;justify-content:flex-end}
+.dip-tag{font-size:11px;font-weight:900;padding:3px 10px;border-radius:999px}
+.dip-tag-acid{background:var(--acid-light);color:var(--acid)}
+.dip-tag-base{background:var(--base-light);color:var(--base)}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="logo-wrap">
+    <a class="logo" href="https://nookagame.ru">Nooka</a>
+    <span class="logo-tag">ХемоЛаб</span>
+  </div>
+  <span class="score-chip" id="scoreChip" hidden>✓ 0 / ✗ 0</span>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+
+<div class="main"><div class="screen" id="screenWrap"></div></div>
+
+<script>
+const CANVAS_SIZE=32,K=5,MIN_EX=4;
+
+class KNN{
+  constructor(){this.data=[]}
+  add(px,label){this.data.push({px:[...px],label})}
+  predict(px){
+    if(!this.data.length)return null;
+    const d=this.data.map(e=>({label:e.label,dist:euc(px,e.px)})).sort((a,b)=>a.dist-b.dist).slice(0,K);
+    const v={};d.forEach(e=>v[e.label]=(v[e.label]||0)+1);
+    let best=null,bv=0;for(const[l,n]of Object.entries(v))if(n>bv){best=l;bv=n}
+    return{label:best,confidence:bv/K};
+  }
+}
+function euc(a,b){let s=0;for(let i=0;i<a.length;i++)s+=(a[i]-b[i])**2;return Math.sqrt(s)}
+function getPixels(cv){
+  const t=document.createElement('canvas');t.width=t.height=CANVAS_SIZE;
+  const c=t.getContext('2d');c.drawImage(cv,0,0,CANVAS_SIZE,CANVAS_SIZE);
+  const d=c.getImageData(0,0,CANVAS_SIZE,CANVAS_SIZE).data;
+  return Array.from({length:d.length/4},(_,i)=>d[i*4]/255);
+}
+
+function makeCanvas(id,onDraw,color){
+  const cv=document.getElementById(id),ctx=cv.getContext('2d');
+  const hint=document.getElementById(id+'_hint');
+  let drawing=false,drawn=false;
+  cv.width=cv.clientWidth;cv.height=cv.clientHeight;
+  function pos(e){const r=cv.getBoundingClientRect(),s=e.touches?e.touches[0]:e;return[s.clientX-r.left,s.clientY-r.top]}
+  function start(e){
+    drawing=true;if(!drawn){drawn=true;if(hint)hint.style.opacity='0'}
+    ctx.lineWidth=Math.max(cv.clientWidth*.055,14);ctx.lineCap='round';ctx.lineJoin='round';
+    ctx.strokeStyle=color||'#181228';
+    const[x,y]=pos(e);ctx.beginPath();ctx.moveTo(x,y);e.preventDefault();
+  }
+  function move(e){if(!drawing)return;const[x,y]=pos(e);ctx.lineTo(x,y);ctx.stroke();e.preventDefault()}
+  function end(){drawing=false;if(onDraw)onDraw(cv)}
+  cv.addEventListener('mousedown',start);cv.addEventListener('mousemove',move);
+  cv.addEventListener('mouseup',end);cv.addEventListener('mouseleave',end);
+  cv.addEventListener('touchstart',start,{passive:false});
+  cv.addEventListener('touchmove',move,{passive:false});cv.addEventListener('touchend',end);
+  return{clear(){ctx.clearRect(0,0,cv.width,cv.height);drawn=false;if(hint)hint.style.opacity='1'},
+    empty(){return!drawn},canvas:cv}
+}
+
+const CLASSES=[
+  {id:'acid',name:'Кислота',icon:'🍋',color:'#E8362A',examples:['лимон','уксус','апельсин','яблоко'],tag:'ct-acid',hint:'Лимон, уксус, кислые продукты'},
+  {id:'base',name:'Щёлочь',icon:'🧼',color:'#1A6FD4',examples:['мыло','сода','нашатырь','стекло'],tag:'ct-base',hint:'Мыло, сода, щелочные продукты'},
+];
+
+const S={
+  phase:'intro',
+  classA:{...CLASSES[0],examples:[]},
+  classB:{...CLASSES[1],examples:[]},
+  cur:'acid',
+  knn:new KNN(),
+  creator:'',
+  score:{r:0,w:0,t:0},
+  trick:false
+};
+let D=null;
+
+function prog(){
+  const m={intro:0,collect_acid:.3,collect_base:.6,train:.75,test:.9,diploma:1};
+  document.getElementById('progressFill').style.width=(m[S.phase]*100)+'%';
+}
+
+function render(){
+  prog();
+  const w=document.getElementById('screenWrap');w.innerHTML='';
+  const d=document.createElement('div');d.className='screen-inner';
+  if(S.phase==='intro')d.innerHTML=intro();
+  else if(S.phase==='collect_acid'||S.phase==='collect_base')d.innerHTML=collect();
+  else if(S.phase==='train')d.innerHTML=trainHTML();
+  else if(S.phase==='test')d.innerHTML=test();
+  else d.innerHTML=diploma();
+  w.appendChild(d);bind();
+}
+
+function intro(){
+  return`
+    <div class="eyebrow">ХемоЛаб · Лакмус-тест</div>
+    <h1>Обучи ИИ <em>предсказывать реакцию</em> лакмуса</h1>
+    <p class="sub">Нарисуй вещества из каждого класса — и посмотри как ИИ предсказывает цвет лакмусовой бумажки!</p>
+
+    <div class="preset-grid">
+      <div class="preset-card sel-acid">
+        <div class="preset-icon">🍋</div>
+        <div class="preset-name" style="color:var(--acid)">Кислота</div>
+        <div class="preset-ex">лимон, уксус, яблоко…</div>
+      </div>
+      <div class="preset-card sel-base">
+        <div class="preset-icon">🧼</div>
+        <div class="preset-name" style="color:var(--base)">Щёлочь</div>
+        <div class="preset-ex">мыло, сода, нашатырь…</div>
+      </div>
+    </div>
+
+    <p class="sub" style="margin-top:-8px">Кислоты окрашивают лакмус в <strong style="color:var(--acid)">красный</strong>, щёлочи — в <strong style="color:var(--base)">синий</strong>.</p>
+
+    <div class="creator-row">
+      <span class="field-lbl">Твоё имя</span>
+      <input class="cn-field" id="creatorField" placeholder="Имя или никнейм" maxlength="20"
+        value="${S.creator}" style="flex:1">
+    </div>
+    <button class="btn btn--pri" id="startBtn" style="width:100%"
+      ${S.creator.trim().length<1?'disabled':''}>
+      Начать опыт →
+    </button>
+  `;
+}
+
+function collect(){
+  const isAcid=S.phase==='collect_acid';
+  const cl=isAcid?S.classA:S.classB;
+  const done=cl.examples.length;
+  const tagClass=isAcid?'ct-acid':'ct-base';
+  const drawColor=isAcid?'#E8362A':'#1A6FD4';
+  const hintIcon=isAcid?'🍋':'🧼';
+
+  return`
+    <div class="eyebrow">Сбор данных · ${isAcid?'1':'2'} из 2</div>
+    <h1>Рисуй <em>${isAcid?'кислоты':'щёлочи'}</em></h1>
+    <p class="sub">Нарисуй символ или образ вещества — ${cl.hint}. Минимум ${MIN_EX} вариантов.</p>
+    <div class="draw-hdr">
+      <span class="class-tag ${tagClass}">${cl.icon} ${cl.name}</span>
+      <span class="ex-counter"><strong id="exCount">${done}</strong> / ${MIN_EX}</span>
+    </div>
+    <div class="canvas-wrap">
+      <canvas class="draw-canvas" id="drawCanvas"></canvas>
+      <div class="canvas-hint" id="drawCanvas_hint">
+        <span class="canvas-hint-icon">${hintIcon}</span>
+        <span class="canvas-hint-text">Нарисуй любой символ</span>
+      </div>
+    </div>
+    <div class="toolbar">
+      <button class="btn btn--ghost" id="clearBtn" style="padding:13px 16px">Стереть</button>
+      <button class="btn ${isAcid?'btn--acid':'btn--base'}" id="addBtn" disabled>+ Запомнить</button>
+    </div>
+    <div class="thumbs-row" id="thumbsRow">${thumbsHTML(cl)}</div>
+    <div style="display:flex;gap:8px">
+      ${isAcid?'':` <button class="btn btn--ghost" onclick="go('collect_acid')">← Назад</button>`}
+      <button class="btn ${done>=MIN_EX?(isAcid?'btn--acid':'btn--base'):'btn--ghost'}" id="nextBtn"
+        ${done<MIN_EX?'disabled':''} style="flex:1">
+        ${isAcid?'Далее: щёлочи →':'Обучить ИИ →'}
+      </button>
+    </div>
+  `;
+}
+
+function thumbsHTML(cl){
+  return cl.examples.map((_,i)=>{
+    const id=`th_${S.phase}_${i}`;
+    setTimeout(()=>{
+      const el=document.getElementById(id);if(!el)return;
+      const tc=el.querySelector('canvas');
+      if(tc){tc.width=50;tc.height=50;tc.getContext('2d').drawImage(cl.examples[i].canvas,0,0,50,50)}
+    },0);
+    return`<div class="thumb" id="${id}"><canvas width="50" height="50"></canvas></div>`;
+  }).join('');
+}
+
+function trainHTML(){
+  return`<div class="train-screen">
+    <span class="neurons">🧪</span>
+    <div class="train-title">Провожу опыты...</div>
+    <div class="train-bar-wrap"><div class="train-bar" id="trainBar" style="width:0%"></div></div>
+    <div class="train-log" id="trainLog"></div>
+  </div>`;
+}
+
+function test(){
+  const sc=S.score;
+  return`
+    <div class="eyebrow">Тест · Предскажи лакмус</div>
+    <h1>Нарисуй вещество — <em>что покажет лакмус?</em></h1>
+    <div class="score-panel">
+      <div class="sc-card"><div class="sc-num sc-ok">${sc.r}</div><div class="sc-lbl">Угадал</div></div>
+      <div class="sc-card"><div class="sc-num sc-fail">${sc.w}</div><div class="sc-lbl">Ошибся</div></div>
+      <div class="sc-card"><div class="sc-num sc-trick">${sc.t}</div><div class="sc-lbl">Обманут</div></div>
+    </div>
+    <div class="trick-toggle" id="trickToggle">
+      <span style="font-size:20px">🧫</span>
+      <span class="trick-toggle-label">Режим «Обмани ИИ» — нарисуй нейтральное</span>
+      <div class="trick-switch${S.trick?' on':''}"></div>
+    </div>
+    ${S.trick?`<div class="trick-banner">⚗️ Попробуй нарисовать воду или нейтральное вещество!</div>`:''}
+    <div class="canvas-wrap">
+      <canvas class="draw-canvas" id="drawCanvas"></canvas>
+      <div class="canvas-hint" id="drawCanvas_hint">
+        <span class="canvas-hint-icon">✏️</span>
+        <span class="canvas-hint-text">Нарисуй любое вещество</span>
+      </div>
+    </div>
+    <div class="toolbar">
+      <button class="btn btn--ghost" id="clearBtn" style="padding:13px 16px">Стереть</button>
+      <button class="btn btn--pri" id="predictBtn" disabled>Проверить лакмус →</button>
+    </div>
+    <div id="resultBox"></div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="btn btn--ghost" onclick="reset()" style="flex:1">↩ Заново</button>
+      <button class="btn btn--pri" onclick="go('diploma')" style="flex:none;padding:13px 18px">Диплом 🎓</button>
+    </div>
+  `;
+}
+
+function diploma(){
+  const sc=S.score,total=sc.r+sc.w;
+  const acc=total>0?Math.round(sc.r/total*100):0;
+  const today=new Date().toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'});
+  const totalEx=S.classA.examples.length+S.classB.examples.length;
+  const rank=acc>=90?'🏆 Химик-эксперт':acc>=70?'🧪 Старший лаборант':acc>=50?'⚗️ Лаборант':'🔬 Стажёр';
+  return`
+    <div class="eyebrow">Опыт завершён!</div>
+    <div class="diploma">
+      <div class="diploma-top">
+        <span class="diploma-icon">🔬</span>
+        <div class="diploma-title">Сертификат · Nooka ХемоЛаб</div>
+        <div class="diploma-name">${S.creator||'Юный химик'}</div>
+      </div>
+      <div class="diploma-body">
+        <div class="dip-row">
+          <div class="dip-key">Обучил ИИ различать</div>
+          <div class="dip-val"><div class="dip-classes">
+            <span class="dip-tag dip-tag-acid">🍋 Кислоты</span>
+            <span class="dip-tag dip-tag-base">🧼 Щёлочи</span>
+          </div></div>
+        </div>
+        <div class="dip-row"><div class="dip-key">Обучающих примеров</div><div class="dip-val">${totalEx} рисунков</div></div>
+        <div class="dip-row"><div class="dip-key">Точность ИИ</div><div class="dip-val">${total?acc+'%':'не тестировал'}</div></div>
+        <div class="dip-row"><div class="dip-key">Обманул ИИ</div><div class="dip-val">${sc.t} раз</div></div>
+        <div class="dip-row"><div class="dip-key">Ранг</div><div class="dip-val">${rank}</div></div>
+        <div class="dip-row"><div class="dip-key">Дата опыта</div><div class="dip-val">${today}</div></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn--ghost" onclick="go('test')" style="flex:1">← Ещё тест</button>
+      <button class="btn btn--pri" onclick="reset()" style="flex:1">Новый опыт</button>
+    </div>
+  `;
+}
+
+function bind(){
+  if(S.phase==='intro')bindIntro();
+  else if(S.phase==='collect_acid'||S.phase==='collect_base')bindCollect();
+  else if(S.phase==='train')runTrain();
+  else if(S.phase==='test')bindTest();
+}
+
+function bindIntro(){
+  const cf=document.getElementById('creatorField');
+  cf?.addEventListener('input',e=>{
+    S.creator=e.target.value;
+    document.getElementById('startBtn').disabled=!S.creator.trim();
+  });
+  document.getElementById('startBtn')?.addEventListener('click',()=>{
+    S.creator=document.getElementById('creatorField').value.trim();
+    go('collect_acid');
+  });
+}
+
+function bindCollect(){
+  const isAcid=S.phase==='collect_acid';
+  const cl=isAcid?S.classA:S.classB;
+  const drawColor=isAcid?'#E8362A':'#1A6FD4';
+  const add=document.getElementById('addBtn');
+
+  D=makeCanvas('drawCanvas',()=>{if(add)add.disabled=false},drawColor);
+  document.getElementById('clearBtn')?.addEventListener('click',()=>{D.clear();if(add)add.disabled=true});
+  add?.addEventListener('click',()=>{
+    if(D.empty())return;
+    const cv=document.createElement('canvas');cv.width=D.canvas.width;cv.height=D.canvas.height;
+    cv.getContext('2d').drawImage(D.canvas,0,0);
+    cl.examples.push({canvas:cv,px:getPixels(D.canvas)});
+    D.clear();add.disabled=true;
+    document.getElementById('exCount').textContent=cl.examples.length;
+    document.getElementById('thumbsRow').innerHTML=thumbsHTML(cl);
+    const nb=document.getElementById('nextBtn');if(nb)nb.disabled=cl.examples.length<MIN_EX;
+  });
+  document.getElementById('nextBtn')?.addEventListener('click',()=>{
+    go(isAcid?'collect_base':'train');
+  });
+}
+
+function runTrain(){
+  const bar=document.getElementById('trainBar'),log=document.getElementById('trainLog');
+  S.knn=new KNN();
+  S.classA.examples.forEach(e=>S.knn.add(e.px,'acid'));
+  S.classB.examples.forEach(e=>S.knn.add(e.px,'base'));
+  const steps=[
+    [20,`> Анализирую кислоты (${S.classA.examples.length} образцов)...`],
+    [40,`> Анализирую щёлочи (${S.classB.examples.length} образцов)...`],
+    [60,'> Рассчитываю pH-профили...'],
+    [80,'> Настраиваю лакмус-детектор...'],
+    [100,'> Готово! Опыт можно начинать ✓'],
+  ];
+  let i=0;
+  (function step(){
+    if(i>=steps.length){setTimeout(()=>{document.getElementById('scoreChip').hidden=false;go('test')},500);return}
+    const[p,t]=steps[i++];if(bar)bar.style.width=p+'%';
+    if(log){const s=document.createElement('span');s.textContent=t;log.appendChild(s);
+      if(log.children.length>4)log.removeChild(log.firstChild)}
+    setTimeout(step,350);
+  })();
+}
+
+function bindTest(){
+  D=makeCanvas('drawCanvas',()=>{
+    document.getElementById('predictBtn').disabled=false;
+    document.getElementById('resultBox').innerHTML='';
+  },'#181228');
+  document.getElementById('clearBtn')?.addEventListener('click',()=>{
+    D.clear();document.getElementById('predictBtn').disabled=true;
+    document.getElementById('resultBox').innerHTML='';
+  });
+  document.getElementById('predictBtn')?.addEventListener('click',()=>{
+    if(D.empty())return;
+    const res=S.knn.predict(getPixels(D.canvas));
+    showRes(res);
+  });
+  document.getElementById('trickToggle')?.addEventListener('click',()=>{S.trick=!S.trick;render()});
+}
+
+function showRes(res){
+  const isAcid=res.label==='acid';
+  const conf=Math.round(res.confidence*100);
+  const box=document.getElementById('resultBox');
+  const cl=isAcid?S.classA:S.classB;
+  const tricked=S.trick&&conf<=40;
+  if(S.trick&&tricked)S.score.t++;
+
+  // Лакмус-анимация
+  const strip=`<div class="lakmus-strip">
+    <div class="lakmus-fill ${isAcid?'acid':'base'}" id="lakmusFill"></div>
+    <div class="lakmus-label ${isAcid?'acid':'base'}" id="lakmusLabel">
+      ${isAcid?'🔴 Красный (кислота)':'🔵 Синий (щёлочь)'}
+    </div>
+  </div>`;
+
+  box.innerHTML=`
+    <div class="result-wrap">
+      ${strip}
+      <div class="result-card ${isAcid?'rc-acid':'rc-base'}">
+        <div class="result-label">${cl.icon} ${cl.name}</div>
+        <div class="result-desc">pH ${isAcid?'< 7 — кислая среда':' > 7 — щелочная среда'}. Уверенность: ${conf}%</div>
+        <div class="conf-bar-wrap"><div class="conf-bar ${isAcid?'cb-acid':'cb-base'}" style="width:${conf}%"></div></div>
+        ${S.trick?`<span class="verdict ${tricked?'v-wrong':'v-right'}">
+          ${tricked?`🧫 ИИ запутался (${conf}%)!`:`⚗️ ИИ не запутался (${conf}%)`}
+        </span>`:''}
+      </div>
+      ${!S.trick?`<div style="display:flex;gap:8px;margin-top:10px">
+        <button class="btn btn--ghost" onclick="mark(true)" style="flex:1">✓ Правильно</button>
+        <button class="btn btn--ghost" onclick="mark(false)" style="flex:1;color:var(--acid)">✗ Ошибся</button>
+      </div>`:''}
+    </div>`;
+
+  // Запускаем анимацию лакмуса
+  setTimeout(()=>{
+    const fill=document.getElementById('lakmusFill');
+    const label=document.getElementById('lakmusLabel');
+    if(fill)fill.style.width='100%';
+    if(label)label.style.opacity='1';
+  },100);
+
+  if(S.trick)updChip();
+}
+
+window.mark=function(ok){
+  if(ok)S.score.r++;else S.score.w++;updChip();
+  const card=document.querySelector('.result-card');
+  if(card){const v=document.createElement('span');v.className=`verdict ${ok?'v-right':'v-wrong'}`;
+    v.textContent=ok?'✓ Правильно!':'✗ Ошибся';card.appendChild(v)}
+  document.querySelector('[onclick^="mark"]')?.parentElement?.remove();
+};
+
+function updChip(){
+  const sc=S.score,chip=document.getElementById('scoreChip');
+  if(chip){chip.textContent=`✓ ${sc.r} / ✗ ${sc.w}`;
+    chip.className=`score-chip${sc.r>sc.w?' ok':''}`;chip.hidden=false}
+}
+
+window.go=s=>{S.phase=s;render()};
+window.reset=()=>{
+  S.phase='intro';
+  S.classA={...CLASSES[0],examples:[]};
+  S.classB={...CLASSES[1],examples:[]};
+  S.knn=new KNN();S.score={r:0,w:0,t:0};S.trick=false;
+  document.getElementById('scoreChip').hidden=true;render();
+};
+
+render();
+</script>
+</body>
+</html>
