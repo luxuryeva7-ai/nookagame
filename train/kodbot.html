@@ -3,96 +3,84 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#0E0C18">
+<meta name="theme-color" content="#FDF7EC">
 <title>КодБот — Обучи ИИ</title>
 <link href="/fonts/nooka-fonts.css" rel="stylesheet">
 <style>
-:root{
-  --ink:#181228;--ink2:#5B5470;--ink3:#8A82A0;
+:root{--ink:#181228;--ink2:#5B5470;--ink3:#8A82A0;
   --purple:#7B2FFF;--sun:#FFC53D;--bg:#FDF7EC;--line:#E9E1F5;--ok:#12A47A;
-  /* КодБот dark theme */
-  --kb-bg:#0E0C18;--kb-card:#1A1630;--kb-border:#2D2850;
-  --kb-green:#00E5A0;--kb-blue:#4D9FFF;--kb-purple:#A259FF;
-  --kb-text:#E8E4FF;--kb-sub:#9B96C0
-}
+  --c0:#7B2FFF;--c1:#0066FF;--c2:#12A47A;--c3:#E07B00}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;background:var(--kb-bg);color:var(--kb-text);
+body{margin:0;background:var(--bg);color:var(--ink);
   font-family:'Nunito',system-ui,sans-serif;-webkit-font-smoothing:antialiased;
   min-height:100vh;display:flex;flex-direction:column;user-select:none}
 
-/* HEADER */
 .hdr{padding:14px 20px;display:flex;align-items:center;justify-content:space-between;
-  border-bottom:1px solid var(--kb-border);background:var(--kb-bg)}
+  border-bottom:1.5px solid var(--line);background:var(--bg)}
 .logo-wrap{display:flex;align-items:center;gap:10px}
 .logo{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:16px;
-  color:var(--kb-green);text-decoration:none}
-.logo-tag{font-size:11px;font-weight:900;color:var(--kb-sub);letter-spacing:.08em;
-  text-transform:uppercase;background:var(--kb-card);padding:3px 8px;border-radius:6px;
-  border:1px solid var(--kb-border)}
-.score-bar{display:flex;align-items:center;gap:8px}
+  color:var(--purple);text-decoration:none}
+.logo-tag{font-size:11px;font-weight:900;color:var(--ink3);letter-spacing:.07em;
+  text-transform:uppercase;background:#F0ECFF;padding:3px 9px;border-radius:6px}
 .score-chip{font-weight:900;font-size:13px;padding:4px 12px;border-radius:999px;
-  background:var(--kb-card);border:1px solid var(--kb-border);color:var(--kb-sub)}
-.score-chip.ok{color:var(--kb-green);border-color:var(--kb-green)}
+  background:#fff;border:1.5px solid var(--line);color:var(--ink3)}
+.score-chip.ok{color:var(--ok);border-color:var(--ok)}
 
-/* PROGRESS */
-.progress-bar{height:3px;background:var(--kb-border)}
-.progress-fill{height:100%;background:var(--kb-green);transition:width .5s ease}
+.progress-bar{height:4px;background:var(--line)}
+.progress-fill{height:100%;background:var(--purple);border-radius:0 2px 2px 0;transition:width .5s ease}
 
-/* MAIN */
 .main{flex:1;display:flex;flex-direction:column;align-items:center;
   justify-content:center;padding:20px 16px}
-.screen{width:100%;max-width:560px}
+.screen{width:100%;max-width:540px}
 .screen-inner{animation:fadein .3s ease}
 @keyframes fadein{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
-/* TYPOGRAPHY */
 .eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:900;
-  letter-spacing:.1em;text-transform:uppercase;color:var(--kb-green);margin-bottom:12px}
-.eyebrow::before{content:'';display:block;width:18px;height:2px;background:var(--kb-green)}
+  letter-spacing:.1em;text-transform:uppercase;color:var(--purple);margin-bottom:12px}
+.eyebrow::before{content:'';display:block;width:14px;height:2px;background:var(--purple)}
 h1{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;
-  font-size:clamp(20px,5vw,28px);line-height:1.2;margin:0 0 10px;letter-spacing:-.3px}
-h1 em{font-style:normal;color:var(--kb-green)}
-.sub{font-size:15px;color:var(--kb-sub);margin:0 0 22px;line-height:1.65}
+  font-size:clamp(20px,5vw,27px);line-height:1.2;margin:0 0 10px;letter-spacing:-.3px}
+h1 em{font-style:normal;color:var(--purple)}
+.sub{font-size:15px;color:var(--ink2);margin:0 0 20px;line-height:1.6}
 
-/* CLASS SELECTOR (intro) */
-.class-count-row{display:flex;gap:8px;margin-bottom:20px}
-.count-btn{flex:1;padding:14px 8px;border-radius:14px;background:var(--kb-card);
-  border:1.5px solid var(--kb-border);color:var(--kb-sub);font-weight:900;font-size:18px;
+/* CLASS COUNT */
+.class-count-row{display:flex;gap:8px;margin-bottom:18px}
+.count-btn{flex:1;padding:14px 8px;border-radius:14px;background:#fff;
+  border:2px solid var(--line);color:var(--ink3);font-weight:900;font-size:18px;
   cursor:pointer;text-align:center;transition:all .15s;font-family:inherit}
-.count-btn:hover,.count-btn.sel{border-color:var(--kb-green);color:var(--kb-green);background:#0E2D22}
-.count-btn small{display:block;font-size:11px;font-weight:700;margin-top:2px;letter-spacing:.03em}
+.count-btn:hover,.count-btn.sel{border-color:var(--purple);color:var(--purple);background:#F0ECFF}
+.count-btn small{display:block;font-size:11px;font-weight:700;margin-top:2px}
 
-.class-names-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px}
-.class-name-input-wrap{display:flex;flex-direction:column;gap:6px}
+.class-names-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.class-name-input-wrap{display:flex;flex-direction:column;gap:5px}
 .cn-label{font-size:11px;font-weight:900;letter-spacing:.07em;text-transform:uppercase}
-.cn-label-0{color:#A259FF}.cn-label-1{color:#4D9FFF}.cn-label-2{color:var(--kb-green)}.cn-label-3{color:var(--sun)}
-.cn-field{padding:11px 14px;border-radius:12px;background:var(--kb-card);
-  border:1.5px solid var(--kb-border);color:var(--kb-text);font-family:'Nunito',inherit;
+.cn-label-0{color:var(--c0)}.cn-label-1{color:var(--c1)}.cn-label-2{color:var(--c2)}.cn-label-3{color:var(--c3)}
+.cn-field{padding:11px 14px;border-radius:12px;background:#fff;
+  border:2px solid var(--line);color:var(--ink);font-family:'Nunito',inherit;
   font-size:15px;outline:none;transition:border-color .15s;width:100%}
-.cn-field:focus{border-color:var(--kb-green)}
+.cn-field:focus{border-color:var(--purple)}
 
-/* DRAW */
+/* DRAW PHASE */
 .draw-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .class-tag{display:inline-flex;align-items:center;gap:6px;font-weight:900;font-size:13px;
-  padding:5px 14px;border-radius:999px;letter-spacing:.02em}
-.ct-0{background:#2D1660;color:#A259FF}.ct-1{background:#0F2650;color:#4D9FFF}
-.ct-2{background:#0E2D22;color:var(--kb-green)}.ct-3{background:#2D2200;color:var(--sun)}
-.ex-counter{font-size:12px;color:var(--kb-sub);font-weight:900}
-.ex-counter strong{color:var(--kb-green)}
+  padding:5px 14px;border-radius:999px}
+.ct-0{background:#EDE9FF;color:var(--c0)}.ct-1{background:#E0EDFF;color:var(--c1)}
+.ct-2{background:#E0F5EE;color:var(--c2)}.ct-3{background:#FFF3DC;color:var(--c3)}
+.ex-counter{font-size:12px;color:var(--ink3);font-weight:900}
+.ex-counter strong{color:var(--purple)}
 
 .canvas-wrap{position:relative;margin-bottom:12px}
 .draw-canvas{display:block;width:100%;aspect-ratio:1;border-radius:20px;
-  background:#1A1630;border:2px solid var(--kb-border);cursor:crosshair;touch-action:none}
+  background:#fff;border:2px solid var(--line);cursor:crosshair;touch-action:none}
 .canvas-hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
   text-align:center;pointer-events:none;transition:opacity .2s}
-.canvas-hint-icon{font-size:40px;display:block;margin-bottom:6px}
-.canvas-hint-text{font-size:14px;color:var(--kb-sub);font-weight:700}
+.canvas-hint-icon{font-size:38px;display:block;margin-bottom:6px}
+.canvas-hint-text{font-size:14px;color:var(--ink3);font-weight:700}
 
-/* THUMBS */
 .thumbs-row{display:flex;flex-wrap:wrap;gap:6px;min-height:52px;margin-bottom:14px}
-.thumb{width:50px;height:50px;border-radius:10px;border:1.5px solid var(--kb-border);
-  background:var(--kb-card);overflow:hidden;flex:none}
-.thumb canvas{width:100%;height:100%;filter:invert(1) brightness(1.5)}
+.thumb{width:50px;height:50px;border-radius:10px;border:1.5px solid var(--line);
+  background:#fff;overflow:hidden;flex:none}
+.thumb canvas{width:100%;height:100%}
 
 /* BUTTONS */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;
@@ -101,94 +89,86 @@ h1 em{font-style:normal;color:var(--kb-green)}
   transition:transform .1s,opacity .12s;white-space:nowrap}
 .btn:active{transform:scale(.96)}
 .btn:disabled{opacity:.35;cursor:default}
-.btn--green{background:var(--kb-green);color:#0E0C18;flex:1}
-.btn--ghost{background:transparent;color:var(--kb-sub);border:1.5px solid var(--kb-border)}
+.btn--pri{background:var(--purple);color:#fff;flex:1}
+.btn--ghost{background:#fff;color:var(--purple);border:2px solid var(--line)}
 .btn--sun{background:var(--sun);color:var(--ink);flex:1}
-.btn--purple{background:var(--kb-purple);color:#fff;flex:1}
+.btn--ok{background:var(--ok);color:#fff;flex:1}
 .toolbar{display:flex;gap:8px;margin-bottom:12px}
 
 /* TRAINING */
-.train-screen{text-align:center;padding:32px 0}
-.neurons{font-size:60px;display:block;margin-bottom:16px;animation:pulse 1s ease-in-out infinite}
-@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
-.train-title{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:22px;margin-bottom:6px}
-.train-bar-wrap{background:var(--kb-border);border-radius:999px;height:8px;margin:14px 0;overflow:hidden}
-.train-bar{height:100%;background:linear-gradient(90deg,var(--kb-purple),var(--kb-green));
-  border-radius:999px;transition:width .15s}
-.train-log{font-size:13px;color:var(--kb-green);font-weight:900;font-family:'Courier New',monospace;
-  min-height:40px;line-height:2}
+.train-screen{text-align:center;padding:36px 0}
+.neurons{font-size:64px;display:block;margin-bottom:16px;animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+.train-title{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:22px;margin-bottom:8px}
+.train-bar-wrap{background:var(--line);border-radius:999px;height:8px;margin:14px 0;overflow:hidden}
+.train-bar{height:100%;background:linear-gradient(90deg,var(--purple),var(--ok));
+  border-radius:999px;transition:width .2s}
+.train-log{font-size:13px;color:var(--purple);font-weight:900;
+  font-family:'Courier New',monospace;min-height:44px;line-height:2;text-align:left}
 .train-log span{display:block;animation:fadein .2s ease}
 
-/* RESULT */
-.result-card{padding:20px;border-radius:18px;margin-top:14px;text-align:center;border:2px solid}
-.rc-0{background:#2D1660;border-color:#A259FF}.rc-1{background:#0F2650;border-color:#4D9FFF}
-.rc-2{background:#0E2D22;border-color:var(--kb-green)}.rc-3{background:#2D2200;border-color:var(--sun)}
-.result-label{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:22px;margin-bottom:4px}
-.rc-0 .result-label{color:#A259FF}.rc-1 .result-label{color:#4D9FFF}
-.rc-2 .result-label{color:var(--kb-green)}.rc-3 .result-label{color:var(--sun)}
-.conf-text{font-size:13px;color:var(--kb-sub);font-weight:700;margin-bottom:10px}
-.conf-bar-wrap{background:var(--kb-border);border-radius:999px;height:6px;overflow:hidden}
-.conf-bar{height:100%;border-radius:999px;transition:width .5s ease}
-.cb-0{background:#A259FF}.cb-1{background:#4D9FFF}.cb-2{background:var(--kb-green)}.cb-3{background:var(--sun)}
-
-/* VERDICT */
-.verdict{display:inline-flex;align-items:center;gap:6px;font-weight:900;font-size:13px;
-  padding:6px 14px;border-radius:999px;margin-top:10px}
-.verdict-right{background:#0E2D22;color:var(--kb-green)}
-.verdict-wrong{background:#2D0E0E;color:#FF6B6B}
-.verdict-trick{background:#2D2200;color:var(--sun)}
-
-/* SCORE panel */
-.score-panel{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
-.sc-card{background:var(--kb-card);border:1.5px solid var(--kb-border);
-  border-radius:16px;padding:14px;text-align:center}
+/* SCORE */
+.score-panel{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+.sc-card{background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:14px;text-align:center}
 .sc-num{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:26px}
-.sc-num-ok{color:var(--kb-green)}.sc-num-fail{color:#FF6B6B}.sc-num-trick{color:var(--sun)}
-.sc-lbl{font-size:11px;color:var(--kb-sub);font-weight:900;letter-spacing:.04em;text-transform:uppercase}
+.sc-ok{color:var(--ok)}.sc-fail{color:#E53E3E}.sc-trick{color:var(--c3)}
+.sc-lbl{font-size:11px;color:var(--ink3);font-weight:900;letter-spacing:.04em;text-transform:uppercase}
 
-/* TRICK mode */
-.trick-banner{background:#2D2200;border:1.5px solid var(--sun);border-radius:14px;
-  padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
-.trick-icon{font-size:22px;flex:none}
-.trick-text{font-size:13px;color:var(--sun);font-weight:900;line-height:1.4}
-
-/* DIPLOMA */
-.diploma{background:var(--kb-card);border:2px solid var(--kb-green);border-radius:24px;
-  overflow:hidden;margin-bottom:20px}
-.diploma-top{background:linear-gradient(135deg,#1A1630,#0E2D22);padding:28px 24px;
-  text-align:center;border-bottom:1.5px solid var(--kb-green)}
-.diploma-icon{font-size:52px;margin-bottom:10px;display:block}
-.diploma-title{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:13px;
-  letter-spacing:.1em;text-transform:uppercase;color:var(--kb-green);margin-bottom:8px}
-.diploma-name{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:22px;color:var(--kb-text)}
-.diploma-body{padding:20px 24px}
-.dip-row{display:flex;justify-content:space-between;align-items:center;
-  padding:10px 0;border-bottom:1px solid var(--kb-border)}
-.dip-row:last-child{border-bottom:none}
-.dip-key{font-size:12px;color:var(--kb-sub);font-weight:900;text-transform:uppercase;letter-spacing:.04em}
-.dip-val{font-size:14px;color:var(--kb-text);font-weight:700;text-align:right}
-.dip-classes{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
-.dip-tag{font-size:11px;font-weight:900;padding:3px 9px;border-radius:999px}
-.dip-tag-0{background:#2D1660;color:#A259FF}.dip-tag-1{background:#0F2650;color:#4D9FFF}
-.dip-tag-2{background:#0E2D22;color:var(--kb-green)}.dip-tag-3{background:#2D2200;color:var(--sun)}
-
-/* trick-mode toggle */
-.trick-toggle{display:flex;align-items:center;gap:10px;background:var(--kb-card);
-  border:1.5px solid var(--kb-border);border-radius:12px;padding:10px 14px;margin-bottom:12px;
+/* TRICK TOGGLE */
+.trick-toggle{display:flex;align-items:center;gap:10px;background:#fff;
+  border:1.5px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:12px;
   cursor:pointer;transition:border-color .15s}
 .trick-toggle:hover{border-color:var(--sun)}
 .trick-toggle-icon{font-size:20px}
-.trick-toggle-label{flex:1;font-weight:900;font-size:13px;color:var(--kb-sub)}
-.trick-switch{width:36px;height:20px;background:var(--kb-border);border-radius:999px;
+.trick-toggle-label{flex:1;font-weight:900;font-size:13px;color:var(--ink2)}
+.trick-switch{width:36px;height:20px;background:var(--line);border-radius:999px;
   position:relative;transition:background .2s;flex:none}
 .trick-switch.on{background:var(--sun)}
 .trick-switch::after{content:'';position:absolute;top:3px;left:3px;width:14px;height:14px;
-  border-radius:50%;background:#fff;transition:left .2s}
+  border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
 .trick-switch.on::after{left:19px}
+.trick-banner{background:#FFF8DC;border:1.5px solid var(--sun);border-radius:14px;
+  padding:11px 14px;margin-bottom:12px;display:flex;align-items:center;gap:8px;
+  font-size:13px;color:#7A5000;font-weight:900;line-height:1.4}
+
+/* RESULT */
+.result-card{padding:20px;border-radius:18px;margin-top:14px;text-align:center;border:2px solid}
+.rc-0{background:#EDE9FF;border-color:#C4B5FD}.rc-1{background:#E0EDFF;border-color:#93C5FD}
+.rc-2{background:#E0F5EE;border-color:#6EE7B7}.rc-3{background:#FFF3DC;border-color:var(--sun)}
+.result-label{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:22px;margin-bottom:4px}
+.rc-0 .result-label{color:var(--c0)}.rc-1 .result-label{color:var(--c1)}
+.rc-2 .result-label{color:var(--c2)}.rc-3 .result-label{color:var(--c3)}
+.conf-text{font-size:13px;color:var(--ink3);font-weight:700;margin-bottom:8px}
+.conf-bar-wrap{background:var(--line);border-radius:999px;height:6px;overflow:hidden}
+.conf-bar{height:100%;border-radius:999px;transition:width .5s ease}
+.cb-0{background:var(--c0)}.cb-1{background:var(--c1)}.cb-2{background:var(--c2)}.cb-3{background:var(--c3)}
+.verdict{display:inline-flex;align-items:center;gap:6px;font-weight:900;font-size:13px;
+  padding:6px 14px;border-radius:999px;margin-top:10px}
+.verdict-right{background:#E0F5EE;color:var(--ok)}
+.verdict-wrong{background:#FFE5E5;color:#E53E3E}
+.verdict-trick{background:#FFF3DC;color:var(--c3)}
+
+/* DIPLOMA */
+.diploma{background:#fff;border:2px solid var(--line);border-radius:24px;overflow:hidden;margin-bottom:20px}
+.diploma-top{background:linear-gradient(135deg,#EDE9FF,#E0F5EE);padding:26px 24px;
+  text-align:center;border-bottom:1.5px solid var(--line)}
+.diploma-icon{font-size:52px;margin-bottom:10px;display:block}
+.diploma-title{font-size:11px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--purple);margin-bottom:8px}
+.diploma-name{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:22px;color:var(--ink)}
+.diploma-body{padding:18px 24px}
+.dip-row{display:flex;justify-content:space-between;align-items:center;
+  padding:10px 0;border-bottom:1px solid var(--line)}
+.dip-row:last-child{border-bottom:none}
+.dip-key{font-size:12px;color:var(--ink3);font-weight:900;text-transform:uppercase;letter-spacing:.04em}
+.dip-val{font-size:14px;color:var(--ink);font-weight:700;text-align:right}
+.dip-classes{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+.dip-tag{font-size:11px;font-weight:900;padding:3px 9px;border-radius:999px}
+.dip-tag-0{background:#EDE9FF;color:var(--c0)}.dip-tag-1{background:#E0EDFF;color:var(--c1)}
+.dip-tag-2{background:#E0F5EE;color:var(--c2)}.dip-tag-3{background:#FFF3DC;color:var(--c3)}
 
 @media(max-width:420px){
   .class-names-grid{grid-template-columns:1fr}
-  .score-panel{grid-template-columns:repeat(3,1fr)}
 }
 </style>
 </head>
@@ -199,57 +179,46 @@ h1 em{font-style:normal;color:var(--kb-green)}
     <a class="logo" href="https://nookagame.ru">Nooka</a>
     <span class="logo-tag">КодБот</span>
   </div>
-  <div class="score-bar">
-    <span class="score-chip" id="scoreChip" hidden>✓ 0 / ✗ 0</span>
-  </div>
+  <span class="score-chip" id="scoreChip" hidden>✓ 0 / ✗ 0</span>
 </div>
 <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
 
 <div class="main"><div class="screen" id="screenWrap"></div></div>
 
 <script>
-// ─── KNN ─────────────────────────────────────────────────────────────────────
-const CANVAS_SIZE = 32, K = 5;
-const MIN_EX = 4;
+const CANVAS_SIZE=32,K=5,MIN_EX=4;
+const DRAW_COLORS=['#7B2FFF','#0066FF','#12A47A','#E07B00'];
 
-class KNN {
-  constructor(){ this.data=[] }
-  add(pixels, label){ this.data.push({pixels:[...pixels], label}) }
-  predict(pixels){
-    if(!this.data.length) return null;
-    const dists = this.data.map(d=>({label:d.label,dist:euclidean(pixels,d.pixels)}))
-      .sort((a,b)=>a.dist-b.dist).slice(0,K);
-    const votes={};
-    dists.forEach(d=>votes[d.label]=(votes[d.label]||0)+1);
+class KNN{
+  constructor(){this.data=[]}
+  add(px,label){this.data.push({px:[...px],label})}
+  predict(px){
+    if(!this.data.length)return null;
+    const d=this.data.map(e=>({label:e.label,dist:euc(px,e.px)})).sort((a,b)=>a.dist-b.dist).slice(0,K);
+    const v={};d.forEach(e=>v[e.label]=(v[e.label]||0)+1);
     let best=null,bestV=0;
-    for(const [l,v] of Object.entries(votes)) if(v>bestV){best=l;bestV=v}
-    return {label:best, confidence:bestV/K,
-      allVotes: Object.fromEntries(Object.entries(votes).map(([l,v])=>[l,v/K]))};
+    for(const[l,n]of Object.entries(v))if(n>bestV){best=l;bestV=n}
+    return{label:best,confidence:bestV/K};
   }
 }
-function euclidean(a,b){let s=0;for(let i=0;i<a.length;i++)s+=(a[i]-b[i])**2;return Math.sqrt(s)}
-function getPixels(canvas){
-  const tmp=document.createElement('canvas'); tmp.width=tmp.height=CANVAS_SIZE;
-  const ctx=tmp.getContext('2d'); ctx.drawImage(canvas,0,0,CANVAS_SIZE,CANVAS_SIZE);
-  const d=ctx.getImageData(0,0,CANVAS_SIZE,CANVAS_SIZE).data;
+function euc(a,b){let s=0;for(let i=0;i<a.length;i++)s+=(a[i]-b[i])**2;return Math.sqrt(s)}
+function getPixels(cv){
+  const t=document.createElement('canvas');t.width=t.height=CANVAS_SIZE;
+  const c=t.getContext('2d');c.drawImage(cv,0,0,CANVAS_SIZE,CANVAS_SIZE);
+  const d=c.getImageData(0,0,CANVAS_SIZE,CANVAS_SIZE).data;
   return Array.from({length:d.length/4},(_,i)=>d[i*4]/255);
 }
 
-// ─── Drawing ──────────────────────────────────────────────────────────────────
-function makeDrawCanvas(id, onDraw, opts={}) {
-  const cv=document.getElementById(id);
-  const ctx=cv.getContext('2d');
+function makeCanvas(id,onDraw,color){
+  const cv=document.getElementById(id),ctx=cv.getContext('2d');
   const hint=document.getElementById(id+'_hint');
-  let drawing=false, hasDrawn=false;
-  cv.width=cv.clientWidth; cv.height=cv.clientHeight;
-  function pos(e){const r=cv.getBoundingClientRect(),s=e.touches?e.touches[0]:e;
-    return[s.clientX-r.left,s.clientY-r.top]}
+  let drawing=false,drawn=false;
+  cv.width=cv.clientWidth;cv.height=cv.clientHeight;
+  function pos(e){const r=cv.getBoundingClientRect(),s=e.touches?e.touches[0]:e;return[s.clientX-r.left,s.clientY-r.top]}
   function start(e){
-    drawing=true;
-    if(!hasDrawn){hasDrawn=true;if(hint)hint.style.opacity='0'}
-    ctx.lineWidth=Math.max(cv.clientWidth*0.055,14);
-    ctx.lineCap='round';ctx.lineJoin='round';
-    ctx.strokeStyle=opts.color||'#00E5A0';
+    drawing=true;if(!drawn){drawn=true;if(hint)hint.style.opacity='0'}
+    ctx.lineWidth=Math.max(cv.clientWidth*.055,14);ctx.lineCap='round';ctx.lineJoin='round';
+    ctx.strokeStyle=color||'#181228';
     const[x,y]=pos(e);ctx.beginPath();ctx.moveTo(x,y);e.preventDefault();
   }
   function move(e){if(!drawing)return;const[x,y]=pos(e);ctx.lineTo(x,y);ctx.stroke();e.preventDefault()}
@@ -259,450 +228,324 @@ function makeDrawCanvas(id, onDraw, opts={}) {
   cv.addEventListener('touchstart',start,{passive:false});
   cv.addEventListener('touchmove',move,{passive:false});cv.addEventListener('touchend',end);
   return{
-    clear(){ctx.clearRect(0,0,cv.width,cv.height);hasDrawn=false;if(hint)hint.style.opacity='1'},
-    isEmpty(){return!hasDrawn}, canvas:cv
+    clear(){ctx.clearRect(0,0,cv.width,cv.height);drawn=false;if(hint)hint.style.opacity='1'},
+    empty(){return!drawn},canvas:cv
   }
 }
 
-// ─── State ────────────────────────────────────────────────────────────────────
-const COLORS=['#A259FF','#4D9FFF','#00E5A0','#FFC53D'];
-const state={
-  phase:'intro', classCount:2,
-  classes:[], currentClass:0,
-  knn:new KNN(), creator:'',
-  score:{right:0,wrong:0,tricks:0},
-  trickMode:false
-};
-let drawer=null;
+const S={phase:'intro',count:2,classes:[],cur:0,knn:new KNN(),creator:'',score:{r:0,w:0,t:0},trick:false};
+let D=null;
 
-const phaseOrder=['intro','collect','train','test','diploma'];
-function phaseIdx(p){return phaseOrder.indexOf(p)}
-
-function setProgress(){
-  const steps={intro:0,collect:0.4,train:0.65,test:0.85,diploma:1};
-  document.getElementById('progressFill').style.width=(steps[state.phase]*100)+'%';
+function prog(){
+  const m={intro:0,collect:.4,train:.65,test:.85,diploma:1};
+  document.getElementById('progressFill').style.width=(m[S.phase]*100)+'%';
 }
 
 function render(){
-  setProgress();
-  const wrap=document.getElementById('screenWrap');
-  wrap.innerHTML='';
-  const div=document.createElement('div');
-  div.className='screen-inner';
-  if(state.phase==='intro') div.innerHTML=phaseIntro();
-  else if(state.phase==='collect') div.innerHTML=phaseCollect();
-  else if(state.phase==='train') div.innerHTML=phaseTrain();
-  else if(state.phase==='test') div.innerHTML=phaseTest();
-  else div.innerHTML=phaseDiploma();
-  wrap.appendChild(div);
-  bindPhase();
+  prog();
+  const w=document.getElementById('screenWrap');w.innerHTML='';
+  const d=document.createElement('div');d.className='screen-inner';
+  if(S.phase==='intro')d.innerHTML=intro();
+  else if(S.phase==='collect')d.innerHTML=collect();
+  else if(S.phase==='train')d.innerHTML=train();
+  else if(S.phase==='test')d.innerHTML=test();
+  else d.innerHTML=diploma();
+  w.appendChild(d);bind();
 }
 
-// ─── INTRO ────────────────────────────────────────────────────────────────────
-function phaseIntro(){
+function intro(){
   return`
-    <div class="eyebrow">КодБот · Лаборатория</div>
+    <div class="eyebrow">КодБот · Лаборатория ИИ</div>
     <h1>Обучи ИИ <em>читать твои рисунки</em></h1>
-    <p class="sub">Выбери сколько категорий ты хочешь научить ИИ различать — и дай им имена.</p>
+    <p class="sub">Выбери сколько категорий научить ИИ, назови их — и начнём!</p>
     <div class="class-count-row">
-      ${[2,3,4].map(n=>`<button class="count-btn${state.classCount===n?' sel':''}" data-n="${n}">
+      ${[2,3,4].map(n=>`<button class="count-btn${S.count===n?' sel':''}" data-n="${n}">
         ${n}<small>${n===2?'легко':n===3?'средне':'сложно'}</small></button>`).join('')}
     </div>
     <div class="class-names-grid" id="namesGrid">${namesGrid()}</div>
-    <div style="display:flex;gap:8px;margin-bottom:16px;align-items:center">
-      <div style="font-size:12px;color:var(--kb-sub);font-weight:900;text-transform:uppercase;letter-spacing:.05em">Твоё имя:</div>
+    <div style="display:flex;gap:8px;margin-bottom:18px;align-items:center">
+      <span style="font-size:12px;font-weight:900;color:var(--ink3);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap">Твоё имя</span>
       <input class="cn-field" id="creatorField" placeholder="Имя или никнейм" maxlength="20"
-        value="${state.creator}" style="flex:1">
+        value="${S.creator}" style="flex:1">
     </div>
-    <button class="btn btn--green" id="startBtn" style="width:100%" disabled>
-      Начать обучение →
-    </button>
+    <button class="btn btn--pri" id="startBtn" style="width:100%" disabled>Начать →</button>
   `;
 }
 
 function namesGrid(){
-  return Array.from({length:state.classCount},(_,i)=>`
+  return Array.from({length:S.count},(_,i)=>`
     <div class="class-name-input-wrap">
       <label class="cn-label cn-label-${i}">Класс ${String.fromCharCode(65+i)}</label>
-      <input class="cn-field" id="cn_${i}" type="text" maxlength="15"
-        placeholder="${['буква А','буква Б','цифра 1','цифра 2'][i]||'своя идея'}"
-        value="${state.classes[i]?.name||''}">
-    </div>
-  `).join('');
+      <input class="cn-field" id="cn_${i}" maxlength="15"
+        placeholder="${['буква А','буква Б','цифра 1','цифра 2'][i]}"
+        value="${S.classes[i]?.name||''}">
+    </div>`).join('');
 }
 
-// ─── COLLECT ─────────────────────────────────────────────────────────────────
-function phaseCollect(){
-  const ci=state.currentClass;
-  const cls=state.classes[ci];
-  const done=cls.examples.length;
-  const pct=Math.round((ci/state.classCount)*100+(done/MIN_EX/state.classCount)*100);
-
+function collect(){
+  const cl=S.classes[S.cur],done=cl.examples.length;
   return`
-    <div class="eyebrow">Собираю данные · ${ci+1}/${state.classCount}</div>
-    <h1>Рисуй «<em>${cls.name}</em>»</h1>
-    <p class="sub">Нарисуй ${MIN_EX}+ разных вариантов. ИИ запомнит как они выглядят.</p>
+    <div class="eyebrow">Собираю данные · ${S.cur+1} из ${S.count}</div>
+    <h1>Рисуй «<em>${cl.name}</em>»</h1>
+    <p class="sub">Нарисуй минимум ${MIN_EX} разных вариантов. Каждый раз немного по-другому.</p>
     <div class="draw-hdr">
-      <span class="class-tag ct-${ci}">${cls.name}</span>
-      <span class="ex-counter"><strong id="exCount">${done}</strong> / ${MIN_EX} примеров</span>
+      <span class="class-tag ct-${S.cur}">${cl.name}</span>
+      <span class="ex-counter"><strong id="exCount">${done}</strong> / ${MIN_EX}</span>
     </div>
     <div class="canvas-wrap">
       <canvas class="draw-canvas" id="drawCanvas"></canvas>
       <div class="canvas-hint" id="drawCanvas_hint">
         <span class="canvas-hint-icon">✏️</span>
-        <span class="canvas-hint-text">Рисуй здесь пальцем или мышью</span>
+        <span class="canvas-hint-text">Рисуй пальцем или мышью</span>
       </div>
     </div>
     <div class="toolbar">
       <button class="btn btn--ghost" id="clearBtn" style="padding:13px 16px">Стереть</button>
-      <button class="btn btn--green" id="addBtn" disabled>+ Запомнить</button>
+      <button class="btn btn--pri" id="addBtn" disabled>+ Запомнить</button>
     </div>
-    <div class="thumbs-row" id="thumbsRow">${thumbsHTML(cls)}</div>
+    <div class="thumbs-row" id="thumbsRow">${thumbsHTML(cl)}</div>
     <div style="display:flex;gap:8px">
-      ${ci>0?`<button class="btn btn--ghost" onclick="prevClass()">← Назад</button>`:''}
-      <button class="btn ${done>=MIN_EX?'btn--green':'btn--ghost'}" id="nextClassBtn"
+      ${S.cur>0?`<button class="btn btn--ghost" onclick="prevCls()">← Назад</button>`:''}
+      <button class="btn ${done>=MIN_EX?'btn--pri':'btn--ghost'}" id="nextBtn"
         ${done<MIN_EX?'disabled':''} style="flex:1">
-        ${ci<state.classCount-1?'Следующий класс →':'Обучить ИИ →'}
+        ${S.cur<S.count-1?'Следующий →':'Обучить ИИ →'}
       </button>
     </div>
   `;
 }
 
-function thumbsHTML(cls){
-  if(!cls.examples.length) return '';
-  return cls.examples.map((_,i)=>{
-    const id=`th_${state.currentClass}_${i}`;
+function thumbsHTML(cl){
+  return cl.examples.map((_,i)=>{
+    const id=`th_${S.cur}_${i}`;
     setTimeout(()=>{
-      const el=document.getElementById(id);
-      if(!el) return;
+      const el=document.getElementById(id);if(!el)return;
       const tc=el.querySelector('canvas');
-      if(tc){tc.width=50;tc.height=50;tc.getContext('2d').drawImage(cls.examples[i].canvas,0,0,50,50)}
+      if(tc){tc.width=50;tc.height=50;tc.getContext('2d').drawImage(cl.examples[i].canvas,0,0,50,50)}
     },0);
     return`<div class="thumb" id="${id}"><canvas width="50" height="50"></canvas></div>`;
   }).join('');
 }
 
-// ─── TRAIN ───────────────────────────────────────────────────────────────────
-function phaseTrain(){
-  return`
-    <div class="train-screen">
-      <span class="neurons">🧠</span>
-      <div class="train-title">ИИ учится...</div>
-      <div class="train-bar-wrap"><div class="train-bar" id="trainBar" style="width:0%"></div></div>
-      <div class="train-log" id="trainLog"></div>
-    </div>
-  `;
+function train(){
+  return`<div class="train-screen">
+    <span class="neurons">🧠</span>
+    <div class="train-title">ИИ учится...</div>
+    <div class="train-bar-wrap"><div class="train-bar" id="trainBar" style="width:0%"></div></div>
+    <div class="train-log" id="trainLog"></div>
+  </div>`;
 }
 
-// ─── TEST ─────────────────────────────────────────────────────────────────────
-function phaseTest(){
-  const sc=state.score;
-  const total=sc.right+sc.wrong;
-  const acc=total>0?Math.round(sc.right/total*100):0;
-
+function test(){
+  const sc=S.score;
   return`
     <div class="eyebrow">Тест · Угадай что это</div>
     <h1>Нарисуй — и посмотрим <em>что скажет ИИ</em></h1>
-    
     <div class="score-panel">
-      <div class="sc-card">
-        <div class="sc-num sc-num-ok">${sc.right}</div>
-        <div class="sc-lbl">Угадал</div>
-      </div>
-      <div class="sc-card">
-        <div class="sc-num sc-num-fail">${sc.wrong}</div>
-        <div class="sc-lbl">Ошибся</div>
-      </div>
-      <div class="sc-card">
-        <div class="sc-num sc-num-trick">${sc.tricks}</div>
-        <div class="sc-lbl">Обманут</div>
-      </div>
+      <div class="sc-card"><div class="sc-num sc-ok">${sc.r}</div><div class="sc-lbl">Угадал</div></div>
+      <div class="sc-card"><div class="sc-num sc-fail">${sc.w}</div><div class="sc-lbl">Ошибся</div></div>
+      <div class="sc-card"><div class="sc-num sc-trick">${sc.t}</div><div class="sc-lbl">Обманут</div></div>
     </div>
-
     <div class="trick-toggle" id="trickToggle">
       <span class="trick-toggle-icon">🎭</span>
       <span class="trick-toggle-label">Режим «Обмани ИИ»</span>
-      <div class="trick-switch${state.trickMode?' on':''}" id="trickSwitch"></div>
+      <div class="trick-switch${S.trick?' on':''}"></div>
     </div>
-
-    ${state.trickMode?`<div class="trick-banner">
-      <span class="trick-icon">⚡</span>
-      <div class="trick-text">Рисуй что-то необычное или смешанное — попробуй запутать ИИ!</div>
-    </div>`:''}
-
+    ${S.trick?`<div class="trick-banner">⚡ Рисуй что-то странное или смешанное — попробуй запутать!</div>`:''}
     <div class="canvas-wrap">
       <canvas class="draw-canvas" id="drawCanvas"></canvas>
       <div class="canvas-hint" id="drawCanvas_hint">
-        <span class="canvas-hint-icon">${state.trickMode?'🎭':'🖊️'}</span>
-        <span class="canvas-hint-text">${state.trickMode?'Обмани ИИ!':'Нарисуй что-нибудь'}</span>
+        <span class="canvas-hint-icon">${S.trick?'🎭':'🖊️'}</span>
+        <span class="canvas-hint-text">${S.trick?'Обмани ИИ!':'Нарисуй что-нибудь'}</span>
       </div>
     </div>
-
     <div class="toolbar">
       <button class="btn btn--ghost" id="clearBtn" style="padding:13px 16px">Стереть</button>
-      <button class="btn${state.trickMode?' btn--sun':' btn--green'}" id="predictBtn" disabled>
-        ${state.trickMode?'🎭 Обмануть!':'Что это? →'}
+      <button class="btn ${S.trick?'btn--sun':'btn--pri'}" id="predictBtn" disabled>
+        ${S.trick?'🎭 Обмануть!':'Что это? →'}
       </button>
     </div>
-
     <div id="resultBox"></div>
-
     <div style="display:flex;gap:8px;margin-top:14px">
-      <button class="btn btn--ghost" onclick="trainAgain()" style="flex:1">↩ Обучить заново</button>
-      <button class="btn btn--purple" onclick="goState('diploma')" style="flex:none;padding:13px 18px">
-        Получить диплом 🎓
-      </button>
+      <button class="btn btn--ghost" onclick="reset()" style="flex:1">↩ Заново</button>
+      <button class="btn btn--ok" onclick="go('diploma')" style="flex:none;padding:13px 18px">Диплом 🎓</button>
     </div>
   `;
 }
 
-// ─── DIPLOMA ─────────────────────────────────────────────────────────────────
-function phaseDiploma(){
-  const sc=state.score;
-  const total=sc.right+sc.wrong;
-  const acc=total>0?Math.round(sc.right/total*100):0;
+function diploma(){
+  const sc=S.score,total=sc.r+sc.w;
+  const acc=total>0?Math.round(sc.r/total*100):0;
   const today=new Date().toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'});
-  const totalEx=state.classes.reduce((s,c)=>s+c.examples.length,0);
+  const totalEx=S.classes.reduce((s,c)=>s+c.examples.length,0);
   const rank=acc>=90?'🥇 Гений ИИ':acc>=70?'🥈 ИИ-Инженер':acc>=50?'🥉 ИИ-Студент':'🎓 Начинающий';
-
   return`
-    <div class="eyebrow">Диплом выдан</div>
+    <div class="eyebrow">Готово!</div>
     <div class="diploma">
       <div class="diploma-top">
         <span class="diploma-icon">🤖</span>
-        <div class="diploma-title">Сертификат разработчика ИИ · Nooka КодБот</div>
-        <div class="diploma-name">${state.creator||'Юный учёный'}</div>
+        <div class="diploma-title">Сертификат · Nooka КодБот</div>
+        <div class="diploma-name">${S.creator||'Юный учёный'}</div>
       </div>
       <div class="diploma-body">
         <div class="dip-row">
-          <div class="dip-key">Обучил ИИ различать</div>
-          <div class="dip-val">
-            <div class="dip-classes">
-              ${state.classes.map((c,i)=>`<span class="dip-tag dip-tag-${i}">${c.name}</span>`).join('')}
-            </div>
-          </div>
+          <div class="dip-key">Научил ИИ</div>
+          <div class="dip-val"><div class="dip-classes">
+            ${S.classes.map((c,i)=>`<span class="dip-tag dip-tag-${i}">${c.name}</span>`).join('')}
+          </div></div>
         </div>
-        <div class="dip-row">
-          <div class="dip-key">Обучающих примеров</div>
-          <div class="dip-val">${totalEx} рисунков</div>
-        </div>
-        <div class="dip-row">
-          <div class="dip-key">Точность ИИ</div>
-          <div class="dip-val">${total>0?acc+'%':'не тестировался'}</div>
-        </div>
-        <div class="dip-row">
-          <div class="dip-key">Обманул ИИ</div>
-          <div class="dip-val">${sc.tricks} раз</div>
-        </div>
-        <div class="dip-row">
-          <div class="dip-key">Ранг</div>
-          <div class="dip-val">${rank}</div>
-        </div>
-        <div class="dip-row">
-          <div class="dip-key">Дата</div>
-          <div class="dip-val">${today}</div>
-        </div>
+        <div class="dip-row"><div class="dip-key">Примеров</div><div class="dip-val">${totalEx} рисунков</div></div>
+        <div class="dip-row"><div class="dip-key">Точность</div><div class="dip-val">${total?acc+'%':'не тестировал'}</div></div>
+        <div class="dip-row"><div class="dip-key">Обманул ИИ</div><div class="dip-val">${sc.t} раз</div></div>
+        <div class="dip-row"><div class="dip-key">Ранг</div><div class="dip-val">${rank}</div></div>
+        <div class="dip-row"><div class="dip-key">Дата</div><div class="dip-val">${today}</div></div>
       </div>
     </div>
     <div style="display:flex;gap:8px">
-      <button class="btn btn--ghost" onclick="goState('test')" style="flex:1">← Ещё потестить</button>
-      <button class="btn btn--green" onclick="trainAgain()" style="flex:1">Обучить новый ИИ</button>
+      <button class="btn btn--ghost" onclick="go('test')" style="flex:1">← Ещё тест</button>
+      <button class="btn btn--pri" onclick="reset()" style="flex:1">Новый ИИ</button>
     </div>
   `;
 }
 
-// ─── BIND ─────────────────────────────────────────────────────────────────────
-function bindPhase(){
-  if(state.phase==='intro') bindIntro();
-  else if(state.phase==='collect') bindCollect();
-  else if(state.phase==='train') runTraining();
-  else if(state.phase==='test') bindTest();
+function bind(){
+  if(S.phase==='intro')bindIntro();
+  else if(S.phase==='collect')bindCollect();
+  else if(S.phase==='train')runTrain();
+  else if(S.phase==='test')bindTest();
 }
 
 function bindIntro(){
-  document.querySelectorAll('.count-btn').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      state.classCount=+btn.dataset.n;
-      document.querySelectorAll('.count-btn').forEach(b=>b.classList.remove('sel'));
-      btn.classList.add('sel');
-      document.getElementById('namesGrid').innerHTML=namesGrid();
-      checkIntroReady();
-    });
+  document.querySelectorAll('.count-btn').forEach(b=>b.addEventListener('click',()=>{
+    S.count=+b.dataset.n;
+    document.querySelectorAll('.count-btn').forEach(x=>x.classList.remove('sel'));
+    b.classList.add('sel');
+    document.getElementById('namesGrid').innerHTML=namesGrid();
+    chk();
+  }));
+  document.querySelectorAll('.cn-field[id^="cn_"]').forEach(f=>f.addEventListener('input',chk));
+  document.getElementById('creatorField')?.addEventListener('input',e=>{S.creator=e.target.value;chk()});
+  document.getElementById('startBtn')?.addEventListener('click',()=>{
+    const names=Array.from(document.querySelectorAll('.cn-field[id^="cn_"]')).map(f=>f.value.trim());
+    S.creator=document.getElementById('creatorField').value.trim();
+    S.classes=Array.from({length:S.count},(_,i)=>({name:names[i],examples:[]}));
+    S.cur=0;go('collect');
   });
-  document.querySelectorAll('.cn-field[id^="cn_"]').forEach(f=>f.addEventListener('input',checkIntroReady));
-  document.getElementById('creatorField')?.addEventListener('input',e=>{state.creator=e.target.value;checkIntroReady()});
-  document.getElementById('startBtn')?.addEventListener('click',startCollect);
-  checkIntroReady();
+  chk();
 }
 
-function checkIntroReady(){
+function chk(){
   const names=Array.from(document.querySelectorAll('.cn-field[id^="cn_"]')).map(f=>f.value.trim());
-  const allNamed=names.slice(0,state.classCount).every(n=>n.length>0);
-  const creator=(document.getElementById('creatorField')?.value||'').trim();
-  const btn=document.getElementById('startBtn');
-  if(btn) btn.disabled=!(allNamed && creator.length>0);
-}
-
-function startCollect(){
-  const names=Array.from(document.querySelectorAll('.cn-field[id^="cn_"]')).map(f=>f.value.trim());
-  state.creator=(document.getElementById('creatorField')?.value||'').trim();
-  state.classes=Array.from({length:state.classCount},(_,i)=>({name:names[i],examples:[]}));
-  state.currentClass=0;
-  goState('collect');
+  const ok=names.slice(0,S.count).every(n=>n.length>0)&&document.getElementById('creatorField')?.value.trim();
+  const b=document.getElementById('startBtn');if(b)b.disabled=!ok;
 }
 
 function bindCollect(){
-  const cls=state.classes[state.currentClass];
-  const addBtn=document.getElementById('addBtn');
-
-  drawer=makeDrawCanvas('drawCanvas',()=>{
-    if(addBtn) addBtn.disabled=false;
-  },{color:COLORS[state.currentClass]});
-
-  document.getElementById('clearBtn')?.addEventListener('click',()=>{
-    drawer.clear(); if(addBtn) addBtn.disabled=true;
+  const cl=S.classes[S.cur];
+  const add=document.getElementById('addBtn');
+  D=makeCanvas('drawCanvas',()=>{if(add)add.disabled=false},DRAW_COLORS[S.cur]);
+  document.getElementById('clearBtn')?.addEventListener('click',()=>{D.clear();if(add)add.disabled=true});
+  add?.addEventListener('click',()=>{
+    if(D.empty())return;
+    const cv=document.createElement('canvas');cv.width=D.canvas.width;cv.height=D.canvas.height;
+    cv.getContext('2d').drawImage(D.canvas,0,0);
+    cl.examples.push({canvas:cv,px:getPixels(D.canvas)});
+    D.clear();add.disabled=true;
+    document.getElementById('exCount').textContent=cl.examples.length;
+    document.getElementById('thumbsRow').innerHTML=thumbsHTML(cl);
+    const nb=document.getElementById('nextBtn');if(nb)nb.disabled=cl.examples.length<MIN_EX;
   });
-
-  addBtn?.addEventListener('click',()=>{
-    if(drawer.isEmpty()) return;
-    const cv=document.createElement('canvas');
-    cv.width=drawer.canvas.width; cv.height=drawer.canvas.height;
-    cv.getContext('2d').drawImage(drawer.canvas,0,0);
-    cls.examples.push({canvas:cv,pixels:getPixels(drawer.canvas)});
-    drawer.clear(); addBtn.disabled=true;
-    document.getElementById('exCount').textContent=cls.examples.length;
-    document.getElementById('thumbsRow').innerHTML=thumbsHTML(cls);
-    const nb=document.getElementById('nextClassBtn');
-    if(nb) nb.disabled=cls.examples.length<MIN_EX;
-  });
-
-  document.getElementById('nextClassBtn')?.addEventListener('click',()=>{
-    if(state.currentClass<state.classCount-1){
-      state.currentClass++; render();
-    } else goState('train');
+  document.getElementById('nextBtn')?.addEventListener('click',()=>{
+    if(S.cur<S.count-1){S.cur++;render()}else go('train');
   });
 }
 
-function prevClass(){state.currentClass=Math.max(0,state.currentClass-1);render()}
+window.prevCls=()=>{S.cur=Math.max(0,S.cur-1);render()};
 
-function runTraining(){
-  const bar=document.getElementById('trainBar');
-  const log=document.getElementById('trainLog');
-  state.knn=new KNN();
-  state.classes.forEach(c=>c.examples.forEach(ex=>state.knn.add(ex.pixels,c.name)));
-
-  const steps=[
-    [15,`> Загружаю ${state.classes[0].name} (${state.classes[0].examples.length} примеров)...`],
-    [35,state.classes.length>1?`> Загружаю ${state.classes[1].name} (${state.classes[1].examples.length} примеров)...`:'> Обрабатываю...'],
-    [55,state.classes.length>2?`> Загружаю ${state.classes[2].name}...`:'> Строю векторы...'],
-    [75,'> Строю модель KNN...'],
-    [90,'> Верифицирую данные...'],
-    [100,'> Готово! Модель обучена ✓'],
-  ];
+function runTrain(){
+  const bar=document.getElementById('trainBar'),log=document.getElementById('trainLog');
+  S.knn=new KNN();
+  S.classes.forEach(c=>c.examples.forEach(e=>S.knn.add(e.px,c.name)));
+  const steps=[[15,`> Загружаю «${S.classes[0].name}» (${S.classes[0].examples.length} шт)...`],
+    [35,S.classes[1]?`> Загружаю «${S.classes[1].name}» (${S.classes[1].examples.length} шт)...`:'> Обрабатываю...'],
+    [55,S.classes[2]?`> Загружаю «${S.classes[2].name}»...`:'> Строю векторы...'],
+    [75,'> Строю KNN-модель...'],
+    [90,'> Проверка данных...'],
+    [100,'> Модель обучена ✓']];
   let i=0;
-  function step(){
-    if(i>=steps.length){setTimeout(()=>{state.phase='test';document.getElementById('scoreChip').hidden=false;render()},500);return}
-    const[pct,txt]=steps[i++];
-    if(bar) bar.style.width=pct+'%';
-    if(log){const s=document.createElement('span');s.textContent=txt;log.appendChild(s);if(log.children.length>4)log.removeChild(log.firstChild)}
+  (function step(){
+    if(i>=steps.length){setTimeout(()=>{document.getElementById('scoreChip').hidden=false;go('test')},500);return}
+    const[p,t]=steps[i++];if(bar)bar.style.width=p+'%';
+    if(log){const s=document.createElement('span');s.textContent=t;log.appendChild(s);
+      if(log.children.length>4)log.removeChild(log.firstChild)}
     setTimeout(step,300);
-  }
-  setTimeout(step,100);
+  })();
 }
 
 function bindTest(){
-  drawer=makeDrawCanvas('drawCanvas',()=>{
-    const pb=document.getElementById('predictBtn');
-    if(pb) pb.disabled=false;
+  D=makeCanvas('drawCanvas',()=>{
+    document.getElementById('predictBtn').disabled=false;
     document.getElementById('resultBox').innerHTML='';
-  },{color:state.trickMode?'#FFC53D':'#00E5A0'});
-
+  },S.trick?'#E07B00':'#181228');
   document.getElementById('clearBtn')?.addEventListener('click',()=>{
-    drawer.clear();
-    document.getElementById('predictBtn').disabled=true;
+    D.clear();document.getElementById('predictBtn').disabled=true;
     document.getElementById('resultBox').innerHTML='';
   });
-
   document.getElementById('predictBtn')?.addEventListener('click',()=>{
-    if(drawer.isEmpty()) return;
-    const pixels=getPixels(drawer.canvas);
-    const res=state.knn.predict(pixels);
-    showResult(res);
+    if(D.empty())return;
+    const res=S.knn.predict(getPixels(D.canvas));
+    showRes(res);
   });
-
-  document.getElementById('trickToggle')?.addEventListener('click',()=>{
-    state.trickMode=!state.trickMode;
-    render();
-  });
+  document.getElementById('trickToggle')?.addEventListener('click',()=>{S.trick=!S.trick;render()});
 }
 
-function showResult(res){
-  const ci=state.classes.findIndex(c=>c.name===res.label);
-  const safeCi=Math.max(0,ci);
+function showRes(res){
+  const ci=Math.max(0,S.classes.findIndex(c=>c.name===res.label));
   const conf=Math.round(res.confidence*100);
-  const isTrick=state.trickMode;
-  const isTricked=conf<=34;
-
-  if(!isTrick) {
-    // ask user if correct
-    const box=document.getElementById('resultBox');
-    box.innerHTML=`
-      <div class="result-card rc-${safeCi}">
-        <div class="result-label">${res.label}</div>
-        <div class="conf-text">Уверенность: ${conf}%</div>
-        <div class="conf-bar-wrap"><div class="conf-bar cb-${safeCi}" style="width:${conf}%"></div></div>
-      </div>
-      <div style="display:flex;gap:8px;margin-top:12px">
-        <button class="btn btn--ghost" onclick="markResult(true)" style="flex:1">✓ Угадал</button>
-        <button class="btn btn--ghost" onclick="markResult(false)" style="flex:1;color:#FF6B6B">✗ Ошибся</button>
-      </div>
-    `;
+  const box=document.getElementById('resultBox');
+  if(!S.trick){
+    box.innerHTML=`<div class="result-card rc-${ci}">
+      <div class="result-label">${res.label}</div>
+      <div class="conf-text">Уверенность: ${conf}%</div>
+      <div class="conf-bar-wrap"><div class="conf-bar cb-${ci}" style="width:${conf}%"></div></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn btn--ghost" onclick="mark(true)" style="flex:1">✓ Угадал</button>
+      <button class="btn btn--ghost" onclick="mark(false)" style="flex:1;color:#E53E3E">✗ Ошибся</button>
+    </div>`;
   } else {
-    const box=document.getElementById('resultBox');
-    if(isTricked) state.score.tricks++;
-    box.innerHTML=`
-      <div class="result-card rc-${safeCi}">
-        <div class="result-label">${res.label}</div>
-        <div class="conf-text">Уверенность: ${conf}%</div>
-        <div class="conf-bar-wrap"><div class="conf-bar cb-${safeCi}" style="width:${conf}%"></div></div>
-        <span class="verdict ${isTricked?'verdict-trick':'verdict-wrong'}">
-          ${isTricked?`⚡ Ты запутал ИИ! (${conf}% — почти случайно)`:`🤖 ИИ не запутался (${conf}% уверен)`}
-        </span>
-      </div>
-    `;
-    updateScoreChip();
+    const tricked=conf<=34;if(tricked)S.score.t++;
+    box.innerHTML=`<div class="result-card rc-${ci}">
+      <div class="result-label">${res.label}</div>
+      <div class="conf-text">Уверенность: ${conf}%</div>
+      <div class="conf-bar-wrap"><div class="conf-bar cb-${ci}" style="width:${conf}%"></div></div>
+      <span class="verdict ${tricked?'verdict-trick':'verdict-wrong'}">
+        ${tricked?`⚡ Ты запутал ИИ! (${conf}% — почти случайно)`:`🤖 ИИ устоял (${conf}% уверен)`}
+      </span>
+    </div>`;
+    updChip();
   }
 }
 
-window.markResult=function(correct){
-  if(correct) state.score.right++; else state.score.wrong++;
-  updateScoreChip();
-  const box=document.getElementById('resultBox');
-  const verdict=box.querySelector('.result-card');
-  if(verdict){
-    const v=document.createElement('span');
-    v.className=`verdict ${correct?'verdict-right':'verdict-wrong'}`;
-    v.textContent=correct?'✓ Правильно!':'✗ Ошибся';
-    verdict.appendChild(v);
-  }
-  // remove buttons
-  const btns=box.querySelector('div[style]');
-  if(btns) btns.remove();
+window.mark=function(ok){
+  if(ok)S.score.r++;else S.score.w++;updChip();
+  const card=document.querySelector('.result-card');
+  if(card){const v=document.createElement('span');v.className=`verdict ${ok?'verdict-right':'verdict-wrong'}`;
+    v.textContent=ok?'✓ Правильно!':'✗ Ошибся';card.appendChild(v)}
+  document.querySelector('[onclick^="mark"]')?.parentElement?.remove();
 };
 
-function updateScoreChip(){
-  const sc=state.score;
-  const chip=document.getElementById('scoreChip');
-  if(chip){chip.textContent=`✓ ${sc.right} / ✗ ${sc.wrong}`;
-    chip.className=`score-chip${sc.right>sc.wrong?' ok':''}`;chip.hidden=false}
+function updChip(){
+  const sc=S.score,chip=document.getElementById('scoreChip');
+  if(chip){chip.textContent=`✓ ${sc.r} / ✗ ${sc.w}`;
+    chip.className=`score-chip${sc.r>sc.w?' ok':''}`;chip.hidden=false}
 }
 
-function goState(s){state.phase=s;render()}
-function trainAgain(){
-  state.phase='intro';state.classes=[];state.currentClass=0;
-  state.knn=new KNN();state.score={right:0,wrong:0,tricks:0};state.trickMode=false;
+window.go=s=>{S.phase=s;render()};
+window.reset=()=>{
+  S.phase='intro';S.classes=[];S.cur=0;S.knn=new KNN();
+  S.score={r:0,w:0,t:0};S.trick=false;
   document.getElementById('scoreChip').hidden=true;render();
-}
+};
 
 render();
 </script>
