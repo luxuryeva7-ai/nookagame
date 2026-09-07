@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#FDF7EC">
+<title>Создай свой ИИ — Nooka</title>
+<link href="/fonts/nooka-fonts.css" rel="stylesheet">
+<style>
+:root{--ink:#181228;--ink2:#5B5470;--ink3:#8A82A0;--purple:#7B2FFF;--sun:#FFC53D;
+  --bg:#FDF7EC;--line:#E9E1F5;--ok:#12A47A}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:'Nunito',system-ui,sans-serif;-webkit-font-smoothing:antialiased;
+  min-height:100vh;display:flex;flex-direction:column}
+
+/* HEADER */
+.hdr{padding:16px 24px;display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1.5px solid var(--line);background:var(--bg)}
+.logo{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:17px;
+  color:var(--purple);text-decoration:none}
+.step-counter{font-weight:900;font-size:13px;color:var(--ink3)}
+
+/* PROGRESS */
+.progress-bar{height:4px;background:var(--line)}
+.progress-fill{height:100%;background:var(--purple);border-radius:0 2px 2px 0;
+  transition:width .4s ease}
+
+/* MAIN */
+.main{flex:1;display:flex;align-items:center;justify-content:center;padding:24px 20px}
+.screen{width:100%;max-width:560px}
+
+/* SCREENS */
+.screen-inner{animation:fadein .3s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+.screen-emoji{font-size:56px;margin-bottom:16px;display:block;line-height:1}
+.screen-title{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;
+  font-size:clamp(22px,5vw,32px);line-height:1.2;margin:0 0 10px;letter-spacing:-.5px}
+.screen-title em{font-style:normal;color:var(--purple)}
+.screen-sub{font-size:16px;color:var(--ink2);margin:0 0 28px;line-height:1.6}
+
+/* OPTIONS */
+.options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:28px}
+.option{background:#fff;border:2px solid var(--line);border-radius:18px;
+  padding:16px 18px;cursor:pointer;transition:border-color .15s,background .15s;
+  text-align:left;font-family:inherit}
+.option:hover{border-color:var(--purple);background:#F6F2FF}
+.option.selected{border-color:var(--purple);background:#F6F2FF}
+.option-icon{font-size:28px;margin-bottom:6px;display:block}
+.option-name{font-weight:900;font-size:15px;color:var(--ink);display:block;margin-bottom:2px}
+.option-hint{font-size:13px;color:var(--ink3);display:block}
+
+/* INPUT */
+.field-label{font-weight:900;font-size:14px;color:var(--ink2);margin-bottom:8px;
+  letter-spacing:.03em;text-transform:uppercase;font-size:12px}
+.field{width:100%;padding:16px 18px;border:2px solid var(--line);border-radius:16px;
+  font-family:'Nunito',inherit;font-size:17px;color:var(--ink);background:#fff;
+  outline:none;transition:border-color .15s;resize:none;line-height:1.5}
+.field:focus{border-color:var(--purple)}
+.field-counter{text-align:right;font-size:12px;color:var(--ink3);margin-top:4px}
+.field-group{margin-bottom:20px}
+
+/* PASSPORT */
+.passport{background:#fff;border:2px solid var(--line);border-radius:24px;overflow:hidden}
+.passport-top{background:var(--purple);padding:24px 28px;color:#fff}
+.passport-top-label{font-size:11px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;
+  opacity:.7;margin-bottom:6px}
+.passport-name{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:22px;
+  line-height:1.2}
+.passport-body{padding:22px 28px}
+.passport-row{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.passport-row:last-child{border-bottom:none}
+.passport-key{flex:none;width:110px;font-size:12px;font-weight:900;color:var(--ink3);
+  text-transform:uppercase;letter-spacing:.04em;padding-top:1px}
+.passport-val{font-size:15px;color:var(--ink);line-height:1.5}
+.passport-badge{display:inline-flex;align-items:center;gap:6px;background:#F1EAFE;
+  color:var(--purple);font-weight:900;font-size:12px;padding:4px 12px;
+  border-radius:999px;margin-top:14px}
+
+/* BTNS */
+.btn-row{display:flex;gap:12px;margin-top:24px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:16px 28px;border-radius:16px;font-weight:900;font-size:16px;
+  border:none;cursor:pointer;font-family:inherit;text-decoration:none;
+  transition:transform .12s,opacity .12s;flex:1}
+.btn:active{transform:scale(.97)}
+.btn--pri{background:var(--purple);color:#fff}
+.btn--pri:disabled{opacity:.4;cursor:default}
+.btn--soft{background:#fff;color:var(--purple);border:2px solid var(--line);flex:none}
+.btn--sun{background:var(--sun);color:var(--ink)}
+
+/* CELEBRATE */
+.celebrate{text-align:center;padding:20px 0 0}
+.celebrate-big{font-size:64px;margin-bottom:12px;display:block;animation:pop .4s cubic-bezier(.36,.07,.19,.97)}
+@keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+.celebrate-title{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:26px;
+  margin-bottom:8px;letter-spacing:-.5px}
+.celebrate-sub{font-size:16px;color:var(--ink2);margin-bottom:24px}
+
+@media(max-width:480px){
+  .options{grid-template-columns:1fr}
+  .btn-row{flex-direction:column}
+  .btn--soft{flex:1}
+  .hdr{padding:12px 16px}
+}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <a class="logo" href="https://nookagame.ru">Nooka</a>
+  <span class="step-counter" id="stepCounter">Шаг 1 из 5</span>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:20%"></div></div>
+
+<div class="main">
+  <div class="screen" id="screenWrap"></div>
+</div>
+
+<script>
+const state = {
+  topic: null,
+  name: '',
+  learns: '',
+  creator: '',
+  step: 1,
+  total: 5
+};
+
+const topics = [
+  {id:'animals', icon:'🐾', name:'Животные', hint:'Кот, собака, птица...'},
+  {id:'food',    icon:'🍕', name:'Еда',       hint:'Пицца, суши, яблоко...'},
+  {id:'mood',    icon:'😊', name:'Настроение', hint:'Радость, грусть, удивление'},
+  {id:'weather', icon:'☁️', name:'Погода',    hint:'Дождь, солнце, снег'},
+  {id:'sport',   icon:'⚽', name:'Спорт',     hint:'Мяч, ракетка, кольцо'},
+  {id:'own',     icon:'✨', name:'Своя идея', hint:'Что-то только твоё'},
+];
+
+function update() {
+  const pct = (state.step / state.total) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('stepCounter').textContent = `Шаг ${state.step} из ${state.total}`;
+  render();
+}
+
+function render() {
+  const wrap = document.getElementById('screenWrap');
+  wrap.innerHTML = '';
+  const div = document.createElement('div');
+  div.className = 'screen-inner';
+
+  if (state.step === 1) div.innerHTML = step1();
+  else if (state.step === 2) div.innerHTML = step2();
+  else if (state.step === 3) div.innerHTML = step3();
+  else if (state.step === 4) div.innerHTML = step4();
+  else if (state.step === 5) div.innerHTML = step5();
+
+  wrap.appendChild(div);
+  bindEvents();
+}
+
+function step1() {
+  return `
+    <span class="screen-emoji">🧠</span>
+    <h1 class="screen-title">Привет! Сегодня ты создаёшь <em>своего ИИ</em></h1>
+    <p class="screen-sub">Выбери тему — чему будет учиться твоя нейросеть?</p>
+    <div class="options">
+      ${topics.map(t => `
+        <button class="option${state.topic===t.id?' selected':''}" data-topic="${t.id}">
+          <span class="option-icon">${t.icon}</span>
+          <span class="option-name">${t.name}</span>
+          <span class="option-hint">${t.hint}</span>
+        </button>
+      `).join('')}
+    </div>
+    <div class="btn-row">
+      <button class="btn btn--pri" id="nextBtn" ${!state.topic?'disabled':''} onclick="next()">Дальше →</button>
+    </div>
+  `;
+}
+
+function step2() {
+  const topic = topics.find(t => t.id === state.topic);
+  return `
+    <span class="screen-emoji">${topic.icon}</span>
+    <h1 class="screen-title">Дай имя <em>своему ИИ</em></h1>
+    <p class="screen-sub">Не «Алиса» и не «Сири» — придумай что-то своё. Как бы ты назвал умного помощника по теме «${topic.name}»?</p>
+    <div class="field-group">
+      <div class="field-label">Имя твоего ИИ</div>
+      <input class="field" id="nameField" maxlength="40" placeholder="Например: КотоМозг, ЕдаМастер..."
+        value="${state.name}" oninput="state.name=this.value;checkName()">
+      <div class="field-counter"><span id="nameLen">${state.name.length}</span>/40</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn--soft" onclick="back()">←</button>
+      <button class="btn btn--pri" id="nextBtn" ${!state.name.trim()?'disabled':''} onclick="next()">Дальше →</button>
+    </div>
+  `;
+}
+
+function step3() {
+  return `
+    <span class="screen-emoji">📚</span>
+    <h1 class="screen-title">Чему научится <em>${state.name || 'твой ИИ'}?</em></h1>
+    <p class="screen-sub">Опиши что он будет различать. Например: «отличать кота от собаки по фото» или «узнавать пиццу среди другой еды».</p>
+    <div class="field-group">
+      <div class="field-label">Что он умеет</div>
+      <textarea class="field" id="learnsField" rows="3" maxlength="200"
+        placeholder="Он будет различать..."
+        oninput="state.learns=this.value;checkLearns()">${state.learns}</textarea>
+      <div class="field-counter"><span id="learnsLen">${state.learns.length}</span>/200</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn--soft" onclick="back()">←</button>
+      <button class="btn btn--pri" id="nextBtn" ${!state.learns.trim()?'disabled':''} onclick="next()">Дальше →</button>
+    </div>
+  `;
+}
+
+function step4() {
+  return `
+    <span class="screen-emoji">👤</span>
+    <h1 class="screen-title">Кто ты — <em>создатель</em>?</h1>
+    <p class="screen-sub">Твоё имя появится в паспорте проекта. Именно ты обучил этот ИИ.</p>
+    <div class="field-group">
+      <div class="field-label">Твоё имя</div>
+      <input class="field" id="creatorField" maxlength="30" placeholder="Имя или никнейм"
+        value="${state.creator}" oninput="state.creator=this.value;checkCreator()">
+    </div>
+    <div class="btn-row">
+      <button class="btn btn--soft" onclick="back()">←</button>
+      <button class="btn btn--pri" id="nextBtn" ${!state.creator.trim()?'disabled':''} onclick="next()">Готово →</button>
+    </div>
+  `;
+}
+
+function step5() {
+  const topic = topics.find(t => t.id === state.topic);
+  const today = new Date().toLocaleDateString('ru-RU', {day:'numeric',month:'long',year:'numeric'});
+  return `
+    <div class="celebrate">
+      <span class="celebrate-big">🎉</span>
+      <div class="celebrate-title">Проект создан!</div>
+      <p class="celebrate-sub">Вот паспорт твоего ИИ — покажи его!</p>
+    </div>
+    <div class="passport">
+      <div class="passport-top">
+        <div class="passport-top-label">Паспорт ИИ-проекта · Nooka</div>
+        <div class="passport-name">${state.name}</div>
+      </div>
+      <div class="passport-body">
+        <div class="passport-row">
+          <div class="passport-key">Тема</div>
+          <div class="passport-val">${topic.icon} ${topic.name}</div>
+        </div>
+        <div class="passport-row">
+          <div class="passport-key">Умеет</div>
+          <div class="passport-val">${state.learns}</div>
+        </div>
+        <div class="passport-row">
+          <div class="passport-key">Создал</div>
+          <div class="passport-val">${state.creator}</div>
+        </div>
+        <div class="passport-row">
+          <div class="passport-key">Дата</div>
+          <div class="passport-val">${today}</div>
+        </div>
+        <div class="passport-row">
+          <div class="passport-key">Статус</div>
+          <div class="passport-val">🟢 Проект готов к обучению</div>
+        </div>
+        <span class="passport-badge">⚡ Сделано в Nooka</span>
+      </div>
+    </div>
+    <div class="btn-row" style="margin-top:20px">
+      <button class="btn btn--sun" onclick="sharePassport()">📸 Сохранить паспорт</button>
+      <a class="btn btn--soft" href="https://nookagame.ru" style="flex:none">На сайт</a>
+    </div>
+  `;
+}
+
+function bindEvents() {
+  document.querySelectorAll('.option[data-topic]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.topic = btn.dataset.topic;
+      document.querySelectorAll('.option').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      const nb = document.getElementById('nextBtn');
+      if (nb) nb.disabled = false;
+    });
+  });
+}
+
+function checkName() {
+  const v = document.getElementById('nameField').value;
+  state.name = v;
+  document.getElementById('nameLen').textContent = v.length;
+  const nb = document.getElementById('nextBtn');
+  if (nb) nb.disabled = !v.trim();
+}
+
+function checkLearns() {
+  const v = document.getElementById('learnsField').value;
+  state.learns = v;
+  document.getElementById('learnsLen').textContent = v.length;
+  const nb = document.getElementById('nextBtn');
+  if (nb) nb.disabled = !v.trim();
+}
+
+function checkCreator() {
+  const v = document.getElementById('creatorField').value;
+  state.creator = v;
+  const nb = document.getElementById('nextBtn');
+  if (nb) nb.disabled = !v.trim();
+}
+
+function next() {
+  if (state.step < state.total) { state.step++; update(); }
+}
+function back() {
+  if (state.step > 1) { state.step--; update(); }
+}
+
+function sharePassport() {
+  if (navigator.share) {
+    navigator.share({
+      title: `Мой ИИ: ${state.name}`,
+      text: `Я создал ИИ «${state.name}» в Nooka! Он умеет: ${state.learns}`,
+      url: 'https://nookagame.ru'
+    }).catch(()=>{});
+  } else {
+    alert('Сделай скриншот экрана — это твой паспорт проекта!');
+  }
+}
+
+update();
+</script>
+</body>
+</html>
