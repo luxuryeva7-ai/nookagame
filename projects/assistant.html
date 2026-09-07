@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#FDF7EC">
+<title>Создай ИИ-ассистента — Мастерская</title>
+<link href="/fonts/nooka-fonts.css" rel="stylesheet">
+<style>
+:root{--ink:#181228;--ink2:#5B5470;--ink3:#8A82A0;--purple:#7B2FFF;--sun:#FFC53D;--bg:#FDF7EC;--line:#E9E1F5;--ok:#12A47A;--blue:#0066FF;--rad:20px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:'Nunito',system-ui,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
+.hdr{padding:14px 20px;display:flex;align-items:center;gap:10px;border-bottom:1.5px solid var(--line)}
+.back{font-size:14px;font-weight:800;color:var(--purple);text-decoration:none;display:flex;align-items:center;gap:4px}
+.progress-bar{height:4px;background:var(--line);position:relative;flex:1}
+.progress-fill{height:4px;background:var(--blue);border-radius:2px;transition:width .4s cubic-bezier(.4,0,.2,1)}
+.wrap{max-width:580px;margin:0 auto;padding:28px 20px 60px}
+.step{display:none;animation:fadeUp .35s ease both}
+.step.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.step-label{font-size:11px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:8px}
+.step-title{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:clamp(20px,5vw,27px);line-height:1.25;margin-bottom:10px}
+.step-sub{font-size:15px;color:var(--ink2);line-height:1.6;margin-bottom:24px}
+.btn-next{width:100%;padding:16px;background:var(--blue);color:#fff;border:none;border-radius:var(--rad);font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:15px;cursor:pointer;transition:opacity .15s}
+.btn-next:disabled{opacity:.35;cursor:default}
+.btn-next:not(:disabled):active{opacity:.85}
+
+/* Кому помогает */
+.who-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
+.who-card{background:#fff;border:2px solid var(--line);border-radius:var(--rad);padding:18px 16px;cursor:pointer;text-align:center;transition:border-color .15s;user-select:none}
+.who-card.selected{border-color:var(--blue);background:#EEF3FF}
+.who-card .ico{font-size:34px;display:block;margin-bottom:8px}
+.who-card .lbl{font-weight:900;font-size:14px}
+
+/* Имя и слайдеры */
+.name-block{background:#fff;border:1.5px solid var(--line);border-radius:var(--rad);padding:20px;margin-bottom:16px}
+.name-label{font-size:13px;font-weight:900;color:var(--ink2);margin-bottom:8px}
+.name-input{width:100%;border:2px solid var(--line);border-radius:12px;padding:12px 14px;font-family:'Nunito',sans-serif;font-size:16px;font-weight:800;color:var(--ink);outline:none;transition:border-color .15s;background:var(--bg)}
+.name-input:focus{border-color:var(--blue)}
+.sliders-block{background:#fff;border:1.5px solid var(--line);border-radius:var(--rad);padding:20px;margin-bottom:24px;display:flex;flex-direction:column;gap:20px}
+.slider-row{}
+.slider-labels{display:flex;justify-content:space-between;margin-bottom:6px}
+.slider-lbl{font-size:13px;font-weight:900}
+.slider-lbl.left{color:var(--ink2)}
+.slider-lbl.right{color:var(--blue)}
+.slider-track{position:relative;height:6px;background:var(--line);border-radius:3px;margin:0 0 4px}
+input[type=range]{width:100%;-webkit-appearance:none;height:6px;background:linear-gradient(to right,var(--blue) 0%,var(--blue) var(--pct,50%),var(--line) var(--pct,50%),var(--line) 100%);border-radius:3px;outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--blue);border:3px solid #fff;box-shadow:0 2px 8px rgba(0,102,255,.25);cursor:pointer}
+.slider-val{text-align:center;font-size:13px;color:var(--ink3);font-weight:700}
+
+/* Правила */
+.rules-list{display:flex;flex-direction:column;gap:12px;margin-bottom:24px}
+.rule-item{background:#fff;border:1.5px solid var(--line);border-radius:var(--rad);padding:16px 18px}
+.rule-num{font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);margin-bottom:6px}
+.rule-input{width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;color:var(--ink);outline:none;resize:none;line-height:1.5}
+.rule-hint{font-size:12px;color:var(--ink3);margin-top:6px}
+
+/* Тест-ситуации */
+.situations{display:flex;flex-direction:column;gap:18px;margin-bottom:24px}
+.sit-card{background:#fff;border:1.5px solid var(--line);border-radius:var(--rad);padding:18px 20px}
+.sit-q{font-size:14px;font-weight:900;color:var(--ink);margin-bottom:4px}
+.sit-ctx{font-size:13px;color:var(--ink2);margin-bottom:14px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px}
+.sit-opts{display:flex;flex-direction:column;gap:8px}
+.sit-opt{border:2px solid var(--line);border-radius:14px;padding:11px 14px;font-size:13px;font-weight:700;cursor:pointer;background:#fff;text-align:left;transition:border-color .15s,background .15s;color:var(--ink)}
+.sit-opt.selected{border-color:var(--blue);background:#EEF3FF;color:var(--blue)}
+.sit-result{margin-top:10px;font-size:13px;color:var(--ok);font-weight:800;display:none;padding:8px 12px;background:#F0FAF5;border-radius:10px}
+.sit-result.show{display:block}
+
+/* Паспорт */
+.passport{background:linear-gradient(135deg,#EEF3FF 0%,#EEF6FF 100%);border:3px solid var(--blue);border-radius:28px;padding:36px 28px;text-align:center}
+.pass-avatar{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:38px}
+.pass-title{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:20px;color:var(--blue);margin-bottom:4px}
+.pass-name{font-size:26px;font-weight:900;color:var(--ink);margin-bottom:18px}
+.pass-details{background:#fff;border-radius:16px;padding:16px 20px;text-align:left;margin-bottom:20px}
+.pass-row{display:flex;gap:12px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line)}
+.pass-row:last-child{border:none}
+.pass-row-k{font-size:13px;color:var(--ink3);font-weight:700;flex:none;width:80px}
+.pass-row-v{font-size:14px;font-weight:800;color:var(--ink);flex:1}
+.pass-traits{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.trait-tag{background:var(--blue);color:#fff;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:800}
+.share-btn{width:100%;padding:14px;background:var(--blue);color:#fff;border:none;border-radius:16px;font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:14px;cursor:pointer;margin-bottom:10px}
+.back-btn{width:100%;padding:14px;background:#fff;color:var(--blue);border:2px solid var(--blue);border-radius:16px;font-weight:900;font-size:14px;cursor:pointer;text-decoration:none;display:block;text-align:center}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <a class="back" href="index.html">← Мастерская</a>
+  <div class="progress-bar"><div class="progress-fill" id="pbar"></div></div>
+</div>
+<div class="wrap">
+
+  <!-- ШАГ 1: Кому помогает -->
+  <div class="step active" id="s1">
+    <div class="step-label">Шаг 1 из 5</div>
+    <h1 class="step-title">Кому будет помогать твой ИИ?</h1>
+    <p class="step-sub">От этого зависит его характер и правила работы.</p>
+    <div class="who-grid">
+      <div class="who-card" data-v="me" onclick="selectWho(this)"><span class="ico">🙋</span><span class="lbl">Мне самому</span></div>
+      <div class="who-card" data-v="friend" onclick="selectWho(this)"><span class="ico">👫</span><span class="lbl">Другу</span></div>
+      <div class="who-card" data-v="teacher" onclick="selectWho(this)"><span class="ico">📚</span><span class="lbl">Учителю</span></div>
+      <div class="who-card" data-v="parent" onclick="selectWho(this)"><span class="ico">👪</span><span class="lbl">Родителям</span></div>
+      <div class="who-card" data-v="all" onclick="selectWho(this)"><span class="ico">🌍</span><span class="lbl">Всем!</span></div>
+      <div class="who-card" data-v="kids" onclick="selectWho(this)"><span class="ico">🧒</span><span class="lbl">Детям</span></div>
+    </div>
+    <button class="btn-next" id="btn1" disabled onclick="go(2)">Выбрать →</button>
+  </div>
+
+  <!-- ШАГ 2: Имя и характер -->
+  <div class="step" id="s2">
+    <div class="step-label">Шаг 2 из 5</div>
+    <h1 class="step-title">Придумай имя и характер</h1>
+    <p class="step-sub">Имя — первое что слышит пользователь. Характер определяет как ассистент общается.</p>
+    <div class="name-block">
+      <div class="name-label">Имя ассистента</div>
+      <input class="name-input" id="nameInput" type="text" placeholder="Например: Арти, Кира, Макс..." maxlength="20" oninput="checkBtn2()">
+    </div>
+    <div class="sliders-block">
+      <div class="slider-row">
+        <div class="slider-labels"><span class="slider-lbl left">😊 Весёлый</span><span class="slider-lbl right">🧐 Строгий</span></div>
+        <input type="range" id="sl1" min="0" max="100" value="40" oninput="updateSlider(this,'sl1v')" style="--pct:40%">
+        <div class="slider-val" id="sl1v"></div>
+      </div>
+      <div class="slider-row">
+        <div class="slider-labels"><span class="slider-lbl left">📖 Подробный</span><span class="slider-lbl right">⚡ Краткий</span></div>
+        <input type="range" id="sl2" min="0" max="100" value="50" oninput="updateSlider(this,'sl2v')" style="--pct:50%">
+        <div class="slider-val" id="sl2v"></div>
+      </div>
+      <div class="slider-row">
+        <div class="slider-labels"><span class="slider-lbl left">🎉 Игривый</span><span class="slider-lbl right">💼 Серьёзный</span></div>
+        <input type="range" id="sl3" min="0" max="100" value="60" oninput="updateSlider(this,'sl3v')" style="--pct:60%">
+        <div class="slider-val" id="sl3v"></div>
+      </div>
+    </div>
+    <button class="btn-next" id="btn2" disabled onclick="go(3)">Характер задан →</button>
+  </div>
+
+  <!-- ШАГ 3: Правила -->
+  <div class="step" id="s3">
+    <div class="step-label">Шаг 3 из 5</div>
+    <h1 class="step-title">Три главных правила</h1>
+    <p class="step-sub">Правила — это промпт твоего ИИ. Они определяют что он делает, а что нет.</p>
+    <div class="rules-list">
+      <div class="rule-item">
+        <div class="rule-num">Правило 1 — Что делать</div>
+        <textarea class="rule-input" id="rule1" rows="2" placeholder="Всегда давать три варианта ответа..." oninput="checkBtn3()"></textarea>
+        <div class="rule-hint">Что ИИ делает в первую очередь?</div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-num">Правило 2 — Как общаться</div>
+        <textarea class="rule-input" id="rule2" rows="2" placeholder="Говорить просто и понятно, без умных слов..." oninput="checkBtn3()"></textarea>
+        <div class="rule-hint">Каким языком и тоном говорит ИИ?</div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-num">Правило 3 — Чего не делать</div>
+        <textarea class="rule-input" id="rule3" rows="2" placeholder="Никогда не давать готовые ответы на задачи..." oninput="checkBtn3()"></textarea>
+        <div class="rule-hint">Где граница? Что запрещено?</div>
+      </div>
+    </div>
+    <button class="btn-next" id="btn3" disabled onclick="go(4)">Правила написаны →</button>
+  </div>
+
+  <!-- ШАГ 4: Тест -->
+  <div class="step" id="s4">
+    <div class="step-label">Шаг 4 из 5</div>
+    <h1 class="step-title" id="s4title">Протестируй <span id="s4name">ассистента</span></h1>
+    <p class="step-sub">Выбери как ассистент ответил бы в каждой ситуации — исходя из его характера и правил.</p>
+    <div class="situations" id="sitsArea"></div>
+    <button class="btn-next" id="btn4" disabled onclick="go(5)">Тест пройден →</button>
+  </div>
+
+  <!-- ШАГ 5: Паспорт -->
+  <div class="step" id="s5">
+    <div class="passport">
+      <div class="pass-avatar" id="d-avatar">🤖</div>
+      <div class="pass-title">Паспорт ИИ-ассистента</div>
+      <div class="pass-name" id="d-name">—</div>
+      <div class="pass-details">
+        <div class="pass-row"><span class="pass-row-k">Помогает</span><span class="pass-row-v" id="d-who">—</span></div>
+        <div class="pass-row"><span class="pass-row-k">Правило 1</span><span class="pass-row-v" id="d-r1">—</span></div>
+        <div class="pass-row"><span class="pass-row-k">Правило 2</span><span class="pass-row-v" id="d-r2">—</span></div>
+        <div class="pass-row"><span class="pass-row-k">Правило 3</span><span class="pass-row-v" id="d-r3">—</span></div>
+      </div>
+      <div class="pass-traits" id="d-traits"></div>
+      <button class="share-btn" onclick="shareCard()">📤 Поделиться паспортом</button>
+      <a class="back-btn" href="index.html">← Вернуться в Мастерскую</a>
+    </div>
+  </div>
+
+</div>
+<script>
+const WHO_LABELS={me:'Себе',friend:'Другу',teacher:'Учителю',parent:'Родителям',all:'Всем',kids:'Детям'};
+const AVATARS=['🤖','🦾','🧠','🌟','⚡','🎯'];
+const SITS=[
+  {q:'Пользователь не понимает задачу',ctx:'«Объясни мне что это значит, я ничего не понимаю»',
+   opts:['Просто дать готовый ответ','Задать уточняющий вопрос и объяснить шаг за шагом','Сказать что не знаю'],best:1},
+  {q:'Пользователь грустит',ctx:'«У меня ничего не получается, я такой тупой»',
+   opts:['Проигнорировать эмоции и перейти к задаче','Поддержать и предложить начать с простого','Согласиться что задача сложная'],best:1},
+  {q:'Пользователь просит сделать всё за него',ctx:'«Напиши за меня весь доклад, мне лень»',
+   opts:['Написать доклад целиком','Предложить помочь с планом и структурой','Отказать и ничего не делать'],best:1}
+];
+
+let state={who:null,name:'',sliders:{sl1:40,sl2:50,sl3:60},rules:['','',''],sitAnswers:{},step:1};
+
+function updateProgress(){
+  document.getElementById('pbar').style.width=(state.step/5*100)+'%';
+  for(let i=1;i<=5;i++) document.getElementById('s'+i).classList.toggle('active',i===state.step);
+}
+
+function go(n){
+  state.step=n;
+  updateProgress();
+  window.scrollTo(0,0);
+  if(n===4){renderSits();document.getElementById('s4name').textContent=state.name||'ассистента';}
+  if(n===5) renderPassport();
+  saveProgress();
+}
+
+function selectWho(el){
+  document.querySelectorAll('.who-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  state.who=el.dataset.v;
+  document.getElementById('btn1').disabled=false;
+}
+
+function updateSlider(el,vid){
+  const v=+el.value;
+  const pct=v+'%';
+  el.style.setProperty('--pct',pct);
+  state.sliders[el.id]=v;
+  const labels={sl1:['Весёлый','Нейтральный','Строгий'],sl2:['Подробный','Средний','Краткий'],sl3:['Игривый','Нейтральный','Серьёзный']};
+  const idx=v<34?0:v<67?1:2;
+  document.getElementById(vid).textContent=labels[el.id][idx];
+}
+
+function checkBtn2(){
+  const n=document.getElementById('nameInput').value.trim();
+  state.name=n;
+  document.getElementById('btn2').disabled=n.length<2;
+}
+
+function checkBtn3(){
+  state.rules=[
+    document.getElementById('rule1').value.trim(),
+    document.getElementById('rule2').value.trim(),
+    document.getElementById('rule3').value.trim()
+  ];
+  document.getElementById('btn3').disabled=!state.rules.every(r=>r.length>3);
+}
+
+function renderSits(){
+  document.getElementById('sitsArea').innerHTML=SITS.map((s,i)=>`
+    <div class="sit-card" id="sit${i}">
+      <div class="sit-q">${s.q}</div>
+      <div class="sit-ctx">${s.ctx}</div>
+      <div class="sit-opts">${s.opts.map((o,j)=>`
+        <button class="sit-opt" onclick="answerSit(${i},${j})">${o}</button>`).join('')}
+      </div>
+      <div class="sit-result" id="sr${i}">✓ Отличный выбор! Хороший ассистент помогает, но не делает всё за пользователя.</div>
+    </div>`).join('');
+}
+
+function answerSit(i,j){
+  state.sitAnswers[i]=j;
+  document.querySelectorAll(`#sit${i} .sit-opt`).forEach((b,k)=>{
+    b.classList.toggle('selected',k===j);
+  });
+  const res=document.getElementById('sr'+i);
+  const msgs=[
+    '✓ Правильно! Хороший ассистент задаёт вопросы и помогает понять, а не просто даёт ответ.',
+    '✓ Правильно! Ассистент замечает эмоции и создаёт безопасную атмосферу.',
+    '✓ Правильно! Хороший ассистент помогает с процессом, но не делает всё за пользователя.'
+  ];
+  res.textContent=msgs[i];
+  res.className='sit-result show';
+  if(Object.keys(state.sitAnswers).length===SITS.length) document.getElementById('btn4').disabled=false;
+}
+
+function getTraits(){
+  const t=[];
+  const v1=state.sliders.sl1,v2=state.sliders.sl2,v3=state.sliders.sl3;
+  t.push(v1<40?'Весёлый':v1>60?'Строгий':'Сбалансированный');
+  t.push(v2<40?'Подробный':v2>60?'Краткий':'Информативный');
+  t.push(v3<40?'Игривый':v3>60?'Серьёзный':'Вдумчивый');
+  return t;
+}
+
+function renderPassport(){
+  const traits=getTraits();
+  document.getElementById('d-avatar').textContent=AVATARS[Math.floor(Math.random()*AVATARS.length)];
+  document.getElementById('d-name').textContent=state.name||'Ассистент';
+  document.getElementById('d-who').textContent=WHO_LABELS[state.who]||'—';
+  document.getElementById('d-r1').textContent=state.rules[0]||'—';
+  document.getElementById('d-r2').textContent=state.rules[1]||'—';
+  document.getElementById('d-r3').textContent=state.rules[2]||'—';
+  document.getElementById('d-traits').innerHTML=traits.map(t=>`<span class="trait-tag">${t}</span>`).join('');
+}
+
+function shareCard(){
+  const text=`Я создал ИИ-ассистента "${state.name}" в Мастерской Nooka!\n`+
+    `Помогает: ${WHO_LABELS[state.who]||'всем'}\n`+
+    `nookagame.ru`;
+  if(navigator.share){navigator.share({text})}
+  else{navigator.clipboard.writeText(text).then(()=>alert('Скопировано!')).catch(()=>{})}
+}
+
+function saveProgress(){
+  try{localStorage.setItem('nooka_proj_assistant',JSON.stringify({step:state.step>=5?5:state.step}))}catch(e){}
+}
+
+['sl1','sl2','sl3'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el) updateSlider(el,id+'v');
+});
+updateProgress();
+</script>
+</body>
+</html>
