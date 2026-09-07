@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#FDF7EC">
+<title>Стань тренером ИИ — Мастерская</title>
+<link href="/fonts/nooka-fonts.css" rel="stylesheet">
+<style>
+:root{--ink:#181228;--ink2:#5B5470;--ink3:#8A82A0;--purple:#7B2FFF;--sun:#FFC53D;--bg:#FDF7EC;--line:#E9E1F5;--ok:#12A47A;--rad:20px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:'Nunito',system-ui,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
+.hdr{padding:14px 20px;display:flex;align-items:center;gap:10px;border-bottom:1.5px solid var(--line)}
+.back{font-size:14px;font-weight:800;color:var(--purple);text-decoration:none;display:flex;align-items:center;gap:4px}
+.hdr-title{font-size:13px;font-weight:900;color:var(--ink2)}
+.progress-bar{height:4px;background:var(--line);position:relative;flex:1}
+.progress-fill{height:4px;background:var(--purple);border-radius:2px;transition:width .4s cubic-bezier(.4,0,.2,1)}
+.wrap{max-width:580px;margin:0 auto;padding:28px 20px 60px}
+.step{display:none;animation:fadeUp .35s ease both}
+.step.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.step-label{font-size:11px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--purple);margin-bottom:8px}
+.step-title{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:clamp(20px,5vw,27px);line-height:1.25;margin-bottom:10px;letter-spacing:-.3px}
+.step-sub{font-size:15px;color:var(--ink2);line-height:1.6;margin-bottom:24px}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
+.card-opt{background:#fff;border:2px solid var(--line);border-radius:var(--rad);padding:18px 16px;cursor:pointer;transition:border-color .15s,transform .1s;text-align:left;position:relative;user-select:none}
+.card-opt:active{transform:scale(.97)}
+.card-opt.selected{border-color:var(--purple);background:#F7F2FF}
+.card-opt .ico{font-size:32px;margin-bottom:8px;display:block;line-height:1}
+.card-opt .lbl{font-weight:900;font-size:15px;color:var(--ink);display:block}
+.card-opt .sub{font-size:12px;color:var(--ink3);margin-top:3px}
+.check-mark{position:absolute;top:10px;right:10px;width:20px;height:20px;border-radius:50%;background:var(--purple);display:none;align-items:center;justify-content:center;color:#fff;font-size:11px}
+.card-opt.selected .check-mark{display:flex}
+.btn-next{width:100%;padding:16px;background:var(--purple);color:#fff;border:none;border-radius:var(--rad);font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:15px;cursor:pointer;transition:opacity .15s;letter-spacing:-.2px}
+.btn-next:disabled{opacity:.35;cursor:default}
+.btn-next:not(:disabled):active{opacity:.85}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px}
+.chip{border:2px solid var(--line);border-radius:999px;padding:9px 18px;font-size:14px;font-weight:800;color:var(--ink);cursor:pointer;transition:border-color .15s,background .15s;background:#fff;user-select:none}
+.chip:active{transform:scale(.96)}
+.chip.selected{border-color:var(--purple);background:#F0EAFF;color:var(--purple)}
+.data-types{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:24px}
+.data-card{background:#fff;border:2px solid var(--line);border-radius:var(--rad);padding:16px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:border-color .15s}
+.data-card.selected{border-color:var(--purple);background:#F7F2FF}
+.data-icon{font-size:28px;flex:none}
+.data-label{font-weight:900;font-size:14px}
+.data-ex{font-size:12px;color:var(--ink3)}
+.cases{display:flex;flex-direction:column;gap:14px;margin-bottom:24px}
+.case-card{background:#fff;border:1.5px solid var(--line);border-radius:var(--rad);padding:18px 20px}
+.case-text{font-size:14px;font-weight:800;margin-bottom:4px}
+.case-ex{font-size:13px;color:var(--ink2);margin-bottom:14px;line-height:1.5}
+.case-btns{display:flex;gap:10px}
+.case-btn{flex:1;padding:11px;border:2px solid var(--line);border-radius:12px;font-size:13px;font-weight:900;cursor:pointer;background:#fff;transition:border-color .12s,background .12s}
+.case-btn.ok{border-color:var(--ok);color:var(--ok);background:#F0FAF5}
+.case-btn.bad{border-color:#E8362A;color:#E8362A;background:#FEF2F2}
+.case-btn.selected-ok{background:var(--ok);color:#fff;border-color:var(--ok)}
+.case-btn.selected-bad{background:#E8362A;color:#fff;border-color:#E8362A}
+.case-result{margin-top:10px;font-size:13px;font-weight:800;padding:8px 12px;border-radius:10px;display:none}
+.case-result.show{display:block}
+.case-result.right{background:#F0FAF5;color:var(--ok)}
+.case-result.wrong{background:#FEF2F2;color:#E8362A}
+
+/* Диплом */
+.diploma{background:linear-gradient(135deg,#F7F2FF 0%,#EEF6FF 100%);border:3px solid var(--purple);border-radius:28px;padding:36px 28px;text-align:center}
+.diploma-badge{font-size:56px;margin-bottom:12px;display:block}
+.diploma-title{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:22px;color:var(--purple);margin-bottom:6px}
+.diploma-name{font-size:18px;font-weight:900;color:var(--ink);margin-bottom:16px}
+.diploma-details{background:#fff;border-radius:16px;padding:16px 20px;text-align:left;margin-bottom:20px}
+.diploma-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--line)}
+.diploma-row:last-child{border:none}
+.diploma-row-k{font-size:13px;color:var(--ink3);font-weight:700}
+.diploma-row-v{font-size:14px;font-weight:900;color:var(--ink)}
+.diploma-sub{font-size:13px;color:var(--ink2);line-height:1.5;margin-bottom:20px}
+.share-btn{width:100%;padding:14px;background:var(--purple);color:#fff;border:none;border-radius:16px;font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:14px;cursor:pointer;margin-bottom:10px}
+.back-btn{width:100%;padding:14px;background:#fff;color:var(--purple);border:2px solid var(--purple);border-radius:16px;font-weight:900;font-size:14px;cursor:pointer;text-decoration:none;display:block;text-align:center}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <a class="back" href="index.html">← Мастерская</a>
+  <div class="progress-bar"><div class="progress-fill" id="pbar"></div></div>
+</div>
+<div class="wrap">
+
+  <!-- ШАГ 1: Профессия -->
+  <div class="step active" id="s1">
+    <div class="step-label">Шаг 1 из 5</div>
+    <h1 class="step-title">Выбери профессию</h1>
+    <p class="step-sub">Для кого будет работать твой ИИ? Это определит всё остальное.</p>
+    <div class="cards" id="profCards">
+      <div class="card-opt" data-v="doctor"><span class="ico">🩺</span><span class="lbl">Врач</span><span class="sub">Диагностика и здоровье</span><div class="check-mark">✓</div></div>
+      <div class="card-opt" data-v="game"><span class="ico">🎮</span><span class="lbl">Геймдизайнер</span><span class="sub">Игры и механики</span><div class="check-mark">✓</div></div>
+      <div class="card-opt" data-v="teacher"><span class="ico">📚</span><span class="lbl">Учитель</span><span class="sub">Обучение и задания</span><div class="check-mark">✓</div></div>
+      <div class="card-opt" data-v="detective"><span class="ico">🕵️</span><span class="lbl">Детектив</span><span class="sub">Улики и расследование</span><div class="check-mark">✓</div></div>
+      <div class="card-opt" data-v="chef"><span class="ico">👨‍🍳</span><span class="lbl">Повар</span><span class="sub">Рецепты и вкусы</span><div class="check-mark">✓</div></div>
+      <div class="card-opt" data-v="farmer"><span class="ico">🌾</span><span class="lbl">Фермер</span><span class="sub">Урожай и природа</span><div class="check-mark">✓</div></div>
+    </div>
+    <button class="btn-next" id="btn1" disabled onclick="go(2)">Выбрать профессию →</button>
+  </div>
+
+  <!-- ШАГ 2: Задача ИИ -->
+  <div class="step" id="s2">
+    <div class="step-label">Шаг 2 из 5</div>
+    <h1 class="step-title">Что будет уметь твой ИИ?</h1>
+    <p class="step-sub">Выбери одну задачу, которую ИИ будет решать в этой профессии.</p>
+    <div class="chips" id="taskChips"></div>
+    <button class="btn-next" id="btn2" disabled onclick="go(3)">Задача выбрана →</button>
+  </div>
+
+  <!-- ШАГ 3: Данные -->
+  <div class="step" id="s3">
+    <div class="step-label">Шаг 3 из 5</div>
+    <h1 class="step-title">Какие данные нужны ИИ?</h1>
+    <p class="step-sub">ИИ учится только на данных. Отметь все типы, которые помогут решить задачу.</p>
+    <div class="data-types" id="dataTypes">
+      <div class="data-card" data-v="photo" onclick="toggleData(this)"><div class="data-icon">📷</div><div><div class="data-label">Фотографии</div><div class="data-ex">Снимки, изображения</div></div></div>
+      <div class="data-card" data-v="text" onclick="toggleData(this)"><div class="data-icon">📝</div><div><div class="data-label">Тексты</div><div class="data-ex">Описания, отзывы</div></div></div>
+      <div class="data-card" data-v="numbers" onclick="toggleData(this)"><div class="data-icon">📊</div><div><div class="data-label">Числа</div><div class="data-ex">Показатели, статистика</div></div></div>
+      <div class="data-card" data-v="audio" onclick="toggleData(this)"><div class="data-icon">🎵</div><div><div class="data-label">Звуки</div><div class="data-ex">Речь, звуки природы</div></div></div>
+      <div class="data-card" data-v="video" onclick="toggleData(this)"><div class="data-icon">🎥</div><div><div class="data-label">Видео</div><div class="data-ex">Движения, действия</div></div></div>
+      <div class="data-card" data-v="sensor" onclick="toggleData(this)"><div class="data-icon">📡</div><div><div class="data-label">Датчики</div><div class="data-ex">Температура, давление</div></div></div>
+    </div>
+    <button class="btn-next" id="btn3" disabled onclick="go(4)">Данные собраны →</button>
+  </div>
+
+  <!-- ШАГ 4: Разметка -->
+  <div class="step" id="s4">
+    <div class="step-label">Шаг 4 из 5</div>
+    <h1 class="step-title">Проверь разметку</h1>
+    <p class="step-sub">Данные без правильных меток — бесполезны. Проверь, правильно ли размечены эти примеры.</p>
+    <div class="cases" id="casesArea"></div>
+    <button class="btn-next" id="btn4" disabled onclick="go(5)">Разметка проверена →</button>
+  </div>
+
+  <!-- ШАГ 5: Карточка тренера -->
+  <div class="step" id="s5">
+    <div class="diploma">
+      <span class="diploma-badge" id="d-badge">🧪</span>
+      <div class="diploma-title">Карточка тренера ИИ</div>
+      <div class="diploma-name" id="d-name">Тренер уровня: Профессионал</div>
+      <div class="diploma-details">
+        <div class="diploma-row"><span class="diploma-row-k">Профессия</span><span class="diploma-row-v" id="d-prof">—</span></div>
+        <div class="diploma-row"><span class="diploma-row-k">Задача ИИ</span><span class="diploma-row-v" id="d-task">—</span></div>
+        <div class="diploma-row"><span class="diploma-row-k">Типы данных</span><span class="diploma-row-v" id="d-data">—</span></div>
+        <div class="diploma-row"><span class="diploma-row-k">Разметка</span><span class="diploma-row-v" id="d-mark">—</span></div>
+      </div>
+      <p class="diploma-sub">Ты прошёл полный путь тренера: выбрал задачу, собрал данные и проверил их качество. Настоящий тренер ИИ!</p>
+      <button class="share-btn" onclick="shareCard()">📤 Поделиться карточкой</button>
+      <a class="back-btn" href="index.html">← Вернуться в Мастерскую</a>
+    </div>
+  </div>
+
+</div>
+<script>
+const TASKS = {
+  doctor:['Распознавать болезни по симптомам','Анализировать снимки МРТ','Предсказывать риск заболевания','Напоминать о приёме таблеток'],
+  game:['Генерировать новые уровни','Балансировать сложность','Предсказывать что понравится игроку','Создавать персонажей'],
+  teacher:['Проверять домашние задания','Объяснять сложные темы','Следить за прогрессом ученика','Подбирать задачи по уровню'],
+  detective:['Находить улики на фото','Анализировать показания свидетелей','Устанавливать личность по данным','Восстанавливать хронологию'],
+  chef:['Подбирать рецепт по ингредиентам','Предсказывать вкусовые сочетания','Адаптировать рецепт под аллергии','Оценивать качество блюда'],
+  farmer:['Распознавать болезни растений','Предсказывать урожай','Определять оптимальное время полива','Анализировать состав почвы']
+};
+const PROF_LABELS = {doctor:'🩺 Врач',game:'🎮 Геймдизайнер',teacher:'📚 Учитель',detective:'🕵️ Детектив',chef:'👨‍🍳 Повар',farmer:'🌾 Фермер'};
+const DATA_LABELS = {photo:'Фото',text:'Тексты',numbers:'Числа',audio:'Звуки',video:'Видео',sensor:'Датчики'};
+
+const CASES = [
+  {text:'Фотографии листьев с подписью «больной»',ex:'Каждый снимок подписан — видно что на нём.',correct:true,exp:'✓ Правильно! Каждый пример подписан — ИИ понимает что учить.'},
+  {text:'1000 снимков рентгена без подписей',ex:'Много данных, но никто не сказал — где болезнь, а где норма.',correct:false,exp:'✗ Неверно! Без меток ИИ не знает что правильно, а что нет.'},
+  {text:'Тексты отзывов с оценкой «позитивный / негативный»',ex:'Каждый отзыв помечен настроением.',correct:true,exp:'✓ Правильно! Метка показывает ИИ что учить определять.'}
+];
+
+let state = {prof:null,task:null,data:[],caseAnswers:{},step:1};
+
+function getProgress(){return state.step/5*100}
+
+function updateProgress(){
+  document.getElementById('pbar').style.width = getProgress()+'%';
+  for(let i=1;i<=5;i++){
+    document.getElementById('s'+i).classList.toggle('active',i===state.step);
+  }
+}
+
+function go(n){
+  state.step=n;
+  updateProgress();
+  window.scrollTo(0,0);
+  if(n===2) renderTasks();
+  if(n===4) renderCases();
+  if(n===5) renderDiploma();
+  saveProgress();
+}
+
+document.querySelectorAll('.card-opt').forEach(c=>{
+  c.onclick=()=>{
+    document.querySelectorAll('.card-opt').forEach(x=>x.classList.remove('selected'));
+    c.classList.add('selected');
+    state.prof=c.dataset.v;
+    document.getElementById('btn1').disabled=false;
+  };
+});
+
+function renderTasks(){
+  const tasks=TASKS[state.prof]||[];
+  document.getElementById('taskChips').innerHTML=tasks.map(t=>`<div class="chip" onclick="selectTask(this,'${t}')">${t}</div>`).join('');
+  document.getElementById('btn2').disabled=true;
+}
+
+function selectTask(el,t){
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  state.task=t;
+  document.getElementById('btn2').disabled=false;
+}
+
+function toggleData(el){
+  el.classList.toggle('selected');
+  state.data=Array.from(document.querySelectorAll('.data-card.selected')).map(x=>x.dataset.v);
+  document.getElementById('btn3').disabled=state.data.length===0;
+}
+
+function renderCases(){
+  document.getElementById('casesArea').innerHTML=CASES.map((c,i)=>`
+    <div class="case-card" id="case${i}">
+      <div class="case-text">${c.text}</div>
+      <div class="case-ex">${c.ex}</div>
+      <div class="case-btns">
+        <button class="case-btn ok" onclick="answerCase(${i},true)">✓ Разметка правильная</button>
+        <button class="case-btn bad" onclick="answerCase(${i},false)">✗ Разметка неверная</button>
+      </div>
+      <div class="case-result" id="cr${i}"></div>
+    </div>`).join('');
+}
+
+function answerCase(i,val){
+  const c=CASES[i];
+  state.caseAnswers[i]=val;
+  const res=document.getElementById('cr'+i);
+  const btns=document.querySelectorAll(`#case${i} .case-btn`);
+  btns.forEach(b=>b.classList.remove('selected-ok','selected-bad'));
+  btns[val?0:1].classList.add(val?'selected-ok':'selected-bad');
+  const right=(val===c.correct);
+  res.className='case-result show '+(right?'right':'wrong');
+  res.textContent=c.exp;
+  if(Object.keys(state.caseAnswers).length===CASES.length){
+    document.getElementById('btn4').disabled=false;
+  }
+}
+
+function renderDiploma(){
+  const correct=Object.entries(state.caseAnswers).filter(([i,v])=>v===CASES[i].correct).length;
+  const pct=Math.round(correct/CASES.length*100);
+  const badges=['🥇','🥈','🥉','🎓'];
+  const levels=['Гений ИИ','Профи-тренер','Тренер ИИ','Новичок'];
+  const idx=pct>=100?0:pct>=67?1:pct>=33?2:3;
+  document.getElementById('d-badge').textContent=badges[idx];
+  document.getElementById('d-name').textContent='Тренер уровня: '+levels[idx];
+  document.getElementById('d-prof').textContent=PROF_LABELS[state.prof]||state.prof;
+  document.getElementById('d-task').textContent=state.task||'—';
+  document.getElementById('d-data').textContent=state.data.map(d=>DATA_LABELS[d]||d).join(', ')||'—';
+  document.getElementById('d-mark').textContent=correct+' из '+CASES.length+' верно ('+pct+'%)';
+  saveProgress();
+}
+
+function shareCard(){
+  const text=`Я стал тренером ИИ в Мастерской Nooka!\n`+
+    `Профессия: ${PROF_LABELS[state.prof]}\n`+
+    `Задача: ${state.task}\n`+
+    `nookagame.ru`;
+  if(navigator.share){navigator.share({text})}
+  else{navigator.clipboard.writeText(text);alert('Скопировано!')}
+}
+
+function saveProgress(){
+  try{localStorage.setItem('nooka_proj_trainer',JSON.stringify({step:state.step>=5?5:state.step}))}catch(e){}
+}
+try{const s=JSON.parse(localStorage.getItem('nooka_proj_trainer')||'{}');if(s.step>1&&s.step<5)state.step=1;}catch(e){}
+updateProgress();
+</script>
+</body>
+</html>
