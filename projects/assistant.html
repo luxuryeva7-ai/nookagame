@@ -2,316 +2,339 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#FDF7EC">
-<title>Создай ИИ-ассистента — Мастерская</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="theme-color" content="#0E0719">
+<title>Создай ИИ-ассистента — Nooka</title>
 <link href="/fonts/nooka-fonts.css" rel="stylesheet">
 <style>
-:root{--ink:#181228;--ink2:#5B5470;--ink3:#8A82A0;--purple:#7B2FFF;--sun:#FFC53D;--bg:#FDF7EC;--line:#E9E1F5;--ok:#12A47A;--blue:#0066FF;--rad:20px}
+:root{--ink:#F4EEFF;--ink2:#C0B0E0;--ink3:#8B7BAE;--bg:#0E0719;--card:#1A1232;--line:rgba(255,255,255,.09);--ok:#4ED99B;--bad:#FF6B6B;--acc:#FFD84D;--purple:#A98BFF}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--ink);font-family:'Nunito',system-ui,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
-.hdr{padding:14px 20px;display:flex;align-items:center;gap:10px;border-bottom:1.5px solid var(--line)}
-.back{font-size:14px;font-weight:800;color:var(--purple);text-decoration:none;display:flex;align-items:center;gap:4px}
-.progress-bar{height:4px;background:var(--line);position:relative;flex:1}
-.progress-fill{height:4px;background:var(--blue);border-radius:2px;transition:width .4s cubic-bezier(.4,0,.2,1)}
-.wrap{max-width:580px;margin:0 auto;padding:28px 20px 60px}
-.step{display:none;animation:fadeUp .35s ease both}
-.step.active{display:block}
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-.step-label{font-size:11px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:8px}
-.step-title{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:clamp(20px,5vw,27px);line-height:1.25;margin-bottom:10px}
-.step-sub{font-size:15px;color:var(--ink2);line-height:1.6;margin-bottom:24px}
-.btn-next{width:100%;padding:16px;background:var(--blue);color:#fff;border:none;border-radius:var(--rad);font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:15px;cursor:pointer;transition:opacity .15s}
-.btn-next:disabled{opacity:.35;cursor:default}
-.btn-next:not(:disabled):active{opacity:.85}
+html,body{height:100%;background:var(--bg)}
+body{font-family:'Nunito',system-ui,sans-serif;-webkit-font-smoothing:antialiased;color:var(--ink);overflow:hidden}
+.root{height:100vh;max-width:480px;margin:0 auto;display:flex;flex-direction:column;overflow:hidden;background:linear-gradient(180deg,#161226 0%,#0F0B1E 60%,#090711 100%)}
+.topbar{flex:none;display:flex;align-items:center;gap:10px;padding:14px 16px 10px;border-bottom:1px solid var(--line)}
+.back{color:var(--purple);font-size:14px;font-weight:800;text-decoration:none;flex:none}
+.tb-title{flex:1;font-weight:900;font-size:13px;color:var(--ink2);text-align:center}
+.tb-steps{flex:none;font-size:12px;font-weight:800;color:var(--ink3)}
+.pbar-wrap{flex:none;height:3px;background:rgba(255,255,255,.07)}
+.pbar-fill{height:3px;transition:width .4s cubic-bezier(.4,0,.2,1)}
+.body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 0 8px}
+.foot{flex:none;padding:10px 14px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(9,7,17,0),#090711 42%)}
 
-/* Кому помогает */
-.who-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
-.who-card{background:#fff;border:2px solid var(--line);border-radius:var(--rad);padding:18px 16px;cursor:pointer;text-align:center;transition:border-color .15s;user-select:none}
-.who-card.selected{border-color:var(--blue);background:#EEF3FF}
-.who-card .ico{font-size:34px;display:block;margin-bottom:8px}
-.who-card .lbl{font-weight:900;font-size:14px}
+.say{display:flex;gap:10px;align-items:flex-start;margin:14px 14px 0;padding:13px 15px;border-radius:18px;background:rgba(255,255,255,.055);box-shadow:inset 0 0 0 1px var(--line);animation:fadeUp .3s ease both}
+.say-icon{flex:none;font-size:28px;line-height:1}
+.say-text{font-weight:700;font-size:13.5px;line-height:1.5;color:#DDD2F2}
+.say-text b{color:var(--acc)}
 
-/* Имя и слайдеры */
-.name-block{background:#fff;border:1.5px solid var(--line);border-radius:var(--rad);padding:20px;margin-bottom:16px}
-.name-label{font-size:13px;font-weight:900;color:var(--ink2);margin-bottom:8px}
-.name-input{width:100%;border:2px solid var(--line);border-radius:12px;padding:12px 14px;font-family:'Nunito',sans-serif;font-size:16px;font-weight:800;color:var(--ink);outline:none;transition:border-color .15s;background:var(--bg)}
-.name-input:focus{border-color:var(--blue)}
-.sliders-block{background:#fff;border:1.5px solid var(--line);border-radius:var(--rad);padding:20px;margin-bottom:24px;display:flex;flex-direction:column;gap:20px}
-.slider-row{}
-.slider-labels{display:flex;justify-content:space-between;margin-bottom:6px}
-.slider-lbl{font-size:13px;font-weight:900}
-.slider-lbl.left{color:var(--ink2)}
-.slider-lbl.right{color:var(--blue)}
-.slider-track{position:relative;height:6px;background:var(--line);border-radius:3px;margin:0 0 4px}
-input[type=range]{width:100%;-webkit-appearance:none;height:6px;background:linear-gradient(to right,var(--blue) 0%,var(--blue) var(--pct,50%),var(--line) var(--pct,50%),var(--line) 100%);border-radius:3px;outline:none;cursor:pointer}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--blue);border:3px solid #fff;box-shadow:0 2px 8px rgba(0,102,255,.25);cursor:pointer}
-.slider-val{text-align:center;font-size:13px;color:var(--ink3);font-weight:700}
+/* Персонаж-ассистент */
+.ava-wrap{margin:14px 14px 0;display:flex;flex-direction:column;align-items:center;gap:6px}
+.ava-svg{transition:all .35s cubic-bezier(.2,.8,.3,1)}
+.ava-name{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:16px;color:var(--ink);text-align:center}
+.ava-trait{font-size:12px;color:var(--ink3);text-align:center}
 
-/* Правила */
-.rules-list{display:flex;flex-direction:column;gap:12px;margin-bottom:24px}
-.rule-item{background:#fff;border:1.5px solid var(--line);border-radius:var(--rad);padding:16px 18px}
-.rule-num{font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);margin-bottom:6px}
-.rule-input{width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;color:var(--ink);outline:none;resize:none;line-height:1.5}
-.rule-hint{font-size:12px;color:var(--ink3);margin-top:6px}
+/* Карточки выбора */
+.picks{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 14px 0}
+.pick{padding:16px 12px;border:2px solid var(--line);border-radius:18px;cursor:pointer;text-align:center;transition:all .18s;background:rgba(255,255,255,.03)}
+.pick:active{transform:scale(.95)}
+.pick.sel{border-color:var(--acc);background:rgba(255,216,77,.1)}
+.pick-ico{font-size:32px;margin-bottom:8px;display:block}
+.pick-name{font-weight:900;font-size:13px;color:var(--ink)}
+.pick-sub{font-size:11px;color:var(--ink3);margin-top:3px}
 
-/* Тест-ситуации */
-.situations{display:flex;flex-direction:column;gap:18px;margin-bottom:24px}
-.sit-card{background:#fff;border:1.5px solid var(--line);border-radius:var(--rad);padding:18px 20px}
-.sit-q{font-size:14px;font-weight:900;color:var(--ink);margin-bottom:4px}
-.sit-ctx{font-size:13px;color:var(--ink2);margin-bottom:14px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px}
-.sit-opts{display:flex;flex-direction:column;gap:8px}
-.sit-opt{border:2px solid var(--line);border-radius:14px;padding:11px 14px;font-size:13px;font-weight:700;cursor:pointer;background:#fff;text-align:left;transition:border-color .15s,background .15s;color:var(--ink)}
-.sit-opt.selected{border-color:var(--blue);background:#EEF3FF;color:var(--blue)}
-.sit-result{margin-top:10px;font-size:13px;color:var(--ok);font-weight:800;display:none;padding:8px 12px;background:#F0FAF5;border-radius:10px}
-.sit-result.show{display:block}
+/* 4-варианта настроения */
+.moods{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 14px 0}
+.mood{padding:14px 10px;border:2px solid var(--line);border-radius:18px;cursor:pointer;text-align:center;transition:all .18s;background:rgba(255,255,255,.03);position:relative}
+.mood:active{transform:scale(.95)}
+.mood.sel{border-color:var(--purple);background:rgba(169,139,255,.12)}
+.mood-name{font-weight:900;font-size:13px;color:var(--ink);margin-top:6px}
+.mood-sub{font-size:11px;color:var(--ink3);margin-top:2px}
 
-/* Паспорт */
-.passport{background:linear-gradient(135deg,#EEF3FF 0%,#EEF6FF 100%);border:3px solid var(--blue);border-radius:28px;padding:36px 28px;text-align:center}
-.pass-avatar{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:38px}
-.pass-title{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:20px;color:var(--blue);margin-bottom:4px}
-.pass-name{font-size:26px;font-weight:900;color:var(--ink);margin-bottom:18px}
-.pass-details{background:#fff;border-radius:16px;padding:16px 20px;text-align:left;margin-bottom:20px}
-.pass-row{display:flex;gap:12px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line)}
-.pass-row:last-child{border:none}
-.pass-row-k{font-size:13px;color:var(--ink3);font-weight:700;flex:none;width:80px}
-.pass-row-v{font-size:14px;font-weight:800;color:var(--ink);flex:1}
-.pass-traits{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
-.trait-tag{background:var(--blue);color:#fff;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:800}
-.share-btn{width:100%;padding:14px;background:var(--blue);color:#fff;border:none;border-radius:16px;font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:14px;cursor:pointer;margin-bottom:10px}
-.back-btn{width:100%;padding:14px;background:#fff;color:var(--blue);border:2px solid var(--blue);border-radius:16px;font-weight:900;font-size:14px;cursor:pointer;text-decoration:none;display:block;text-align:center}
+/* Чат */
+.chat-box{margin:14px 14px 0;display:flex;flex-direction:column;gap:10px}
+.chat-msg{display:flex;gap:8px;align-items:flex-end;animation:fadeUp .25s ease}
+.chat-msg.bot{flex-direction:row}
+.chat-msg.usr{flex-direction:row-reverse}
+.chat-bubble{padding:12px 15px;border-radius:18px;font-size:13.5px;font-weight:700;max-width:78%;line-height:1.5}
+.chat-bubble.bot{background:rgba(169,139,255,.15);box-shadow:inset 0 0 0 1px rgba(169,139,255,.25);color:var(--ink);border-bottom-left-radius:4px}
+.chat-bubble.usr{background:var(--acc);color:#0D0A18;border-bottom-right-radius:4px}
+.chat-opts{display:flex;flex-direction:column;gap:7px;margin-top:4px}
+.chat-opt{padding:11px 14px;border:2px solid var(--line);border-radius:14px;cursor:pointer;font-family:inherit;font-weight:800;font-size:13px;text-align:left;background:rgba(255,255,255,.04);color:var(--ink);transition:all .15s}
+.chat-opt:active{transform:scale(.98)}
+.chat-opt:hover{border-color:var(--purple);background:rgba(169,139,255,.08)}
+
+/* Финал */
+.passport{margin:14px;background:linear-gradient(135deg,rgba(169,139,255,.15),rgba(78,217,155,.08));border:2px solid rgba(169,139,255,.35);border-radius:24px;padding:24px 20px;animation:fadeUp .4s ease}
+.passport-head{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.passport-info{flex:1}
+.passport-badge{display:inline-block;background:var(--purple);color:#fff;border-radius:999px;padding:4px 12px;font-size:10px;font-weight:900;letter-spacing:.06em;margin-bottom:6px}
+.passport-name{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:17px;color:var(--ink)}
+.passport-type{font-size:13px;color:var(--purple);font-weight:700;margin-top:2px}
+.passport-stats{background:rgba(255,255,255,.06);border-radius:16px;padding:12px 14px;margin-bottom:14px}
+.ps-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line)}
+.ps-row:last-child{border:none}
+.ps-k{font-size:12px;color:var(--ink3);font-weight:700}
+.ps-v{font-size:13px;font-weight:900;color:var(--ink)}
+.passport-law{font-size:13px;color:var(--ink2);line-height:1.6}
+
+.intro-modal{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:28px 20px;text-align:center;animation:fadeUp .4s ease}
+.intro-emoji{font-size:64px;margin-bottom:20px;display:block}
+.intro-title{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:24px;line-height:1.25;margin-bottom:12px;color:var(--ink)}
+.intro-law{font-size:15px;color:var(--ink2);line-height:1.65;margin-bottom:24px;white-space:pre-line}
+
+.btn-pri{width:100%;padding:16px;border:none;border-radius:18px;font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#0D0A18;background:var(--acc);transition:opacity .15s;margin-bottom:0}
+.btn-pri:disabled{opacity:.3}
+.btn-sec{width:100%;padding:15px;border:2px solid var(--line);border-radius:18px;font-family:inherit;font-weight:900;font-size:14px;cursor:pointer;color:var(--ink2);background:transparent;margin-bottom:8px}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
-<div class="hdr">
-  <a class="back" href="index.html">← Мастерская</a>
-  <div class="progress-bar"><div class="progress-fill" id="pbar"></div></div>
-</div>
-<div class="wrap">
-
-  <!-- ШАГ 1: Кому помогает -->
-  <div class="step active" id="s1">
-    <div class="step-label">Шаг 1 из 5</div>
-    <h1 class="step-title">Кому будет помогать твой ИИ?</h1>
-    <p class="step-sub">От этого зависит его характер и правила работы.</p>
-    <div class="who-grid">
-      <div class="who-card" data-v="me" onclick="selectWho(this)"><span class="ico">🙋</span><span class="lbl">Мне самому</span></div>
-      <div class="who-card" data-v="friend" onclick="selectWho(this)"><span class="ico">👫</span><span class="lbl">Другу</span></div>
-      <div class="who-card" data-v="teacher" onclick="selectWho(this)"><span class="ico">📚</span><span class="lbl">Учителю</span></div>
-      <div class="who-card" data-v="parent" onclick="selectWho(this)"><span class="ico">👪</span><span class="lbl">Родителям</span></div>
-      <div class="who-card" data-v="all" onclick="selectWho(this)"><span class="ico">🌍</span><span class="lbl">Всем!</span></div>
-      <div class="who-card" data-v="kids" onclick="selectWho(this)"><span class="ico">🧒</span><span class="lbl">Детям</span></div>
-    </div>
-    <button class="btn-next" id="btn1" disabled onclick="go(2)">Выбрать →</button>
+<div class="root">
+  <div class="topbar">
+    <a class="back" href="index.html">← Мастерская</a>
+    <div class="tb-title">ИИ-ассистент</div>
+    <div class="tb-steps" id="tbSteps"></div>
   </div>
-
-  <!-- ШАГ 2: Имя и характер -->
-  <div class="step" id="s2">
-    <div class="step-label">Шаг 2 из 5</div>
-    <h1 class="step-title">Придумай имя и характер</h1>
-    <p class="step-sub">Имя — первое что слышит пользователь. Характер определяет как ассистент общается.</p>
-    <div class="name-block">
-      <div class="name-label">Имя ассистента</div>
-      <input class="name-input" id="nameInput" type="text" placeholder="Например: Арти, Кира, Макс..." maxlength="20" oninput="checkBtn2()">
-    </div>
-    <div class="sliders-block">
-      <div class="slider-row">
-        <div class="slider-labels"><span class="slider-lbl left">😊 Весёлый</span><span class="slider-lbl right">🧐 Строгий</span></div>
-        <input type="range" id="sl1" min="0" max="100" value="40" oninput="updateSlider(this,'sl1v')" style="--pct:40%">
-        <div class="slider-val" id="sl1v"></div>
-      </div>
-      <div class="slider-row">
-        <div class="slider-labels"><span class="slider-lbl left">📖 Подробный</span><span class="slider-lbl right">⚡ Краткий</span></div>
-        <input type="range" id="sl2" min="0" max="100" value="50" oninput="updateSlider(this,'sl2v')" style="--pct:50%">
-        <div class="slider-val" id="sl2v"></div>
-      </div>
-      <div class="slider-row">
-        <div class="slider-labels"><span class="slider-lbl left">🎉 Игривый</span><span class="slider-lbl right">💼 Серьёзный</span></div>
-        <input type="range" id="sl3" min="0" max="100" value="60" oninput="updateSlider(this,'sl3v')" style="--pct:60%">
-        <div class="slider-val" id="sl3v"></div>
-      </div>
-    </div>
-    <button class="btn-next" id="btn2" disabled onclick="go(3)">Характер задан →</button>
-  </div>
-
-  <!-- ШАГ 3: Правила -->
-  <div class="step" id="s3">
-    <div class="step-label">Шаг 3 из 5</div>
-    <h1 class="step-title">Три главных правила</h1>
-    <p class="step-sub">Правила — это промпт твоего ИИ. Они определяют что он делает, а что нет.</p>
-    <div class="rules-list">
-      <div class="rule-item">
-        <div class="rule-num">Правило 1 — Что делать</div>
-        <textarea class="rule-input" id="rule1" rows="2" placeholder="Всегда давать три варианта ответа..." oninput="checkBtn3()"></textarea>
-        <div class="rule-hint">Что ИИ делает в первую очередь?</div>
-      </div>
-      <div class="rule-item">
-        <div class="rule-num">Правило 2 — Как общаться</div>
-        <textarea class="rule-input" id="rule2" rows="2" placeholder="Говорить просто и понятно, без умных слов..." oninput="checkBtn3()"></textarea>
-        <div class="rule-hint">Каким языком и тоном говорит ИИ?</div>
-      </div>
-      <div class="rule-item">
-        <div class="rule-num">Правило 3 — Чего не делать</div>
-        <textarea class="rule-input" id="rule3" rows="2" placeholder="Никогда не давать готовые ответы на задачи..." oninput="checkBtn3()"></textarea>
-        <div class="rule-hint">Где граница? Что запрещено?</div>
-      </div>
-    </div>
-    <button class="btn-next" id="btn3" disabled onclick="go(4)">Правила написаны →</button>
-  </div>
-
-  <!-- ШАГ 4: Тест -->
-  <div class="step" id="s4">
-    <div class="step-label">Шаг 4 из 5</div>
-    <h1 class="step-title" id="s4title">Протестируй <span id="s4name">ассистента</span></h1>
-    <p class="step-sub">Выбери как ассистент ответил бы в каждой ситуации — исходя из его характера и правил.</p>
-    <div class="situations" id="sitsArea"></div>
-    <button class="btn-next" id="btn4" disabled onclick="go(5)">Тест пройден →</button>
-  </div>
-
-  <!-- ШАГ 5: Паспорт -->
-  <div class="step" id="s5">
-    <div class="passport">
-      <div class="pass-avatar" id="d-avatar">🤖</div>
-      <div class="pass-title">Паспорт ИИ-ассистента</div>
-      <div class="pass-name" id="d-name">—</div>
-      <div class="pass-details">
-        <div class="pass-row"><span class="pass-row-k">Помогает</span><span class="pass-row-v" id="d-who">—</span></div>
-        <div class="pass-row"><span class="pass-row-k">Правило 1</span><span class="pass-row-v" id="d-r1">—</span></div>
-        <div class="pass-row"><span class="pass-row-k">Правило 2</span><span class="pass-row-v" id="d-r2">—</span></div>
-        <div class="pass-row"><span class="pass-row-k">Правило 3</span><span class="pass-row-v" id="d-r3">—</span></div>
-      </div>
-      <div class="pass-traits" id="d-traits"></div>
-      <button class="share-btn" onclick="shareCard()">📤 Поделиться паспортом</button>
-      <a class="back-btn" href="index.html">← Вернуться в Мастерскую</a>
-    </div>
-  </div>
-
+  <div class="pbar-wrap"><div class="pbar-fill" id="pbar" style="width:0%"></div></div>
+  <div class="body" id="body"></div>
+  <div class="foot" id="foot"></div>
 </div>
 <script>
-const WHO_LABELS={me:'Себе',friend:'Другу',teacher:'Учителю',parent:'Родителям',all:'Всем',kids:'Детям'};
-const AVATARS=['🤖','🦾','🧠','🌟','⚡','🎯'];
-const SITS=[
-  {q:'Пользователь не понимает задачу',ctx:'«Объясни мне что это значит, я ничего не понимаю»',
-   opts:['Просто дать готовый ответ','Задать уточняющий вопрос и объяснить шаг за шагом','Сказать что не знаю'],best:1},
-  {q:'Пользователь грустит',ctx:'«У меня ничего не получается, я такой тупой»',
-   opts:['Проигнорировать эмоции и перейти к задаче','Поддержать и предложить начать с простого','Согласиться что задача сложная'],best:1},
-  {q:'Пользователь просит сделать всё за него',ctx:'«Напиши за меня весь доклад, мне лень»',
-   opts:['Написать доклад целиком','Предложить помочь с планом и структурой','Отказать и ничего не делать'],best:1}
+const SPHERES=[
+  {id:'study',ico:'📚',name:'Учёба',sub:'помогает с домашкой'},
+  {id:'sport',ico:'⚽',name:'Спорт',sub:'тренирует и мотивирует'},
+  {id:'cook',ico:'🍳',name:'Кулинария',sub:'учит готовить'},
+  {id:'game',ico:'🎮',name:'Игры',sub:'советует и помогает'},
+];
+const MOODS=[
+  {id:'fun',ico:'🤩',name:'Весёлый',sub:'шутки и смайлы',color:'#FFD84D'},
+  {id:'serious',ico:'🤓',name:'Серьёзный',sub:'точно и по делу',color:'#A98BFF'},
+  {id:'soft',ico:'🥰',name:'Мягкий',sub:'добрый и терпеливый',color:'#FF9ECF'},
+  {id:'direct',ico:'😎',name:'Прямой',sub:'быстро и чётко',color:'#4ED99B'},
 ];
 
-let state={who:null,name:'',sliders:{sl1:40,sl2:50,sl3:60},rules:['','',''],sitAnswers:{},step:1};
+// диалог зависит от сферы и настроения
+const CHATS={
+  study:{
+    q:['Ты задаёшь задачу, а ИИ...','Ты устал и не хочешь делать домашку. ИИ говорит...','Что важнее в учёбе?'],
+    opts:[
+      ['Объясняет сам','Спрашивает тебя'],
+      ['«Отдохни, потом сделаем»','«Давай начнём с одного примера»'],
+      ['Понять тему','Сдать на 5'],
+    ],
+  },
+  sport:{
+    q:['Ты пропустил тренировку. ИИ...','Ты не можешь сделать упражнение. ИИ...','Твой лучший результат — это...'],
+    opts:[
+      ['Молчит, понимает','Мотивирует вернуться'],
+      ['Даёт более лёгкий вариант','Объясняет технику снова'],
+      ['Твой личный рекорд','Лучше чем у других'],
+    ],
+  },
+  cook:{
+    q:['Ты хочешь приготовить что-то. ИИ...','Блюдо не получилось. ИИ...','Лучшие рецепты это...'],
+    opts:[
+      ['Предлагает варианты','Спрашивает что есть в холодильнике'],
+      ['Объясняет что пошло не так','Даёт другой рецепт'],
+      ['Сложные но вкусные','Простые и быстрые'],
+    ],
+  },
+  game:{
+    q:['Ты застрял на уровне. ИИ...','Ты хочешь новую игру. ИИ...','Игры это...'],
+    opts:[
+      ['Даёт подсказку','Объясняет механику'],
+      ['Спрашивает что нравится','Называет топ-5'],
+      ['Способ отдыхать','Способ соревноваться'],
+    ],
+  },
+};
 
-function updateProgress(){
-  document.getElementById('pbar').style.width=(state.step/5*100)+'%';
-  for(let i=1;i<=5;i++) document.getElementById('s'+i).classList.toggle('active',i===state.step);
+let phase='intro';
+let sphere=null,mood=null;
+let chatStep=0,chatHistory=[],chatDone=false;
+
+const BOT_NAMES={study:'Умник',sport:'Тренер',cook:'Шеф',game:'Геймер'};
+const BOT_SAY={
+  fun:{study:'Привет! 🌟 Ты мой первый ученик — давай разберём всё вместе!',sport:'Эй! 💪 Готов стать чемпионом? Я верю в тебя!',cook:'Ооо, будем готовить? 🍕 Я обожаю вкусняшки!',game:'Погнали! 🎮 Я знаю каждый секрет этой игры!'},
+  serious:{study:'Здравствуй. Я готов помочь разобраться с учебным материалом.',sport:'Приступим к тренировке. Я отслеживаю твой прогресс.',cook:'Рад начать обучение. Опиши что хочешь приготовить.',game:'Анализирую ситуацию. Назови уровень и задачу.'},
+  soft:{study:'Привет! 💙 Не переживай, мы разберёмся с этим вместе, шаг за шагом.',sport:'Здравствуй! Главное — не торопиться. Начнём в твоём темпе.',cook:'Привет! Готовить — это весело. Я помогу тебе, не переживай.',game:'Привет! Никакого давления. Расскажи что случилось — вместе придумаем.'},
+  direct:{study:'Привет. Задача → решение. Показывай что надо сделать.',sport:'Готов. Цель — результат. Что тренируем сегодня?',cook:'Покупаем? Варим? Жарим? Говори — сделаем.',game:'Слушаю. Что за игра, что за проблема?'},
+};
+
+function svgFace(moodId){
+  const M={
+    fun:  {eye1:'M38 42 L42 38 L46 42',eye2:'M54 42 L58 38 L62 42',mouth:'M32 58 Q50 72 68 58',color:'#FFD84D',glow:'rgba(255,216,77,.35)'},
+    serious:{eye1:'circle cx=42 cy=40 r=4',eye2:'circle cx=58 cy=40 r=4',mouth:'M36 60 L64 60',color:'#A98BFF',glow:'rgba(169,139,255,.35)'},
+    soft: {eye1:'M38 43 Q42 38 46 43',eye2:'M54 43 Q58 38 62 43',mouth:'M36 57 Q50 66 64 57',color:'#FF9ECF',glow:'rgba(255,158,207,.35)'},
+    direct:{eye1:'M38 40 L46 40',eye2:'M54 40 L62 40',mouth:'M34 62 Q50 55 66 62',color:'#4ED99B',glow:'rgba(78,217,155,.35)'},
+  };
+  const m=M[moodId]||M.fun;
+  const e1=m.eye1.startsWith('circle')?`<${m.eye1} fill="${m.color}"/>`:`<path d="${m.eye1}" stroke="${m.color}" stroke-width="3" stroke-linecap="round" fill="none"/>`;
+  const e2=m.eye2.startsWith('circle')?`<${m.eye2} fill="${m.color}"/>`:`<path d="${m.eye2}" stroke="${m.color}" stroke-width="3" stroke-linecap="round" fill="none"/>`;
+  return `<svg width="110" height="110" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="${m.glow}"/>
+        <stop offset="100%" stop-color="transparent"/>
+      </radialGradient>
+      <radialGradient id="head" cx="40%" cy="35%" r="65%">
+        <stop offset="0%" stop-color="#2A1F4A"/>
+        <stop offset="100%" stop-color="#160D30"/>
+      </radialGradient>
+    </defs>
+    <circle cx="50" cy="50" r="48" fill="url(#glow)"/>
+    <circle cx="50" cy="52" r="38" fill="url(#head)" stroke="${m.color}" stroke-width="2.5" stroke-opacity=".7"/>
+    <circle cx="35" cy="52" r="5" fill="#0E0719" stroke="${m.color}" stroke-width="1.5" stroke-opacity=".5"/>
+    <circle cx="65" cy="52" r="5" fill="#0E0719" stroke="${m.color}" stroke-width="1.5" stroke-opacity=".5"/>
+    ${e1}${e2}
+    <path d="${m.mouth}" stroke="${m.color}" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+    <line x1="50" y1="14" x2="50" y2="22" stroke="${m.color}" stroke-width="2" stroke-linecap="round"/>
+    <path d="M44 16 Q50 10 56 16" stroke="${m.color}" stroke-width="2" stroke-linecap="round" fill="none"/>
+  </svg>`;
 }
 
-function go(n){
-  state.step=n;
-  updateProgress();
-  window.scrollTo(0,0);
-  if(n===4){renderSits();document.getElementById('s4name').textContent=state.name||'ассистента';}
-  if(n===5) renderPassport();
-  saveProgress();
-}
+function render(){
+  const pct={intro:0,sphere:15,mood:35,chat:60,done:100}[phase]||0;
+  document.getElementById('pbar').style.width=pct+'%';
+  document.getElementById('pbar').style.background=mood?MOODS.find(m=>m.id===mood)?.color||'var(--acc)':'var(--acc)';
+  const body=document.getElementById('body');
+  const foot=document.getElementById('foot');
+  const steps=document.getElementById('tbSteps');
 
-function selectWho(el){
-  document.querySelectorAll('.who-card').forEach(c=>c.classList.remove('selected'));
-  el.classList.add('selected');
-  state.who=el.dataset.v;
-  document.getElementById('btn1').disabled=false;
-}
+  if(phase==='intro'){
+    steps.textContent='';
+    body.innerHTML=`<div class="intro-modal">
+      <span class="intro-emoji">🤖</span>
+      <h1 class="intro-title">Создай своего ИИ</h1>
+      <p class="intro-law">Выбери для него сферу и характер.\nПотом пообщайся с ним — и узнай\nкаким он получился.</p>
+    </div>`;
+    foot.innerHTML=`<button class="btn-pri" onclick="go('sphere')">Создать ИИ-ассистента →</button>`;
+    return;
+  }
 
-function updateSlider(el,vid){
-  const v=+el.value;
-  const pct=v+'%';
-  el.style.setProperty('--pct',pct);
-  state.sliders[el.id]=v;
-  const labels={sl1:['Весёлый','Нейтральный','Строгий'],sl2:['Подробный','Средний','Краткий'],sl3:['Игривый','Нейтральный','Серьёзный']};
-  const idx=v<34?0:v<67?1:2;
-  document.getElementById(vid).textContent=labels[el.id][idx];
-}
+  if(phase==='sphere'){
+    steps.textContent='1/3';
+    body.innerHTML=`
+      <div class="say"><span class="say-icon">🤖</span><span class="say-text">Для чего будет твой ИИ? <b>Выбери сферу</b>.</span></div>
+      <div class="picks">${SPHERES.map(s=>`
+        <div class="pick${sphere===s.id?' sel':''}" onclick="selSphere('${s.id}')">
+          <span class="pick-ico">${s.ico}</span>
+          <div class="pick-name">${s.name}</div>
+          <div class="pick-sub">${s.sub}</div>
+        </div>`).join('')}</div>`;
+    foot.innerHTML=`<button class="btn-pri" onclick="go('mood')" ${sphere?'':'disabled'}>Дальше →</button>`;
+    return;
+  }
 
-function checkBtn2(){
-  const n=document.getElementById('nameInput').value.trim();
-  state.name=n;
-  document.getElementById('btn2').disabled=n.length<2;
-}
-
-function checkBtn3(){
-  state.rules=[
-    document.getElementById('rule1').value.trim(),
-    document.getElementById('rule2').value.trim(),
-    document.getElementById('rule3').value.trim()
-  ];
-  document.getElementById('btn3').disabled=!state.rules.every(r=>r.length>3);
-}
-
-function renderSits(){
-  document.getElementById('sitsArea').innerHTML=SITS.map((s,i)=>`
-    <div class="sit-card" id="sit${i}">
-      <div class="sit-q">${s.q}</div>
-      <div class="sit-ctx">${s.ctx}</div>
-      <div class="sit-opts">${s.opts.map((o,j)=>`
-        <button class="sit-opt" onclick="answerSit(${i},${j})">${o}</button>`).join('')}
+  if(phase==='mood'){
+    steps.textContent='2/3';
+    const curMood=mood||'fun';
+    body.innerHTML=`
+      <div class="say"><span class="say-icon">🤖</span><span class="say-text">Какой у него будет <b>характер?</b></span></div>
+      <div class="ava-wrap" id="avaWrap">
+        <div class="ava-svg">${svgFace(curMood)}</div>
+        <div class="ava-name">${BOT_NAMES[sphere]||'Ассистент'}</div>
+        <div class="ava-trait" id="avaTrait">${MOODS.find(m=>m.id===curMood)?.name||'...'}</div>
       </div>
-      <div class="sit-result" id="sr${i}">✓ Отличный выбор! Хороший ассистент помогает, но не делает всё за пользователя.</div>
-    </div>`).join('');
+      <div class="moods">${MOODS.map(m=>`
+        <div class="mood${mood===m.id?' sel':''}" onclick="selMood('${m.id}')" onmouseenter="previewMood('${m.id}')">
+          <span style="font-size:28px">${m.ico}</span>
+          <div class="mood-name">${m.name}</div>
+          <div class="mood-sub">${m.sub}</div>
+        </div>`).join('')}</div>`;
+    foot.innerHTML=`<button class="btn-pri" onclick="go('chat')" ${mood?'':'disabled'}>Создать →</button>`;
+    return;
+  }
+
+  if(phase==='chat'){
+    steps.textContent='3/3';
+    const m=mood||'fun';
+    const s=sphere||'study';
+    const chat=CHATS[s];
+    const q=chat.q[chatStep];
+    const opts=chat.opts[chatStep];
+    const botColor=MOODS.find(x=>x.id===m)?.color||'#A98BFF';
+    const botSay=chatStep===0?BOT_SAY[m]?.[s]||'Привет! Я готов помочь.':'Твоя очередь — что думаешь?';
+    let html=`
+      <div class="ava-wrap" style="margin-top:14px">
+        <div class="ava-svg">${svgFace(m)}</div>
+        <div class="ava-name">${BOT_NAMES[s]}</div>
+      </div>
+      <div class="chat-box">`;
+    if(chatStep===0){
+      html+=`<div class="chat-msg bot"><div class="chat-bubble bot">${botSay}</div></div>`;
+    }
+    chatHistory.forEach(h=>{
+      html+=`<div class="chat-msg bot"><div class="chat-bubble bot">${h.bot}</div></div>`;
+      html+=`<div class="chat-msg usr"><div class="chat-bubble usr">${h.usr}</div></div>`;
+    });
+    if(!chatDone){
+      html+=`<div class="chat-msg bot"><div class="chat-bubble bot">${q}</div></div>`;
+      html+=`</div><div style="margin:10px 14px 0" class="chat-opts">
+        <button class="chat-opt" onclick="chatAnswer('${opts[0]}','${chatStep}')">${opts[0]}</button>
+        <button class="chat-opt" onclick="chatAnswer('${opts[1]}','${chatStep}')">${opts[1]}</button>
+      </div>`;
+    } else {
+      html+=`</div>`;
+    }
+    body.innerHTML=html;
+    if(!chatDone) foot.innerHTML='';
+    else foot.innerHTML=`<button class="btn-pri" onclick="go('done')">Посмотреть паспорт →</button>`;
+    setTimeout(()=>document.getElementById('body').scrollTo({top:9999,behavior:'smooth'}),50);
+    return;
+  }
+
+  if(phase==='done'){
+    steps.textContent='';
+    const m=MOODS.find(x=>x.id===mood);
+    const s=SPHERES.find(x=>x.id===sphere);
+    body.innerHTML=`<div class="passport">
+      <div class="passport-head">
+        <div>${svgFace(mood)}</div>
+        <div class="passport-info">
+          <span class="passport-badge">ПАСПОРТ ИИ</span>
+          <div class="passport-name">${BOT_NAMES[sphere]}</div>
+          <div class="passport-type">${m?.name} · ${s?.name}</div>
+        </div>
+      </div>
+      <div class="passport-stats">
+        <div class="ps-row"><span class="ps-k">Специализация</span><span class="ps-v">${s?.name} ${s?.ico}</span></div>
+        <div class="ps-row"><span class="ps-k">Характер</span><span class="ps-v">${m?.name} ${m?.ico}</span></div>
+        <div class="ps-row"><span class="ps-k">Стиль общения</span><span class="ps-v">${m?.sub}</span></div>
+        <div class="ps-row"><span class="ps-k">Тест пройден</span><span class="ps-v">3 из 3 ✓</span></div>
+      </div>
+      <p class="passport-law">У настоящих ИИ-ассистентов тоже есть «характер» — это их <b>системный промпт</b>. Ты только что создал его смысл — кто это, для чего и как говорит.</p>
+    </div>`;
+    foot.innerHTML=`<button class="btn-sec" onclick="restart()">🔄 Создать другого</button>
+      <a href="index.html" style="display:block;text-align:center;font-weight:900;font-size:14px;color:var(--purple);padding:10px">← В Мастерскую</a>`;
+    try{localStorage.setItem('nooka_proj_assistant',JSON.stringify({step:5}))}catch(e){}
+    return;
+  }
 }
 
-function answerSit(i,j){
-  state.sitAnswers[i]=j;
-  document.querySelectorAll(`#sit${i} .sit-opt`).forEach((b,k)=>{
-    b.classList.toggle('selected',k===j);
-  });
-  const res=document.getElementById('sr'+i);
-  const msgs=[
-    '✓ Правильно! Хороший ассистент задаёт вопросы и помогает понять, а не просто даёт ответ.',
-    '✓ Правильно! Ассистент замечает эмоции и создаёт безопасную атмосферу.',
-    '✓ Правильно! Хороший ассистент помогает с процессом, но не делает всё за пользователя.'
-  ];
-  res.textContent=msgs[i];
-  res.className='sit-result show';
-  if(Object.keys(state.sitAnswers).length===SITS.length) document.getElementById('btn4').disabled=false;
+function go(p){phase=p;chatDone=false;render()}
+function selSphere(id){sphere=id;render()}
+function selMood(id){mood=id;render()}
+function previewMood(id){
+  const w=document.getElementById('avaWrap');
+  if(!w)return;
+  w.querySelector('.ava-svg').innerHTML=svgFace(id);
+  const t=w.querySelector('#avaTrait');
+  if(t)t.textContent=MOODS.find(m=>m.id===id)?.name||'';
 }
-
-function getTraits(){
-  const t=[];
-  const v1=state.sliders.sl1,v2=state.sliders.sl2,v3=state.sliders.sl3;
-  t.push(v1<40?'Весёлый':v1>60?'Строгий':'Сбалансированный');
-  t.push(v2<40?'Подробный':v2>60?'Краткий':'Информативный');
-  t.push(v3<40?'Игривый':v3>60?'Серьёзный':'Вдумчивый');
-  return t;
+function chatAnswer(ans,step){
+  const s=sphere||'study';
+  const chat=CHATS[s];
+  const nextIdx=parseInt(step)+1;
+  const botReply=nextIdx<chat.q.length?chat.q[nextIdx]:'Отлично! Ты определил мой характер. 🎉';
+  chatHistory.push({bot:chat.q[parseInt(step)],usr:ans});
+  if(nextIdx>=chat.opts.length){chatDone=true;chatStep=chat.q.length;}
+  else chatStep=nextIdx;
+  render();
 }
-
-function renderPassport(){
-  const traits=getTraits();
-  document.getElementById('d-avatar').textContent=AVATARS[Math.floor(Math.random()*AVATARS.length)];
-  document.getElementById('d-name').textContent=state.name||'Ассистент';
-  document.getElementById('d-who').textContent=WHO_LABELS[state.who]||'—';
-  document.getElementById('d-r1').textContent=state.rules[0]||'—';
-  document.getElementById('d-r2').textContent=state.rules[1]||'—';
-  document.getElementById('d-r3').textContent=state.rules[2]||'—';
-  document.getElementById('d-traits').innerHTML=traits.map(t=>`<span class="trait-tag">${t}</span>`).join('');
-}
-
-function shareCard(){
-  const text=`Я создал ИИ-ассистента "${state.name}" в Мастерской Nooka!\n`+
-    `Помогает: ${WHO_LABELS[state.who]||'всем'}\n`+
-    `nookagame.ru`;
-  if(navigator.share){navigator.share({text})}
-  else{navigator.clipboard.writeText(text).then(()=>alert('Скопировано!')).catch(()=>{})}
-}
-
-function saveProgress(){
-  try{localStorage.setItem('nooka_proj_assistant',JSON.stringify({step:state.step>=5?5:state.step}))}catch(e){}
-}
-
-['sl1','sl2','sl3'].forEach(id=>{
-  const el=document.getElementById(id);
-  if(el) updateSlider(el,id+'v');
-});
-updateProgress();
+function restart(){phase='intro';sphere=null;mood=null;chatStep=0;chatHistory=[];chatDone=false;render()}
+render();
 </script>
 </body>
 </html>
