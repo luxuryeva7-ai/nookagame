@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#FDF7EC">
+<title>ИИ-стартап — Мастерская</title>
+<link href="/fonts/nooka-fonts.css" rel="stylesheet">
+<style>
+:root{--ink:#181228;--ink2:#5B5470;--ink3:#8A82A0;--green:#12A47A;--sun:#FFC53D;--bg:#FDF7EC;--line:#E9E1F5;--purple:#7B2FFF;--rad:20px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:'Nunito',system-ui,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
+.hdr{padding:14px 20px;display:flex;align-items:center;gap:10px;border-bottom:1.5px solid var(--line)}
+.back{font-size:14px;font-weight:800;color:var(--green);text-decoration:none;display:flex;align-items:center;gap:4px}
+.progress-bar{height:4px;background:var(--line);flex:1}
+.progress-fill{height:4px;background:var(--green);border-radius:2px;transition:width .4s cubic-bezier(.4,0,.2,1)}
+.wrap{max-width:580px;margin:0 auto;padding:28px 20px 60px}
+.step{display:none;animation:fadeUp .35s ease both}
+.step.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.step-label{font-size:11px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin-bottom:8px}
+.step-title{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:clamp(20px,5vw,27px);line-height:1.25;margin-bottom:10px}
+.step-sub{font-size:15px;color:var(--ink2);line-height:1.6;margin-bottom:24px}
+.btn-next{width:100%;padding:16px;background:var(--green);color:#fff;border:none;border-radius:var(--rad);font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:15px;cursor:pointer;transition:opacity .15s}
+.btn-next:disabled{opacity:.35;cursor:default}
+.btn-next:not(:disabled):active{opacity:.85}
+
+/* Проблемы */
+.problems{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
+.prob-card{background:#fff;border:2px solid var(--line);border-radius:var(--rad);padding:16px;cursor:pointer;transition:border-color .15s;user-select:none;position:relative}
+.prob-card.selected{border-color:var(--green);background:#F0FAF5}
+.prob-ico{font-size:30px;margin-bottom:8px;display:block}
+.prob-title{font-weight:900;font-size:14px;margin-bottom:3px}
+.prob-ex{font-size:12px;color:var(--ink3)}
+.check-mark{position:absolute;top:10px;right:10px;width:20px;height:20px;border-radius:50%;background:var(--green);display:none;align-items:center;justify-content:center;color:#fff;font-size:11px}
+.prob-card.selected .check-mark{display:flex}
+
+/* Решение */
+.sol-block{background:#fff;border:1.5px solid var(--line);border-radius:var(--rad);padding:20px;margin-bottom:16px}
+.sol-label{font-size:13px;font-weight:900;color:var(--ink2);margin-bottom:8px}
+.sol-input{width:100%;border:2px solid var(--line);border-radius:12px;padding:12px 14px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;color:var(--ink);outline:none;resize:none;transition:border-color .15s;background:var(--bg);line-height:1.5}
+.sol-input:focus{border-color:var(--green)}
+.abilities-block{background:#fff;border:1.5px solid var(--line);border-radius:var(--rad);padding:20px;margin-bottom:24px}
+.ab-title{font-size:13px;font-weight:900;color:var(--ink2);margin-bottom:12px}
+.ability-chips{display:flex;flex-wrap:wrap;gap:8px}
+.ab-chip{border:2px solid var(--line);border-radius:999px;padding:8px 16px;font-size:13px;font-weight:800;cursor:pointer;background:#fff;color:var(--ink);transition:all .12s;user-select:none}
+.ab-chip.selected{border-color:var(--green);background:#F0FAF5;color:var(--green)}
+
+/* Архитектура */
+.arch-wrap{margin-bottom:24px}
+.arch-section{margin-bottom:20px}
+.arch-label{font-size:13px;font-weight:900;color:var(--ink2);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.arch-label-dot{width:8px;height:8px;border-radius:50%;flex:none}
+.arch-opts{display:flex;flex-wrap:wrap;gap:8px}
+.arch-opt{border:2px solid var(--line);border-radius:12px;padding:9px 14px;font-size:13px;font-weight:800;cursor:pointer;background:#fff;color:var(--ink);transition:all .12s;user-select:none}
+.arch-opt.selected{border-color:var(--green);background:#F0FAF5;color:var(--green)}
+.arch-flow{background:#fff;border:1.5px solid var(--line);border-radius:var(--rad);padding:16px 20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-height:52px;margin-top:16px}
+.arch-flow-item{background:var(--green);color:#fff;border-radius:10px;padding:6px 12px;font-size:13px;font-weight:800;animation:pop .2s ease}
+@keyframes pop{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
+.arch-arrow{color:var(--ink3);font-size:18px;font-weight:900}
+.arch-empty{color:var(--ink3);font-size:13px}
+
+/* Команда */
+.team-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.team-role{background:#fff;border:2px solid var(--line);border-radius:var(--rad);padding:16px;cursor:pointer;transition:border-color .15s;user-select:none;text-align:center}
+.team-role.selected{border-color:var(--sun);background:#FFFBF0}
+.team-ico{font-size:32px;display:block;margin-bottom:6px}
+.team-name{font-weight:900;font-size:14px}
+.team-desc{font-size:12px;color:var(--ink3)}
+.team-hint{font-size:13px;color:var(--ink3);text-align:center;margin-bottom:24px}
+
+/* Питч */
+.pitch{background:linear-gradient(135deg,#F0FAF5 0%,#FFFBF0 100%);border:3px solid var(--green);border-radius:28px;padding:36px 28px;text-align:center}
+.pitch-badge{font-size:60px;display:block;margin-bottom:12px}
+.pitch-tag{display:inline-block;background:var(--green);color:#fff;border-radius:999px;padding:5px 16px;font-size:12px;font-weight:900;letter-spacing:.05em;margin-bottom:14px}
+.pitch-name{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:26px;color:var(--ink);margin-bottom:6px}
+.pitch-tagline{font-size:15px;color:var(--ink2);margin-bottom:24px;line-height:1.6}
+.pitch-details{background:#fff;border-radius:16px;padding:16px 20px;text-align:left;margin-bottom:16px}
+.pitch-row{display:flex;gap:12px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line)}
+.pitch-row:last-child{border:none}
+.pitch-row-k{font-size:12px;color:var(--ink3);font-weight:700;flex:none;width:90px;padding-top:1px}
+.pitch-row-v{font-size:13px;font-weight:800;color:var(--ink);flex:1;line-height:1.45}
+.pitch-team{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.pitch-member{background:var(--sun);border-radius:10px;padding:6px 14px;font-size:13px;font-weight:800;color:#181228}
+.share-btn{width:100%;padding:14px;background:var(--green);color:#fff;border:none;border-radius:16px;font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:14px;cursor:pointer;margin-bottom:10px}
+.back-btn{width:100%;padding:14px;background:#fff;color:var(--green);border:2px solid var(--green);border-radius:16px;font-weight:900;font-size:14px;cursor:pointer;text-decoration:none;display:block;text-align:center}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <a class="back" href="index.html">← Мастерская</a>
+  <div class="progress-bar"><div class="progress-fill" id="pbar"></div></div>
+</div>
+<div class="wrap">
+
+  <!-- ШАГ 1: Проблема -->
+  <div class="step active" id="s1">
+    <div class="step-label">Шаг 1 из 5</div>
+    <h1 class="step-title">Какую проблему решит твой стартап?</h1>
+    <p class="step-sub">Хороший ИИ-продукт всегда начинается с реальной боли людей.</p>
+    <div class="problems">
+      <div class="prob-card" data-v="traffic"><span class="prob-ico">🚗</span><div class="prob-title">Пробки в городе</div><div class="prob-ex">Люди теряют часы</div><div class="check-mark">✓</div></div>
+      <div class="prob-card" data-v="health"><span class="prob-ico">💊</span><div class="prob-title">Врач далеко</div><div class="prob-ex">Нет времени на клинику</div><div class="check-mark">✓</div></div>
+      <div class="prob-card" data-v="study"><span class="prob-ico">📚</span><div class="prob-title">Скучные уроки</div><div class="prob-ex">Дети не хотят учиться</div><div class="check-mark">✓</div></div>
+      <div class="prob-card" data-v="food"><span class="prob-ico">🍕</span><div class="prob-title">Нет идей для еды</div><div class="prob-ex">Каждый день «что приготовить?»</div><div class="check-mark">✓</div></div>
+      <div class="prob-card" data-v="sports"><span class="prob-ico">⚽</span><div class="prob-title">Тренировки без тренера</div><div class="prob-ex">Некому подсказать технику</div><div class="check-mark">✓</div></div>
+      <div class="prob-card" data-v="plants"><span class="prob-ico">🌱</span><div class="prob-title">Болеют растения</div><div class="prob-ex">Непонятно что с ними</div><div class="check-mark">✓</div></div>
+    </div>
+    <button class="btn-next" id="btn1" disabled onclick="go(2)">Проблема найдена →</button>
+  </div>
+
+  <!-- ШАГ 2: Решение -->
+  <div class="step" id="s2">
+    <div class="step-label">Шаг 2 из 5</div>
+    <h1 class="step-title">Как ИИ решает эту проблему?</h1>
+    <p class="step-sub">Опиши своё решение одним предложением и выбери что умеет твой ИИ.</p>
+    <div class="sol-block">
+      <div class="sol-label">Описание решения</div>
+      <textarea class="sol-input" id="solInput" rows="3" placeholder="Мой ИИ анализирует трафик в реальном времени и предлагает лучший маршрут..." oninput="checkBtn2()"></textarea>
+    </div>
+    <div class="abilities-block">
+      <div class="ab-title">Что умеет твой ИИ? (выбери несколько)</div>
+      <div class="ability-chips">
+        <div class="ab-chip" onclick="toggleAb(this)">Распознаёт изображения</div>
+        <div class="ab-chip" onclick="toggleAb(this)">Понимает текст</div>
+        <div class="ab-chip" onclick="toggleAb(this)">Предсказывает события</div>
+        <div class="ab-chip" onclick="toggleAb(this)">Даёт рекомендации</div>
+        <div class="ab-chip" onclick="toggleAb(this)">Переводит языки</div>
+        <div class="ab-chip" onclick="toggleAb(this)">Анализирует данные</div>
+        <div class="ab-chip" onclick="toggleAb(this)">Генерирует контент</div>
+        <div class="ab-chip" onclick="toggleAb(this)">Распознаёт голос</div>
+      </div>
+    </div>
+    <button class="btn-next" id="btn2" disabled onclick="go(3)">Решение готово →</button>
+  </div>
+
+  <!-- ШАГ 3: Архитектура -->
+  <div class="step" id="s3">
+    <div class="step-label">Шаг 3 из 5</div>
+    <h1 class="step-title">Спроектируй архитектуру</h1>
+    <p class="step-sub">Что входит в твой ИИ, что он делает внутри и что выдаёт на выходе?</p>
+    <div class="arch-wrap">
+      <div class="arch-section">
+        <div class="arch-label"><div class="arch-label-dot" style="background:var(--purple)"></div>Входные данные (что получает ИИ)</div>
+        <div class="arch-opts" id="inOpts">
+          <div class="arch-opt" onclick="toggleArch('in',this)">📷 Фото</div>
+          <div class="arch-opt" onclick="toggleArch('in',this)">🎤 Голос</div>
+          <div class="arch-opt" onclick="toggleArch('in',this)">📝 Текст</div>
+          <div class="arch-opt" onclick="toggleArch('in',this)">📍 Геолокация</div>
+          <div class="arch-opt" onclick="toggleArch('in',this)">📊 Цифры</div>
+          <div class="arch-opt" onclick="toggleArch('in',this)">📡 Датчики</div>
+        </div>
+      </div>
+      <div class="arch-section">
+        <div class="arch-label"><div class="arch-label-dot" style="background:var(--green)"></div>Что делает ИИ внутри</div>
+        <div class="arch-opts" id="procOpts">
+          <div class="arch-opt" onclick="toggleArch('proc',this)">🔍 Анализирует</div>
+          <div class="arch-opt" onclick="toggleArch('proc',this)">🧠 Классифицирует</div>
+          <div class="arch-opt" onclick="toggleArch('proc',this)">📈 Предсказывает</div>
+          <div class="arch-opt" onclick="toggleArch('proc',this)">✍️ Генерирует</div>
+          <div class="arch-opt" onclick="toggleArch('proc',this)">🔗 Находит связи</div>
+        </div>
+      </div>
+      <div class="arch-section">
+        <div class="arch-label"><div class="arch-label-dot" style="background:var(--sun)"></div>Результат (что выдаёт)</div>
+        <div class="arch-opts" id="outOpts">
+          <div class="arch-opt" onclick="toggleArch('out',this)">💬 Ответ текстом</div>
+          <div class="arch-opt" onclick="toggleArch('out',this)">🗺️ Маршрут/карта</div>
+          <div class="arch-opt" onclick="toggleArch('out',this)">📊 Отчёт</div>
+          <div class="arch-opt" onclick="toggleArch('out',this)">🔔 Уведомление</div>
+          <div class="arch-opt" onclick="toggleArch('out',this)">🖼️ Изображение</div>
+          <div class="arch-opt" onclick="toggleArch('out',this)">⚙️ Действие</div>
+        </div>
+      </div>
+      <div class="arch-label" style="margin-top:4px">Твоя схема</div>
+      <div class="arch-flow" id="archFlow"><span class="arch-empty">Выбирай блоки выше — здесь появится схема</span></div>
+    </div>
+    <button class="btn-next" id="btn3" disabled onclick="go(4)">Архитектура готова →</button>
+  </div>
+
+  <!-- ШАГ 4: Команда -->
+  <div class="step" id="s4">
+    <div class="step-label">Шаг 4 из 5</div>
+    <h1 class="step-title">Собери команду</h1>
+    <p class="step-sub">Хороший стартап — это правильная команда. Кто нужен для твоего продукта?</p>
+    <div class="team-grid">
+      <div class="team-role" onclick="toggleTeam(this,'dev')"><span class="team-ico">👨‍💻</span><div class="team-name">Разработчик</div><div class="team-desc">Пишет код ИИ</div></div>
+      <div class="team-role" onclick="toggleTeam(this,'design')"><span class="team-ico">🎨</span><div class="team-name">Дизайнер</div><div class="team-desc">Делает удобным</div></div>
+      <div class="team-role" onclick="toggleTeam(this,'expert')"><span class="team-ico">🔬</span><div class="team-name">Эксперт</div><div class="team-desc">Знает предметную область</div></div>
+      <div class="team-role" onclick="toggleTeam(this,'biz')"><span class="team-ico">📈</span><div class="team-name">Бизнес</div><div class="team-desc">Найдёт клиентов</div></div>
+      <div class="team-role" onclick="toggleTeam(this,'data')"><span class="team-ico">📊</span><div class="team-name">Аналитик данных</div><div class="team-desc">Обучает модель</div></div>
+      <div class="team-role" onclick="toggleTeam(this,'invest')"><span class="team-ico">💰</span><div class="team-name">Инвестор</div><div class="team-desc">Даёт деньги</div></div>
+    </div>
+    <div class="team-hint" id="teamHint">Выбери кто нужен в команде</div>
+    <button class="btn-next" id="btn4" disabled onclick="go(5)">Команда собрана →</button>
+  </div>
+
+  <!-- ШАГ 5: Питч -->
+  <div class="step" id="s5">
+    <div class="pitch">
+      <span class="pitch-badge" id="d-badge">🚀</span>
+      <div class="pitch-tag">ИИ-СТАРТАП</div>
+      <div class="pitch-name" id="d-name">—</div>
+      <div class="pitch-tagline" id="d-tagline">—</div>
+      <div class="pitch-details">
+        <div class="pitch-row"><span class="pitch-row-k">Проблема</span><span class="pitch-row-v" id="d-prob">—</span></div>
+        <div class="pitch-row"><span class="pitch-row-k">Решение</span><span class="pitch-row-v" id="d-sol">—</span></div>
+        <div class="pitch-row"><span class="pitch-row-k">ИИ умеет</span><span class="pitch-row-v" id="d-ab">—</span></div>
+        <div class="pitch-row"><span class="pitch-row-k">Архитектура</span><span class="pitch-row-v" id="d-arch">—</span></div>
+      </div>
+      <div class="pitch-team" id="d-team"></div>
+      <button class="share-btn" onclick="shareCard()">📤 Поделиться питчем</button>
+      <a class="back-btn" href="index.html">← Вернуться в Мастерскую</a>
+    </div>
+  </div>
+
+</div>
+<script>
+const PROB_LABELS={traffic:'🚗 Пробки в городе',health:'💊 Врач далеко',study:'📚 Скучные уроки',food:'🍕 Нет идей для еды',sports:'⚽ Тренировки без тренера',plants:'🌱 Болеют растения'};
+const PROB_BADGES={traffic:'🚗',health:'💊',study:'📚',food:'🍕',sports:'⚽',plants:'🌱'};
+const PROB_NAMES={traffic:'ТрафикАИ',health:'МедАссист',study:'ЛёрнБот',food:'ШефИИ',sports:'ТренерАИ',plants:'ФлораБот'};
+const TEAM_LABELS={dev:'👨‍💻 Разработчик',design:'🎨 Дизайнер',expert:'🔬 Эксперт',biz:'📈 Бизнес',data:'📊 Аналитик',invest:'💰 Инвестор'};
+
+let state={prob:null,sol:'',abilities:[],arch:{in:[],proc:[],out:[]},team:[],step:1};
+
+function updateProgress(){
+  document.getElementById('pbar').style.width=(state.step/5*100)+'%';
+  for(let i=1;i<=5;i++) document.getElementById('s'+i).classList.toggle('active',i===state.step);
+}
+
+function go(n){
+  state.step=n;
+  updateProgress();
+  window.scrollTo(0,0);
+  if(n===5) renderPitch();
+  saveProgress();
+}
+
+document.querySelectorAll('.prob-card').forEach(c=>{
+  c.onclick=()=>{
+    document.querySelectorAll('.prob-card').forEach(x=>x.classList.remove('selected'));
+    c.classList.add('selected');
+    state.prob=c.dataset.v;
+    document.getElementById('btn1').disabled=false;
+  };
+});
+
+function checkBtn2(){
+  const v=document.getElementById('solInput').value.trim();
+  state.sol=v;
+  document.getElementById('btn2').disabled=v.length<10||state.abilities.length===0;
+}
+
+function toggleAb(el){
+  el.classList.toggle('selected');
+  state.abilities=Array.from(document.querySelectorAll('.ab-chip.selected')).map(x=>x.textContent);
+  checkBtn2();
+}
+
+function toggleArch(type,el){
+  el.classList.toggle('selected');
+  state.arch[type]=Array.from(el.closest('[id]').querySelectorAll('.arch-opt.selected')).map(x=>x.textContent.trim());
+  renderFlow();
+  checkBtn3();
+}
+
+function renderFlow(){
+  const flow=document.getElementById('archFlow');
+  const all=[...state.arch.in,...state.arch.proc,...state.arch.out];
+  if(!all.length){flow.innerHTML='<span class="arch-empty">Выбирай блоки выше — здесь появится схема</span>';return;}
+  const parts=[];
+  if(state.arch.in.length) parts.push(...state.arch.in.map(x=>`<span class="arch-flow-item">${x}</span>`));
+  if(state.arch.in.length&&state.arch.proc.length) parts.push('<span class="arch-arrow">→</span>');
+  if(state.arch.proc.length) parts.push(...state.arch.proc.map(x=>`<span class="arch-flow-item">${x}</span>`));
+  if(state.arch.proc.length&&state.arch.out.length) parts.push('<span class="arch-arrow">→</span>');
+  if(state.arch.out.length) parts.push(...state.arch.out.map(x=>`<span class="arch-flow-item">${x}</span>`));
+  flow.innerHTML=parts.join('');
+}
+
+function checkBtn3(){
+  const ok=state.arch.in.length>0&&state.arch.proc.length>0&&state.arch.out.length>0;
+  document.getElementById('btn3').disabled=!ok;
+}
+
+function toggleTeam(el,role){
+  el.classList.toggle('selected');
+  const sel=Array.from(document.querySelectorAll('.team-role.selected'));
+  state.team=sel.map(e=>e.onclick.toString().match(/'(\w+)'/)?.[1]).filter(Boolean);
+  state.team=[];
+  document.querySelectorAll('.team-role.selected').forEach(e=>{
+    const attr=e.getAttribute('onclick');
+    const m=attr.match(/'(\w+)'/);
+    if(m) state.team.push(m[1]);
+  });
+  if(state.team.length===0){
+    document.getElementById('teamHint').textContent='Выбери кто нужен в команде';
+  } else {
+    document.getElementById('teamHint').textContent=`Выбрано: ${state.team.length} ${state.team.length===1?'роль':state.team.length<5?'роли':'ролей'}`;
+  }
+  document.getElementById('btn4').disabled=state.team.length===0;
+}
+
+function renderPitch(){
+  const name=PROB_NAMES[state.prob]||'МойАИ';
+  document.getElementById('d-badge').textContent=PROB_BADGES[state.prob]||'🚀';
+  document.getElementById('d-name').textContent=name;
+  document.getElementById('d-tagline').textContent=state.sol||'ИИ-решение для реального мира';
+  document.getElementById('d-prob').textContent=PROB_LABELS[state.prob]||'—';
+  document.getElementById('d-sol').textContent=state.sol||'—';
+  document.getElementById('d-ab').textContent=state.abilities.join(', ')||'—';
+  const archText=[[...state.arch.in].join(', '),[...state.arch.proc].join(', '),[...state.arch.out].join(', ')].filter(Boolean).join(' → ')||'—';
+  document.getElementById('d-arch').textContent=archText;
+  document.getElementById('d-team').innerHTML=state.team.map(r=>`<span class="pitch-member">${TEAM_LABELS[r]||r}</span>`).join('');
+}
+
+function shareCard(){
+  const name=PROB_NAMES[state.prob]||'МойАИ';
+  const text=`Я запустил ИИ-стартап "${name}" в Мастерской Nooka!\n`+
+    `Проблема: ${PROB_LABELS[state.prob]||'—'}\n`+
+    `Решение: ${state.sol}\n`+
+    `nookagame.ru`;
+  if(navigator.share){navigator.share({text})}
+  else{navigator.clipboard.writeText(text).then(()=>alert('Скопировано!')).catch(()=>{})}
+}
+
+function saveProgress(){
+  try{localStorage.setItem('nooka_proj_startup',JSON.stringify({step:state.step>=5?5:state.step}))}catch(e){}
+}
+updateProgress();
+</script>
+</body>
+</html>
