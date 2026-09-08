@@ -24,7 +24,7 @@ body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);-w
  background:linear-gradient(180deg,rgba(255,248,238,0),var(--bg) 38%)}
 
 .say{display:flex;gap:9px;align-items:flex-start;margin-top:12px;animation:up .3s ease both}
-.say-av{flex:none;width:42px;height:42px;border-radius:50%;background:var(--accbg);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:inset 0 0 0 1.5px var(--line)}
+.say-av{flex:none;width:50px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:2px}
 .say-b{flex:1;background:var(--card);border-radius:16px;border-top-left-radius:5px;padding:11px 14px;box-shadow:var(--sh);font-weight:600;font-size:15px;line-height:1.45;color:var(--ink2);white-space:pre-line}
 .say-b b{color:var(--acc);font-weight:800}
 
@@ -135,6 +135,20 @@ canvas{border-radius:18px;box-shadow:var(--sh);touch-action:none;display:block;b
 .gst.on .gst-b{background:var(--accbg);color:var(--acc);animation:spin 1s linear infinite}
 .gst.done .gst-b{background:var(--acc);color:#fff;animation:none}
 @keyframes spin{to{transform:rotate(360deg)}}
+.dock{position:sticky;bottom:0;z-index:26;background:var(--bg);padding:8px 0 calc(8px + env(safe-area-inset-bottom));
+ border-top:1px solid var(--line)}
+.dock-r{display:flex;gap:7px;overflow-x:auto;padding:0 12px 2px;scrollbar-width:none}
+.dock-r::-webkit-scrollbar{display:none}
+.dk{flex:none;min-width:74px;background:var(--card);border:none;border-radius:14px;box-shadow:var(--sh);
+ padding:8px 6px;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:3px}
+.dk:active{transform:scale(.94)}
+.dk.on{box-shadow:inset 0 0 0 2px var(--acc);background:var(--accbg)}
+.dk-ic{font-size:20px;line-height:1}
+.dk-l{font-size:9.5px;font-weight:900;letter-spacing:.03em;color:var(--ink3);text-transform:uppercase}
+.dk-v{font-size:10.5px;font-weight:800;color:var(--ink);line-height:1.15;max-width:66px;
+ overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dock-play{display:flex;gap:8px;padding:8px 12px 0}
+.dock-play .btn{min-height:46px;font-size:14.5px;border-radius:23px}
 .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:#fff;
  padding:12px 20px;border-radius:999px;font-weight:800;font-size:14px;z-index:60;animation:up .25s ease}
 @keyframes up{from{opacity:0;transform:translateY(11px)}to{opacity:1;transform:none}}
@@ -394,16 +408,18 @@ function startGame(cfg){
     p:{x:lvl.start.x+.5,y:lvl.start.y+.5,vx:0,vy:0},
     target:null, items:lvl.items.slice(), help:lvl.help, exit:lvl.exit,
     obs:[], score:0, got:0, hits:0, left:cfg.dur||45, over:0, win:0,
-    combo:0, boost:0, frozen:0, shield:0, ruleFired:0, idleT:0, extraSpeed:0,
+    combo:0, boost:0, frozen:0, shield:0, ruleFired:0, idleT:0, extraSpeed:0, inv:0,
     flash:0, shake:0, carried:0, face:0, lean:0, moving:0, trail:[], parts:[], pops:[],
     intro:1.1, vx:0, vy:0,
   };
   // помехи
   if(cfg.obst&&!cfg.gray){
     const r=rng((cfg.seed||1234)*31);
+    const far=lvl.free.filter(c=>Math.hypot(c.x-lvl.start.x,c.y-lvl.start.y)>5);
+    const pool=far.length>=T.n?far:lvl.free;
     for(let i=0;i<T.n;i++){
-      const c=lvl.free[rint(r,Math.floor(lvl.free.length/2),lvl.free.length-1)];
-      st.obs.push({x:c.x+.5,y:c.y+.5,ox:c.x+.5,oy:c.y+.5,a:r()*6.28,dir:r()>.5?1:-1,ph:r()*6.28});
+      const c=pool[rint(r,0,pool.length-1)];
+      st.obs.push({x:c.x+.5,y:c.y+.5,ox:c.x+.5,oy:c.y+.5,a:r()*6.28,dir:r()>.5?1:-1,ph:r()*6.28,hunt:3});
     }
   }
   G.cfg=cfg;G.st=st;G.lvl=lvl;G.ctx=ctx;G.cell=cell;G.size=size;G.W=W;G.H=H;G.T=T;
@@ -489,8 +505,18 @@ function step(dt){
       else if(solid(lvl.grid,o.x,ny))o.a=-o.a;
       else{o.x=nx;o.y=ny}}
     else if(ob.mode==='chase'){
+      o.hunt=(o.hunt===undefined?3:o.hunt)-dt;
       const d=Math.hypot(st.p.x-o.x,st.p.y-o.y);
-      if(d>.1){moveWithWalls(o,(st.p.x-o.x)/d*osp,(st.p.y-o.y)/d*osp,lvl.grid)}}
+      if(o.hunt>0){
+        if(d>.1)moveWithWalls(o,(st.p.x-o.x)/d*osp,(st.p.y-o.y)/d*osp,lvl.grid);
+        if(d>5.5)o.hunt=3;                       // потеряла из виду — сбрасывает охоту
+      }else{
+        // след потерян: бродит вслепую 2.5 секунды
+        o.wa=(o.wa||0)+dt;
+        if(o.wa>2.5){o.wa=0;o.hunt=3}
+        o.wd=o.wd||Math.random()*6.283;
+        if(!moveWithWalls(o,Math.cos(o.wd)*osp*.6,Math.sin(o.wd)*osp*.6,lvl.grid))o.wd+=2.1;
+      }}
     else if(ob.mode==='sine'){o.ph+=dt*1.6;
       const nx=o.ox+Math.sin(o.ph)*2.2,ny=o.oy+Math.cos(o.ph*.7)*1.4;
       if(!solid(lvl.grid,nx,ny)){o.x=nx;o.y=ny}}
@@ -526,13 +552,14 @@ function step(dt){
     checkRule('help');
   }
   // касание помехи
-  if(cfg.obst&&!st.over){
+  if(st.inv>0)st.inv-=dt;
+  if(cfg.obst&&!st.over&&st.inv<=0){
     st.obs.forEach(o=>{
       if(o.cool>0){o.cool-=dt;return}
       if(Math.hypot(o.x-st.p.x,o.y-st.p.y)<.68){
         o.cool=1.2;
         if(st.shield){st.shield=0;st.flash=10;return}
-        st.hits++;st.combo=0;st.shake=14;
+        st.hits++;st.combo=0;st.shake=14;st.inv=1.5;   // передышка после удара
         burst(st,st.p.x,st.p.y,'#D93030',10);
         const L=cfg.loseRule?cfg.loseRule.id:'hits3';
         if(cfg.scoreRule&&cfg.scoreRule.id==='risk')st.score=Math.max(0,st.score-10);
@@ -603,11 +630,12 @@ function fireRule(){
 function solid(g,x,y){const cx=Math.floor(x),cy=Math.floor(y);
   if(cx<0||cy<0||cx>=N||cy>=N)return 1;return g[cy][cx]}
 function moveWithWalls(p,dx,dy,g){
-  const R=.34;
+  const R=.34; let moved=false;
   if(dx){const nx=p.x+dx;
-    if(!solid(g,nx+Math.sign(dx)*R,p.y-R*.9)&&!solid(g,nx+Math.sign(dx)*R,p.y+R*.9))p.x=nx}
+    if(!solid(g,nx+Math.sign(dx)*R,p.y-R*.9)&&!solid(g,nx+Math.sign(dx)*R,p.y+R*.9)){p.x=nx;moved=true}}
   if(dy){const ny=p.y+dy;
-    if(!solid(g,p.x-R*.9,ny+Math.sign(dy)*R)&&!solid(g,p.x+R*.9,ny+Math.sign(dy)*R))p.y=ny}
+    if(!solid(g,p.x-R*.9,ny+Math.sign(dy)*R)&&!solid(g,p.x+R*.9,ny+Math.sign(dy)*R)){p.y=ny;moved=true}}
+  return moved;
 }
 function endGame(win){
   const st=G.st,cfg=G.cfg;
@@ -689,6 +717,7 @@ function draw(){
   ctx.save();
   ctx.translate(st.p.x*cell,st.p.y*cell);
   if(st.moving)ctx.rotate(Math.cos(st.face)*Math.min(.16,(st.lean||0)*.006));
+  if(st.inv>0)ctx.globalAlpha=.45+Math.abs(Math.sin(G.tick*.35))*.55;   // мигает, пока неуязвим
   drawHero(ctx,0,0,cell*.34,H,cfg.gray);
   ctx.restore();
   // частицы
@@ -957,9 +986,12 @@ function render(){
   }
   if(st==='ruledone'){
     $('htitle').textContent='Сработало';
-    B().innerHTML=say('Это правило придумал не я.\nОно теперь есть только в твоей игре.')
+    B().innerHTML=say('Это правило придумал не я.\nОно теперь есть только в твоей игре.','happy')
       +`<div class="preview">Когда ${S.ifCond.when} — ${S.ifThen.then}.</div>`;
-    F().innerHTML=`<button class="btn" onclick="runV3()">Играть свою игру</button>`;
+    F().innerHTML=S.back2free
+      ? `<div class="btnrow"><button class="btn btn2 btn-sm" onclick="S.back2free=0;go('free')">В мастерскую</button>
+         <button class="btn btn-sm" onclick="S.back2free=0;runV3()">▶ Играть</button></div>`
+      : `<button class="btn" onclick="runV3()">Играть свою игру</button>`;
     return;
   }
 
@@ -976,7 +1008,17 @@ function render(){
       <div class="result-sub">${S.lastWin?'Получилось!':'Не успел'} · рекорд ${best}</div></div>`
       +say(S.lastWin?'Твоя игра работает. И правила в ней — твои.':'Попробуй ещё. Или оставь как есть — это твоя игра.');
     F().innerHTML=`<div class="btnrow"><button class="btn btn2 btn-sm" onclick="runV3()">Ещё раз</button>
-      <button class="btn btn-sm" onclick="go('s5')">Это моя игра</button></div>`;
+      <button class="btn btn-sm" onclick="go('free')">Что-нибудь поменять</button></div>`
+      +`<button class="txtbtn" onclick="go('s5')">Готово, хочу паспорт →</button>`;
+    return;
+  }
+
+  if(st==='free'){
+    $('htitle').textContent='Мастерская';
+    B().innerHTML=say('Здесь всё твоё. Меняй что хочешь — и сразу играй.')
+      +`<div class="pcard" style="font-size:14.5px;line-height:1.5">${promptText()}</div>`
+      +`<div class="result" style="margin-top:10px">Твой рекорд: <b style="color:var(--acc)">${S.record}</b> · сыграно забегов: ${S.runs||0}</div>`;
+    F().innerHTML=dockHTML();
     return;
   }
 
@@ -994,7 +1036,82 @@ function render(){
   if(st==='s6'){renderPassport();return}
 }
 
-function say(t){return `<div class="say"><div class="say-av">🤖</div><div class="say-b">${t}</div></div>`}
+/* Нейро — персонаж, а не системный эмодзи (единый с остальными Мастерскими) */
+function svgNeuro(size,mood){
+  const sz=size||50,m=mood||'idle';
+  const eye={idle:'#4FD1C5',think:'#FFC94D',happy:'#7BE495',oops:'#FF9A76'}[m]||'#4FD1C5';
+  const tilt={idle:0,think:-6,happy:3,oops:-3}[m]||0;
+  const lid={idle:0,think:2.4,happy:1.6,oops:0}[m]||0;
+  return `<svg viewBox="0 0 64 64" width="${sz}" height="${sz}" style="display:block;overflow:visible">
+   <ellipse cx="32" cy="59" rx="15" ry="3" fill="rgba(120,72,28,.16)"/>
+   <g transform="rotate(${tilt} 32 34)">
+     <line x1="32" y1="12" x2="32" y2="19" stroke="#C9B49B" stroke-width="2.4" stroke-linecap="round"/>
+     <circle cx="32" cy="9.5" r="3.4" fill="${eye}"/><circle cx="32" cy="9.5" r="6.5" fill="${eye}" opacity=".22"/>
+     <path d="M14 30 q18 -20 36 0 z" fill="#E4DCCF"/>
+     <rect x="13" y="28" width="38" height="30" rx="13" fill="#F2ECE1" stroke="#D8CDBB" stroke-width="1.4"/>
+     <rect x="18" y="34" width="28" height="15" rx="7.5" fill="#2B2118"/>
+     <ellipse cx="25.5" cy="${41.5+lid}" rx="3.4" ry="${3.4-lid*.7}" fill="${eye}"/>
+     <ellipse cx="38.5" cy="${41.5+lid}" rx="3.4" ry="${3.4-lid*.7}" fill="${eye}"/>
+     <circle cx="24.3" cy="${40.3+lid}" r="1.05" fill="#fff" opacity=".9"/>
+     <circle cx="37.3" cy="${40.3+lid}" r="1.05" fill="#fff" opacity=".9"/>
+     ${m==='happy'?'<path d="M27 53 q5 4 10 0" stroke="#C9B49B" stroke-width="1.8" fill="none" stroke-linecap="round"/>':''}
+     ${m==='oops'?'<path d="M28 54 q4 -3 8 0" stroke="#C9B49B" stroke-width="1.8" fill="none" stroke-linecap="round"/>':''}
+     <rect x="8" y="38" width="5" height="12" rx="2.5" fill="#DCD2C2"/>
+     <rect x="51" y="38" width="5" height="12" rx="2.5" fill="#DCD2C2"/>
+   </g></svg>`;
+}
+
+/* панель инструментов: любую часть игры можно менять в любой момент */
+const DOCK=[
+ {k:'hero', ic:'🦊', l:'герой',    get:()=>S.hero&&S.hero.n},
+ {k:'goal', ic:'🎯', l:'цель',     get:()=>S.goal&&S.goal.n},
+ {k:'item', ic:'⭐', l:'предмет',  get:()=>S.item&&S.item.n, when:()=>S.goal&&S.goal.needItem},
+ {k:'world',ic:'🗺', l:'мир',      get:()=>S.world&&S.world.n},
+ {k:'obst', ic:'💥', l:'помеха',   get:()=>S.obst&&S.obst.n},
+ {k:'help', ic:'🎁', l:'помощник', get:()=>S.help&&S.help.n},
+ {k:'tempo',ic:'⚡', l:'темп',     get:()=>TEMPO[S.tempo].t},
+ {k:'score',ic:'🔢', l:'очки',     get:()=>S.scoreRule&&S.scoreRule.n},
+ {k:'lose', ic:'💔', l:'проигрыш', get:()=>S.loseRule&&S.loseRule.n},
+ {k:'rule', ic:'✨', l:'правило',  get:()=>S.ifCond&&S.ifThen?'своё':'нет'},
+];
+function dockHTML(){
+  const items=DOCK.filter(d=>!d.when||d.when());
+  return `<div class="dock-play">
+      <button class="btn btn2" onclick="go('s5')">К паспорту</button>
+      <button class="btn" onclick="runV3()">▶ Играть</button>
+    </div>
+    <div class="dock"><div class="dock-r">${items.map(d=>
+      `<button class="dk" onclick="dockTap('${d.k}')">
+        <span class="dk-ic">${d.ic}</span><span class="dk-l">${d.l}</span>
+        <span class="dk-v">${d.get()||'—'}</span></button>`).join('')}</div></div>`;
+}
+function dockTap(k){
+  if(k==='tempo'){const o=['calm','normal','fast'];S.tempo=o[(o.indexOf(S.tempo)+1)%3];render();toast('Темп: '+TEMPO[S.tempo].t);return}
+  if(k==='score'){S.scoreRule=SCORE_RULES[(SCORE_RULES.indexOf(S.scoreRule)+1)%4];render();toast(S.scoreRule.n);return}
+  if(k==='lose'){S.loseRule=LOSE_RULES[(LOSE_RULES.indexOf(S.loseRule)+1)%4];render();toast(S.loseRule.n);return}
+  if(k==='rule'){S.back2free=1;S.step='ifthen';render();return}
+  openPick(k);
+}
+function openPick(k){
+  const src={hero:HEROES,goal:GOALS,item:ITEMS,world:WORLDS,obst:OBST,help:HELP}[k];
+  const title={hero:'Кто герой?',goal:'Что он должен делать?',item:'Что собирать?',
+    world:'Где всё происходит?',obst:'Кто мешает?',help:'Кто помогает?'}[k];
+  $('sheetT').textContent=title;
+  const cur=S[k];
+  $('sheetL').innerHTML='<div class="grid3">'+src.map((t,i)=>{
+    const ic=t.ic||(k==='hero'?'🦊':k==='world'?'🗺':'⭐');
+    return `<button class="cell${cur&&cur.id===t.id?' on':''}" onclick="pickFree('${k}',${i})">
+      <span style="font-size:28px">${ic}</span><span class="cell-n">${t.n}</span></button>`}).join('')+'</div>';
+  $('ovl').classList.add('on');
+  const sh=$('sheet'); sh.style.display='flex'; sh.classList.add('on');
+}
+function pickFree(k,i){
+  const src={hero:HEROES,goal:GOALS,item:ITEMS,world:WORLDS,obst:OBST,help:HELP}[k];
+  S[k]=src[i];
+  if(k==='goal'&&S.goal.needItem&&!S.item)S.item=ITEMS[10];
+  closeSheet(); render();
+}
+function say(t,mood){return `<div class="say"><div class="say-av">${svgNeuro(50,mood)}</div><div class="say-b">${t}</div></div>`}
 function plural(n,a,b,c){const m=n%10,h=n%100;return h>=11&&h<=14?c:m===1?a:m>=2&&m<=4?b:c}
 
 /* ═══════════ ПЕРЕХОДЫ ═══════════ */
@@ -1070,6 +1187,7 @@ function testRule(){
 function runV3(){
   assemble(()=>{
     S.step='play';render();
+    S.runs=(S.runs||0)+1;
     setTimeout(()=>startGame(cfgNow({dur:60,onEnd:(st)=>{
       S.lastScore=st.score;S.lastWin=st.win;
       if(st.score>S.record)S.record=st.score;
@@ -1111,7 +1229,7 @@ function renderPassport(){
   +say('Готово. Расскажи дома, почему у твоего героя ' + (S.help?S.help.n:'помощник') + ' — и что было бы без него.');
   F().innerHTML=`<button class="btn" onclick="share()">Дать другу ссылку</button>
     <div class="btnrow" style="margin-top:9px">
-      <button class="btn btn2 btn-sm" onclick="runV3()">Играть ещё</button>
+      <button class="btn btn2 btn-sm" onclick="go('free')">Доработать</button>
       <button class="btn btn2 btn-sm" onclick="savePng()">Сохранить картинку</button></div>`;
   drawCover();
 }
@@ -1164,7 +1282,7 @@ function savePng(){
 /* ═══════════ НАВИГАЦИЯ ═══════════ */
 $('back').onclick=()=>{
   stopGame();
-  const map={v0:'s1',s2:'s1',v1:'s2',s3:'s2',v2:'s3',tempo:'s3',howto:'s3',s4:'s4',
+  const map={v0:'s1',s2:'s1',v1:'s2',s3:'s2',v2:'s3',tempo:'s3',howto:'s3',s4:'s4',free:'played',
     abplay:'s4',abnext:'s4',abpick:'s4',ifthen:'s4',ruletest:'ifthen',ruledone:'ifthen',
     play:'ifthen',played:'ifthen',s5:'played',s6:'s5',s1:'s0'};
   const p=map[S.step]||'s0';S.step=p;render();
