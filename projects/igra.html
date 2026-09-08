@@ -146,7 +146,7 @@ canvas{border-radius:18px;box-shadow:var(--sh);touch-action:none;display:block;b
   <div class="hdr">
     <button class="hdr-back" id="back">‹</button>
     <div class="hdr-t" id="htitle">Своя игра</div>
-    <button class="hdr-r" id="mute">🔊</button>
+    <div class="hdr-r"></div>
   </div>
   <div class="prog"><i id="pbar" style="width:0"></i></div>
   <div class="body" id="body"></div>
@@ -260,7 +260,7 @@ const PALETTES=[
 const S={step:'s0',name:'',hero:null,goal:null,world:null,item:null,obst:null,help:null,
  tempo:'normal',scoreRule:SCORE_RULES[0],loseRule:LOSE_RULES[0],ifCond:null,ifThen:null,
  title:'',palette:PALETTES[0],cover:'start',seed:1234,record:0,lastScore:0,lastGot:0,
- mute:false,abRound:0,abPair:null,abResults:{},decisions:0,frames:{}};
+abRound:0,abPair:null,abResults:{},decisions:0,frames:{}};
 const STEPS=['s0','s1','s2','s3','s4','s5','s6'];
 
 /* ═══════════ УТИЛИТЫ ═══════════ */
@@ -271,23 +271,6 @@ function rint(r,a,b){return a+Math.floor(r()*(b-a+1))}
 function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
 function toast(t){const e=document.createElement('div');e.className='toast';e.textContent=t;document.body.appendChild(e);setTimeout(()=>e.remove(),2200)}
 
-/* звук — процедурно, без файлов */
-let AC=null;
-function beep(type){
-  if(S.mute)return;
-  try{
-    AC=AC||new (window.AudioContext||window.webkitAudioContext)();
-    const t=AC.currentTime, g=AC.createGain(); g.connect(AC.destination); g.gain.value=.16;
-    const mk=(f0,f1,dur,wave)=>{const o=AC.createOscillator();o.type=wave||'sine';
-      o.frequency.setValueAtTime(f0,t);o.frequency.linearRampToValueAtTime(f1,t+dur);
-      o.connect(g);o.start(t);o.stop(t+dur);};
-    if(type==='pick')mk(880,1320,.09);
-    if(type==='hit'){mk(220,160,.14,'sawtooth')}
-    if(type==='rule'){[523,659,784].forEach((f,i)=>setTimeout(()=>mk(f,f,.35),i*40))}
-    if(type==='win'){[523,659,784,1046,1318].forEach((f,i)=>setTimeout(()=>mk(f,f,.2),i*90))}
-    g.gain.setValueAtTime(.16,t); g.gain.exponentialRampToValueAtTime(.001,t+.6);
-  }catch(e){}
-}
 
 /* ═══════════ РИСОВАНИЕ СПРАЙТОВ ═══════════ */
 function drawHero(ctx,x,y,r,h,gray){
@@ -412,7 +395,8 @@ function startGame(cfg){
     target:null, items:lvl.items.slice(), help:lvl.help, exit:lvl.exit,
     obs:[], score:0, got:0, hits:0, left:cfg.dur||45, over:0, win:0,
     combo:0, boost:0, frozen:0, shield:0, ruleFired:0, idleT:0, extraSpeed:0,
-    flash:0, shake:0, carried:0,
+    flash:0, shake:0, carried:0, face:0, lean:0, moving:0, trail:[], parts:[], pops:[],
+    intro:1.1,
   };
   // помехи
   if(cfg.obst&&!cfg.gray){
@@ -457,6 +441,7 @@ function loop(t){
 function step(dt){
   const st=G.st,cfg=G.cfg,T=G.T,lvl=G.lvl;
   if(st.over)return;
+  if(st.intro>0){st.intro-=dt;stepFx(st,dt);return}   // «три-два-один» до старта
   st.left-=dt;
   if(st.left<=0){st.left=0;endGame(cfg.goal&&cfg.goal.id==='survive');return}
 
@@ -472,6 +457,19 @@ function step(dt){
 
   let sp=(T.sp/30)*(1+st.extraSpeed);
   if(st.boost>0){sp*=1.35;st.boost-=dt}
+  // разгон и торможение: движение перестаёт быть «включил-выключил»
+  const acc=dx||dy?14:11;
+  st.vx+=((dx*sp)-st.vx)*Math.min(1,acc*dt);
+  st.vy+=((dy*sp)-st.vy)*Math.min(1,acc*dt);
+  const spd=Math.hypot(st.vx,st.vy);
+  if(spd>0.004){st.face=Math.atan2(st.vy,st.vx);st.moving=1}else st.moving=0;
+  st.lean=(st.lean||0)+((spd*46)-(st.lean||0))*Math.min(1,10*dt);
+  // след за героем на скорости
+  st.trail=st.trail||[];
+  if(spd>0.028){st.trail.push({x:st.p.x,y:st.p.y,t:1});if(st.trail.length>7)st.trail.shift()}
+  st.trail.forEach(p=>p.t-=dt*3.1);
+  st.trail=st.trail.filter(p=>p.t>0);
+  dx=st.vx/sp||0; dy=st.vy/sp||0;
   // зоны замедления
   st.obs.forEach(o=>{const ob=cfg.obst;if(ob&&ob.mode==='zone'&&Math.hypot(o.x-st.p.x,o.y-st.p.y)<1.1)sp*=.5});
 
@@ -506,17 +504,21 @@ function step(dt){
       const d=Math.hypot(it.x-st.p.x,it.y-st.p.y);
       if(d<(pull?99:2.2)&&d>.05){it.x+=(st.p.x-it.x)/d*.09;it.y+=(st.p.y-it.y)/d*.09}}
     if(Math.hypot(it.x-st.p.x,it.y-st.p.y)<.62){
-      it.got=1;st.got++;st.combo++;st.carried++;beep('pick');
+      const sBefore=st.score;
+      it.got=1;st.got++;st.combo++;st.carried++;
+      burst(st,it.x,it.y,cfg.item?cfg.item.c:'#F2C337',12);
       const R=cfg.scoreRule?cfg.scoreRule.id:'flat';
       if(R==='flat')st.score+=10;
       else if(R==='time')st.score+=10;
       else if(R==='combo')st.score+=st.combo>=3?20:10;
       else if(R==='risk')st.score+=25;
       st.flash=8;
+      st.pops=st.pops||[];
+      st.pops.push({x:it.x,y:it.y-.25,t:1,v:'+'+(st.score-sBefore)});
     }});
   // помощник
   if(st.help&&!st.help.got&&Math.hypot(st.help.x-st.p.x,st.help.y-st.p.y)<.62){
-    st.help.got=1;beep('pick');st.flash=10;
+    st.help.got=1;st.flash=10;
     const h=cfg.help?cfg.help.id:'';
     if(h==='boost')st.boost=3;
     if(h==='shield')st.shield=1;
@@ -530,7 +532,8 @@ function step(dt){
       if(Math.hypot(o.x-st.p.x,o.y-st.p.y)<.68){
         o.cool=1.2;
         if(st.shield){st.shield=0;st.flash=10;return}
-        st.hits++;st.combo=0;beep('hit');st.shake=12;
+        st.hits++;st.combo=0;st.shake=14;
+        burst(st,st.p.x,st.p.y,'#D93030',10);
         const L=cfg.loseRule?cfg.loseRule.id:'hits3';
         if(cfg.scoreRule&&cfg.scoreRule.id==='risk')st.score=Math.max(0,st.score-10);
         if(L==='hits1'){endGame(0);return}
@@ -555,9 +558,25 @@ function step(dt){
     if(c==='half'&&st.items.length&&st.got>=Math.ceil(st.items.length/2))fireRule();
     if(c==='idle'&&st.idleT>=2)fireRule();
   }
+  stepFx(st,dt);
   if(st.flash>0)st.flash--;
   if(st.shake>0)st.shake--;
   updHUD();
+}
+/* короткие частицы: сбор, урон, срабатывание правила */
+function burst(st,x,y,color,n){
+  st.parts=st.parts||[];
+  for(let i=0;i<n;i++){
+    const a=Math.random()*6.283, v=.03+Math.random()*.07;
+    st.parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-.02,t:1,c:color,r:.06+Math.random()*.07});
+  }
+  if(st.parts.length>90)st.parts.splice(0,st.parts.length-90);
+}
+function stepFx(st,dt){
+  (st.parts||[]).forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=dt*.55;p.t-=dt*1.9});
+  st.parts=(st.parts||[]).filter(p=>p.t>0);
+  (st.pops||[]).forEach(p=>{p.y-=dt*1.15;p.t-=dt*1.15});
+  st.pops=(st.pops||[]).filter(p=>p.t>0);
 }
 function checkRule(kind){
   const cfg=G.cfg,st=G.st;
@@ -567,7 +586,8 @@ function checkRule(kind){
 }
 function fireRule(){
   const cfg=G.cfg,st=G.st;
-  st.ruleFired=1;st.flash=18;st.shake=16;beep('rule');
+  st.ruleFired=1;st.flash=20;st.shake=18;
+  for(let k=0;k<3;k++)burst(st,st.p.x,st.p.y,'#7B2FFF',14);
   const t=cfg.ifThen?cfg.ifThen.id:'';
   if(t==='freeze')st.frozen=3;
   if(t==='fast')st.extraSpeed=.5;
@@ -594,7 +614,7 @@ function endGame(win){
   if(st.over)return;
   st.over=1;st.win=win?1:0;
   if(cfg.scoreRule&&cfg.scoreRule.id==='time'&&win)st.score+=Math.floor(st.left)*5;
-  if(win)beep('win');
+  if(win)
   G.run=0;
   captureFrame('finish');
   setTimeout(()=>{stopGame();G.onEnd&&G.onEnd(st)},420);
@@ -615,18 +635,31 @@ function draw(){
   if(st.shake>0){ctx.translate((Math.random()-.5)*st.shake*.5,(Math.random()-.5)*st.shake*.5)}
   // пол
   ctx.fillStyle=cfg.gray?'#D8D8D8':W.floor;ctx.fillRect(0,0,size,size);
+  // мягкое затемнение к краям — арена перестаёт быть плоским листом
+  const vg=ctx.createRadialGradient(size/2,size/2,size*.28,size/2,size/2,size*.78);
+  vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.14)');
+  ctx.fillStyle=vg;ctx.fillRect(0,0,size,size);
   // клетка
   ctx.strokeStyle='rgba(0,0,0,.05)';ctx.lineWidth=1;
   for(let i=1;i<N;i++){ctx.beginPath();ctx.moveTo(i*cell,0);ctx.lineTo(i*cell,size);ctx.stroke();
     ctx.beginPath();ctx.moveTo(0,i*cell);ctx.lineTo(size,i*cell);ctx.stroke()}
-  // стены
-  ctx.fillStyle=cfg.gray?'#B4B4B4':W.wall;
+  // стены: тень под блоком, тело, светлая верхняя грань — плоские квадраты читались как заглушка
+  const wallC=cfg.gray?'#B4B4B4':W.wall;
+  const rr=cell*.2, lift=cell*.13;
+  const shade=(hex,k)=>{const p=h=>parseInt(h,16);
+    const r0=p(hex.slice(1,3)),g0=p(hex.slice(3,5)),b0=p(hex.slice(5,7));
+    const c=v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0');
+    return '#'+c(r0*k)+c(g0*k)+c(b0*k)};
+  const rbox=(px,py,w,h,r)=>{ctx.beginPath();
+    ctx.moveTo(px+r,py);ctx.arcTo(px+w,py,px+w,py+h,r);
+    ctx.arcTo(px+w,py+h,px,py+h,r);ctx.arcTo(px,py+h,px,py,r);
+    ctx.arcTo(px,py,px+w,py,r);ctx.closePath()};
   for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(lvl.grid[y][x]){
-    ctx.beginPath();const rr=cell*.18;
     const px=x*cell,py=y*cell;
-    ctx.moveTo(px+rr,py);ctx.arcTo(px+cell,py,px+cell,py+cell,rr);
-    ctx.arcTo(px+cell,py+cell,px,py+cell,rr);ctx.arcTo(px,py+cell,px,py,rr);
-    ctx.arcTo(px,py,px+cell,py,rr);ctx.fill();
+    ctx.fillStyle='rgba(0,0,0,.16)';rbox(px+1,py+3,cell-2,cell-2,rr);ctx.fill();
+    ctx.fillStyle=shade(wallC,.82);rbox(px,py,cell,cell,rr);ctx.fill();
+    ctx.fillStyle=wallC;rbox(px,py-lift*.35,cell,cell-lift*.2,rr);ctx.fill();
+    ctx.fillStyle=shade(wallC,1.22);rbox(px+cell*.13,py-lift*.2,cell*.74,cell*.3,rr*.7);ctx.fill();
   }
   // выход
   if(st.exit&&cfg.goal&&(cfg.goal.id==='escape'||cfg.goal.id==='deliver')){
@@ -635,13 +668,37 @@ function draw(){
     ctx.fillText('🚪',st.exit.x*cell,st.exit.y*cell);
   }
   // предметы
-  if(cfg.item)st.items.forEach(it=>{if(!it.got)drawItem(ctx,it.x*cell,it.y*cell,cell*.28,cfg.item)});
+  if(cfg.item)st.items.forEach((it,k)=>{if(it.got)return;
+    const ph=G.tick*.055+k*1.3;
+    const bob=Math.sin(ph)*cell*.07;
+    ctx.save();
+    ctx.globalAlpha=.28;ctx.fillStyle=cfg.item.c;
+    ctx.beginPath();ctx.ellipse(it.x*cell,it.y*cell+cell*.24,cell*.2,cell*.07,0,0,7);ctx.fill();
+    ctx.globalAlpha=1;
+    drawItem(ctx,it.x*cell,it.y*cell+bob,cell*.28*(1+Math.sin(ph)*.05),cfg.item);
+    ctx.restore()});
   // помощник
   if(st.help&&!st.help.got&&cfg.help)drawHelp(ctx,st.help.x*cell,st.help.y*cell,cell*.3,cfg.help,G.tick);
   // помехи
   if(cfg.obst)st.obs.forEach(o=>drawObst(ctx,o.x*cell,o.y*cell,cell*.34,cfg.obst,G.tick));
-  // герой
-  drawHero(ctx,st.p.x*cell,st.p.y*cell,cell*.34,H,cfg.gray);
+  // след героя на скорости
+  (st.trail||[]).forEach(p=>{ctx.save();ctx.globalAlpha=p.t*.2;
+    ctx.fillStyle=cfg.gray?'#9A9A9A':H.c;
+    ctx.beginPath();ctx.arc(p.x*cell,p.y*cell,cell*.3*p.t,0,7);ctx.fill();ctx.restore()});
+  // герой: слегка наклоняется в сторону бега
+  ctx.save();
+  ctx.translate(st.p.x*cell,st.p.y*cell);
+  if(st.moving)ctx.rotate(Math.cos(st.face)*Math.min(.16,(st.lean||0)*.006));
+  drawHero(ctx,0,0,cell*.34,H,cfg.gray);
+  ctx.restore();
+  // частицы
+  (st.parts||[]).forEach(p=>{ctx.save();ctx.globalAlpha=Math.max(0,p.t);
+    ctx.fillStyle=p.c;ctx.beginPath();ctx.arc(p.x*cell,p.y*cell,p.r*cell*p.t,0,7);ctx.fill();ctx.restore()});
+  // всплывающие очки
+  (st.pops||[]).forEach(p=>{ctx.save();ctx.globalAlpha=Math.max(0,p.t);
+    ctx.fillStyle='#fff';ctx.strokeStyle='rgba(0,0,0,.35)';ctx.lineWidth=3;
+    ctx.font='800 '+Math.round(cell*.42)+'px Nunito, system-ui';ctx.textAlign='center';
+    ctx.strokeText(p.v,p.x*cell,p.y*cell);ctx.fillText(p.v,p.x*cell,p.y*cell);ctx.restore()});
   // темнота
   const dk=cfg.gray?0:W.dark*(cfg.help&&cfg.help.id==='torch'&&st.help&&st.help.got?.4:1);
   if(dk>0){
@@ -651,6 +708,17 @@ function draw(){
   }
   // вспышка
   if(st.flash>0){ctx.fillStyle='rgba(255,255,255,'+(st.flash/40)+')';ctx.fillRect(0,0,size,size)}
+  // отсчёт перед стартом
+  if(st.intro>0){
+    ctx.fillStyle='rgba(20,14,8,.32)';ctx.fillRect(0,0,size,size);
+    const n=Math.ceil(st.intro);
+    const k=1-(st.intro%1);
+    ctx.save();ctx.globalAlpha=Math.min(1,1.6-k*1.2);
+    ctx.translate(size/2,size/2);ctx.scale(.8+k*.5,.8+k*.5);
+    ctx.fillStyle='#fff';ctx.font='800 '+Math.round(size*.26)+'px Unbounded, Nunito, system-ui';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(n>0?String(n):'В путь!',0,0);ctx.restore();
+  }
   // подсказки в пустоте
   if(cfg.gray){
     ctx.fillStyle='rgba(90,90,90,.75)';ctx.font='600 12px Nunito, system-ui';ctx.textAlign='left';
@@ -769,7 +837,6 @@ function cfgNow(extra){
 function render(){
   $('pbar').style.width=pct()+'%';
   $('back').style.visibility=S.step==='s0'?'hidden':'visible';
-  $('mute').textContent=S.mute?'🔇':'🔊';
   const st=S.step;
 
   if(st==='s0'){
@@ -1102,7 +1169,6 @@ $('back').onclick=()=>{
     play:'ifthen',played:'ifthen',s5:'played',s6:'s5',s1:'s0'};
   const p=map[S.step]||'s0';S.step=p;render();
 };
-$('mute').onclick=()=>{S.mute=!S.mute;$('mute').textContent=S.mute?'🔇':'🔊'};
 render();
 </script>
 </body>
