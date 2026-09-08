@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
 <meta name="theme-color" content="#FFF8EE">
 <title>Твоя история — Nooka</title>
-<link href="/fonts/nooka-fonts.css" rel="stylesheet">
+<link href="../fonts/nooka-fonts.css" rel="stylesheet">
 <style>
 :root{
   --bg:#FFF8EE; --card:#FFFFFF; --ink:#2B2118; --ink2:#5C4A38; --ink3:#8A7A68;
@@ -15,20 +15,20 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;background:var(--bg)}
-body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);overflow:hidden;-webkit-font-smoothing:antialiased}
-.root{height:100dvh;max-width:480px;margin:0 auto;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);position:relative}
+body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+.root{min-height:100vh;min-height:100dvh;max-width:480px;margin:0 auto;display:flex;flex-direction:column;background:var(--bg);position:relative}
 
 /* ── шапка ── */
-.hdr{flex:none;height:52px;display:flex;align-items:center;gap:10px;padding:0 14px;background:var(--bg);z-index:20}
+.hdr{flex:none;height:52px;display:flex;align-items:center;gap:10px;padding:0 14px;background:var(--bg);z-index:20;position:sticky;top:0}
 .hdr-back{width:34px;height:34px;border:none;background:none;cursor:pointer;font-size:20px;color:var(--acc);display:flex;align-items:center;justify-content:center;flex:none}
 .hdr-t{flex:1;font-weight:800;font-size:14px;color:var(--ink2);text-align:center}
 .hdr-r{width:34px;flex:none;text-align:right;font-size:12px;font-weight:800;color:var(--ink3)}
-.prog{flex:none;height:4px;background:rgba(180,110,40,.1)}
+.prog{flex:none;height:4px;background:rgba(180,110,40,.1);position:sticky;top:52px;z-index:20}
 .prog i{display:block;height:4px;background:var(--acc);border-radius:0 2px 2px 0;transition:width .45s cubic-bezier(.4,0,.2,1)}
 
 /* ── тело ── */
-.body{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:0 12px 8px}
-.foot{flex:none;padding:8px 12px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(255,248,238,0),var(--bg) 45%)}
+.body{flex:1;padding:0 12px 8px}
+.foot{flex:none;position:sticky;bottom:0;z-index:25;padding:10px 12px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(255,248,238,0),var(--bg) 38%)}
 
 /* ── сцена ── */
 .scene{width:100%;aspect-ratio:4/3;border-radius:20px;overflow:hidden;background:#F3EADC;box-shadow:var(--sh);position:relative;margin-top:6px}
@@ -66,10 +66,10 @@ body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);ov
 .txtbtn{display:block;width:100%;text-align:center;border:none;background:none;color:var(--acc);font-family:inherit;font-weight:800;font-size:14px;padding:11px;cursor:pointer}
 
 /* ── bottom sheet ── */
-.ovl{position:absolute;inset:0;background:rgba(43,33,24,.42);opacity:0;pointer-events:none;transition:opacity .25s;z-index:40}
+.ovl{position:fixed;inset:0;background:rgba(43,33,24,.42);opacity:0;pointer-events:none;transition:opacity .25s;z-index:40}
 .ovl.on{opacity:1;pointer-events:auto}
-.sheet{position:absolute;left:0;right:0;bottom:0;max-height:66%;background:var(--bg);border-radius:24px 24px 0 0;transform:translateY(101%);transition:transform .3s cubic-bezier(.3,.9,.4,1);z-index:41;display:flex;flex-direction:column}
-.sheet.on{transform:none}
+.sheet{position:fixed;left:50%;width:100%;max-width:480px;margin-left:-240px;bottom:0;max-height:66%;pointer-events:none;background:var(--bg);border-radius:24px 24px 0 0;transform:translateY(101%);transition:transform .3s cubic-bezier(.3,.9,.4,1);z-index:41;display:flex;flex-direction:column}
+.sheet.on{transform:none;pointer-events:auto}
 .sheet-h{flex:none;padding:9px 16px 11px;text-align:center;position:relative}
 .sheet-h::before{content:'';display:block;width:36px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 11px}
 .sheet-t{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:17px;color:var(--ink)}
@@ -86,7 +86,7 @@ body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);ov
 .opt-ck{color:var(--acc);font-size:17px;font-weight:900}
 
 /* ── генерация ── */
-.gen{position:absolute;inset:0;background:rgba(255,248,238,.96);z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px;gap:16px}
+.gen{position:fixed;inset:0;background:rgba(255,248,238,.96);z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px;gap:16px}
 .gen-stage{width:100%;max-width:310px}
 .gst{display:flex;align-items:center;gap:11px;padding:9px 0;font-weight:700;font-size:14.5px;color:var(--ink3);opacity:.32;transition:opacity .3s,color .3s}
 .gst.on{opacity:1;color:var(--ink)}
@@ -162,7 +162,7 @@ body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);ov
 .rev-n{flex:none;width:30px;height:30px;border-radius:9px;background:var(--accbg);color:var(--acc);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900}
 
 /* ── прочее ── */
-.center{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;padding:20px 8px}
+.center{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:62vh;text-align:center;padding:20px 8px}
 .h1{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:25px;line-height:1.2;color:var(--ink);margin-bottom:13px}
 .lead{font-size:16px;line-height:1.6;color:var(--ink2);font-weight:600;white-space:pre-line}
 .card{background:var(--card);border-radius:18px;box-shadow:var(--sh);padding:16px;margin-top:12px}
@@ -756,7 +756,7 @@ function reroll(){S.seed=1000+Math.floor(Math.random()*9000);
   const sr=document.querySelector('.seedrow span');if(sr)sr.textContent='Зерно #'+S.seed;}
 
 /* ── шаги ── */
-function go(s){S.step=s;render();B().scrollTo({top:0,behavior:'smooth'})}
+function go(s){S.step=s;render();window.scrollTo({top:0,behavior:'smooth'})}
 function doGen(next){generate(()=>{go(next)})}
 
 function render(){
@@ -835,11 +835,11 @@ function render(){
     pages.forEach((p,i)=>setTimeout(()=>{
       const d=document.createElement('div');d.className='page flyin';d.style.width='100%';d.style.marginBottom='10px';
       d.innerHTML=`<div class="scene">${scene(S,{seed:S.seed+i*17,angle:i===0?'full':i===1?'close':i===4?'far':'full'})}</div><div class="page-txt">${p}</div>`;
-      box.appendChild(d);B().scrollTo({top:box.scrollHeight,behavior:'smooth'});
+      box.appendChild(d);window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
       if(i===pages.length-1)setTimeout(()=>{
         box.insertAdjacentHTML('beforeend',say(`Готово. Пять картинок, один герой, одна история.\nЗаметил? ${cap(S.prop.n)}, котор${S.prop.sex==='f'?'ую':S.prop.sex==='n'?'ое':S.prop.sex==='p'?'ые':'ый'} ты дал${''} ему в самом начале, вернул${S.prop.sex==='f'?'ась':S.prop.sex==='n'?'ось':S.prop.sex==='p'?'ись':'ся'} на последней странице. Я ${S.prop.sex==='p'?'их':'его'} не потерял.`));
         F().innerHTML=`<div class="btnrow"><button class="btn btn2 btn-sm" onclick="S.textSeed++;go('build')">Другими словами</button><button class="btn btn-sm" onclick="go('title')">Дальше</button></div>`;
-        B().scrollTo({top:99999,behavior:'smooth'});
+        window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
       },700);
     },i*720));
     return;
@@ -993,11 +993,11 @@ function renderReveal(){
   const box=$('revl');
   LAYERS.forEach((l,i)=>setTimeout(()=>{
     box.insertAdjacentHTML('beforeend',`<div class="rev-l"><div class="rev-n">${i+1}</div><b>${l[0]}</b><span>${l[1]}</span></div>`);
-    B().scrollTo({top:99999,behavior:'smooth'});
+    window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
     if(i===LAYERS.length-1)setTimeout(()=>{
       box.insertAdjacentHTML('beforeend',say(`Секрет.\nУ меня в памяти лежат нарисованные детали — тела, головы, глаза, фоны, вещи. Я не рисовал их сейчас. Я сложил твою картинку из кусочков.\n\nНастоящий ИИ рисует иначе — точку за точкой, с нуля. Но главное у нас одинаковое: <b>мы оба ничего не берём из воздуха. Мы собираем из того, что уже видели.</b>\n\nРазница только в размере библиотеки: у меня десятки деталей, у больших моделей — миллиарды.\n\nТвоя история от этого хуже не стала. Придумал её всё равно ты.`));
       F().innerHTML=`<button class="btn" onclick="go('end')">Понятно</button>`;
-      B().scrollTo({top:99999,behavior:'smooth'});
+      window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
     },600);
   },i*260));
 }
