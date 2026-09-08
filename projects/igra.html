@@ -1241,9 +1241,10 @@ function renderPassport(){
       <div class="pp-fr"><canvas id="fr1" width="92" height="92"></canvas><span>${promptText().split(/\s+/).length} слов</span></div>
     </div>
     <div class="pp-rules">
-      <div class="pp-rule"><b>Герой</b>${S.hero.n} ${S.goal.needItem&&S.item?'· собирает '+S.item.np:''}</div>
+      <div class="pp-rule"><b>Герой</b>${S.hero.n} ${S.goal.needItem&&S.item?'· собирает '+S.item.ap:''}</div>
       <div class="pp-rule"><b>Мир</b>${S.world.n}, темп ${TEMPO[S.tempo].t}</div>
-      <div class="pp-rule"><b>Мешает</b>${S.obst?S.obst.n:'никто'} · <b style="margin-left:0">помогает</b> ${S.help?S.help.n:'никто'}</div>
+      <div class="pp-rule"><b>Мешает</b>${S.obst?S.obst.n:'никто'}</div>
+      <div class="pp-rule"><b>Помогает</b>${S.help?S.help.n:'никто'}</div>
       <div class="pp-rule"><b>Очки</b>${S.scoreRule.n}</div>
       ${S.ifCond&&S.ifThen?`<div class="pp-rule pp-own"><b>Своё правило</b>Когда ${S.ifCond.when} — ${S.ifThen.then}</div>`:''}
     </div>
