@@ -110,6 +110,12 @@ canvas{border-radius:18px;box-shadow:var(--sh);touch-action:none;display:block;b
 .pp-fr canvas{width:92px;height:92px;border-radius:12px;box-shadow:none;display:block}
 .pp-fr span{display:block;font-size:11px;font-weight:800;color:var(--ink3);margin-top:5px}
 .pp-ar{font-size:20px;color:var(--acc)}
+.pp-story{margin:0 16px 4px;padding:13px 15px;background:#FFF8EE;border-radius:14px;
+ font-size:14px;line-height:1.55;color:var(--ink);font-weight:600;font-style:italic}
+.pp-end{margin-top:9px;padding-top:9px;border-top:1px dashed var(--line);color:var(--ink2);font-style:normal;font-weight:700}
+.pp-lesson{margin:4px 16px 0;padding:13px 15px;background:var(--accbg);border-radius:14px;
+ font-size:13px;line-height:1.5;color:var(--ink2);font-weight:600}
+.pp-lesson b{color:var(--acc);font-weight:900}
 .pp-rules{padding:4px 16px 12px}
 .pp-rule{display:flex;gap:8px;padding:8px 0;border-top:1px solid var(--line);font-size:13px;
  font-weight:600;color:var(--ink2);line-height:1.4}
@@ -142,6 +148,12 @@ canvas{border-radius:18px;box-shadow:var(--sh);touch-action:none;display:block;b
 .gst.on .gst-b{background:var(--accbg);color:var(--acc);animation:spin 1s linear infinite}
 .gst.done .gst-b{background:var(--acc);color:#fff;animation:none}
 @keyframes spin{to{transform:rotate(360deg)}}
+.live{margin-top:12px;background:var(--card);border-radius:16px;box-shadow:var(--sh);padding:10px 10px 11px}
+.live-t{font-size:10.5px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;
+ color:var(--ink3);text-align:center;margin-bottom:8px}
+.live-r{display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
+.live-r .dk{padding:7px 2px}
+.live-r .dk-ic{font-size:19px}
 .dock{position:sticky;bottom:0;z-index:26;background:var(--bg);padding:8px 0 calc(8px + env(safe-area-inset-bottom));
  border-top:1px solid var(--line)}
 .dock-r{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;padding:0 12px 2px}
@@ -281,7 +293,7 @@ const PALETTES=[
 const S={step:'s0',name:'',hero:null,goal:null,world:null,item:null,obst:null,help:null,
  tempo:'normal',scoreRule:SCORE_RULES[0],loseRule:LOSE_RULES[0],ifCond:null,ifThen:null,
  title:'',palette:PALETTES[0],cover:'start',seed:1234,record:0,lastScore:0,lastGot:0,
-abRound:0,abPair:null,abResults:{},decisions:0,frames:{}};
+abRound:0,abPair:null,abResults:{},decisions:0,frames:{},story:'',ending:'',runs:0,tab:'in'};
 const STEPS=['s0','s1','s2','s3','s4','s5','s6'];
 
 /* ═══════════ УТИЛИТЫ ═══════════ */
@@ -891,17 +903,86 @@ function assemble(after){
 function go(s){S.step=s;stopGame();render();window.scrollTo({top:0,behavior:'smooth'})}
 function pct(){return Math.round(STEPS.indexOf(S.step)/(STEPS.length-1)*100)}
 
-function arenaHTML(rule){
+function arenaHTML(rule,live){
   return `<div class="arena-wrap" id="arena">
     <div class="hud" id="hud"></div>
     <canvas id="cv"></canvas>
     <div class="rulebar" id="rulebar">${rule||''}</div>
-  </div>`;
+  </div>`+(live?liveBarHTML():'');
+}
+/* инструменты, которые работают НА ХОДУ — игра не останавливается */
+const LIVE=[
+ {k:'obst', ic:'💥', l:'помеха'},
+ {k:'help', ic:'🎁', l:'помощник'},
+ {k:'item', ic:'⭐', l:'предмет'},
+ {k:'world',ic:'🗺', l:'мир'},
+ {k:'tempo',ic:'⚡', l:'темп'},
+ {k:'add',  ic:'➕', l:'добавить'},
+];
+function liveBarHTML(){
+  return `<div class="live"><div class="live-t">Меняй на ходу — игра не остановится</div>
+    <div class="live-r">${LIVE.map(d=>
+      `<button class="dk" onclick="liveTap('${d.k}')">
+        <span class="dk-ic">${d.ic}</span><span class="dk-l">${d.l}</span></button>`).join('')}</div></div>`;
+}
+function liveTap(k){
+  if(!G.st||!G.cfg){return}
+  if(k==='add'){addStuff();return}
+  if(k==='tempo'){
+    const o=['calm','normal','fast'];S.tempo=o[(o.indexOf(S.tempo)+1)%3];S.decisions++;
+    G.T=TEMPO[S.tempo];G.cfg.tempo=S.tempo;
+    syncObstacles();
+    toast('Темп: '+TEMPO[S.tempo].t);return;
+  }
+  liveKey=k; openPick(k);
+}
+let liveKey=null;
+/* подменяем деталь прямо в идущей игре */
+function applyLive(k,v){
+  S[k]=v; S.decisions++;
+  if(!G.st||!G.cfg)return;
+  G.cfg[k]=v;
+  if(k==='world'){G.W=v; G.cfg.world=v}
+  if(k==='obst'){syncObstacles(); toast('Теперь мешает: '+v.n)}
+  if(k==='help'){if(G.st.help)G.st.help.got=0; toast('Теперь помогает: '+v.n)}
+  if(k==='item'){toast('Теперь собираешь: '+v.n)}
+  if(k==='world')toast('Мир: '+v.n);
+  const bar=$('rulebar');
+  if(bar&&S.ifCond&&S.ifThen)bar.textContent='Твоё правило: когда '+S.ifCond.when;
+}
+/* число помех подгоняем под темп, не перезапуская игру */
+function syncObstacles(){
+  const st=G.st,T=G.T,lvl=G.lvl;
+  if(!st||!lvl)return;
+  const want=T.n;
+  while(st.obs.length>want)st.obs.pop();
+  const r=rng((S.seed||1)+st.obs.length*17+Math.floor(st.left));
+  const far=lvl.free.filter(c=>Math.hypot(c.x-st.p.x,c.y-st.p.y)>6);
+  const pool=far.length?far:lvl.free;
+  while(st.obs.length<want){
+    const c=pool[rint(r,0,pool.length-1)];
+    st.obs.push({x:c.x+.5,y:c.y+.5,ox:c.x+.5,oy:c.y+.5,a:r()*6.28,dir:r()>.5?1:-1,ph:r()*6.28,hunt:3});
+  }
+}
+/* докидываем предметы в живую игру */
+function addStuff(){
+  const st=G.st,lvl=G.lvl;
+  if(!st||!lvl)return;
+  const r=rng(Math.floor(st.left*97)+st.items.length);
+  const near=lvl.free.filter(c=>{const d=Math.hypot(c.x-st.p.x,c.y-st.p.y);return d>2&&d<9});
+  const pool=near.length>=5?near:lvl.free;
+  for(let i=0;i<5;i++){
+    const c=pool[rint(r,0,pool.length-1)];
+    st.items.push({x:c.x+.5,y:c.y+.5,got:0});
+    burst(st,c.x+.5,c.y+.5,G.cfg.item?G.cfg.item.c:'#F2C337',6);
+  }
+  st.left+=6;
+  toast('+5 предметов и 6 секунд');
 }
 function cfgNow(extra){
   return Object.assign({hero:S.hero,world:S.world,goal:S.goal,item:S.item,obst:S.obst,help:S.help,
     tempo:S.tempo,scoreRule:S.scoreRule,loseRule:S.loseRule,ifCond:S.ifCond,ifThen:S.ifThen,
-    seed:S.seed,itemCount:8,dur:60},extra||{});
+    seed:S.seed,itemCount:16,dur:60},extra||{});
 }
 
 function render(){
@@ -1038,7 +1119,7 @@ function render(){
 
   if(st==='play'){
     $('htitle').textContent='Твоя игра';
-    B().innerHTML=arenaHTML(S.ifCond&&S.ifThen?('Твоё правило: когда '+S.ifCond.when):'');
+    B().innerHTML=arenaHTML(S.ifCond&&S.ifThen?('Твоё правило: когда '+S.ifCond.when):'',true);
     F().innerHTML='';
     return;
   }
@@ -1060,6 +1141,25 @@ function render(){
       +`<div class="pcard" style="font-size:14.5px;line-height:1.5">${promptText()}</div>`
       +`<div class="result" style="margin-top:10px">Твой рекорд: <b style="color:var(--acc)">${S.record}</b> · сыграно забегов: ${S.runs||0}</div>`;
     F().innerHTML=dockHTML();
+    return;
+  }
+
+  if(st==='story'){
+    $('htitle').textContent='История';
+    const starts=['Всё началось, когда…','Никто не знал, что…','Однажды ночью…',
+      'Это была обычная ночь, пока…','Говорят, что…','Давным-давно…'];
+    B().innerHTML=say('У игры есть правила. Теперь придумай, <b>зачем</b> это всё.','think')
+      +`<div class="pcard" style="font-size:14.5px;line-height:1.5">${promptText()}</div>`
+      +`<div class="grp-t">Как всё началось?</div>
+        <textarea class="field" id="fst" rows="4" maxlength="220" placeholder="Напиши свою историю…"
+          oninput="S.story=this.value" style="resize:none;line-height:1.5">${S.story||''}</textarea>
+        <div class="chips">${starts.map(t=>`<button class="chip" onclick="startStory('${t}')">${t}</button>`).join('')}</div>
+        <div class="grp-t">Что будет, если победишь?</div>
+        <textarea class="field" id="fen" rows="3" maxlength="140" placeholder="Чем всё закончится…"
+          oninput="S.ending=this.value" style="resize:none;line-height:1.5">${S.ending||''}</textarea>`;
+    F().innerHTML=`<div class="btnrow">
+      <button class="btn btn2 btn-sm" onclick="go('free')">Назад к игре</button>
+      <button class="btn btn-sm" onclick="go('s5')">К паспорту →</button></div>`;
     return;
   }
 
@@ -1114,6 +1214,7 @@ const DOCK=[
  {k:'score',ic:'🔢', l:'очки',     get:()=>S.scoreRule&&S.scoreRule.n},
  {k:'lose', ic:'💔', l:'проигрыш', get:()=>S.loseRule&&S.loseRule.n},
  {k:'rule', ic:'✨', l:'правило',  get:()=>S.ifCond&&S.ifThen?'своё':'нет'},
+ {k:'story',ic:'📖', l:'история',  get:()=>S.story?'есть':'нет'},
 ];
 function dockHTML(){
   const items=DOCK.filter(d=>!d.when||d.when());
@@ -1134,11 +1235,14 @@ function short(v){
   const first=String(v).split(/[ ,-]/)[0];
   return first.length>9?first.slice(0,8)+'…':first;
 }
+function startStory(t){const f=$('fst');f.value=t+' ';S.story=f.value;f.focus();
+  f.setSelectionRange(f.value.length,f.value.length)}
 function dockTap(k){
   if(k==='tempo'){const o=['calm','normal','fast'];S.tempo=o[(o.indexOf(S.tempo)+1)%3];S.decisions++;render();toast('Темп: '+TEMPO[S.tempo].t);return}
   if(k==='score'){S.scoreRule=SCORE_RULES[(SCORE_RULES.indexOf(S.scoreRule)+1)%4];S.decisions++;render();toast(S.scoreRule.n);return}
   if(k==='lose'){S.loseRule=LOSE_RULES[(LOSE_RULES.indexOf(S.loseRule)+1)%4];S.decisions++;render();toast(S.loseRule.n);return}
   if(k==='rule'){S.back2free=1;S.step='ifthen';render();return}
+  if(k==='story'){go('story');return}
   openPick(k);
 }
 function openPick(k){
@@ -1156,8 +1260,12 @@ function openPick(k){
 }
 function pickFree(k,i){
   const src={hero:HEROES,goal:GOALS,item:ITEMS,world:WORLDS,obst:OBST,help:HELP}[k];
-  if(!S[k]||S[k].id!==src[i].id)S.decisions++;
-  S[k]=src[i];
+  const v=src[i];
+  if(liveKey&&G.run){                 // идёт игра — подменяем деталь на ходу
+    liveKey=null; closeSheet(); applyLive(k,v); return;
+  }
+  if(!S[k]||S[k].id!==v.id)S.decisions++;
+  S[k]=v;
   if(k==='goal'&&S.goal.needItem&&!S.item)S.item=ITEMS[10];
   closeSheet(); render();
 }
@@ -1274,6 +1382,7 @@ function renderPassport(){
       <div class="pp-ar">→</div>
       <div class="pp-fr"><canvas id="fr1" width="92" height="92"></canvas><span>${promptText().split(/\s+/).length} слов</span></div>
     </div>
+    ${S.story?`<div class="pp-story">${S.story}${S.ending?`<div class="pp-end">${S.ending}</div>`:''}</div>`:''}
     <div class="pp-rules">
       <div class="pp-rule"><b>Герой</b>${S.hero.n} ${S.goal.needItem&&S.item?'· собирает '+S.item.ap:''}</div>
       <div class="pp-rule"><b>Мир</b>${S.world.n}, темп ${TEMPO[S.tempo].t}</div>
@@ -1282,6 +1391,8 @@ function renderPassport(){
       <div class="pp-rule"><b>Очки</b>${S.scoreRule.n}</div>
       ${S.ifCond&&S.ifThen?`<div class="pp-rule pp-own"><b>Своё правило</b>Когда ${S.ifCond.when} — ${S.ifThen.then}</div>`:''}
     </div>
+    <div class="pp-lesson">Игра получилась такой, потому что ты <b>${S.decisions} раз</b> сказал, какой она должна быть.<br>
+      Компьютер не догадался сам — он собрал ровно то, что ты назвал.</div>
     <div class="pp-foot"><span>твоих решений: ${S.decisions}</span><span>побей мой рекорд: <b style="color:var(--acc)">${S.record}</b></span></div>
   </div>`
   +say('Готово. Расскажи дома, почему у твоего героя ' + (S.help?S.help.n:'помощник') + ' — и что было бы без него.');
@@ -1340,7 +1451,7 @@ function savePng(){
 /* ═══════════ НАВИГАЦИЯ ═══════════ */
 $('back').onclick=()=>{
   stopGame();
-  const map={v0:'s1',s2:'s1',v1:'s2',s3:'s2',v2:'s3',tempo:'s3',howto:'s3',s4:'s4',free:'played',
+  const map={v0:'s1',s2:'s1',v1:'s2',s3:'s2',v2:'s3',tempo:'s3',howto:'s3',s4:'s4',free:'played',story:'free',
     abplay:'s4',abnext:'s4',abpick:'s4',ifthen:'s4',ruletest:'ifthen',ruledone:'ifthen',
     play:'ifthen',played:'ifthen',s5:'played',s6:'s5',s1:'s0'};
   const p=map[S.step]||'s0';S.step=p;render();
