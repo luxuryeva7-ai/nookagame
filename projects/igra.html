@@ -396,7 +396,7 @@ function startGame(cfg){
     obs:[], score:0, got:0, hits:0, left:cfg.dur||45, over:0, win:0,
     combo:0, boost:0, frozen:0, shield:0, ruleFired:0, idleT:0, extraSpeed:0,
     flash:0, shake:0, carried:0, face:0, lean:0, moving:0, trail:[], parts:[], pops:[],
-    intro:1.1,
+    intro:1.1, vx:0, vy:0,
   };
   // помехи
   if(cfg.obst&&!cfg.gray){
