@@ -681,7 +681,9 @@ function promptText(){
 function promptCard(mini){
   if(mini)return `<div class="pcard mini" onclick="alert(promptText())">${promptText()}</div>`;
   const sl=(k,label,val)=>`<button class="slot ${val?'':'todo pulse'}" onclick="openSheet('${k}')">${val||label}<em>▾</em></button>`;
-  if(!S.hero&&!S.goal&&!S.world)return `<div class="pcard">Сделай игру.</div>`;
+  // «Сделай игру» показываем только на первом шаге — это и есть промпт из двух слов.
+  // Дальше карточка обязана быть со слотами, иначе на экране выбора нечего тапать.
+  if(S.step==='s1')return `<div class="pcard">Сделай игру.</div>`;
   let p='Герой — '+sl('hero','кто?',S.hero&&S.hero.n)+'. ';
   p+=(S.hero&&S.hero.sex==='f'?'Она должна ':'Он должен ')+sl('goal','что делать?',S.goal&&S.goal.n.toLowerCase());
   if(S.goal&&S.goal.needItem)p+=' '+sl('item','что?',S.item&&S.item.ap);
