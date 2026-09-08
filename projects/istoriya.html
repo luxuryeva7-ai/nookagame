@@ -183,11 +183,11 @@ body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);-w
   <div class="prog"><i id="pbar" style="width:0"></i></div>
   <div class="body" id="body"></div>
   <div class="foot" id="foot"></div>
-  <div class="ovl" id="ovl"></div>
-  <div class="sheet" id="sheet">
-    <div class="sheet-h"><div class="sheet-t" id="sheetT"></div><button class="sheet-x" id="sheetX">✕</button></div>
-    <div class="sheet-l" id="sheetL"></div>
-  </div>
+</div>
+<div class="ovl" id="ovl"></div>
+<div class="sheet" id="sheet">
+  <div class="sheet-h"><div class="sheet-t" id="sheetT"></div><button class="sheet-x" id="sheetX">✕</button></div>
+  <div class="sheet-l" id="sheetL"></div>
 </div>
 
 <script>
@@ -735,7 +735,7 @@ function generate(after){
   g.innerHTML=`<div class="gen-toks" id="gtok"></div>
     <div class="gen-pool" id="gpool" style="display:none">${Array.from({length:40},()=>'<div class="pdot"></div>').join('')}</div>
     <div class="gen-stage">${GEN_STAGES.map((s,i)=>`<div class="gst" id="gst${i}"><div class="gst-b">${i+1}</div>${s.n}</div>`).join('')}</div>`;
-  document.querySelector('.root').appendChild(g);
+  document.body.appendChild(g);
 
   let i=0;
   const run=()=>{
