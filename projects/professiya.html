@@ -579,7 +579,7 @@ function render(){
       <div style="margin-bottom:14px">${svgNeuro(96,'happy')}</div>
       <h1 class="h1">Профессия будущего</h1>
       <p class="lead">Через двадцать минут у тебя будет профессия,\nкоторой ещё нет ни в одном справочнике.</p>
-      <input class="field" id="nm" maxlength="12" placeholder="Как тебя зовут?" value="${S.child}">
+      <input class="field" id="nm" maxlength="12" placeholder="Как тебя зовут?" value="${S.child}" oninput="S.child=this.value">
       <div style="font-size:12.5px;color:var(--ink3);font-weight:700;margin-top:8px">Имя попадёт на карточку</div>
       <div class="chips" style="justify-content:center">${[8,9,10,11,12].map(a=>
         `<button class="chip${S.age==a?' on':''}" onclick="S.age=${a};render()">${a}</button>`).join('')}</div>
@@ -706,13 +706,13 @@ function render(){
     $('htitle').textContent='Имя и название';
     B().innerHTML=say('Осталось назвать. Три коротких вопроса.')
       +`<div class="grp-t">Как называется его работа?</div>
-        <input class="field" id="ft" maxlength="28" placeholder="Название профессии" value="${S.title}">
+        <input class="field" id="ft" maxlength="28" placeholder="Название профессии" value="${S.title}" oninput="S.title=this.value">
         <button class="txtbtn" onclick="hintTitle()">Не придумывается?</button>
         <div class="grp-t">Как зовут человека?</div>
-        <input class="field" id="fh" maxlength="16" placeholder="Имя героя" value="${S.hero}">
+        <input class="field" id="fh" maxlength="16" placeholder="Имя героя" value="${S.hero}" oninput="S.hero=this.value">
         <button class="txtbtn" onclick="hintHero()">Дай случайное</button>
         <div class="grp-t">Что он говорит, когда приходит на работу?</div>
-        <input class="field" id="fl" maxlength="60" placeholder="Одна фраза" value="${S.line}">
+        <input class="field" id="fl" maxlength="60" placeholder="Одна фраза" value="${S.line}" oninput="S.line=this.value">
         <div class="chips">${STARTERS.map(s=>`<button class="chip" onclick="setStart('${s}')">${s}</button>`).join('')}</div>`;
     F().innerHTML=`<button class="btn" onclick="saveNames()">Дальше →</button>`;
     return;
@@ -897,7 +897,7 @@ function miniHead(i){const h=HEADS[i];
 
 /* ═════════ ДЕЙСТВИЯ ═════════ */
 function startIt(){
-  const v=$('nm').value.trim();
+  const f=$('nm'); const v=(f?f.value:S.child||'').trim();
   if(!v){toast('Впиши имя — оно попадёт на карточку');return}
   if(!S.age){toast('Выбери, сколько тебе лет');return}
   S.child=v; try{localStorage.setItem('nooka.child',v)}catch(e){}
@@ -933,14 +933,15 @@ function pickDay(k,i){
   if(S.evening)window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
 }
 function hintTitle(){
+  S.title='';
   const r=rng(S.seed+S.title.length);
   const v=[`${cap(S.object.n)}-${S.action.inf.slice(0,-2)}тель`,
     `Мастер ${S.object.g}`,`${cap(S.problem.kw)}-инженер`,
     `Хранитель ${S.object.g}`,`${cap(S.action.n)} будущего`];
-  $('ft').value=pick(r,v);
+  const t=pick(r,v); $('ft').value=t; S.title=t;
 }
-function hintHero(){const r=rng(Date.now()&0xffff);$('fh').value=pick(r,NAMES)}
-function setStart(s){const f=$('fl');f.value=s+' ';f.focus()}
+function hintHero(){const r=rng(Date.now()&0xffff);const n=pick(r,NAMES);$('fh').value=n;S.hero=n}
+function setStart(s){const f=$('fl');f.value=s+' ';S.line=f.value;f.focus()}
 function saveNames(){
   S.title=($('ft').value||('Мастер '+S.object.g)).trim();
   S.hero=($('fh').value||NAMES[S.seed%NAMES.length]).trim();
