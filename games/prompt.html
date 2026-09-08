@@ -317,7 +317,14 @@ html::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 
 .p5hint{margin-top:10px;font-size:12px;font-weight:700;color:#7C6B99;text-align:center;}
 .p5q{font-weight:900;font-size:14.5px;line-height:1.3;color:#F4EEFF;margin-bottom:11px;}
-.p5steps{display:flex;flex-direction:column;gap:7px;}
+/* Блок читался как обычный тест с вариантами, хотя это план робота.
+   Связка между шагами и иконка команды делают его планом на вид. */
+.p5steps{display:flex;flex-direction:column;gap:7px;position:relative;}
+.p5steps::before{content:'';position:absolute;left:26px;top:22px;bottom:22px;width:2px;
+  background:repeating-linear-gradient(180deg,rgba(181,123,255,.5) 0 4px,transparent 4px 9px);}
+.p5step__ic{flex-shrink:0;width:26px;height:26px;color:#C9B4FF;display:flex;align-items:center;justify-content:center;}
+.p5plan__t{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-weight:900;font-size:11px;
+  letter-spacing:.08em;text-transform:uppercase;color:#9C8CB5;}
 .p5step{display:flex;align-items:center;gap:11px;padding:13px 15px;border:none;border-radius:15px;cursor:pointer;
   width:100%;text-align:left;font-family:var(--nk-body);font-weight:800;font-size:14px;color:#E9DFFF;
   background:rgba(255,255,255,.055);box-shadow:inset 0 0 0 1px rgba(255,255,255,.09);transition:box-shadow .15s;}
@@ -4473,6 +4480,7 @@ function p5run(plan, round) {
 const P5_CHECK = {
   task: 'Полей рассаду',
   plan: ['Набрать воды', 'Взять лейку', 'Полить рассаду'],
+  icons: ['drop', 'can', 'water'],
   right: 0,
   why: 'Воду он набрал раньше, чем взял лейку. Набирать было не во что — набрал в себя.',
   wrong: 'Не здесь. Смотри, что у Нейро в руках к этому шагу.'
@@ -5651,7 +5659,9 @@ function Level5Night({
     }
   }, React.createElement('div', {
     className: 'p5q'
-  }, 'Нейро составил план сам. На каком шаге он сядет в лужу?'), React.createElement('div', {
+  }, 'Нейро составил план сам. На каком шаге он сядет в лужу?'),
+  React.createElement('div', { className: 'p5plan__t' }, 'План Нейро \u2014 нажми на неверный шаг'),
+  React.createElement('div', {
     className: 'p5steps'
   }, P5_CHECK.plan.map((s, i) => React.createElement('button', {
     key: i,
@@ -5660,7 +5670,9 @@ function Level5Night({
     disabled: checkOk
   }, React.createElement('span', {
     className: 'p5step__n'
-  }, i + 1), React.createElement('span', null, s)))), cPick !== null && React.createElement('div', {
+  }, i + 1), React.createElement('span', {
+    className: 'p5step__ic'
+  }, P5Ico(P5_CHECK.icons[i], 20)), React.createElement('span', null, s)))), cPick !== null && React.createElement('div', {
     className: 'p5say' + (checkOk ? '' : ' p5say--bad'),
     style: {
       marginTop: 12
