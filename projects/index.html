@@ -2,173 +2,102 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
-<meta name="theme-color" content="#0E0719">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#FFF8EE">
 <title>Мастерская — Nooka</title>
-<link href="/fonts/nooka-fonts.css" rel="stylesheet">
+<link href="../fonts/nooka-fonts.css" rel="stylesheet">
 <style>
-:root{--ink:#F4EEFF;--ink2:#C0B0E0;--ink3:#8B7BAE;--bg:#0E0719;--line:rgba(255,255,255,.09);--acc:#FFD84D;--purple:#A98BFF;--ok:#4ED99B}
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:var(--bg)}
-body{font-family:'Nunito',system-ui,sans-serif;-webkit-font-smoothing:antialiased;color:var(--ink);min-height:100%}
-.root{max-width:480px;margin:0 auto;min-height:100vh;background:linear-gradient(180deg,#161226 0%,#0F0B1E 50%,#090711 100%);padding-bottom:calc(24px + env(safe-area-inset-bottom))}
-
-/* шапка */
-.hero{padding:28px 18px 0;text-align:center}
-.hero-back{display:inline-flex;align-items:center;gap:6px;color:var(--purple);font-size:13px;font-weight:800;text-decoration:none;margin-bottom:20px}
-.hero-badge{display:inline-block;background:rgba(169,139,255,.15);border:1px solid rgba(169,139,255,.3);border-radius:999px;padding:6px 16px;font-size:11px;font-weight:900;letter-spacing:.08em;color:var(--purple);margin-bottom:12px}
-.hero-title{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:26px;line-height:1.2;color:var(--ink);margin-bottom:10px}
-.hero-sub{font-size:14px;color:var(--ink2);line-height:1.6;max-width:300px;margin:0 auto 24px}
-
-/* общий прогресс */
-.total-bar{margin:0 18px 28px;background:rgba(255,255,255,.06);border-radius:16px;padding:14px 16px}
-.tb-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.tb-label-k{font-size:11px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3)}
-.tb-label-v{font-size:13px;font-weight:900;color:var(--acc)}
-.bar-outer{height:8px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden}
-.bar-inner{height:8px;border-radius:4px;background:linear-gradient(90deg,var(--purple),var(--ok));transition:width .6s cubic-bezier(.4,0,.2,1)}
-
-/* карточки проектов */
-.projects{padding:0 14px;display:flex;flex-direction:column;gap:14px}
-.proj{display:flex;align-items:stretch;border-radius:22px;overflow:hidden;text-decoration:none;background:rgba(255,255,255,.04);box-shadow:inset 0 0 0 1.5px var(--line);transition:transform .15s,box-shadow .15s;position:relative}
-.proj:active{transform:scale(.97)}
-.proj.done{box-shadow:inset 0 0 0 1.5px rgba(78,217,155,.4)}
-.proj-accent{width:6px;flex:none}
-.proj-body{flex:1;padding:16px 14px}
-.proj-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
-.proj-ico{font-size:32px;line-height:1}
-.proj-status{font-size:10px;font-weight:900;letter-spacing:.07em;padding:4px 10px;border-radius:999px}
-.proj-status.done{background:rgba(78,217,155,.2);color:var(--ok)}
-.proj-status.new{background:rgba(169,139,255,.15);color:var(--purple)}
-.proj-num{font-size:10px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
-.proj-name{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:16px;color:var(--ink);margin-bottom:5px;line-height:1.25}
-.proj-desc{font-size:12.5px;color:var(--ink2);line-height:1.5;margin-bottom:10px}
-.proj-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
-.tag{background:rgba(255,255,255,.07);border-radius:999px;padding:3px 10px;font-size:11px;font-weight:800;color:var(--ink3)}
-.proj-cta{display:inline-flex;align-items:center;gap:6px;font-weight:900;font-size:13px}
-.proj-arr{font-size:16px}
-
-/* знания */
-.know{margin:28px 14px 0;padding:16px;background:rgba(255,255,255,.04);border-radius:20px;box-shadow:inset 0 0 0 1px var(--line)}
-.know-title{font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:12px}
-.know-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.know-item{background:rgba(255,255,255,.04);border-radius:14px;padding:12px;display:flex;align-items:center;gap:8px}
-.know-ico{font-size:20px;flex:none}
-.know-text{font-size:12px;font-weight:800;color:var(--ink2);line-height:1.35}
-
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-.proj{animation:fadeUp .3s ease both}
-.proj:nth-child(2){animation-delay:.06s}
-.proj:nth-child(3){animation-delay:.12s}
+:root{--bg:#FFF8EE;--card:#FFFFFF;--ink:#2B2118;--ink2:#5C4A38;--ink3:#8A7A68;
+ --acc:#E65C00;--accbg:#FFF1E4;--line:rgba(180,110,40,.16);--sh:0 2px 14px rgba(170,100,40,.11);color-scheme:light}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg)}
+body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+.root{max-width:480px;margin:0 auto;min-height:100vh;min-height:100dvh;padding-bottom:calc(28px + env(safe-area-inset-bottom))}
+.hero{padding:26px 18px 0;text-align:center}
+.back{display:inline-block;color:var(--acc);font-size:13.5px;font-weight:800;text-decoration:none;margin-bottom:20px}
+.badge{display:inline-block;background:var(--accbg);border:1px solid var(--line);border-radius:999px;
+ padding:6px 16px;font-size:11px;font-weight:900;letter-spacing:.08em;color:var(--acc);margin-bottom:12px}
+h1{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:26px;line-height:1.2;margin-bottom:10px}
+.sub{font-size:15px;color:var(--ink2);line-height:1.55;font-weight:600;max-width:310px;margin:0 auto 24px}
+.list{padding:0 14px;display:flex;flex-direction:column;gap:13px}
+.card{display:block;text-decoration:none;background:var(--card);border-radius:22px;box-shadow:var(--sh);
+ overflow:hidden;color:inherit;position:relative}
+.card:active{transform:scale(.98)}
+.card.soon{opacity:.62}
+.strip{height:6px}
+.in{padding:16px 16px 17px}
+.top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:9px}
+.ico{font-size:32px;line-height:1}
+.tag{font-size:10px;font-weight:900;letter-spacing:.07em;padding:5px 11px;border-radius:999px;
+ background:var(--accbg);color:var(--acc);white-space:nowrap}
+.tag.gray{background:#F0EAE0;color:var(--ink3)}
+.num{font-size:10px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3);margin-bottom:4px}
+.name{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:17px;line-height:1.25;margin-bottom:6px}
+.desc{font-size:13.5px;color:var(--ink2);line-height:1.5;font-weight:600;margin-bottom:11px}
+.out{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:800;color:var(--ink3);
+ background:#FBF5EA;border-radius:12px;padding:9px 12px;margin-bottom:12px;line-height:1.4}
+.out b{color:var(--ink);font-weight:900}
+.cta{display:inline-flex;align-items:center;gap:6px;font-weight:900;font-size:14px;color:var(--acc)}
+.note{margin:26px 14px 0;background:var(--card);border-radius:20px;box-shadow:var(--sh);padding:17px 16px}
+.note-t{font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:10px}
+.note-p{font-size:14px;line-height:1.6;color:var(--ink2);font-weight:600}
+.note-p b{color:var(--ink)}
+@keyframes up{from{opacity:0;transform:translateY(11px)}to{opacity:1;transform:none}}
+.card{animation:up .35s ease both}
+.card:nth-child(2){animation-delay:.07s}
+.card:nth-child(3){animation-delay:.14s}
 </style>
 </head>
 <body>
 <div class="root">
   <div class="hero">
-    <a class="hero-back" href="/index.html">← Назад в игры</a>
-    <div class="hero-badge">МАСТЕРСКАЯ</div>
-    <h1 class="hero-title">Твои проекты</h1>
-    <p class="hero-sub">Создавай настоящие ИИ-системы — на основе того что ты уже изучил</p>
+    <a class="back" href="../index.html">← Назад в игры</a>
+    <div class="badge">МАСТЕРСКАЯ</div>
+    <h1>Твои проекты</h1>
+    <p class="sub">Прошёл игру — сделай своё. И забери то, что можно показать.</p>
   </div>
 
-  <div class="total-bar">
-    <div class="tb-label">
-      <span class="tb-label-k">Прогресс Мастерской</span>
-      <span class="tb-label-v" id="totalLabel">0 / 3</span>
+  <div class="list">
+    <a class="card" href="istoriya.html">
+      <div class="strip" style="background:linear-gradient(90deg,#E65C00,#FFB300)"></div>
+      <div class="in">
+        <div class="top"><span class="ico">📖</span><span class="tag">Готово</span></div>
+        <div class="num">Проект 1 · после игры «Как ИИ понимает и создаёт»</div>
+        <div class="name">Твоя история</div>
+        <div class="desc">Придумай героя, мир и поворот сюжета. Промпт растёт с одного слова до целого абзаца — и картинка меняется вместе с ним.</div>
+        <div class="out">📚 <span>На выходе: <b>книжка из 5 картинок</b> с обложкой и твоим именем</span></div>
+        <span class="cta">Открыть →</span>
+      </div>
+    </a>
+
+    <a class="card" href="igra.html">
+      <div class="strip" style="background:linear-gradient(90deg,#189E70,#7FA8FF)"></div>
+      <div class="in">
+        <div class="top"><span class="ico">🎮</span><span class="tag">Готово</span></div>
+        <div class="num">Проект 2 · после игры «Как ставить задачи ИИ»</div>
+        <div class="name">Своя игра</div>
+        <div class="desc">Закажи игру двумя словами и посмотри, что выйдет. Потом объясни точнее — и собери правило, которого нет ни в одном списке.</div>
+        <div class="out">🔗 <span>На выходе: <b>играбельная ссылка</b> с твоим рекордом — друг может побить</span></div>
+        <span class="cta">Открыть →</span>
+      </div>
+    </a>
+
+    <div class="card soon">
+      <div class="strip" style="background:linear-gradient(90deg,#8A6BC4,#C43D7E)"></div>
+      <div class="in">
+        <div class="top"><span class="ico">🚀</span><span class="tag gray">Скоро</span></div>
+        <div class="num">Проект 3 · после игры «Что внутри ИИ и профессии»</div>
+        <div class="name">Профессия будущего</div>
+        <div class="desc">Придумай работу, которой ещё нет. Собери для неё ИИ-помощника и реши, что оставишь себе, а что отдашь машине.</div>
+        <div class="out">🪪 <span>На выходе: <b>карточка в энциклопедии</b> профессий будущего</span></div>
+      </div>
     </div>
-    <div class="bar-outer"><div class="bar-inner" id="totalBar" style="width:0%"></div></div>
   </div>
 
-  <div class="projects">
-    <a class="proj" href="trainer.html" id="p-trainer">
-      <div class="proj-accent" style="background:linear-gradient(180deg,#FFD84D,#FF9ECF)"></div>
-      <div class="proj-body">
-        <div class="proj-top">
-          <span class="proj-ico">🧪</span>
-          <span class="proj-status new" id="s-trainer">Новое</span>
-        </div>
-        <div class="proj-num">Проект 1</div>
-        <div class="proj-name">Тренировочный лагерь</div>
-        <div class="proj-desc">Обучи ИИ различать котов и собак — покажи примеры и проверь результат</div>
-        <div class="proj-tags">
-          <span class="tag">Разметка данных</span>
-          <span class="tag">Обучение модели</span>
-          <span class="tag">Точность</span>
-        </div>
-        <div class="proj-cta" style="color:#FFD84D">Открыть <span class="proj-arr">→</span></div>
-      </div>
-    </a>
-
-    <a class="proj" href="assistant.html" id="p-assistant">
-      <div class="proj-accent" style="background:linear-gradient(180deg,#A98BFF,#FF9ECF)"></div>
-      <div class="proj-body">
-        <div class="proj-top">
-          <span class="proj-ico">🤖</span>
-          <span class="proj-status new" id="s-assistant">Новое</span>
-        </div>
-        <div class="proj-num">Проект 2</div>
-        <div class="proj-name">ИИ-ассистент</div>
-        <div class="proj-desc">Создай своего ИИ — выбери сферу, настрой характер и пообщайся с ним</div>
-        <div class="proj-tags">
-          <span class="tag">Промпт-инжиниринг</span>
-          <span class="tag">Характер модели</span>
-          <span class="tag">Диалог</span>
-        </div>
-        <div class="proj-cta" style="color:#A98BFF">Открыть <span class="proj-arr">→</span></div>
-      </div>
-    </a>
-
-    <a class="proj" href="startup.html" id="p-startup">
-      <div class="proj-accent" style="background:linear-gradient(180deg,#4ED99B,#A98BFF)"></div>
-      <div class="proj-body">
-        <div class="proj-top">
-          <span class="proj-ico">🚀</span>
-          <span class="proj-status new" id="s-startup">Новое</span>
-        </div>
-        <div class="proj-num">Проект 3</div>
-        <div class="proj-name">ИИ-лаборатория</div>
-        <div class="proj-desc">Собери настоящую ИИ-систему из компонентов: данные → модель → продукт</div>
-        <div class="proj-tags">
-          <span class="tag">ML-пайплайн</span>
-          <span class="tag">Архитектура</span>
-          <span class="tag">Деплой</span>
-        </div>
-        <div class="proj-cta" style="color:#4ED99B">Открыть <span class="proj-arr">→</span></div>
-      </div>
-    </a>
-  </div>
-
-  <div class="know">
-    <div class="know-title">Что ты освоишь</div>
-    <div class="know-grid">
-      <div class="know-item"><span class="know-ico">🏷</span><span class="know-text">Разметка и подготовка данных</span></div>
-      <div class="know-item"><span class="know-ico">⚙️</span><span class="know-text">Как ИИ учится на примерах</span></div>
-      <div class="know-item"><span class="know-ico">💬</span><span class="know-text">Промпты и характер модели</span></div>
-      <div class="know-item"><span class="know-ico">🔧</span><span class="know-text">Архитектура ИИ-продуктов</span></div>
-    </div>
+  <div class="note">
+    <div class="note-t">Чем это отличается от урока</div>
+    <p class="note-p">Здесь нет правильного ответа. Ты не угадываешь, что задумал взрослый — ты принимаешь решения, и каждое меняет результат прямо на глазах. <b>Ошибиться нельзя. Можно только сделать по-другому.</b></p>
   </div>
 </div>
-
-<script>
-const KEYS=['nooka_proj_trainer','nooka_proj_assistant','nooka_proj_startup'];
-const IDS=['trainer','assistant','startup'];
-let done=0;
-try{
-  IDS.forEach((id,i)=>{
-    const raw=localStorage.getItem(KEYS[i]);
-    if(!raw)return;
-    const d=JSON.parse(raw);
-    if(d&&d.step>=5){
-      done++;
-      document.getElementById('p-'+id).classList.add('done');
-      const s=document.getElementById('s-'+id);
-      s.textContent='Пройдено ✓';
-      s.className='proj-status done';
-    }
-  });
-}catch(e){}
-document.getElementById('totalLabel').textContent=done+' / 3';
-document.getElementById('totalBar').style.width=Math.round(done/3*100)+'%';
-</script>
 </body>
 </html>
