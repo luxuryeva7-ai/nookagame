@@ -361,7 +361,9 @@ function dwFeatures(cv) {
       }
     }
   }
-  if (maxX < 0 || ink < 220) return null;          // пусто или почти пусто
+  /* Порог был 220 — ребёнок, который рисует тонкой линией и мелко, получал
+     «тут почти ничего нет» и решал, что рисует плохо. */
+  if (maxX < 0 || ink < 150) return null;          // пусто или почти пусто
   const bw = Math.max(1, maxX - minX + 1), bh = Math.max(1, maxY - minY + 1);
   const cells = new Array(DW_GRID * DW_GRID).fill(0);
   for (let y = minY; y <= maxY; y++) {
@@ -1112,6 +1114,7 @@ function LevelDraw({ n, onWin, onHome }) {
   const [tries, setTries] = useState(0);           // сколько раз Нейро промахнулся
   const [dirtyAcc, setDirtyAcc] = useState(null);  // точность до чистки набора
   const [flash, setFlash] = useState(false);       // «улетело в набор» — отклик на действие
+  const [extra, setExtra] = useState(0);           // сколько раз дорисовывали после промаха
   const [rounds, setRounds] = useState([]);        // история кругов: с какой уверенностью отвечал
   /* Круги разбора ошибок — свой журнал. Раньше они писались в rounds рядом с
      кругами дообучения, у записей разные поля, и полоса уверенности показывала
@@ -1243,7 +1246,7 @@ function LevelDraw({ n, onWin, onHome }) {
     api.current.clear();
     var got = next.filter(m => m.label === label).length;
     setFlash(true);
-    if (fix) { setFix(false); setGuess(null); setNote({ m: 'ok', t: 'Запомнил! Теперь пересчитаю.' }); return; }
+    if (fix) { setFix(false); setGuess(null); setExtra(extra + 1); setNote({ m: 'ok', t: 'Запомнил! Теперь пересчитаю.' }); return; }
     if (got >= step.need) setSi(si + 1);
     else setNote({ m: 'ok', t: got === 1
       ? 'Запомнил! Нарисуй ещё — по одному примеру я почти ничего не пойму.'
@@ -1991,10 +1994,23 @@ function LevelDraw({ n, onWin, onHome }) {
               else setPhase('quiz');
             },
           }, si + 1 < L.steps.length ? 'Понятно, дальше' : 'Дальше')
-        : React.createElement('button', {
-            className: 'nk-btn nk-btn--pri', style: { width: '100%' },
-            onClick: () => { setFix(true); setGuess(null); api.current.clear(); },
-          }, 'Дать ещё пример'))));
+        : React.createElement(React.Fragment, null,
+            React.createElement('button', {
+              className: 'nk-btn nk-btn--pri', style: { width: '100%' },
+              onClick: () => { setFix(true); setGuess(null); api.current.clear(); },
+            }, 'Дать ещё пример'),
+            /* Выход из круга. Раньше кнопка была одна, и ребёнок рисовал,
+               пока Нейро не угадает: дети, которые рисуют неуверенно, доходили
+               до слёз. Промах Нейро — это и есть содержание уровня, поэтому
+               после двух дорисовок честно отпускаем дальше. */
+            extra >= 2 && React.createElement('button', {
+              className: 'nk-btn nk-btn--soft',
+              style: { width: '100%', marginTop: 8 },
+              onClick: () => {
+                if (si + 1 < L.steps.length) { setSi(si + 1); setGuess(null); api.current.clear(); }
+                else setPhase('quiz');
+              },
+            }, 'Дело не в рисунке — дальше')))));
 }
 
 function App() {
