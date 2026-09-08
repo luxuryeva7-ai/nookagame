@@ -762,6 +762,7 @@ function doGen(next){generate(()=>{go(next)})}
 function render(){
   $('pbar').style.width=pct()+'%';
   const st=S.step;
+  $('htitle').textContent = st==='art'?'Моя книжка':st==='reveal'?'Как это устроено':'Твоя история';
   const stepNo={s1:1,s2:2,s3:3,s4:4,cmp:4,name:4,fA:5,fB:5,fC:5,build:5,title:6,line:6,author:6}[st];
   $('hstep').textContent=stepNo?stepNo+'/6':'';
   $('back').style.visibility=st==='intro'?'hidden':'visible';
