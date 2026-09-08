@@ -1132,6 +1132,11 @@ function LevelDraw({ n, onWin, onHome }) {
   const [kit, setKit] = useState([]);              // карточки, взятые в набор на выпускном
   const [fin, setFin] = useState(null);            // результат выпускного экзамена
   const [finTries, setFinTries] = useState(0);     // сколько раз ходили на выпускной
+  /* Выпускной раньше смешивал два разных дела на одном экране: нажатие по
+     картинке брало её в набор, нажатие по подписи — меняло подпись. Дети жали
+     наугад и не понимали, чего от них хотят. Теперь по очереди: сначала чиним
+     подписи, потом собираем набор. */
+  const [finStage, setFinStage] = useState('fix');  // fix | pick
   const fset = useRef(null);
   if (!fset.current && L.final) {
     const F = L.final, lib = [], exam = [];
@@ -1654,18 +1659,37 @@ function LevelDraw({ n, onWin, onHome }) {
 
       isFinal && React.createElement('div', { className: 'dwjudge' },
         React.createElement('div', { className: 'dwjudge__h' },
-          React.createElement('b', null, 'Собери набор'),
-          React.createElement('span', null, kit.length + ' из ' + L.final.budget)),
+          React.createElement('b', null, finStage === 'fix' ? 'Шаг 1. Почини подписи' : 'Шаг 2. Собери набор'),
+          React.createElement('span', null, finStage === 'fix'
+            ? 'их ставили второпях'
+            : kit.length + ' из ' + L.final.budget)),
         React.createElement('div', { className: 'dwtags dwtags--4' },
           fset.current.lib.map((c, i) => React.createElement('div', {
-            key: i, className: 'dwtag dwtag--pick' + (kit.indexOf(i) > -1 ? ' on' : ''),
+            key: i,
+            className: 'dwtag dwtag--pick' + (finStage === 'pick' && kit.indexOf(i) > -1 ? ' on' : ''),
           },
-            React.createElement('img', { src: c.thumb, alt: '', onClick: () => togglePick(i) }),
+            React.createElement('img', {
+              src: c.thumb, alt: '',
+              onClick: () => finStage === 'fix' ? flipLabel(i) : togglePick(i),
+            }),
             React.createElement('button', {
-              className: 'dwtag__lb', onClick: () => flipLabel(i),
+              className: 'dwtag__lb',
+              onClick: () => finStage === 'fix' ? flipLabel(i) : togglePick(i),
             }, WORD[c.label])))),
         React.createElement('div', { className: 'dwjudge__n' },
-          'Нажми на рисунок — берёшь в набор. Нажми на подпись — меняешь её.')),
+          finStage === 'fix'
+            ? 'Под каждым рисунком — подпись. Где она врёт, нажми и поменяй.'
+            : 'Нажимай на рисунки, которые дашь Нейро. Больше ' + L.final.budget + ' взять нельзя.'),
+        finStage === 'fix' && React.createElement('button', {
+          className: 'nk-btn nk-btn--pri',
+          style: { width: '100%', marginTop: 12 },
+          onClick: () => setFinStage('pick'),
+        }, 'Подписи в порядке — собирать набор'),
+        finStage === 'pick' && React.createElement('button', {
+          className: 'nk-btn nk-btn--soft',
+          style: { width: '100%', marginTop: 10 },
+          onClick: () => setFinStage('fix'),
+        }, '← Вернуться к подписям')),
 
       isFinal && fin && React.createElement('div', { className: 'dwexam' },
         React.createElement('div', { className: 'dwexam__t' },
@@ -1924,9 +1948,11 @@ function LevelDraw({ n, onWin, onHome }) {
         }, 'Дальше \u2192'),
         React.createElement('button', {
           className: 'nk-btn ' + (passed ? 'nk-btn--ok' : 'nk-btn--pri'), style: { flex: 1 },
-          disabled: !kit.length,
+          disabled: !kit.length || finStage === 'fix',
           onClick: passed ? () => setPhase('quiz') : runFinal,
         }, passed ? 'Забрать диплом'
+          /* На первом шаге экзамен ещё не при чём — не зовём туда. */
+          : finStage === 'fix' ? 'Сначала подписи'
           : !kit.length ? 'Выбери карточки'
           : fin ? 'Попробовать снова' : 'На экзамен')),
 
