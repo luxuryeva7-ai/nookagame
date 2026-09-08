@@ -163,13 +163,13 @@ function RmRoom({ light, done, active, onMove, all }) {
   const W = 340, H = 300;
   const ref = React.useRef(null);
 
-  const move = e => {
+  const move = (e, tap) => {
     const svg = ref.current;
     const pt = svg.createSVGPoint();
     const t = e.touches ? e.touches[0] : e;
     pt.x = t.clientX; pt.y = t.clientY;
     const p = pt.matrixTransform(svg.getScreenCTM().inverse());
-    onMove({ x: p.x, y: p.y });
+    onMove({ x: p.x, y: p.y }, tap);
   };
 
   /* когда разобраны все шесть — в комнате зажигается свет */
@@ -268,7 +268,7 @@ function RmRoom({ light, done, active, onMove, all }) {
 
   return React.createElement('svg', {
     ref: ref, viewBox: '0 0 ' + W + ' ' + H,
-    onPointerMove: move, onPointerDown: move,
+    onPointerMove: e => move(e, false), onPointerDown: e => move(e, true),
   },
     React.createElement('defs', null,
       React.createElement('radialGradient', { id: 'rmglow' },
@@ -353,10 +353,14 @@ function LevelRoom({ onWin, onHome }) {
     return hit;
   };
 
-  const moveLight = l => {
+  const moveLight = (l, tap) => {
     setLight(l);
     const hit = aim(l);
-    if (hit) setPicked(hit.id);
+    /* Пока на выбранную вещь не ответили, скольжение луча выбор не меняет:
+       ребёнок ведёт мышь вниз к кнопкам и по дороге задевает соседние вещи —
+       выбор слетал прямо перед нажатием. Сменить вещь можно нажатием на неё. */
+    const busy = picked && done[picked] === undefined;
+    if (hit && (tap || !busy)) setPicked(hit.id);
   };
 
   const active = RM_THINGS.find(t => t.id === picked && done[t.id] === undefined) || null;
@@ -471,7 +475,7 @@ function LevelRoom({ onWin, onHome }) {
 
       React.createElement('div', { className: 'rmhow' },
         all ? 'Все шесть разобраны'
-            : active ? 'Реши про эту вещь — или наведи фонарь на другую'
+            : active ? 'Реши про эту вещь — или нажми на другую'
             : 'Наведи фонарь на вещь'),
 
       React.createElement('div', { className: 'rmscore' },

@@ -110,6 +110,30 @@
     setTimeout(function () { logPush('открыт', document.title); }, 900);
   }
 
+  /* ── уровень целиком на экране компьютера ──────────────────
+     Игры свёрстаны под телефон: узкая колонка в высоту экрана, внутри неё
+     прокрутка. На компьютере высота примерно та же, что у телефона, а вот
+     кнопки ответа оказываются под нижним краем — ребёнок крутит колесо и не
+     видит, чем отвечать.
+
+     Рычаг тут неожиданный: сцена уровня квадратная, её высота растёт вместе
+     с шириной колонки. Значит на большом экране колонку надо не расширять,
+     а сузить — сцена становится ниже, и всё помещается. Ширины хватает: на
+     компьютере по бокам и так пусто. */
+  function fitWide() {
+    var id = 'nooka-fit';
+    var st = document.getElementById(id);
+    if (window.innerWidth < 900) { if (st) st.remove(); return; }
+    if (st) return;
+    st = document.createElement('style');
+    st.id = id;
+    st.textContent = '@media(min-width:900px){#root>*{max-width:408px}}';
+    document.head.appendChild(st);
+  }
+  window.addEventListener('resize', fitWide);
+  document.addEventListener('DOMContentLoaded', fitWide);
+  fitWide();
+
   /* Служебный параметр перехода между уровнями одного файла в адресе не нужен:
      ребёнок копирует ссылку, показывает её другу — там должен быть чистый адрес. */
   (function tidyGo() {
