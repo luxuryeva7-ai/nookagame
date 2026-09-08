@@ -299,11 +299,11 @@ function LevelNeuron({ onWin, onHome }) {
 
   /* ── проверка связи ── */
   if (phase === 'quiz') {
-    const opts = [
+    const opts = nkMix([
       { t: 'Я сделал уши важнее хвоста, а по ушам котов видно', ok: true },
       { t: 'Нейро подумал и сам догадался', ok: false },
       { t: 'Нейро запомнил всех котов по именам', ok: false },
-    ];
+    ]);
     return React.createElement('div', { className: 'nn' },
       React.createElement(TopBar, { level: 1, title: 'Один нейрон', onHome, step: 1, total: 1 }),
       React.createElement('div', { className: 'nnbody' },

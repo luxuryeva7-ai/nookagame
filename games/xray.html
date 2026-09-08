@@ -508,16 +508,16 @@ function LevelXray({ onWin, onHome }) {
 
   /* ── проверка связи ── */
   if (phase === 'quiz') {
-    const o1 = [
+    const o1 = nkMix([
       { t: 'Царапина — тоже резкая линия, а он ищет линии', ok: true },
       { t: 'Он сломался и показал случайное место', ok: false },
       { t: 'Он хотел меня проверить', ok: false },
-    ];
-    const o2 = [
+    ]);
+    const o2 = nkMix([
       { t: 'Браслет ярче и заметнее — вот он и вылез вперёд', ok: true },
       { t: 'Браслет опаснее перелома', ok: false },
       { t: 'Он решил, что браслет надо снять', ok: false },
-    ];
+    ]);
     const both = q1 !== null && o1[q1].ok && q2 !== null && o2[q2].ok;
     return React.createElement('div', { className: 'xr' },
       React.createElement(TopBar, { level: 6, title: 'Рентгенолог', onHome, step: 4, total: 1 }),

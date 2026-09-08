@@ -1561,26 +1561,29 @@ function LevelDraw({ n, onWin, onHome }) {
 
   /* ── проверка связи ── */
   if (phase === 'quiz') {
+    /* Перемешиваем один раз и дальше работаем только с этим порядком: индекс
+       выбора считается по нему же, иначе ответ и проверка разъедутся. */
+    const qo = nkMix(L.quiz.opts);
     return React.createElement('div', { className: 'dw' },
       React.createElement(TopBar, { level: n, title: L.title, onHome, step: 1, total: 1 }),
       React.createElement('div', { className: 'dwbody' },
         React.createElement('div', { className: 'dwq' },
           React.createElement('div', { className: 'dwq__t' }, L.quiz.q),
-          L.quiz.opts.map((o, i) => React.createElement('button', {
+          qo.map((o, i) => React.createElement('button', {
             key: i, className: pick === i ? (o.ok ? 'on--ok' : 'on--bad') : '',
             onClick: () => setPick(i),
           }, o.t))),
         pick !== null && React.createElement('div', {
-          className: 'dwsay ' + (L.quiz.opts[pick].ok ? 'dwsay--ok' : 'dwsay--bad'), style: { marginTop: 12 },
+          className: 'dwsay ' + (qo[pick].ok ? 'dwsay--ok' : 'dwsay--bad'), style: { marginTop: 12 },
         },
-          React.createElement('i', null, NKM(L.quiz.opts[pick].ok ? 'win' : 'think', 30)),
-          React.createElement('span', null, L.quiz.opts[pick].ok ? L.quiz.okSay : L.quiz.badSay))),
+          React.createElement('i', null, NKM(qo[pick].ok ? 'win' : 'think', 30)),
+          React.createElement('span', null, qo[pick].ok ? L.quiz.okSay : L.quiz.badSay))),
       React.createElement('div', { className: 'dwfoot' },
         React.createElement('button', {
           className: 'nk-btn nk-btn--pri', style: { width: '100%' },
-          disabled: pick === null || !L.quiz.opts[pick].ok,
+          disabled: pick === null || !qo[pick].ok,
           onClick: () => setPhase('done'),
-        }, pick !== null && !L.quiz.opts[pick].ok ? 'Выбери верное' : 'Дальше')));
+        }, pick !== null && !qo[pick].ok ? 'Выбери верное' : 'Дальше')));
   }
 
   /* ── игра ── */

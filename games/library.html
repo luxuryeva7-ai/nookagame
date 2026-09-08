@@ -790,16 +790,16 @@ function LevelLibrary({ onWin, onHome }) {
 
   /* ── проверка связи ── */
   if (phase === 'quiz') {
-    const o1 = [
+    const o1 = nkMix([
       { t: 'В названии не было ни одного слова из просьбы', ok: true },
       { t: 'Такой книги в библиотеке нет', ok: false },
       { t: 'Читатель говорил слишком тихо', ok: false },
-    ];
-    const o2 = [
+    ]);
+    const o2 = nkMix([
       { t: 'Он расставил книги по смыслу и смотрит, что оказалось рядом с просьбой', ok: true },
       { t: 'Он читает все книги подряд каждый раз', ok: false },
       { t: 'Он угадывает наугад', ok: false },
-    ];
+    ]);
     const both = q1 !== null && o1[q1].ok && q2 !== null && o2[q2].ok;
     return React.createElement('div', { className: 'lb' },
       React.createElement(TopBar, { level: 4, title: 'Библиотекарь', onHome, step: 2, total: 3 }),

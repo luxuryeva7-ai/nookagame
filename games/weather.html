@@ -367,16 +367,16 @@ function LevelWeather({ onWin, onHome }) {
 
   /* ── проверка связи ── */
   if (phase === 'quiz') {
-    const o1 = [
+    const o1 = nkMix([
       { t: 'Нет. Из десяти таких дней в двух дождя и не бывает', ok: true },
       { t: 'Да, раз дождя не было — прогноз неверный', ok: false },
       { t: 'Да, ему надо было сказать сто процентов', ok: false },
-    ];
-    const o2 = [
+    ]);
+    const o2 = nkMix([
       { t: 'Данных стало больше, и он стал увереннее', ok: true },
       { t: 'Погода за это время испортилась', ok: false },
       { t: 'Он передумал и решил напугать', ok: false },
-    ];
+    ]);
     const both = q1 !== null && o1[q1].ok && q2 !== null && o2[q2].ok;
     return React.createElement('div', { className: 'wt' },
       React.createElement(TopBar, { level: 8, title: 'Метеоролог', onHome, step: 6, total: 1 }),

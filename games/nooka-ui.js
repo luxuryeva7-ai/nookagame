@@ -69,6 +69,11 @@ function TopBar({
 function TaskBadge({
   children
 }) {
+  /* Если уровень не передал свой текст — показываем инструкцию из реестра.
+     Задача должна оставаться перед глазами: дети не читают вступление, они
+     сразу тыкают. */
+  children = children || nkDo();
+  if (!children) return null;
   return /*#__PURE__*/React.createElement("div", {
     className: "ak-pulse",
     style: {
@@ -224,9 +229,22 @@ function FailModal({
    иначе уровень заходит как развлечение, а знание из него не достаётся.
    Берётся из реестра nooka-levels.js — все формулировки правятся в одном месте.
    Явно переданный goal перебивает реестр. */
+/* Перемешать варианты ответа перед показом. Правильный вариант в исходниках
+   стоит первым — так его удобно писать и читать, но ребёнку это подсказка. */
+function nkMix(list) {
+  return (window.nooka && window.nooka.shuffled) ? window.nooka.shuffled(list) : list;
+}
 function nkGoal() {
   var lv = nkLevel();
   return (lv && lv.goal) || '';
+}
+/* Что делать руками — одна фраза из реестра. Раньше на входе стояла только
+   цель («проверять ИИ, даже когда он уверен»), и ребёнок не понимал, что от
+   него требуется. Цель никуда не делась: она возвращается на экране победы
+   как «теперь ты это умеешь». */
+function nkDo() {
+  var lv = nkLevel();
+  return (lv && lv.do) || '';
 }
 function nkLevel() {
   try {
@@ -275,24 +293,37 @@ function GuessGate({ emoji, title, ask, bets, tip, onStart }) {
         color: 'var(--ak-ink)', textAlign: 'center', marginBottom: 8
       }
     }, title),
-    nkGoal() && React.createElement('div', {
+    (nkDo() || nkGoal()) && React.createElement('div', {
       style: {
-        display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 7,
-        flexWrap: 'wrap', maxWidth: 320, marginBottom: 18
+        width: '100%', maxWidth: 330, marginBottom: 18, padding: '12px 16px 14px',
+        borderRadius: 18, textAlign: 'center',
+        background: 'rgba(255,216,77,.12)',
+        boxShadow: 'inset 0 0 0 1.5px rgba(255,216,77,.45)'
       }
     },
-      React.createElement('span', {
+      React.createElement('div', {
         style: {
           fontFamily: 'var(--ak-display)', fontWeight: 700, fontSize: 10,
-          letterSpacing: '.1em', color: '#FFD84D', textTransform: 'uppercase'
+          letterSpacing: '.1em', color: '#FFD84D', textTransform: 'uppercase',
+          marginBottom: 6
         }
-      }, 'Здесь учимся'),
-      React.createElement('span', {
+      }, nkDo() ? 'Что делать' : 'Здесь учимся'),
+      React.createElement('div', {
         style: {
-          fontFamily: 'var(--ak-display)', fontWeight: 700, fontSize: 14.5,
-          lineHeight: 1.3, color: '#FFE7B8', textAlign: 'center'
+          fontFamily: 'var(--ak-display)', fontWeight: 700, fontSize: 17,
+          lineHeight: 1.28, color: '#FFF6DC'
         }
-      }, nkGoal())
+      }, nkDo() || nkGoal()),
+      /* Цель уровня остаётся на входе мелкой строкой: ту же фразу ребёнок
+         увидит на экране победы как «теперь ты это умеешь». Без начала
+         замыкание не работает — фраза в конце читается как новая. */
+      nkDo() && nkGoal() && React.createElement('div', {
+        style: {
+          marginTop: 9, paddingTop: 9, borderTop: '1px solid rgba(255,216,77,.22)',
+          fontFamily: 'var(--ak-display)', fontWeight: 700, fontSize: 12.5,
+          lineHeight: 1.3, color: '#E6C77A'
+        }
+      }, 'Здесь учимся: ' + nkGoal())
     ),
     React.createElement('div', {
       style: {
@@ -366,7 +397,7 @@ function IntroModal({
       marginBottom: 16,
       textAlign: 'center'
     }
-  }, title), (goal = goal || nkGoal()) && /*#__PURE__*/React.createElement("div", {
+  }, title), (goal = nkDo() || goal || nkGoal()) && /*#__PURE__*/React.createElement("div", {
     style: {
       width: '100%',
       maxWidth: 320,
@@ -386,7 +417,7 @@ function IntroModal({
       color: '#FFD84D',
       marginBottom: 7
     }
-  }, "ЗДЕСЬ УЧИМСЯ"), /*#__PURE__*/React.createElement("div", {
+  }, nkDo() ? "ЧТО ДЕЛАТЬ" : "ЗДЕСЬ УЧИМСЯ"), /*#__PURE__*/React.createElement("div", {
     style: {
       fontFamily: 'var(--ak-display)',
       fontWeight: 700,
@@ -394,7 +425,21 @@ function IntroModal({
       lineHeight: 1.25,
       color: '#FFF6DC'
     }
-  }, goal)), diagram && /*#__PURE__*/React.createElement("div", {
+  }, goal), nkDo() && nkGoal() && /*#__PURE__*/React.createElement("div", {
+    /* Цель остаётся видна и здесь: на экране победы она вернётся как
+       «теперь ты это умеешь», и ребёнок должен её узнать, а не прочесть
+       впервые. */
+    style: {
+      marginTop: 10,
+      paddingTop: 10,
+      borderTop: '1px solid rgba(255,216,77,.22)',
+      fontFamily: 'var(--ak-display)',
+      fontWeight: 700,
+      fontSize: 13,
+      lineHeight: 1.3,
+      color: '#E6C77A'
+    }
+  }, 'Здесь учимся: ' + nkGoal())), diagram && /*#__PURE__*/React.createElement("div", {
     style: {
       width: '100%',
       maxWidth: 320,

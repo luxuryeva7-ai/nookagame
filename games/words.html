@@ -281,16 +281,16 @@ function LevelWords({ onWin, onHome }) {
 
   /* ── проверка связи ── */
   if (phase === 'quiz') {
-    const o1 = [
+    const o1 = nkMix([
       { t: 'Он прочитал чужие фразы и запомнил, что за чем идёт', ok: true },
       { t: 'Он понимает, о чём фраза, и думает', ok: false },
       { t: 'Он подсматривает мои ответы', ok: false },
-    ];
-    const o2 = [
+    ]);
+    const o2 = nkMix([
       { t: 'Стал видеть больше слов перед собой — и выбор сузился', ok: true },
       { t: 'Стал умнее и начал понимать смысл', ok: false },
       { t: 'Ему просто повезло во второй раз', ok: false },
-    ];
+    ]);
     const both = q1 !== null && o1[q1].ok && q2 !== null && o2[q2].ok;
     return React.createElement('div', { className: 'wd' },
       React.createElement(TopBar, { level: 5, title: 'Следующее слово', onHome, step: 1, total: 1 }),

@@ -403,16 +403,16 @@ function LevelRoom({ onWin, onHome }) {
 
   /* ── проверка связи ── */
   if (phase === 'quiz') {
-    const o1 = [
+    const o1 = nkMix([
       { t: 'Программе человек написал по шагам, а ИИ показали примеры', ok: true },
       { t: 'ИИ дороже стоит', ok: false },
       { t: 'ИИ работает от электричества, а программа нет', ok: false },
-    ];
-    const o2 = [
+    ]);
+    const o2 = nkMix([
       { t: 'Колонка ищет похожее на то, что слышала, и может не угадать', ok: true },
       { t: 'Колонка старее будильника', ok: false },
       { t: 'Будильник умнее колонки', ok: false },
-    ];
+    ]);
     const both = q1 !== null && o1[q1].ok && q2 !== null && o2[q2].ok;
     return React.createElement('div', { className: 'rm' },
       React.createElement(TopBar, { level: 1, title: 'Где спрятан ИИ', onHome, step: 1, total: 1 }),

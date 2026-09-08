@@ -387,16 +387,16 @@ function LevelBall({ onWin, onHome }) {
 
   /* ── проверка связи ── */
   if (phase === 'quiz') {
-    const o1 = [
+    const o1 = nkMix([
       { t: 'Он перескакивал дно и раскачивался всё сильнее', ok: true },
       { t: 'Он устал и покатился назад', ok: false },
       { t: 'Долина оказалась слишком короткой', ok: false },
-    ];
-    const o2 = [
+    ]);
+    const o2 = nkMix([
       { t: 'Он видит только наклон под собой, а не всю долину', ok: true },
       { t: 'Он специально выбирает место похуже', ok: false },
       { t: 'Он запомнил ямку с прошлого раза', ok: false },
-    ];
+    ]);
     const both = q1 !== null && o1[q1].ok && q2 !== null && o2[q2].ok;
     return React.createElement('div', { className: 'bl' },
       React.createElement(TopBar, { level: 3, title: 'Шарик ищет дно', onHome, step: 1, total: 2 }),

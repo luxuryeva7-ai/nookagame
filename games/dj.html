@@ -383,16 +383,16 @@ function LevelDj({ onWin, onHome }) {
 
   /* ── проверка связи ── */
   if (phase === 'quiz') {
-    const o1 = [
+    const o1 = nkMix([
       { t: 'Он каждый раз брал самое частое, и оно пошло по кругу', ok: true },
       { t: 'Он забыл, что уже играл', ok: false },
       { t: 'У него закончились ноты', ok: false },
-    ];
-    const o2 = [
+    ]);
+    const o2 = nkMix([
       { t: 'Он послушал чужие мелодии и запомнил, что за чем идёт', ok: true },
       { t: 'Он придумал их сам, когда родился', ok: false },
       { t: 'Он подсмотрел, что играю я', ok: false },
-    ];
+    ]);
     const both = q1 !== null && o1[q1].ok && q2 !== null && o2[q2].ok;
     return React.createElement('div', { className: 'dj' },
       React.createElement(TopBar, { level: 7, title: 'Диджей', onHome, step: 1, total: 1 }),

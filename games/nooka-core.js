@@ -141,6 +141,20 @@
       return many;
     },
 
+    /* Перемешать варианты ответа. Во всех викторинах правильный вариант стоял
+       первым — за пару уровней ребёнок это замечает и дальше жмёт первый, не
+       читая. Порядок считается от текстов, поэтому он одинаков при каждой
+       перерисовке экрана и варианты не прыгают под пальцем. */
+    shuffled: function (list) {
+      if (!list || list.length < 2) return list || [];
+      function key(x) {
+        var t = String((x && (x.t || x.text)) || x), h = 2166136261;
+        for (var i = 0; i < t.length; i++) { h ^= t.charCodeAt(i); h = (h * 16777619) >>> 0; }
+        return h;
+      }
+      return list.slice().sort(function (a, b) { return key(a) - key(b); });
+    },
+
     addXP: function (n) { var p = load(); p.xp += n; save(p); return p.xp; },
 
     // Отметить миссию пройденной. XP начисляется один раз, день идёт в стрик всегда.
@@ -201,7 +215,9 @@
       el.id = 'nooka-beat';
       el.innerHTML =
         '<style>' +
-        '#nooka-beat{position:fixed;left:12px;right:12px;bottom:14px;z-index:9998;display:flex;justify-content:center;' +
+        /* Плашка висит СВЕРХУ. Снизу она садилась ровно на кнопку действия —
+           ребёнок жал и попадал в подсказку, а не в кнопку. */
+        '#nooka-beat{position:fixed;left:12px;right:12px;top:12px;z-index:9998;display:flex;justify-content:center;' +
         'pointer-events:none;animation:nkBeatIn .38s cubic-bezier(.34,1.4,.64,1)}' +
         '#nooka-beat.out{animation:nkBeatOut .3s ease forwards}' +
         '#nooka-beat .nkb{pointer-events:auto;cursor:pointer;max-width:460px;width:100%;display:flex;gap:12px;align-items:flex-start;' +
@@ -209,9 +225,12 @@
         'box-shadow:0 14px 34px rgba(0,0,0,.45);font-family:\'Space Grotesk\',system-ui,sans-serif}' +
         '#nooka-beat i{flex:none;width:5px;align-self:stretch;background:#FFD84D;border-radius:4px}' +
         '#nooka-beat span{display:block;font-size:17px;line-height:1.3;font-weight:700;color:#FFF6DC}' +
-        '@keyframes nkBeatIn{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}' +
-        '@keyframes nkBeatOut{to{opacity:0;transform:translateY(14px)}}' +
-        '</style><div class="nkb"><i></i><span>' + text + '</span></div>';
+        '#nooka-beat b{flex:none;align-self:center;width:26px;height:26px;border-radius:50%;display:flex;' +
+        'align-items:center;justify-content:center;font-size:15px;font-weight:400;color:#FFE7B8;' +
+        'background:rgba(255,255,255,.08)}' +
+        '@keyframes nkBeatIn{from{opacity:0;transform:translateY(-22px)}to{opacity:1;transform:none}}' +
+        '@keyframes nkBeatOut{to{opacity:0;transform:translateY(-14px)}}' +
+        '</style><div class="nkb"><i></i><span>' + text + '</span><b>\u2715</b></div>';
       document.body.appendChild(el);
 
       var gone = false;

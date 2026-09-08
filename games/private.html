@@ -337,16 +337,16 @@ function LevelPrivate({ onWin, onHome }) {
 
   /* ── проверка связи ── */
   if (phase === 'quiz') {
-    const o1 = [
+    const o1 = nkMix([
       { t: 'Всё сказанное лежит на чужом компьютере — кто прочтёт, неизвестно', ok: true },
       { t: 'Помощник хотел меня обмануть с самого начала', ok: false },
       { t: 'Помощники всегда врут, им нельзя верить', ok: false },
-    ];
-    const o2 = [
+    ]);
+    const o2 = nkMix([
       { t: 'Что я люблю читать', ok: true },
       { t: 'В какой школе я учусь', ok: false },
       { t: 'Во сколько я гуляю во дворе', ok: false },
-    ];
+    ]);
     const both = q1 !== null && o1[q1].ok && q2 !== null && o2[q2].ok;
     return React.createElement('div', { className: 'pv' },
       React.createElement(TopBar, { level: 10, title: 'Что не говорить ИИ', onHome, step: 1, total: 1 }),
