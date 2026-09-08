@@ -933,7 +933,7 @@ const DW_LEVELS = {
       other: ['dog', 'cat', 'cat', 'dog', 'cat', 'dog'],
       who: 'Даня, 9 лет' },
     steps: [{ kind: 'tag' }],
-    tagSay: 'Меня учат на подписанных картинках — а подписывают их <b>люди</b>. Сегодня разметчик ты. Вот шесть рисунков, которые прислали ребята: <b>кот или собака</b>, решай сам.',
+    tagSay: 'Меня учат на подписанных картинках — а подписывают их <b>люди</b>. Сегодня разметчик ты. Вот шесть рисунков, которые прислали ребята: <b>кот или собака</b> — решать тебе.',
     quiz: {
       q: 'Почему две модели ответили по-разному?',
       opts: [
@@ -1531,8 +1531,9 @@ function LevelDraw({ n, onWin, onHome }) {
                   React.createElement('span', null, 'круг ' + (i + 1))))),
               React.createElement('div', { className: 'dwwords__n' },
                 rounds.length > 1
-                  ? 'Было ' + rounds[0].conf + '%, стало ' + rounds[rounds.length - 1].conf +
-                    '%. Между ними — только твои примеры.'
+                  ? 'Сначала Нейро был уверен на ' + rounds[0].conf +
+                    ' из 100, потом на ' + rounds[rounds.length - 1].conf +
+                    ' из 100. Между ними — только твои примеры.'
                   : 'Каждый круг добавлял Нейро тот пример, которого не хватало.'))
           : L.win.show === 'acc'
           ? React.createElement('div', { className: 'dwwords' },
@@ -1542,7 +1543,12 @@ function LevelDraw({ n, onWin, onHome }) {
                 React.createElement('em', null, '→'),
                 React.createElement('b', null, dwSelfCheck(model).acc + '%')),
               React.createElement('div', { className: 'dwwords__n' },
-                'Столько Нейро угадывал до чистки — и столько после. Рисунки те же, изменились только подписи.'))
+                /* Восьмилетка не знает процентов. Цифру оставляем — она честная,
+                   но рядом говорим то же самое счётом, который он понимает. */
+                'Из каждых десяти картинок Нейро угадывал ' +
+                Math.round((dirtyAcc === null ? 80 : dirtyAcc) / 10) + ', а теперь угадывает ' +
+                Math.round(dwSelfCheck(model).acc / 10) + '. ' +
+                'Рисунки те же — изменились только подписи.'))
           : React.createElement('div', { className: 'dwwords' },
               React.createElement('div', { className: 'dwwords__t' }, 'Теперь Нейро знает столько слов'),
               React.createElement('div', { className: 'dwwords__r' },

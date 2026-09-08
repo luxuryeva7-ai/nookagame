@@ -159,10 +159,13 @@ const NN_TAPS = [
   { t: 'закрыт',   k: 0 },
   { t: 'чуть-чуть', k: 0.4 },
   { t: 'наполовину', k: 0.8 },
-  { t: 'настежь',  k: 1.2 },
+  { t: 'до упора', k: 1.2 },
 ];
 
-function NnFace({ kind, size }) {
+/* Рисуем обе приметы, по которым работает уровень: уши и хвост. Раньше на
+   морде были только уши, и четверо зверей выглядели как две одинаковые пары —
+   ребёнок не понимал, чем Мурзик отличается от Луны и зачем второй кран. */
+function NnFace({ kind, size, tail }) {
   const s = size || 44;
   const c = kind === 'cat' ? '#7FE7FF' : '#FFB37A';
   const ears = kind === 'cat'
@@ -170,9 +173,15 @@ function NnFace({ kind, size }) {
        React.createElement('path', { key: 'b', d: 'M48 22 L52 6 L36 18' })]
     : [React.createElement('path', { key: 'a', d: 'M17 20 Q8 42 20 46 Q24 34 26 26' }),
        React.createElement('path', { key: 'b', d: 'M47 20 Q56 42 44 46 Q40 34 38 26' })];
+  /* хвост: длинный завивается вверх, короткий — коротышка */
+  const long = (tail == null ? 80 : tail) >= 55;
+  const tailPath = long
+    ? 'M49 44 Q62 44 60 30 Q59 22 52 24'
+    : 'M49 45 Q56 47 56 41';
   return React.createElement('svg', { viewBox: '0 0 64 64', width: s, height: s },
     React.createElement('g', { fill: 'none', stroke: c, strokeWidth: 3.4,
       strokeLinecap: 'round', strokeLinejoin: 'round' },
+      React.createElement('path', { d: tailPath, opacity: .85 }),
       React.createElement('circle', { cx: 32, cy: 36, r: 17 }),
       ears,
       React.createElement('circle', { cx: 26, cy: 34, r: 1.6, fill: c }),
@@ -346,7 +355,7 @@ function LevelNeuron({ onWin, onHome }) {
           : 'Уши у котов острые, у собак висячие. А длинный хвост бывает и у кота, и у таксы. Открой посильнее ту примету, по которой кота правда видно.')),
 
       React.createElement('div', { className: 'nnwho' },
-        React.createElement(NnFace, { kind: cur.b.kind, size: 46 }),
+        React.createElement(NnFace, { kind: cur.b.kind, tail: cur.b.tail, size: 46 }),
         React.createElement('div', { className: 'nnwho__n' },
           React.createElement('b', null, cur.b.who),
           React.createElement('span', null, cur.b.hint)),
@@ -354,7 +363,7 @@ function LevelNeuron({ onWin, onHome }) {
           rows.map((r, i) => React.createElement('button', {
             key: i, className: who === i ? 'on' : '', onClick: () => setWho(i),
             title: r.b.who,
-          }, React.createElement(NnFace, { kind: r.b.kind, size: 26 }))))),
+          }, React.createElement(NnFace, { kind: r.b.kind, tail: r.b.tail, size: 26 }))))),
 
       React.createElement('div', { className: 'nnhow' },
         'Приметы капают в ведро. Набралось до черты — я говорю «кот»'),
@@ -387,7 +396,7 @@ function LevelNeuron({ onWin, onHome }) {
         React.createElement('div', { className: 'nnset__t' },
           'Что Нейро говорит про всех · верно ' + good + ' из ' + rows.length),
         rows.map((r, i) => React.createElement('div', { key: i, className: 'nnrow' },
-          React.createElement(NnFace, { kind: r.b.kind, size: 40 }),
+          React.createElement(NnFace, { kind: r.b.kind, tail: r.b.tail, size: 40 }),
           React.createElement('div', { className: 'nnrow__n' },
             React.createElement('b', null, r.b.who),
             React.createElement('span', null, r.b.cat ? 'это кот' : 'это собака')),

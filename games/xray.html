@@ -56,6 +56,12 @@
   font-family:inherit;font-weight:900;font-size:11.5px;color:#8195AD;
   background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1px rgba(255,255,255,.09);}
 .xrtabs button.on{color:#08131F;background:#7FC8FF;box-shadow:0 6px 16px -8px #7FC8FF;}
+/* вкладка, в которую ещё не заглядывали: дети жмут «перелом» с первого
+   же экрана, не посмотрев, что видит машина */
+.xrtabs button.new{color:#FFE7B8;box-shadow:inset 0 0 0 1.5px rgba(255,216,77,.5);}
+.xrtabs button.new::after{content:'';display:inline-block;width:6px;height:6px;margin-left:5px;
+  border-radius:50%;background:#FFD84D;vertical-align:middle;animation:xrdot 1.6s ease-in-out infinite;}
+@keyframes xrdot{0%,100%{opacity:1}50%{opacity:.25}}
 
 /* вердикт */
 .xracts{margin:12px 14px 0;display:flex;gap:8px;}
@@ -439,6 +445,7 @@ function LevelXray({ onWin, onHome }) {
   const [view, setView] = useState('raw');
   const [mark, setMark] = useState(null);
   const [verdict, setVerdict] = useState(null);   // {ok, kind}
+  const [seen, setSeen] = useState(['raw']);     // какие виды ребёнок открыл
   const [right, setRight] = useState(0);
   const [saved, setSaved] = useState(false);
   const [q1, setQ1] = useState(null);
@@ -591,7 +598,12 @@ function LevelXray({ onWin, onHome }) {
 
       React.createElement('div', { className: 'xrtabs' },
         XR_VIEWS.map(v => React.createElement('button', {
-          key: v.k, className: view === v.k ? 'on' : '', onClick: () => setView(v.k),
+          key: v.k,
+          className: view === v.k ? 'on' : (seen.indexOf(v.k) < 0 ? 'new' : ''),
+          onClick: () => {
+            setView(v.k);
+            if (seen.indexOf(v.k) < 0) setSeen(seen.concat([v.k]));
+          },
         }, v.t))),
 
       !answered && React.createElement('div', { className: 'xracts' },
@@ -603,8 +615,14 @@ function LevelXray({ onWin, onHome }) {
           className: 'nk-btn nk-btn--soft', onClick: sayClean,
         }, 'Кость целая')),
 
-      !answered && !mark && React.createElement('div', { className: 'xrhint' },
-        'Нажми на снимок, чтобы поставить метку')),
+      !answered && React.createElement('div', { className: 'xrhint' },
+        /* Порядок действий раньше нигде не был написан, и ребёнок жал «перелом»
+           сразу. А кнопка молча заблокирована, пока нет метки, — выглядит как
+           поломка. Теперь ведём по шагам. */
+        seen.length < XR_VIEWS.length
+          ? 'Посмотри все четыре вида — снимок, линии, форму и что видит Нейро'
+          : (!mark ? 'Теперь нажми на снимок там, где видишь перелом'
+                   : 'Метка стоит — решай: перелом или кость целая'))),
 
     React.createElement('div', { className: 'xrfoot' },
       answered
