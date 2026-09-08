@@ -546,7 +546,7 @@ function scene(st,opt){
   opt=opt||{};
   const seed=opt.seed!==undefined?opt.seed:st.seed;
   const ang=opt.angle||(st.angle?st.angle.id:'full');
-  const vb=ang==='close'?'62 30 176 132':ang==='far'?'-40 -14 380 250':'0 0 300 200';
+  const vb=ang==='cover'?'36 22 128 128':ang==='close'?'52 26 196 147':ang==='far'?'-40 -14 380 250':'0 0 300 200';
   const stl=st.style;
   let inner='';
   inner+=svgBG(st.place,st.time,seed,st.living,st.mood?st.mood.id:null);
@@ -932,7 +932,7 @@ function renderArt(){
   const comb=(12*8*6*6*14*8*6*6*6).toLocaleString('ru-RU');
   let html=`<div class="bookwrap"><div class="pages" id="pgs">`;
   // обложка
-  html+=`<div class="page"><div class="cover"><div class="scene">${scene(S,{angle:'close'})}</div>
+  html+=`<div class="page"><div class="cover"><div class="scene">${scene(S,{angle:'cover'})}</div>
     <div class="cover-b"><div class="cover-t">${S.title||'Моя история'}</div>
     <div class="cover-a">Сделал${S.author&&/[аяь]$/i.test(S.author)?'а':''} ${S.author}${S.age?', '+S.age+' лет':''} · ${dstr}</div></div></div></div>`;
   // страницы
