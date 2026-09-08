@@ -31,7 +31,7 @@ body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);-w
 .foot{flex:none;position:sticky;bottom:0;z-index:25;padding:10px 12px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(255,248,238,0),var(--bg) 38%)}
 
 /* ── сцена ── */
-.scene{width:100%;aspect-ratio:4/3;border-radius:20px;overflow:hidden;background:#F3EADC;box-shadow:var(--sh);position:relative;margin-top:6px}
+.scene{width:100%;aspect-ratio:3/2;border-radius:20px;overflow:hidden;background:#F3EADC;box-shadow:var(--sh);position:relative;margin-top:6px}
 .scene svg{width:100%;height:100%;display:block}
 .scene.empty{background:repeating-linear-gradient(45deg,#F6EEE2,#F6EEE2 8px,#F1E6D6 8px,#F1E6D6 16px)}
 .seedrow{display:flex;align-items:center;justify-content:space-between;padding:8px 4px 0;font-size:12px;font-weight:700;color:var(--ink3)}
@@ -462,6 +462,13 @@ function svgFace(x,y,s,mood){
 }
 
 /* ── SVG: фон ── */
+/* смешение цветов — чтобы закрытые миры реагировали на время суток */
+function mixHex(a,b,t){
+  const p=h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
+  const [r1,g1,b1]=p(a),[r2,g2,b2]=p(b);
+  const c=v=>Math.round(v).toString(16).padStart(2,'0');
+  return '#'+c(r1+(r2-r1)*t)+c(g1+(g2-g1)*t)+c(b1+(b2-b1)*t);
+}
 function svgBG(place,time,seed,living,mood){
   const r=rng(seed*31+5);const T=time||TIMES[1];const K=place?place.kind:'forest';
   let o=`<defs><linearGradient id="sky${seed}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${T.sky[0]}"/><stop offset="1" stop-color="${T.sky[1]}"/></linearGradient></defs>`;
@@ -483,7 +490,7 @@ function svgBG(place,time,seed,living,mood){
     o+=`<ellipse cx="52" cy="176" rx="26" ry="11" fill="#6B6459"/>`;faces.push([52,174,.8]);
   }
   if(K==='libr'){
-    o+=`<rect width="300" height="200" fill="#4A3826"/>`;
+    o+=`<rect width="300" height="200" fill="${mixHex('#4A3826',T.amb,.24)}"/>`;
     for(let s=0;s<4;s++){o+=`<rect y="${18+s*44}" width="300" height="7" fill="#33251A"/>`;
       for(let b=0;b<19;b++){const bh=rint(r,20,34);o+=`<rect x="${4+b*16}" y="${25+s*44-bh+34}" width="${rint(r,7,13)}" height="${bh}" fill="${['#8C4A3A','#6B7A4A','#4A6B7A','#7A6B4A','#5A4A6B'][rint(r,0,4)]}" opacity=".9"/>`;}}
     faces.push([60,60,.9]);faces.push([220,148,.9]);
@@ -496,14 +503,14 @@ function svgBG(place,time,seed,living,mood){
       if(i===3)faces.push([x+17,200-h+26,.8]);}
   }
   if(K==='sea'){
-    o+=`<rect width="300" height="200" fill="#1E5A78"/>`;
+    o+=`<rect width="300" height="200" fill="${mixHex('#1E5A78',T.amb,.24)}"/>`;
     for(let i=0;i<16;i++)o+=`<circle cx="${rint(r,0,300)}" cy="${rint(r,0,180)}" r="${rint(r,2,6)}" fill="#8FD4E8" opacity=".3"/>`;
     for(let i=0;i<6;i++){const x=rint(r,0,300);o+=`<path d="M${x} 200 q${rint(r,-16,16)} -50 ${rint(r,-8,8)} -86" stroke="#3E8C6A" stroke-width="${rint(r,5,10)}" fill="none" stroke-linecap="round" opacity=".8"/>`;}
-    o+=`<ellipse y="190" cx="150" cy="196" rx="180" ry="18" fill="#C4A87A"/>`;
+    o+=`<ellipse cx="150" cy="196" rx="180" ry="18" fill="#C4A87A"/>`;
     o+=`<path d="M226 150 q14 -12 26 0 q-6 16 -26 0z" fill="#E8A03C"/>`;faces.push([238,150,.7]);
   }
   if(K==='space'){
-    o+=`<rect width="300" height="200" fill="#0E1330"/>`;
+    o+=`<rect width="300" height="200" fill="${mixHex('#0E1330',T.amb,.24)}"/>`;
     for(let i=0;i<52;i++)o+=`<circle cx="${rint(r,0,300)}" cy="${rint(r,0,200)}" r="${(r()*1.2+.4).toFixed(1)}" fill="#fff" opacity="${(r()*.7+.3).toFixed(2)}"/>`;
     o+=`<circle cx="252" cy="48" r="30" fill="#5C7BC4" opacity=".9"/><ellipse cx="252" cy="48" rx="46" ry="9" fill="none" stroke="#9AAFE0" stroke-width="3" opacity=".65"/>`;
     faces.push([252,48,1]);
@@ -526,7 +533,7 @@ function svgBG(place,time,seed,living,mood){
     o+=`<circle cx="248" cy="40" r="22" fill="${T.star?'#FFF3C4':'#FFE08C'}"/>`;faces.push([248,40,.9]);
   }
   if(K==='metro'){
-    o+=`<rect width="300" height="200" fill="#2A2A33"/>`;
+    o+=`<rect width="300" height="200" fill="${mixHex('#2A2A33',T.amb,.24)}"/>`;
     o+=`<path d="M150 96 m-96 104 q0 -104 96 -104 q96 0 96 104z" fill="#3A3A47"/>`;
     for(let i=0;i<5;i++)o+=`<circle cx="${34+i*58}" cy="${52+Math.abs(i-2)*10}" r="6" fill="#FFE08C" opacity=".9"/>`;
     o+=`<rect y="176" width="300" height="24" fill="#22222A"/>`;
@@ -554,7 +561,15 @@ function scene(st,opt){
   inner+=svgBG(st.place,st.time,seed,st.living,st.mood?st.mood.id:null);
   if(st.hero){
     inner+=`<g transform="translate(0 0)">`+svgHero(st.hero,st.mood?st.mood.id:'brave',seed,stl,st.acc)+`</g>`;
-    if(st.prop)inner+=svgProp(st.prop,seed);
+    // последствие выбранного поворота сюжета видно прямо в кадре
+    const fk=opt.fork;
+    if(st.prop&&fk!=='stolen'){
+      const fade=fk==='fade'?' opacity=".38"':'';
+      inner+=`<g${fade}>`+svgProp(st.prop,seed)+`</g>`;
+      if(fk==='alive')inner+=svgFace(100,163,.42,'amazed');
+      if(fk==='door')inner+=`<rect x="236" y="120" width="34" height="56" rx="4" fill="#3A2A18" opacity=".85"/><circle cx="262" cy="150" r="2.6" fill="#F2C337"/>`;
+    }
+    if(st.prop&&fk==='stolen')inner+=`<path d="M262 176 q-6 -22 4 -34 q8 10 6 34z" fill="rgba(30,20,12,.5)"/>`;
   }
   // стиль-оверлей
   if(stl){
@@ -650,7 +665,7 @@ function makeStory(st){
 const $=id=>document.getElementById(id);
 const B=()=>$('body'), F=()=>$('foot');
 
-const STEPS=['intro','s1','s2','s3','s4','cmp','name','fA','fB','fC','build','title','line','author','art','reveal','end'];
+const STEPS=['intro','s1','meet','s2','s3','joke','s4','cmp','name','fA','fB','fC','build','title','line','author','art','reveal','end'];
 function pct(){const i=STEPS.indexOf(S.step);return Math.max(0,Math.round(i/(STEPS.length-1)*100))}
 
 function say(t){return `<div class="say"><div class="say-av">🤖</div><div class="say-b">${t}</div></div>`}
@@ -790,7 +805,7 @@ function render(){
       2:'Герой есть, а мира нет — он висит в пустоте. Где он живёт?',
       3:'Два слова — и картинка меняется целиком. Проверим?',
       4:'Последнее про картинку. Дай ему в лапы одну вещь — с неё начнётся вся история. И скажи, как рисовать.'}[lv];
-    B().innerHTML=sceneBox(S.hero&&lv>1?seedRow():'')+say(SAY)+promptCard(lv)
+    B().innerHTML=sceneBox(S.hero?seedRow():'')+say(SAY)+promptCard(lv)
       +(lv===3&&!S.master?`<button class="harder" onclick="S.master=true;render()">Хочу сложнее →</button>`:'');
     F().innerHTML=`<button class="btn" ${ready(lv)?'':'disabled'} onclick="onGen(${lv})">Собрать</button>`;
     return;
@@ -826,7 +841,7 @@ function render(){
              fB:{t:'Как он справился?',l:FORK_B,k:'fB',n:'fC'},
              fC:{t:'Чем всё кончилось?',l:FORK_C,k:'fC',n:'build'}}[st];
     const intro=st==='fA'?'Картинка есть. Истории нет.\nИстория — это когда что-то пошло не так. Три вопроса, и книжка соберётся.':'';
-    B().innerHTML=`<div class="scene">${scene(S,{angle:'close'})}</div>`
+    B().innerHTML=`<div class="scene" id="sc">${scene(S,{angle:'close',fork:S.fA&&S.fA.id})}</div>`
       +(intro?say(intro):'')
       +`<div class="pcard" style="line-height:1.4;font-size:16px">${D.t}</div>
         <div class="forks">${D.l.map((f,i)=>`<button class="fork${S[D.k]&&S[D.k].id===f.id?' on':''}" onclick="pickFork('${D.k}',${i})"><span class="fork-ic">${f.ic}</span>${f.n}</button>`).join('')}</div>`;
@@ -904,14 +919,24 @@ function promptText(){
   return p;
 }
 function onGen(lv){
-  if(lv===1){S.seed=1000+Math.floor(Math.random()*9000);generate(()=>{S.shot1=scene(S);go('s2')});return}
+  // каждое «Собрать» — новая сборка: свежий сид, иначе кадр не меняется
+  S.seed=1000+Math.floor(Math.random()*9000);
+  if(lv===1){generate(()=>{S.shot1=scene(S);go('meet')});return}
   if(lv===2){generate(()=>go('s3'));return}
   if(lv===3){generate(()=>{
     // шутка «испуганная луна» — один раз за прохождение
     if(!S.jokeShown){S.jokeShown=true;S.living=true;go('joke')}else go('s4')});return}
   if(lv===4){generate(()=>go('cmp'));return}
 }
-function pickFork(k,i){S[k]=({fA:FORK_A,fB:FORK_B,fC:FORK_C})[k][i];render()}
+function pickFork(k,i){
+  S[k]=({fA:FORK_A,fB:FORK_B,fC:FORK_C})[k][i];
+  // кадр отвечает на тап сразу, а не после «дальше»
+  const sc=$('sc');
+  if(sc){sc.style.transition='opacity .16s';sc.style.opacity='.3';
+    setTimeout(()=>{sc.innerHTML=scene(S,{angle:'close',fork:S.fA&&S.fA.id});sc.style.opacity='1'},160)}
+  document.querySelectorAll('.fork').forEach((el,j)=>el.classList.toggle('on',j===i));
+  const b=$('foot').querySelector('.btn-pri'); if(b)b.disabled=false;
+}
 function suggestName(){
   const m=['Рыж','Тимка','Шустрик','Барс','Кузя','Гром','Тишка','Финик'];
   const f=['Гайка','Ласка','Мила','Стрелка','Нюша','Пуговка','Ирис','Соня'];
@@ -967,8 +992,10 @@ function renderArt(){
   const pg=$('pgs');
   pg.onscroll=()=>{const i=Math.round(pg.scrollLeft/pg.clientWidth);
     [...$('dots').children].forEach((d,j)=>d.classList.toggle('on',j===i))};
-  F().innerHTML=`<div class="btnrow"><button class="btn btn2 btn-sm" onclick="share()">Показать</button><button class="btn btn-sm" onclick="go('reveal')">Дальше</button></div>`;
-  $('htitle').textContent='Моя книжка';
+  F().innerHTML=S.shared
+    ? `<button class="btn-pri" onclick="location.href=location.pathname">Сделать свою историю</button>`
+    : `<div class="btnrow"><button class="btn btn2 btn-sm" onclick="share()">Показать</button><button class="btn btn-sm" onclick="go('reveal')">Дальше</button></div>`;
+  $('htitle').textContent=S.shared?('Книжка · '+(S.author||'друг')):'Моя книжка';
 }
 
 function share(){
