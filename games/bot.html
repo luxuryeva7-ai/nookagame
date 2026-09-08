@@ -236,20 +236,42 @@ function LevelBot({ onWin, onHome }) {
   const [rules, setRules] = useState({ len: 'long', tone: 'robot', ban: 'none', habit: 'none' });
   const [tries, setTries] = useState(0);
   const [say, setSay] = useState(null);
+  /* Раньше все трое приходили сразу: четыре правила, три недовольных лица и
+     стена текста — глаза разбегались, подобрать было нечем. Теперь по одному:
+     на каждом посетителе видно, какое правило за что отвечает, а последний
+     заход — все трое разом, где и вылезает, что правила у них разные. */
+  const [stage, setStage] = useState(0);          // 0,1,2 — по одному; 3 — все трое
+  const solo = stage < BT_GUESTS.length;
+  const crew = solo ? [BT_GUESTS[stage]] : BT_GUESTS;
 
   const set = (k, v) => setRules(prev => Object.assign({}, prev, { [k]: v }));
-  const results = BT_GUESTS.map(g => btJudge(g, rules));
+  const results = crew.map(g => btJudge(g, rules));
   const happy = results.filter(r => r === null).length;
+  const allOk = happy === crew.length;
 
   const run = () => {
     setTries(tries + 1);
     setPhase('day');
-    const res = BT_GUESTS.map(g => btJudge(g, rules));
+    const res = crew.map(g => btJudge(g, rules));
     const n = res.filter(r => r === null).length;
-    setSay(n === 3
-      ? 'Все трое довольны. Заметь: бот один, а люди разные — и подошёл он им только тогда, когда правила подобраны.'
-      : n === 0 ? 'Никому не подошло. Посмотри, на что каждый жалуется, — там и подсказка.'
-      : 'Доволен' + (n === 1 ? ' один' : 'ы двое') + '. Остальные жалуются — читай, на что именно.');
+    if (solo) {
+      setSay(n === 1
+        ? 'Подошло. Запомни, какое правило это решило, — дальше пригодится.'
+        : 'Не подошло. Прочитай, на что жалуется, — там прямо сказано, что менять.');
+    } else {
+      setSay(n === 3
+        ? 'Все трое довольны. Заметь: бот один, а люди разные — и подошёл он им только тогда, когда правила подобраны.'
+        : n === 0 ? 'Никому не подошло. Посмотри, на что каждый жалуется, — там и подсказка.'
+        : 'Доволен' + (n === 1 ? ' один' : 'ы двое') + '. Остальные жалуются — читай, на что именно.');
+    }
+  };
+
+  const nextStage = () => {
+    setStage(stage + 1);
+    setPhase('setup');
+    setSay(stage + 1 < BT_GUESTS.length
+      ? 'Следующий посетитель. Правила можно оставить или поменять — смотри, что ему нужно.'
+      : 'А теперь все трое разом. Правила одни на всех — вот тут и начинается самое интересное.');
   };
 
   const finish = () => {
@@ -286,14 +308,14 @@ function LevelBot({ onWin, onHome }) {
       emoji: NKM('hello', 88),
       title: 'Бот с характером',
       law: 'К боту придут трое, и все разные.\nБот один — а правила ему даёшь ты.',
-      tip: 'Задача: подобрать правила так, чтобы ушли довольными все трое.',
+      tip: 'Сначала по одному посетителю, потом все трое сразу.',
       onStart: () => setPhase('setup')
     }),
 
     React.createElement('div', { className: 'btbody' },
       phase === 'setup' && React.createElement(TaskBadge, null, 'Дай боту правила'),
       phase === 'day' && React.createElement(TaskBadge, null,
-        'Довольны: ' + happy + ' из 3'),
+        'Довольны: ' + happy + ' из ' + crew.length),
 
       say && React.createElement('div', { className: 'btsay', key: say },
         React.createElement('i', null, NKM(happy === 3 ? 'win' : 'think', 32)),
@@ -301,8 +323,9 @@ function LevelBot({ onWin, onHome }) {
 
       /* кто придёт — показываем заранее, иначе подбирать вслепую */
       phase === 'setup' && React.createElement('div', { className: 'btrow' },
-        React.createElement('div', { className: 'btrow__t' }, 'Сегодня придут трое'),
-        BT_GUESTS.map((g, i) => React.createElement('div', { className: 'btguest', key: i },
+        React.createElement('div', { className: 'btrow__t' },
+          solo ? 'Сейчас придёт один' : 'А теперь все трое сразу'),
+        crew.map((g, i) => React.createElement('div', { className: 'btguest', key: i },
           React.createElement('b', null, g.who),
           React.createElement('span', null, '«' + g.q + '»')))),
 
@@ -318,7 +341,7 @@ function LevelBot({ onWin, onHome }) {
             'Звучит так: «' + BT_VOICE[rules.tone] + '»'))),
 
       /* день: три диалога подряд с реакцией каждого */
-      phase === 'day' && BT_GUESTS.map((g, i) => {
+      phase === 'day' && crew.map((g, i) => {
         const miss = results[i];
         return React.createElement('div', { className: 'btcase', key: i },
           React.createElement('div', { className: 'btcase__w' }, g.who),
@@ -334,12 +357,16 @@ function LevelBot({ onWin, onHome }) {
         className: 'nk-btn nk-btn--cta', style: { width: '100%' }, onClick: run
       }, tries === 0 ? 'Открыть приём' : 'Пустить их снова'),
 
-      phase === 'day' && happy < 3 && React.createElement('button', {
+      phase === 'day' && !allOk && React.createElement('button', {
         className: 'nk-btn nk-btn--pri', style: { width: '100%' },
         onClick: () => { setPhase('setup'); setSay('Меняй правила и пробуй ещё. Бот тот же — важно, что ты ему скажешь.'); }
       }, 'Поменять правила'),
 
-      phase === 'day' && happy === 3 && React.createElement('button', {
+      phase === 'day' && allOk && solo && React.createElement('button', {
+        className: 'nk-btn nk-btn--ok', style: { width: '100%' }, onClick: nextStage
+      }, stage + 1 < BT_GUESTS.length ? 'Следующий посетитель \u2192' : 'Теперь все трое \u2192'),
+
+      phase === 'day' && allOk && !solo && React.createElement('button', {
         className: 'nk-btn nk-btn--ok', style: { width: '100%' }, onClick: finish
       }, 'Готово')));
 }
