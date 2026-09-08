@@ -945,7 +945,7 @@ function pickFork(k,i){
   if(sc){sc.style.transition='opacity .16s';sc.style.opacity='.3';
     setTimeout(()=>{sc.innerHTML=scene(S,{angle:'close',fork:S.fA&&S.fA.id});sc.style.opacity='1'},160)}
   document.querySelectorAll('.fork').forEach((el,j)=>el.classList.toggle('on',j===i));
-  const b=$('foot').querySelector('.btn-pri'); if(b)b.disabled=false;
+  const b=$('foot').querySelector('.btn'); if(b)b.disabled=false;
 }
 function suggestName(){
   const m=['Рыж','Тимка','Шустрик','Барс','Кузя','Гром','Тишка','Финик'];
