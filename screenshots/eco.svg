@@ -31,9 +31,4 @@
 <path d="M300 340 Q 420 260 560 300" stroke="#FF5038" stroke-width="5" fill="none" stroke-dasharray="3 12" stroke-linecap="round"/>
 <text x="410" y="252" font-size="30">⚡</text>
 <text x="90" y="120" font-size="42">🌱</text><text x="480" y="120" font-size="36">☁️</text>
-<rect x="40" y="386" width="430" height="60" rx="18" fill="#111118" opacity=".92"/>
-<text x="64" y="412" font-size="19" font-weight="800" fill="#fff">ЭкоСфера</text>
-<text x="64" y="434" font-size="13" fill="#BBF7D0">Запитай город чистой энергией — без блэкаута</text>
-<rect x="614" y="30" width="156" height="34" rx="17" fill="#111118"/>
-<text x="692" y="52" text-anchor="middle" font-size="14" font-weight="800" fill="#fff">в разработке</text>
 </svg>

@@ -21,9 +21,4 @@
 </g>
 <!-- луна -->
 <circle cx="150" cy="120" r="34" fill="#E5E7EB"/><circle cx="140" cy="112" r="8" fill="#9CA3AF" opacity=".7"/><circle cx="162" cy="132" r="6" fill="#9CA3AF" opacity=".6"/>
-<rect x="40" y="386" width="440" height="60" rx="18" fill="#111118" opacity=".92"/>
-<text x="64" y="412" font-size="19" font-weight="800" fill="#fff">КосмоПорт</text>
-<text x="64" y="434" font-size="13" fill="#93C5FD">Собери ракету и выведи её на орбиту Сатурна</text>
-<rect x="614" y="30" width="156" height="34" rx="17" fill="#FFE141"/>
-<text x="692" y="52" text-anchor="middle" font-size="14" font-weight="800" fill="#111118">в разработке</text>
 </svg>

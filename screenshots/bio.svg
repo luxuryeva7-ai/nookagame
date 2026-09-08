@@ -24,9 +24,4 @@
 <line x1="592" y1="310" x2="656" y2="310" stroke="#FF9F43"/>
 </g>
 <text x="470" y="120" font-size="38">🔬</text><text x="120" y="420" font-size="34">🦠</text>
-<rect x="40" y="386" width="440" height="60" rx="18" fill="#111118" opacity=".92"/>
-<text x="64" y="412" font-size="19" font-weight="800" fill="#fff">БиоМир</text>
-<text x="64" y="434" font-size="13" fill="#A7F3D0">Собери клетку, расшифруй ДНК, оживи экосистему</text>
-<rect x="614" y="30" width="156" height="34" rx="17" fill="#FFE141"/>
-<text x="692" y="52" text-anchor="middle" font-size="14" font-weight="800" fill="#111118">в разработке</text>
 </svg>

@@ -22,9 +22,4 @@
 <circle cx="0" cy="-22" r="12" fill="#fff"/>
 </g>
 <text x="130" y="420" font-size="40">🧭</text><text x="480" y="110" font-size="34">✈️</text>
-<rect x="40" y="386" width="440" height="60" rx="18" fill="#111118" opacity=".92"/>
-<text x="64" y="412" font-size="19" font-weight="800" fill="#fff">ГеоАтлас</text>
-<text x="64" y="434" font-size="13" fill="#7DD3FC">Квесты по всей планете — от океанов до вулканов</text>
-<rect x="614" y="30" width="156" height="34" rx="17" fill="#FFE141"/>
-<text x="692" y="52" text-anchor="middle" font-size="14" font-weight="800" fill="#111118">в разработке</text>
 </svg>

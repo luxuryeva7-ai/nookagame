@@ -23,9 +23,4 @@
 <rect x="545" y="322" width="64" height="64" rx="12" fill="none" stroke="#4ADE80" stroke-width="8" transform="rotate(12 577 354)"/>
 </g>
 <text x="480" y="90" font-size="36">🧩</text>
-<rect x="40" y="386" width="440" height="60" rx="18" fill="#111118" opacity=".92"/>
-<text x="64" y="412" font-size="19" font-weight="800" fill="#fff">Цифрариум</text>
-<text x="64" y="434" font-size="13" fill="#FDBA74">Числа, фигуры и шифры — головоломки со вкусом</text>
-<rect x="614" y="30" width="156" height="34" rx="17" fill="#FFE141"/>
-<text x="692" y="52" text-anchor="middle" font-size="14" font-weight="800" fill="#111118">в разработке</text>
 </svg>

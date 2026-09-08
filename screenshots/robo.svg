@@ -30,9 +30,4 @@
 <path d="M700 236 q 6 -26 30 -34" stroke="#FF5038" stroke-width="4" fill="none" stroke-dasharray="2 10" stroke-linecap="round"/>
 <!-- гайки -->
 <text x="120" y="90" font-size="40">🔧</text><text x="640" y="120" font-size="34">⚙️</text>
-<rect x="40" y="386" width="430" height="60" rx="18" fill="#111118" opacity=".92"/>
-<text x="64" y="412" font-size="19" font-weight="800" fill="#fff">РобоЛаб</text>
-<text x="64" y="434" font-size="13" fill="#FDBA74">Шестерёнки, рычаги, моторы — собери машину сам</text>
-<rect x="614" y="30" width="156" height="34" rx="17" fill="#111118"/>
-<text x="692" y="52" text-anchor="middle" font-size="14" font-weight="800" fill="#fff">в разработке</text>
 </svg>

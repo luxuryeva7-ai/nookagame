@@ -667,7 +667,7 @@ PLANETS.forEach(function(p){
   card.innerHTML =
     '<div class="p-media">' +
       '<img src="'+p.img+(p.active?V:'')+'" alt="'+p.name+'" loading="lazy">' +
-      (p.active ? '' : '<div class="p-dim"><span>В разработке</span></div>') +
+      (p.active ? '' : '<div class="p-dim"></div>') +
       '<span class="p-chip '+(p.active?'open':'soon')+'">'+status+'</span>' +
       '<span class="nk-coin '+p.coin+' p-coin"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-'+p.icon+'"></use></svg></span>' +
     '</div>' +
