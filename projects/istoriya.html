@@ -470,10 +470,13 @@ function svgBG(place,time,seed,living,mood){
   if(K==='forest'){
     if(T.star){o+=`<circle cx="238" cy="42" r="21" fill="#FFF3C4"/>`;faces.push([238,42,1]);}
     else {o+=`<circle cx="242" cy="38" r="18" fill="#FFEFA8" opacity=".85"/>`;}
-    for(let i=0;i<7;i++){const x=rint(r,-10,300),h=rint(r,70,130);
-      o+=`<path d="M${x} 200 v-${h} q0 -12 8 -12 q8 0 8 12 v${h}z" fill="#3E5A3A" opacity="${(.5+i*.06).toFixed(2)}"/>`;
-      o+=`<path d="M${x-22} ${200-h} q22 -40 44 0z" fill="#4A6B42" opacity="${(.55+i*.06).toFixed(2)}"/>`;
-      if(i===2)faces.push([x+8,200-h+34,.85]);}
+    /* ели: узкий ствол + три яруса лап, сужающихся кверху */
+    for(let i=0;i<8;i++){const x=rint(r,-6,300),h=rint(r,76,138),w=rint(r,20,30);
+      const op=(.52+i*.055).toFixed(2), top=200-h;
+      o+=`<rect x="${x-3.5}" y="${top+14}" width="7" height="${h-14}" fill="#4A3826" opacity="${op}"/>`;
+      for(let t=0;t<3;t++){const ty=top+t*(h*.27), tw=w*(1-t*0.22);
+        o+=`<path d="M${x} ${ty} l${tw} ${h*.34} h-${tw*2}z" fill="${t%2?'#3E5A3A':'#4A6B42'}" opacity="${op}"/>`;}
+      if(i===2)faces.push([x,top+h*.42,.8]);}
     o+=`<rect y="168" width="300" height="32" fill="#5A4A34"/>`;
     o+=`<ellipse cx="52" cy="176" rx="26" ry="11" fill="#6B6459"/>`;faces.push([52,174,.8]);
   }
@@ -575,6 +578,8 @@ function polish(s){
 }
 /* родовые окончания глаголов */
 function vb(sex,stem){return stem+(sex==='f'?'а':'')}
+/* возвратные: взялся / взялась — «ся» и «а» не складываются, а замещаются */
+function rf(sex,stem){return stem+(sex==='f'?'ась':'ся')}
 
 function makeStory(st){
   const r=rng(st.seed*97+st.textSeed*13);
@@ -584,13 +589,14 @@ function makeStory(st){
   const he=sx==='f'?'она':'он';
   const moodW=sx==='f'?M.f:M.n;
   const V=(stem)=>vb(sx,stem);
+  const R=(stem)=>rf(sx,stem);
 
   // Бит 1 — обычный день
   const b1=[
     `${nm} жил${V('')} ${P.p}. ${cap(T.n)} здесь было тихо, и ${he===  'она'?'её':'его'} это устраивало.`,
     `${cap(P.p)} никто не удивлялся ${H.g}. ${nm} был${V('')} тут своим.`,
     `Каждое утро ${nm} делал${V('')} одно и то же. В это утро — не стал${V('')}.`,
-    `Никто ${P.p} не знал, откуда взял${V('ся')} ${H.n} по имени ${nm}.`,
+    `Никто ${P.p} не знал, откуда ${R('взял')} ${H.n} по имени ${nm}.`,
     `${cap(P.n)} умел${P.n.endsWith('а')?'а':''} молчать. ${nm} умел${V('')} слушать. Они ладили.`,
   ];
   // Бит 2 — находка
@@ -619,18 +625,18 @@ function makeStory(st){
     brave:[`${nm} не стал${V('')} ждать. Пошёл${sx==='f'?'ла':''} прямо, как есть.`],
     give:[`${nm} отдал${V('')} ${PR.a}. И стало легче — всем.`],
     fix:[`${nm} сел${V('')} и починил${V('')} то, что сломалось. Медленно, но до конца.`],
-    talk:[`${nm} не стал${V('')} драться. Договорил${V('ся')} — оказалось, можно.`],
+    talk:[`${nm} не стал${V('')} драться. ${cap(R('Договорил'))} — оказалось, можно.`],
   };
   const b4=b4map[B?B.id:'trick'];
   // Бит 5 — финал (по развилке C) + ОБЯЗАТЕЛЬНЫЙ callback предмета
   const C=st.fC;
   const b5map={
-    home:[`${nm} вернул${V('ся')} домой другим. ${cap(PR.n)} остал${PR.sex==='f'?'ась':PR.sex==='n'?'ось':'ся'} с ${he==='она'?'ней':'ним'} — на память.`],
-    stay:[`${nm} остал${V('ся')} там навсегда. А ${PR.n} так и лежит рядом.`],
+    home:[`${nm} ${R('вернул')} домой друг${sx==='f'?'ой':'им'}. ${cap(PR.n)} остал${PR.sex==='f'?'ась':PR.sex==='n'?'ось':PR.sex==='p'?'ись':'ся'} с ${he==='она'?'ней':'ним'} — на память.`],
+    stay:[`${nm} ${R('остал')} там навсегда. А ${PR.n} так и лежит рядом.`],
     friend:[`Теперь ${nm} не один${sx==='f'?'а':''}. И ${PR.n} — общ${PR.sex==='f'?'ая':'ий'}.`],
     road:[`Дорога открыта для всех. А ${PR.n} держит её открытой.`],
     secret:[`${nm} никому не рассказал${V('')}. Только ${PR.n} знает, как было на самом деле.`],
-    again:[`С тех пор всё началось заново. И снова с ${PR.g}.`],
+    again:[`С тех пор всё началось заново. И снова с ${PR.i}.`],
   };
   const b5=b5map[C?C.id:'home'];
 
@@ -908,7 +914,7 @@ function saveName(){const v=$('fn').value.trim();S.name=v||(S.hero.sex==='f'?'Л
 function titleSuggest(){
   const P=S.place,PR=S.prop,T=S.time,n=S.name;
   return [`${cap(T.n)} ${P.p}`,`${cap(PR.n)} и то, чего не было`,`${n} и ${PR.n}`,
-    `Что нашли ${T.n}`,`История про ${PR.g}`,`${n} уходит`].slice(0,6);
+    `Что нашли ${T.n}`,`История про ${PR.a}`,`${n} уходит`].slice(0,6);
 }
 function sugFallback(){return titleSuggest()[0]}
 function setTitle(el){$('ft').value=el.textContent.trim()}
