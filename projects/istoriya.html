@@ -723,7 +723,10 @@ const GEN_STAGES=[
   {n:'Собираю слой за слоем',k:'build'},
 ];
 function slotsCount(){let c=0;['hero','place','time','mood','prop','style','acc','angle'].forEach(k=>{if(S[k])c++});return c}
+let genBusy=false;
 function generate(after){
+  if(genBusy)return;              // защита от двойного тапа по «Собрать»
+  genBusy=true;
   const slots=slotsCount();
   const per=Math.min(380+80*slots,1130);
   const toks=[];
@@ -744,7 +747,7 @@ function generate(after){
   let i=0;
   const run=()=>{
     if(i>0)$('gst'+(i-1)).className='gst done';
-    if(i>=GEN_STAGES.length){setTimeout(()=>{g.remove();after&&after()},180);return}
+    if(i>=GEN_STAGES.length){setTimeout(()=>{g.remove();genBusy=false;after&&after()},180);return}
     $('gst'+i).className='gst on';
     if(i===0){$('gtok').innerHTML='';toks.forEach((t,j)=>setTimeout(()=>{const e=document.createElement('span');e.className='tok';e.textContent=t;$('gtok')&&$('gtok').appendChild(e)},j*70))}
     if(i===1){$('gtok').style.display='none';$('gpool').style.display='grid';
