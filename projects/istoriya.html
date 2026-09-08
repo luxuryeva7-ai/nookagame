@@ -812,12 +812,11 @@ function render(){
   }
 
   if(st==='meet'){
-    steps.textContent='';
-    body.innerHTML=sceneBox(seedRow())
+    B().innerHTML=sceneBox(seedRow())
       +say('Вот он.\nСобрал из деталей, которые у меня уже есть.\nЖми «Ещё вариант» сколько хочешь — запрос тот же, зерно другое.')
       +`<input class="field" id="fn" maxlength="16" placeholder="Как его зовут?" value="${S.name}" autocomplete="off">
         <button class="txtbtn" onclick="suggestName()">Не придумывается</button>`;
-    foot.innerHTML=`<button class="btn" onclick="saveNameGo()">Дальше →</button>`;
+    F().innerHTML=`<button class="btn" onclick="saveNameGo()">Дальше →</button>`;
     return;
   }
 
