@@ -137,16 +137,16 @@ canvas{border-radius:18px;box-shadow:var(--sh);touch-action:none;display:block;b
 @keyframes spin{to{transform:rotate(360deg)}}
 .dock{position:sticky;bottom:0;z-index:26;background:var(--bg);padding:8px 0 calc(8px + env(safe-area-inset-bottom));
  border-top:1px solid var(--line)}
-.dock-r{display:flex;gap:7px;overflow-x:auto;padding:0 12px 2px;scrollbar-width:none}
-.dock-r::-webkit-scrollbar{display:none}
-.dk{flex:none;min-width:74px;background:var(--card);border:none;border-radius:14px;box-shadow:var(--sh);
- padding:8px 6px;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:3px}
+.dock-r{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;padding:0 12px 2px}
+.dk{background:var(--card);border:none;border-radius:13px;box-shadow:var(--sh);
+ padding:7px 3px;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
 .dk:active{transform:scale(.94)}
 .dk.on{box-shadow:inset 0 0 0 2px var(--acc);background:var(--accbg)}
 .dk-ic{font-size:20px;line-height:1}
 .dk-l{font-size:9.5px;font-weight:900;letter-spacing:.03em;color:var(--ink3);text-transform:uppercase}
-.dk-v{font-size:10.5px;font-weight:800;color:var(--ink);line-height:1.15;max-width:66px;
+.dk-v{font-size:10px;font-weight:800;color:var(--ink);line-height:1.15;max-width:100%;
  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dk-l{font-size:9px}
 .dock-play{display:flex;gap:8px;padding:8px 12px 0}
 .dock-play .btn{min-height:46px;font-size:14.5px;border-radius:23px}
 .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:#fff;
@@ -1083,7 +1083,15 @@ function dockHTML(){
     <div class="dock"><div class="dock-r">${items.map(d=>
       `<button class="dk" onclick="dockTap('${d.k}')">
         <span class="dk-ic">${d.ic}</span><span class="dk-l">${d.l}</span>
-        <span class="dk-v">${d.get()||'—'}</span></button>`).join('')}</div></div>`;
+        <span class="dk-v">${short(d.get())}</span></button>`).join('')}</div></div>`;
+}
+function short(v){
+  if(!v)return '—';
+  const map={'Собрать всё':'собрать','Найти выход':'выход','Продержаться':'выжить',
+    'Набрать очки':'очки','Догнать':'догнать','Донести':'донести'};
+  if(map[v])return map[v];
+  const first=String(v).split(/[ ,-]/)[0];
+  return first.length>9?first.slice(0,8)+'…':first;
 }
 function dockTap(k){
   if(k==='tempo'){const o=['calm','normal','fast'];S.tempo=o[(o.indexOf(S.tempo)+1)%3];render();toast('Темп: '+TEMPO[S.tempo].t);return}
