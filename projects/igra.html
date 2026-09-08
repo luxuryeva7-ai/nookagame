@@ -437,8 +437,9 @@ function startGame(cfg){
   addEventListener('keydown',G.kd);addEventListener('keyup',G.ku);
 
   G.onEnd=cfg.onEnd;
-  G.raf=requestAnimationFrame(loop);
+  draw();          // первый кадр сразу — поле видно, не дожидаясь rAF
   updHUD();
+  G.raf=requestAnimationFrame(loop);
 }
 function emptyGrid(){const g=[];for(let y=0;y<N;y++){g.push([]);for(let x=0;x<N;x++)g[y].push(y===0||x===0||y===N-1||x===N-1?1:0)}return g}
 function stopGame(){
@@ -729,6 +730,10 @@ const STAGES=['Читаю твой бриф','Отбираю детали','Со
 let genBusy=false;
 function assemble(after){
   if(genBusy)return;genBusy=true;
+  // страховка: если браузер притормозил таймеры (вкладка в фоне),
+  // флаг не должен залипнуть навсегда — иначе кнопка «Собрать» умрёт
+  clearTimeout(window.__genGuard);
+  window.__genGuard=setTimeout(()=>{genBusy=false},6000);
   const g=document.createElement('div');g.className='gen';
   g.innerHTML=`<div style="width:100%;max-width:300px">${STAGES.map((s,i)=>
     `<div class="gst" id="gs${i}"><div class="gst-b">${i+1}</div>${s}</div>`).join('')}</div>`;
@@ -736,7 +741,7 @@ function assemble(after){
   let i=0;
   const run=()=>{
     if(i>0)$('gs'+(i-1)).className='gst done';
-    if(i>=STAGES.length){setTimeout(()=>{g.remove();genBusy=false;after&&after()},170);return}
+    if(i>=STAGES.length){setTimeout(()=>{g.remove();genBusy=false;clearTimeout(window.__genGuard);after&&after()},170);return}
     $('gs'+i).className='gst on';i++;setTimeout(run,620);
   };
   setTimeout(run,100);
