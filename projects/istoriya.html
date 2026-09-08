@@ -31,17 +31,20 @@ body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);-w
 .foot{flex:none;position:sticky;bottom:0;z-index:25;padding:10px 12px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(255,248,238,0),var(--bg) 38%)}
 
 /* ── сцена ── */
-.scene{width:100%;aspect-ratio:3/2;border-radius:20px;overflow:hidden;background:#F3EADC;box-shadow:var(--sh);position:relative;margin-top:6px}
+/* кадр как вклеенная иллюстрация: паспарту, тень внутрь, широкое нижнее поле */
+.plate{margin-top:8px;background:var(--card);border-radius:20px;box-shadow:0 1px 2px rgba(120,72,28,.10),0 10px 26px -10px rgba(120,72,28,.20);padding:10px 10px 0}
+.scene{width:100%;aspect-ratio:3/2;border-radius:12px;overflow:hidden;background:#F3EADC;position:relative}
+.scene::after{content:'';position:absolute;inset:0;border-radius:12px;pointer-events:none;box-shadow:inset 0 0 0 1px rgba(120,72,28,.12),inset 0 2px 10px rgba(120,72,28,.10)}
 .scene svg{width:100%;height:100%;display:block}
 .scene.empty{background:repeating-linear-gradient(45deg,#F6EEE2,#F6EEE2 8px,#F1E6D6 8px,#F1E6D6 16px)}
-.seedrow{display:flex;align-items:center;justify-content:space-between;padding:8px 4px 0;font-size:12px;font-weight:700;color:var(--ink3)}
+.seedrow{display:flex;align-items:center;justify-content:space-between;padding:9px 4px 11px;font-size:12px;font-weight:700;color:var(--ink3)}
 .reroll{border:none;background:none;color:var(--acc);font-family:inherit;font-weight:800;font-size:13px;cursor:pointer;padding:5px 8px;display:flex;align-items:center;gap:5px}
 .reroll:active{opacity:.55}
 .reroll-note{font-size:10.5px;color:var(--ink3);text-align:right;padding:1px 8px 0;font-weight:600}
 
 /* ── Нейро ── */
 .say{display:flex;gap:9px;align-items:flex-start;margin-top:12px;animation:up .32s ease both}
-.say-av{flex:none;width:42px;height:42px;border-radius:50%;background:var(--accbg);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:inset 0 0 0 1.5px var(--line)}
+.say-av{flex:none;width:50px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:2px}
 .say-b{flex:1;background:var(--card);border-radius:16px;border-top-left-radius:5px;padding:11px 14px;box-shadow:var(--sh);font-weight:600;font-size:15px;line-height:1.45;color:var(--ink2);white-space:pre-line}
 .say-b b{color:var(--acc);font-weight:800}
 
@@ -668,9 +671,41 @@ const B=()=>$('body'), F=()=>$('foot');
 const STEPS=['intro','s1','meet','s2','s3','joke','s4','cmp','name','fA','fB','fC','build','title','line','author','art','reveal','end'];
 function pct(){const i=STEPS.indexOf(S.step);return Math.max(0,Math.round(i/(STEPS.length-1)*100))}
 
-function say(t){return `<div class="say"><div class="say-av">🤖</div><div class="say-b">${t}</div></div>`}
-function sceneBox(extra){return `<div class="scene${S.hero?'':' empty'}" id="sc">${S.hero?scene(S):''}</div>${extra||''}`}
-function seedRow(){return `<div class="seedrow"><span>Зерно #${S.seed}</span><button class="reroll" onclick="reroll()">↻ Ещё вариант</button></div><div class="reroll-note">тот же запрос, другое зерно — как у настоящей нейросети</div>`}
+/* Нейро — собственный персонаж, а не эмодзи из системного шрифта.
+   mood: idle | think | happy | oops. open=1 — макушка откинута, «принимает» слово. */
+function svgNeuro(size,mood,open){
+  const s=size||56, m=mood||'idle';
+  const eye={idle:'#4FD1C5',think:'#FFC94D',happy:'#7BE495',oops:'#FF9A76'}[m]||'#4FD1C5';
+  const tilt={idle:0,think:-6,happy:3,oops:-3}[m]||0;
+  const lidY={idle:0,think:2.4,happy:1.6,oops:0}[m]||0;
+  return `<svg viewBox="0 0 64 64" width="${s}" height="${s}" style="display:block;overflow:visible">
+   <ellipse cx="32" cy="59" rx="15" ry="3" fill="rgba(120,72,28,.16)"/>
+   <g transform="rotate(${tilt} 32 34)">
+     <line x1="32" y1="12" x2="32" y2="19" stroke="#C9B49B" stroke-width="2.4" stroke-linecap="round"/>
+     <circle cx="32" cy="9.5" r="3.4" fill="${eye}"/>
+     <circle cx="32" cy="9.5" r="6.5" fill="${eye}" opacity=".22"/>
+     ${open?`<path d="M14 30 q18 -20 36 0 z" fill="#E4DCCF" transform="rotate(-26 14 30)"/>`
+           :`<path d="M14 30 q18 -20 36 0 z" fill="#E4DCCF"/>`}
+     <rect x="13" y="28" width="38" height="30" rx="13" fill="#F2ECE1"/>
+     <rect x="13" y="28" width="38" height="30" rx="13" fill="none" stroke="#D8CDBB" stroke-width="1.4"/>
+     <rect x="18" y="34" width="28" height="15" rx="7.5" fill="#2B2118"/>
+     <ellipse cx="25.5" cy="${41.5+lidY}" rx="3.4" ry="${3.4-lidY*0.7}" fill="${eye}"/>
+     <ellipse cx="38.5" cy="${41.5+lidY}" rx="3.4" ry="${3.4-lidY*0.7}" fill="${eye}"/>
+     <circle cx="24.3" cy="${40.3+lidY}" r="1.05" fill="#fff" opacity=".9"/>
+     <circle cx="37.3" cy="${40.3+lidY}" r="1.05" fill="#fff" opacity=".9"/>
+     ${m==='happy'?'<path d="M27 53 q5 4 10 0" stroke="#C9B49B" stroke-width="1.8" fill="none" stroke-linecap="round"/>':''}
+     ${m==='oops'?'<path d="M28 54 q4 -3 8 0" stroke="#C9B49B" stroke-width="1.8" fill="none" stroke-linecap="round"/>':''}
+     <rect x="8" y="38" width="5" height="12" rx="2.5" fill="#DCD2C2"/>
+     <rect x="51" y="38" width="5" height="12" rx="2.5" fill="#DCD2C2"/>
+   </g></svg>`;
+}
+function say(t,mood,open){
+  return `<div class="say"><div class="say-av">${svgNeuro(50,mood,open)}</div><div class="say-b">${t}</div></div>`;
+}
+function sceneBox(extra){
+  return `<div class="plate"><div class="scene${S.hero?'':' empty'}" id="sc" onclick="pokeScene(event)">${S.hero?scene(S):''}</div>${extra||'<div style="height:10px"></div>'}</div>`;
+}
+function seedRow(){return `<div class="seedrow"><span>Кадр #${S.seed}</span><button class="reroll" onclick="reroll()">↻ Ещё вариант</button></div>`}
 
 /* конструктор промпта */
 function promptCard(level){
@@ -773,6 +808,39 @@ function generate(after){
   };
   setTimeout(run,110);
 }
+/* тап по кадру: попал в героя — своя реакция, попал в мир — вздрагивает */
+const POKE={brave:['Ха!','Не боюсь.','Ну давай.'],scared:['Ой!','Ты кто?','А?!'],
+  sly:['Хе-хе.','Смотри-смотри.','Ага.'],sleepy:['Мм?','Ещё пять минуточек…','Зевс…'],
+  amazed:['Ух ты!','Что это?','Вот это да!'],sad:['Не сейчас…','Эх.','Ну ладно.']};
+let pokeCount=0;
+function pokeScene(ev){
+  const sc=$('sc'); if(!sc||!S.hero)return;
+  const r=sc.getBoundingClientRect();
+  const x=(ev.clientX-r.left)/r.width, y=(ev.clientY-r.top)/r.height;
+  const onHero=x>0.28&&x<0.72&&y>0.18&&y<0.95;
+  pokeCount++;
+  if(onHero){
+    const list=POKE[S.mood?S.mood.id:'brave']||POKE.brave;
+    bubble(sc,list[pokeCount%list.length],ev.clientX-r.left,ev.clientY-r.top);
+    sc.animate([{transform:'scale(1)'},{transform:'scale(1.014)'},{transform:'scale(1)'}],{duration:220,easing:'ease-out'});
+  }else{
+    sc.animate([{transform:'translateX(0)'},{transform:'translateX(-2.5px)'},
+                {transform:'translateX(2.5px)'},{transform:'translateX(0)'}],{duration:240});
+  }
+}
+function bubble(host,text,x,y){
+  const b=document.createElement('div');
+  b.textContent=text;
+  b.style.cssText='position:absolute;left:'+x+'px;top:'+y+'px;transform:translate(-50%,-130%);'
+   +'background:#fff;color:#2B2118;font-weight:800;font-size:13px;padding:6px 11px;border-radius:13px;'
+   +'box-shadow:0 3px 10px rgba(90,50,10,.22);pointer-events:none;white-space:nowrap;z-index:5';
+  host.appendChild(b);
+  b.animate([{opacity:0,transform:'translate(-50%,-100%) scale(.8)'},
+             {opacity:1,transform:'translate(-50%,-140%) scale(1)'},
+             {opacity:1,transform:'translate(-50%,-145%) scale(1)'},
+             {opacity:0,transform:'translate(-50%,-175%) scale(.95)'}],
+            {duration:1500,easing:'ease-out'}).onfinish=()=>b.remove();
+}
 function reroll(){S.seed=1000+Math.floor(Math.random()*9000);
   const el=$('sc');if(el){el.innerHTML='';setTimeout(()=>{el.innerHTML=scene(S)},60)}
   const sr=document.querySelector('.seedrow span');if(sr)sr.textContent='Зерно #'+S.seed;}
@@ -807,7 +875,9 @@ function render(){
       4:'Последнее про картинку. Дай ему в лапы одну вещь — с неё начнётся вся история. И скажи, как рисовать.'}[lv];
     B().innerHTML=sceneBox(S.hero?seedRow():'')+say(SAY)+promptCard(lv)
       +(lv===3&&!S.master?`<button class="harder" onclick="S.master=true;render()">Хочу сложнее →</button>`:'');
-    F().innerHTML=`<button class="btn" ${ready(lv)?'':'disabled'} onclick="onGen(${lv})">Собрать</button>`;
+    F().innerHTML=`<div class="btnrow">
+      <button class="btn btn2 btn-sm" style="flex:0 0 44%" onclick="surprise(${lv})">🎲 Удиви меня</button>
+      <button class="btn btn-sm" ${ready(lv)?'':'disabled'} onclick="onGen(${lv})">Собрать</button></div>`;
     return;
   }
 
@@ -926,6 +996,17 @@ function promptText(){
   if(S.prop)p+=', с '+S.prop.i;
   if(S.style)p+=', '+S.style.n;
   return p;
+}
+/* заполняет пустые слоты вслепую — единственный настоящий сюрприз в Мастерской */
+function surprise(lv){
+  const r=rng(Date.now()&0xffff);
+  if(!S.hero)S.hero=pick(r,HEROES);
+  if(lv>=2&&!S.place)S.place=pick(r,PLACES);
+  if(lv>=3){if(!S.time)S.time=pick(r,TIMES); if(!S.mood)S.mood=pick(r,MOODS);}
+  if(lv>=4){if(!S.prop)S.prop=pick(r,PROPS); if(!S.style)S.style=pick(r,STYLES);}
+  if(lv>=4&&S.master){if(!S.acc)S.acc=pick(r,ACCS); if(!S.angle)S.angle=pick(r,ANGLES);}
+  render();
+  const c=$('foot');if(c){const b=c.querySelectorAll('.btn')[1];if(b&&!b.disabled)b.focus()}
 }
 function onGen(lv){
   // каждое «Собрать» — новая сборка: свежий сид, иначе кадр не меняется
