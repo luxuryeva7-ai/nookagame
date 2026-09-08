@@ -703,9 +703,13 @@ function openSheet(k){
     ${o.rare?'<span class="opt-tag">редкий</span>':''}
     ${cur&&cur.id===o.v.id?'<span class="opt-ck">✓</span>':''}
   </button>`).join('');
-  $('ovl').classList.add('on');$('sheet').classList.add('on');
+  $('ovl').classList.add('on');
+  const sh=$('sheet'); sh.classList.add('on');
+  sh.style.transform='none'; sh.style.pointerEvents='auto';
 }
-function closeSheet(){$('ovl').classList.remove('on');$('sheet').classList.remove('on')}
+function closeSheet(){$('ovl').classList.remove('on');
+  const sh=$('sheet'); sh.classList.remove('on');
+  sh.style.transform='translateY(101%)'; sh.style.pointerEvents='none';}
 function pickOpt(i){
   const C=SHEETS[sheetKey];const o=C.list()[i];
   C.set(o.v);closeSheet();render();
