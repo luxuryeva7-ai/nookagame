@@ -199,6 +199,11 @@ function PvScene({ kept, fly }) {
   return E('svg', { viewBox: '0 0 ' + W + ' ' + H },
     E('rect', { x: 0, y: 0, width: W, height: H, fill: 'none' }),
 
+    /* Кто есть кто на картинке. Без подписей она ничего не рассказывала:
+       телефон, облако с обрывком «ЧУЖОЙ» и пустая папка сбоку. */
+    E('text', { x: 46, y: 132, textAnchor: 'middle', fill: '#8C7BB5',
+      style: { font: '900 9.5px Nunito,sans-serif', letterSpacing: '.08em' } }, 'ТЫ'),
+
     /* телефон в руках ребёнка */
     E('g', { transform: 'translate(46,86)' },
       E('rect', { x: -20, y: -34, width: 40, height: 66, rx: 8, fill: '#2A2145' }),
@@ -217,8 +222,10 @@ function PvScene({ kept, fly }) {
     E('g', { transform: 'translate(258,44)' },
       E('path', { d: 'M-44,10 a20,20 0 0 1 8,-38 a26,26 0 0 1 48,4 a18,18 0 0 1 2,34 z',
         fill: '#3A3060', stroke: 'rgba(255,255,255,.16)', strokeWidth: 1.6 }),
-      E('text', { x: 0, y: 4, textAnchor: 'middle', fill: '#C4B5FF',
-        style: { font: '900 9.5px Nunito,sans-serif', letterSpacing: '.06em' } }, 'ЧУЖОЙ')),
+      E('text', { x: 0, y: 1, textAnchor: 'middle', fill: '#C4B5FF',
+        style: { font: '900 8.5px Nunito,sans-serif' } }, 'ЧУЖОЙ'),
+      E('text', { x: 0, y: 11, textAnchor: 'middle', fill: '#C4B5FF',
+        style: { font: '900 8px Nunito,sans-serif' } }, 'КОМПЬЮТЕР')),
 
     /* папка: чем больше сказал, тем толще */
     E('g', { transform: 'translate(258,110)' },
@@ -230,11 +237,15 @@ function PvScene({ kept, fly }) {
           stroke: 'rgba(0,0,0,.15)', strokeWidth: .8 })),
       E('text', { x: 0, y: 32, textAnchor: 'middle', fill: '#A896C9',
         style: { font: '900 10px Nunito,sans-serif' } },
-        kept.length ? 'узнал: ' + kept.length : 'пока пусто')),
+        kept.length
+          ? 'знает о тебе: ' + kept.length
+          : 'пока не знает ничего')),
 
-    /* стрелка от телефона к серверу */
-    E('path', { d: 'M76,70 q80,-16 150,-24', fill: 'none', stroke: 'rgba(169,139,255,.35)',
-      strokeWidth: 1.6, strokeDasharray: '5 6' }));
+    /* стрелка от телефона к серверу: с наконечником, иначе непонятно,
+       что слова уходят туда, а не оттуда */
+    E('path', { d: 'M76,70 q80,-16 144,-24', fill: 'none', stroke: 'rgba(169,139,255,.45)',
+      strokeWidth: 1.8, strokeDasharray: '5 6' }),
+    E('path', { d: 'M212,44 l10,2 -9,5z', fill: 'rgba(169,139,255,.75)' }));
 }
 
 /* карточка в коллекцию */
