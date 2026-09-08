@@ -811,6 +811,16 @@ function render(){
     return;
   }
 
+  if(st==='meet'){
+    steps.textContent='';
+    body.innerHTML=sceneBox(seedRow())
+      +say('Вот он.\nСобрал из деталей, которые у меня уже есть.\nЖми «Ещё вариант» сколько хочешь — запрос тот же, зерно другое.')
+      +`<input class="field" id="fn" maxlength="16" placeholder="Как его зовут?" value="${S.name}" autocomplete="off">
+        <button class="txtbtn" onclick="suggestName()">Не придумывается</button>`;
+    foot.innerHTML=`<button class="btn-pri" onclick="saveNameGo()">Дальше →</button>`;
+    return;
+  }
+
   if(st==='joke'){
     B().innerHTML=sceneBox()+say(`Ой.\nТы сказал «${S.hero.sex==='f'?S.mood.f:S.mood.n}». А про кого — не сказал.\nЯ и сделал таким всё, что было в кадре. Даже луну.\n\nТак и оставить?`);
     F().innerHTML=`<div class="btnrow"><button class="btn btn2 btn-sm" onclick="S.living=false;go('s4')">Только герой</button><button class="btn btn-sm" onclick="S.living=true;go('s4')">Оставь, так смешнее</button></div>`;
@@ -823,7 +833,7 @@ function render(){
       <div class="cmp-ar">↓</div>
       <div class="cmp-i"><div class="scene">${scene(S)}</div><div class="cmp-cap"><b>Ты сказал</b>«${promptText()}»</div></div>
     </div>`+say('Я за эти четыре шага умнее не стал. Точнее стал ты.\nКакая ближе к тому, что было у тебя в голове?');
-    F().innerHTML=`<div class="btnrow"><button class="btn btn2 btn-sm" onclick="S.cmpPick=1;go('name')">Первая</button><button class="btn btn2 btn-sm" onclick="S.cmpPick=2;go('name')">Вторая</button></div>`;
+    F().innerHTML=`<div class="btnrow"><button class="btn btn2 btn-sm" onclick="S.cmpPick=1;go('fA')">Первая</button><button class="btn btn2 btn-sm" onclick="S.cmpPick=2;go('fA')">Вторая</button></div>`;
     return;
   }
 
@@ -943,6 +953,8 @@ function suggestName(){
   const l=S.hero.sex==='f'?f:m;
   const r=rng(S.seed+7);$('fn').value=pick(r,l);
 }
+function saveNameGo(){const f=$('fn');const v=f?f.value.trim():'';
+  S.name=v||(S.hero.sex==='f'?'Ласка':'Рыж');go('s2')}
 function saveName(){const v=$('fn').value.trim();S.name=v||(S.hero.sex==='f'?'Ласка':'Рыж');go('fA')}
 function titleSuggest(){
   const P=S.place,PR=S.prop,T=S.time,n=S.name;
@@ -1043,6 +1055,30 @@ $('back').onclick=()=>{
   S.step=STEPS[Math.max(0,i-1)];render();
 };
 
+/* чужая книжка, открытая по ссылке */
+function openShared(){
+  try{
+    const q=new URLSearchParams(location.search);
+    const a=q.get('a'); if(!a)return false;
+    const P=a.split('.'); if(P.length<10)return false;
+    const f=(arr,id)=>arr.find(x=>x.id===id);
+    const h=f(HEROES,P[0]),pl=f(PLACES,P[1]),t=f(TIMES,P[2]),m=f(MOODS,P[3]),
+          pr=f(PROPS,P[4]),stl=f(STYLES,P[5]),a1=f(FORK_A,P[6]),b1=f(FORK_B,P[7]),c1=f(FORK_C,P[8]);
+    if(!h||!pl||!t||!m||!pr||!stl||!a1||!b1||!c1)return false;
+    S.hero=h;S.place=pl;S.time=t;S.mood=m;S.prop=pr;S.style=stl;
+    S.fA=a1;S.fB=b1;S.fC=c1;
+    S.seed=parseInt(P[9],10)||4821;
+    S.living=P[10]==='1';
+    S.name=q.get('n')||cap(h.n);
+    S.title=q.get('t')||'История';
+    S.author=q.get('by')||'';
+    S.shared=true;
+    S.pages=makeStory(S);
+    S.step='art';
+    return true;
+  }catch(e){return false}
+}
+openShared();
 render();
 </script>
 </body>
