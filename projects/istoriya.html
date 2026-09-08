@@ -817,7 +817,7 @@ function render(){
       +say('Вот он.\nСобрал из деталей, которые у меня уже есть.\nЖми «Ещё вариант» сколько хочешь — запрос тот же, зерно другое.')
       +`<input class="field" id="fn" maxlength="16" placeholder="Как его зовут?" value="${S.name}" autocomplete="off">
         <button class="txtbtn" onclick="suggestName()">Не придумывается</button>`;
-    foot.innerHTML=`<button class="btn-pri" onclick="saveNameGo()">Дальше →</button>`;
+    foot.innerHTML=`<button class="btn" onclick="saveNameGo()">Дальше →</button>`;
     return;
   }
 
@@ -1005,7 +1005,7 @@ function renderArt(){
   pg.onscroll=()=>{const i=Math.round(pg.scrollLeft/pg.clientWidth);
     [...$('dots').children].forEach((d,j)=>d.classList.toggle('on',j===i))};
   F().innerHTML=S.shared
-    ? `<button class="btn-pri" onclick="location.href=location.pathname">Сделать свою историю</button>`
+    ? `<button class="btn" onclick="location.href=location.pathname">Сделать свою историю</button>`
     : `<div class="btnrow"><button class="btn btn2 btn-sm" onclick="share()">Показать</button><button class="btn btn-sm" onclick="go('reveal')">Дальше</button></div>`;
   $('htitle').textContent=S.shared?('Книжка · '+(S.author||'друг')):'Моя книжка';
 }
