@@ -1,0 +1,1008 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="theme-color" content="#FFF8EE">
+<title>Твоя история — Nooka</title>
+<link href="/fonts/nooka-fonts.css" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFF8EE; --card:#FFFFFF; --ink:#2B2118; --ink2:#5C4A38; --ink3:#8A7A68;
+  --acc:#E65C00; --accbg:#FFF1E4; --line:rgba(180,110,40,.16);
+  --sh:0 2px 14px rgba(170,100,40,.11);
+  color-scheme:light;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg)}
+body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);overflow:hidden;-webkit-font-smoothing:antialiased}
+.root{height:100dvh;max-width:480px;margin:0 auto;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);position:relative}
+
+/* ── шапка ── */
+.hdr{flex:none;height:52px;display:flex;align-items:center;gap:10px;padding:0 14px;background:var(--bg);z-index:20}
+.hdr-back{width:34px;height:34px;border:none;background:none;cursor:pointer;font-size:20px;color:var(--acc);display:flex;align-items:center;justify-content:center;flex:none}
+.hdr-t{flex:1;font-weight:800;font-size:14px;color:var(--ink2);text-align:center}
+.hdr-r{width:34px;flex:none;text-align:right;font-size:12px;font-weight:800;color:var(--ink3)}
+.prog{flex:none;height:4px;background:rgba(180,110,40,.1)}
+.prog i{display:block;height:4px;background:var(--acc);border-radius:0 2px 2px 0;transition:width .45s cubic-bezier(.4,0,.2,1)}
+
+/* ── тело ── */
+.body{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:0 12px 8px}
+.foot{flex:none;padding:8px 12px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(255,248,238,0),var(--bg) 45%)}
+
+/* ── сцена ── */
+.scene{width:100%;aspect-ratio:4/3;border-radius:20px;overflow:hidden;background:#F3EADC;box-shadow:var(--sh);position:relative;margin-top:6px}
+.scene svg{width:100%;height:100%;display:block}
+.scene.empty{background:repeating-linear-gradient(45deg,#F6EEE2,#F6EEE2 8px,#F1E6D6 8px,#F1E6D6 16px)}
+.seedrow{display:flex;align-items:center;justify-content:space-between;padding:8px 4px 0;font-size:12px;font-weight:700;color:var(--ink3)}
+.reroll{border:none;background:none;color:var(--acc);font-family:inherit;font-weight:800;font-size:13px;cursor:pointer;padding:5px 8px;display:flex;align-items:center;gap:5px}
+.reroll:active{opacity:.55}
+.reroll-note{font-size:10.5px;color:var(--ink3);text-align:right;padding:1px 8px 0;font-weight:600}
+
+/* ── Нейро ── */
+.say{display:flex;gap:9px;align-items:flex-start;margin-top:12px;animation:up .32s ease both}
+.say-av{flex:none;width:42px;height:42px;border-radius:50%;background:var(--accbg);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:inset 0 0 0 1.5px var(--line)}
+.say-b{flex:1;background:var(--card);border-radius:16px;border-top-left-radius:5px;padding:11px 14px;box-shadow:var(--sh);font-weight:600;font-size:15px;line-height:1.45;color:var(--ink2);white-space:pre-line}
+.say-b b{color:var(--acc);font-weight:800}
+
+/* ── карточка промпта ── */
+.pcard{margin-top:12px;background:var(--card);border-radius:16px;box-shadow:var(--sh);padding:13px 14px;font-family:'Nunito',sans-serif;font-weight:600;font-size:16.5px;line-height:2.05;color:var(--ink)}
+.slot{display:inline-flex;align-items:center;gap:4px;background:var(--accbg);border:1.5px solid var(--acc);border-radius:999px;padding:4px 11px;min-height:38px;font-weight:800;font-size:15px;color:var(--acc);cursor:pointer;vertical-align:middle;font-family:inherit}
+.slot.todo{border-style:dashed;color:#B8895F;background:#FFF8F0}
+.slot.pulse{animation:pulse 1.1s ease 2}
+.slot:active{transform:scale(.96)}
+.slot em{font-style:normal;font-size:10px;opacity:.75;margin-left:1px}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(230,92,0,0)}50%{box-shadow:0 0 0 7px rgba(230,92,0,.16)}}
+.harder{display:block;width:100%;text-align:center;border:none;background:none;color:var(--ink3);font-family:inherit;font-weight:800;font-size:12.5px;padding:9px;cursor:pointer;margin-top:2px}
+
+/* ── кнопки ── */
+.btn{width:100%;min-height:54px;border:none;border-radius:27px;font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:16px;cursor:pointer;background:var(--acc);color:#fff;transition:opacity .15s,transform .1s;display:flex;align-items:center;justify-content:center;gap:7px}
+.btn:active{transform:scale(.975)}
+.btn[disabled]{opacity:.28;pointer-events:none}
+.btn2{background:var(--card);color:var(--acc);box-shadow:inset 0 0 0 2px var(--line)}
+.btn-sm{min-height:46px;font-size:14.5px;border-radius:23px}
+.btnrow{display:flex;gap:9px}
+.btnrow .btn{flex:1}
+.txtbtn{display:block;width:100%;text-align:center;border:none;background:none;color:var(--acc);font-family:inherit;font-weight:800;font-size:14px;padding:11px;cursor:pointer}
+
+/* ── bottom sheet ── */
+.ovl{position:absolute;inset:0;background:rgba(43,33,24,.42);opacity:0;pointer-events:none;transition:opacity .25s;z-index:40}
+.ovl.on{opacity:1;pointer-events:auto}
+.sheet{position:absolute;left:0;right:0;bottom:0;max-height:66%;background:var(--bg);border-radius:24px 24px 0 0;transform:translateY(101%);transition:transform .3s cubic-bezier(.3,.9,.4,1);z-index:41;display:flex;flex-direction:column}
+.sheet.on{transform:none}
+.sheet-h{flex:none;padding:9px 16px 11px;text-align:center;position:relative}
+.sheet-h::before{content:'';display:block;width:36px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 11px}
+.sheet-t{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:17px;color:var(--ink)}
+.sheet-x{position:absolute;right:12px;top:20px;width:32px;height:32px;border:none;background:none;font-size:19px;color:var(--ink3);cursor:pointer}
+.sheet-l{flex:1;overflow-y:auto;padding:0 12px calc(16px + env(safe-area-inset-bottom))}
+.opt{display:flex;align-items:center;gap:12px;width:100%;min-height:58px;padding:8px 12px;margin-bottom:7px;border:none;border-radius:15px;background:var(--card);box-shadow:var(--sh);font-family:inherit;font-weight:700;font-size:16px;color:var(--ink);cursor:pointer;text-align:left}
+.opt:active{transform:scale(.985)}
+.opt.on{box-shadow:inset 0 0 0 2px var(--acc);background:var(--accbg)}
+.opt.rare{box-shadow:inset 0 0 0 2px #D9A521;background:#FFFAEC}
+.opt-ic{flex:none;width:42px;height:42px;border-radius:11px;background:#F7EFE2;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.opt-ic svg{width:100%;height:100%}
+.opt-n{flex:1}
+.opt-tag{font-size:10px;font-weight:900;color:#B8860B;background:#FFF0C4;padding:3px 8px;border-radius:999px}
+.opt-ck{color:var(--acc);font-size:17px;font-weight:900}
+
+/* ── генерация ── */
+.gen{position:absolute;inset:0;background:rgba(255,248,238,.96);z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px;gap:16px}
+.gen-stage{width:100%;max-width:310px}
+.gst{display:flex;align-items:center;gap:11px;padding:9px 0;font-weight:700;font-size:14.5px;color:var(--ink3);opacity:.32;transition:opacity .3s,color .3s}
+.gst.on{opacity:1;color:var(--ink)}
+.gst.done{opacity:.68;color:var(--ink2)}
+.gst-b{flex:none;width:26px;height:26px;border-radius:50%;background:#F0E5D6;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:var(--ink3);transition:all .3s}
+.gst.on .gst-b{background:var(--accbg);color:var(--acc);animation:spin 1s linear infinite}
+.gst.done .gst-b{background:var(--acc);color:#fff;animation:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.gen-toks{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;min-height:32px;max-width:330px}
+.tok{background:var(--accbg);border:1px solid var(--line);border-radius:8px;padding:3px 9px;font-size:12.5px;font-weight:800;color:var(--acc);animation:tokup .5s ease both}
+@keyframes tokup{0%{opacity:0;transform:translateY(9px) scale(.85)}60%{opacity:1;transform:translateY(-4px) scale(1.04)}100%{opacity:1;transform:none}}
+.gen-pool{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;max-width:300px}
+.pdot{aspect-ratio:1;border-radius:4px;background:var(--acc);opacity:.75;transition:opacity .45s,background .45s}
+.pdot.off{opacity:.13;background:var(--ink3)}
+
+/* ── сравнение ── */
+.cmp{margin-top:10px}
+.cmp-i{margin-bottom:14px}
+.cmp-i .scene{margin-top:0;aspect-ratio:16/9}
+.cmp-cap{font-size:13.5px;font-weight:700;color:var(--ink2);padding:8px 4px 0;line-height:1.4}
+.cmp-cap b{color:var(--ink3);font-weight:800;font-size:11px;display:block;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.cmp-ar{text-align:center;font-size:20px;color:var(--acc);padding:2px}
+
+/* ── ввод ── */
+.field{width:100%;background:var(--card);border:2px solid var(--line);border-radius:16px;padding:15px 16px;font-family:'Nunito',sans-serif;font-weight:700;font-size:17px;color:var(--ink);margin-top:12px}
+.field:focus{outline:none;border-color:var(--acc)}
+.field::placeholder{color:#C4B4A2}
+.fcount{text-align:right;font-size:11.5px;font-weight:700;color:var(--ink3);padding:5px 6px 0}
+
+/* ── карточки развилок ── */
+.forks{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
+.fork{background:var(--card);border:none;border-radius:16px;box-shadow:var(--sh);padding:14px 11px;font-family:inherit;font-weight:700;font-size:13.5px;line-height:1.35;color:var(--ink);cursor:pointer;text-align:center;min-height:96px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px}
+.fork:active{transform:scale(.96)}
+.fork.on{box-shadow:inset 0 0 0 2px var(--acc);background:var(--accbg)}
+.fork-ic{font-size:26px;line-height:1}
+
+/* ── книжка ── */
+.bookwrap{margin-top:8px}
+.pages{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:10px;padding-bottom:6px;scrollbar-width:none}
+.pages::-webkit-scrollbar{display:none}
+.page{flex:none;width:100%;scroll-snap-align:center;background:var(--card);border-radius:20px;box-shadow:var(--sh);overflow:hidden}
+.page .scene{margin:0;border-radius:0;box-shadow:none}
+.page-txt{padding:14px 16px;font-size:16px;line-height:1.55;color:var(--ink2);font-weight:500;min-height:92px}
+.dots{display:flex;gap:6px;justify-content:center;padding:11px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--line);transition:all .25s}
+.dot.on{background:var(--acc);width:19px;border-radius:4px}
+
+/* обложка */
+.cover{background:linear-gradient(160deg,#FFF3E2,#FFE9D2);border-radius:20px;box-shadow:var(--sh);overflow:hidden}
+.cover .scene{margin:0;border-radius:0;box-shadow:none;aspect-ratio:1/1}
+.cover-b{padding:17px 18px 20px;text-align:center}
+.cover-t{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:23px;line-height:1.22;color:var(--ink);margin-bottom:9px;word-break:break-word}
+.cover-a{font-size:13px;font-weight:700;color:var(--ink3)}
+
+/* финальная страница */
+.lastp{background:var(--card);border-radius:20px;box-shadow:var(--sh);padding:22px 18px;text-align:center;min-height:280px;display:flex;flex-direction:column;justify-content:center;gap:14px}
+.uniq{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:17px;color:var(--acc);line-height:1.35}
+.uniq-f{font-size:11px;color:var(--ink3);font-weight:600;line-height:1.5}
+.forwho{font-size:16px;font-weight:800;color:var(--ink)}
+.honest{font-size:11px;color:var(--ink3);font-weight:600;line-height:1.5;border-top:1px solid var(--line);padding-top:13px}
+
+/* разворот «как придумал» */
+.howp{background:var(--card);border-radius:20px;box-shadow:var(--sh);padding:20px 17px}
+.howp-h{font-size:11px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);text-align:center;margin-bottom:15px}
+.pquote{background:var(--accbg);border-radius:13px;padding:12px 14px;font-size:14.5px;font-weight:700;color:var(--ink);line-height:1.45}
+.pquote small{display:block;font-size:10.5px;font-weight:900;color:var(--acc);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.pdown{text-align:center;font-size:22px;color:var(--acc);padding:9px}
+
+/* ── разбор на слои ── */
+.rev-l{display:flex;align-items:center;gap:11px;padding:9px 13px;background:var(--card);border-radius:13px;box-shadow:var(--sh);margin-bottom:7px;animation:up .35s ease both}
+.rev-l b{flex:1;font-size:14px;font-weight:800;color:var(--ink)}
+.rev-l span{font-size:12px;font-weight:700;color:var(--ink3)}
+.rev-n{flex:none;width:30px;height:30px;border-radius:9px;background:var(--accbg);color:var(--acc);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900}
+
+/* ── прочее ── */
+.center{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;padding:20px 8px}
+.h1{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:25px;line-height:1.2;color:var(--ink);margin-bottom:13px}
+.lead{font-size:16px;line-height:1.6;color:var(--ink2);font-weight:600;white-space:pre-line}
+.card{background:var(--card);border-radius:18px;box-shadow:var(--sh);padding:16px;margin-top:12px}
+.mini{font-size:12.5px;color:var(--ink3);font-weight:600;line-height:1.5}
+@keyframes up{from{opacity:0;transform:translateY(11px)}to{opacity:1;transform:none}}
+@keyframes fly{from{opacity:0;transform:translateX(-60px) rotate(-6deg)}to{opacity:1;transform:none}}
+.flyin{animation:fly .55s cubic-bezier(.2,.85,.3,1) both}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="hdr">
+    <button class="hdr-back" id="back">‹</button>
+    <div class="hdr-t" id="htitle">Твоя история</div>
+    <div class="hdr-r" id="hstep"></div>
+  </div>
+  <div class="prog"><i id="pbar" style="width:0"></i></div>
+  <div class="body" id="body"></div>
+  <div class="foot" id="foot"></div>
+  <div class="ovl" id="ovl"></div>
+  <div class="sheet" id="sheet">
+    <div class="sheet-h"><div class="sheet-t" id="sheetT"></div><button class="sheet-x" id="sheetX">✕</button></div>
+    <div class="sheet-l" id="sheetL"></div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════ ДАННЫЕ ═══════════════ */
+
+/* Падежи хранятся, а не вычисляются — алгоритмическая склонялка
+   обязательно выдаст «щенока». n=им. a=вин. g=род. d=дат. i=твор. */
+const HEROES=[
+ {id:'fox',  n:'лисёнок',    a:'лисёнка',    g:'лисёнка',    i:'лисёнком',    sex:'m', ears:'sharp', body:'slim',  tail:'bush', c:['#E8863C','#F5AE72','#C25E1E','#FFF0DC']},
+ {id:'hog',  n:'ёжик',       a:'ёжика',      g:'ёжика',      i:'ёжиком',      sex:'m', ears:'tiny',  body:'round', tail:'none', c:['#9C7A5C','#C0A184','#6E5340','#F2E4D2']},
+ {id:'cat',  n:'котёнок',    a:'котёнка',    g:'котёнка',    i:'котёнком',    sex:'m', ears:'tri',   body:'slim',  tail:'long', c:['#8A8A96','#B4B4C0','#5E5E68','#F0F0F5']},
+ {id:'wolf', n:'волчонок',   a:'волчонка',   g:'волчонка',   i:'волчонком',   sex:'m', ears:'sharp', body:'wide',  tail:'bush', c:['#7C8794','#A3ADBA','#535D6A','#E8EDF2']},
+ {id:'drag', n:'дракончик',  a:'дракончика', g:'дракончика', i:'дракончиком', sex:'m', ears:'horn',  body:'wide',  tail:'spike',c:['#4FA86E','#7BC994','#337A4E','#E0F5E7']},
+ {id:'bot',  n:'робот',      a:'робота',     g:'робота',     i:'роботом',     sex:'m', ears:'ant',   body:'box',   tail:'none', c:['#8C93A8','#B2B8C9','#636A80','#EDEFF5']},
+ {id:'mouse',n:'мышонок',    a:'мышонка',    g:'мышонка',    i:'мышонком',    sex:'m', ears:'big',   body:'small', tail:'thin', c:['#B0A3A8','#D0C5C9','#867A80','#F5EEF0']},
+ {id:'peng', n:'пингвинёнок',a:'пингвинёнка',g:'пингвинёнка',i:'пингвинёнком',sex:'m', ears:'none',  body:'egg',   tail:'none', c:['#3D4453','#5D6675','#252A36','#FFFFFF']},
+ {id:'turt', n:'черепаха',   a:'черепаху',   g:'черепахи',   i:'черепахой',   sex:'f', ears:'none',  body:'shell', tail:'stub', c:['#6FA05A','#95BE84','#4E7A3D','#F0E8C8']},
+ {id:'owl',  n:'сова',       a:'сову',       g:'совы',       i:'совой',       sex:'f', ears:'tuft',  body:'round', tail:'fan',  c:['#A6875F','#C7AC8A','#7C6244','#F5EBDA']},
+ {id:'panda',n:'панда',      a:'панду',      g:'панды',      i:'пандой',      sex:'f', ears:'rnd',   body:'wide',  tail:'stub', c:['#2E2E33','#FFFFFF','#1A1A1E','#FFFFFF']},
+ {id:'squir',n:'белка',      a:'белку',      g:'белки',      i:'белкой',      sex:'f', ears:'tuft',  body:'slim',  tail:'huge', c:['#C46B3A','#E09462','#964E26','#FBEADA']},
+];
+
+const PLACES=[
+ {id:'forest',n:'старый лес',           p:'в старом лесу',           g:'старого леса',      kind:'forest'},
+ {id:'libr',  n:'заброшенная библиотека',p:'в заброшенной библиотеке',g:'библиотеки',        kind:'libr'},
+ {id:'roofs', n:'крыши ночного города',  p:'на крышах города',        g:'города',            kind:'roofs'},
+ {id:'sea',   n:'дно моря',              p:'на дне моря',             g:'морского дна',      kind:'sea'},
+ {id:'space', n:'космическая станция',   p:'на космической станции',  g:'станции',           kind:'space'},
+ {id:'snow',  n:'снежная гора',          p:'на снежной горе',         g:'горы',              kind:'snow'},
+ {id:'ruins', n:'пустыня с руинами',     p:'в пустыне среди руин',    g:'руин',              kind:'ruins'},
+ {id:'metro', n:'подземный тоннель',     p:'в подземном тоннеле',     g:'тоннеля',           kind:'metro'},
+];
+
+/* палитры неба/света по времени */
+const TIMES=[
+ {id:'dawn', n:'на рассвете', sky:['#FFD9A8','#FFB07C'], amb:'#FFE0BC', dark:.06, star:0},
+ {id:'day',  n:'днём',        sky:['#BFE4F5','#8FC9E8'], amb:'#FFFFFF', dark:0,   star:0},
+ {id:'dusk', n:'на закате',   sky:['#FFAE7A','#C96FA0'], amb:'#FFC79E', dark:.14, star:0},
+ {id:'night',n:'ночью',       sky:['#2E3B63','#16203D'], amb:'#8FA8E0', dark:.42, star:1},
+ {id:'storm',n:'в грозу',     sky:['#5C6270','#33383F'], amb:'#B9C2D0', dark:.34, star:0},
+ {id:'fog',  n:'в тумане',    sky:['#D8D5CE','#B6B3AC'], amb:'#EDEBE6', dark:.12, star:0},
+];
+
+const MOODS=[
+ {id:'brave',  n:'смелый',    f:'смелая',    eye:'brave',  mouth:'grin'},
+ {id:'scared', n:'испуганный',f:'испуганная',eye:'wide',   mouth:'o'},
+ {id:'sly',    n:'хитрый',    f:'хитрая',    eye:'sly',    mouth:'smirk'},
+ {id:'sleepy', n:'сонный',    f:'сонная',    eye:'sleepy', mouth:'small'},
+ {id:'amazed', n:'удивлённый',f:'удивлённая',eye:'wide',   mouth:'o'},
+ {id:'sad',    n:'грустный',  f:'грустная',  eye:'sad',    mouth:'frown'},
+];
+
+const PROPS=[
+ {id:'key',   n:'старый ключ',      a:'старый ключ',      g:'старого ключа',   i:'старым ключом',   sex:'m', ic:'🔑'},
+ {id:'stone', n:'светящийся камень',a:'светящийся камень',g:'камня',           i:'камнем',          sex:'m', ic:'💎'},
+ {id:'map',   n:'карта',            a:'карту',            g:'карты',           i:'картой',          sex:'f', ic:'🗺'},
+ {id:'letter',n:'письмо',           a:'письмо',           g:'письма',          i:'письмом',         sex:'n', ic:'✉️'},
+ {id:'comp',  n:'компас',           a:'компас',           g:'компаса',         i:'компасом',        sex:'m', ic:'🧭'},
+ {id:'glass', n:'очки',             a:'очки',             g:'очков',           i:'очками',          sex:'p', ic:'👓'},
+ {id:'lamp',  n:'фонарик',          a:'фонарик',          g:'фонарика',        i:'фонариком',       sex:'m', ic:'🔦'},
+ {id:'egg',   n:'яйцо',             a:'яйцо',             g:'яйца',            i:'яйцом',           sex:'n', ic:'🥚'},
+ {id:'seed',  n:'семечко',          a:'семечко',          g:'семечка',         i:'семечком',        sex:'n', ic:'🌱'},
+ {id:'shard', n:'осколок зеркала',  a:'осколок зеркала',  g:'осколка',         i:'осколком',        sex:'m', ic:'🪞'},
+ {id:'watch', n:'часы',             a:'часы',             g:'часов',           i:'часами',          sex:'p', ic:'⏱'},
+ {id:'feath', n:'перо',             a:'перо',             g:'пера',            i:'пером',           sex:'n', ic:'🪶'},
+ {id:'coin',  n:'монета',           a:'монету',           g:'монеты',          i:'монетой',         sex:'f', ic:'🪙'},
+ {id:'box',   n:'деревянная коробка',a:'деревянную коробку',g:'коробки',       i:'коробкой',        sex:'f', ic:'📦'},
+];
+
+const STYLES=[
+ {id:'aqua',  n:'акварель',            stroke:0,   sat:.9,  soft:1, tex:'aqua'},
+ {id:'comic', n:'комикс',              stroke:3.2, sat:1.25,soft:0, tex:'none'},
+ {id:'toon',  n:'мультфильм',          stroke:2,   sat:1.1, soft:0, tex:'none'},
+ {id:'pencil',n:'карандашный набросок',stroke:1.2, sat:.35, soft:0, tex:'pencil'},
+ {id:'pixel', n:'пиксель-арт',         stroke:0,   sat:1.15,soft:0, tex:'pixel'},
+ {id:'glass2',n:'витраж',              stroke:4,   sat:1.35,soft:0, tex:'none'},
+ {id:'paper', n:'бумажная аппликация', stroke:0,   sat:.95, soft:0, tex:'paper'},
+ {id:'chalk', n:'мелки на асфальте',   stroke:0,   sat:.8,  soft:1, tex:'chalk'},
+];
+
+const ACCS=[
+ {id:'scarf',n:'шарф'},{id:'round',n:'круглые очки'},{id:'bag',n:'рюкзак'},{id:'hat',n:'шляпа'},
+ {id:'phones',n:'наушники'},{id:'cloak',n:'плащ'},{id:'head',n:'налобный фонарь'},{id:'patch',n:'повязка на глаз'},
+ {id:'badge',n:'значок'},{id:'wings',n:'крылья'},{id:'arm',n:'механическая лапа'},{id:'wreath',n:'венок'},
+];
+const RARE=[{id:'crown',n:'золотая корона'},{id:'starc',n:'звёздный плащ'},{id:'fly',n:'светлячок-спутник'},{id:'medal',n:'часы-медальон'}];
+const ANGLES=[{id:'close',n:'крупный план'},{id:'full',n:'во весь рост'},{id:'far',n:'издалека'}];
+
+const FORK_A=[
+ {id:'alive', n:'ожил',                    ic:'✨', tone:'wow'},
+ {id:'stolen',n:'украли',                  ic:'🏃', tone:'bad'},
+ {id:'door',  n:'открыл дверь',            ic:'🚪', tone:'wow'},
+ {id:'call',  n:'позвал на помощь',        ic:'📣', tone:'bad'},
+ {id:'fade',  n:'начал исчезать',          ic:'💨', tone:'bad'},
+ {id:'owner', n:'оказался чужим',          ic:'👤', tone:'bad'},
+];
+const FORK_B=[
+ {id:'trick', n:'придумал хитрость',       ic:'🧠'},
+ {id:'help',  n:'попросил помощи',         ic:'🤝'},
+ {id:'brave', n:'пошёл прямо',             ic:'⚡'},
+ {id:'give',  n:'отдал предмет',           ic:'🎁'},
+ {id:'fix',   n:'починил сломанное',       ic:'🔧'},
+ {id:'talk',  n:'договорился',             ic:'💬'},
+];
+const FORK_C=[
+ {id:'home',  n:'вернулся другим',         ic:'🏠'},
+ {id:'stay',  n:'остался навсегда',        ic:'🌙'},
+ {id:'friend',n:'нашёл друга',             ic:'👥'},
+ {id:'road',  n:'открыл дорогу для всех',  ic:'🌈'},
+ {id:'secret',n:'никому не рассказал',     ic:'🤫'},
+ {id:'again', n:'всё началось заново',     ic:'🔄'},
+];
+
+/* ═══════════════ ДВИЖОК ═══════════════ */
+
+/* детерминированный PRNG — одно зерно даёт одну и ту же картинку */
+function rng(seed){let s=seed>>>0;return()=>{s=(s+0x6D2B79F5)>>>0;let t=s;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
+function pick(r,arr){return arr[Math.floor(r()*arr.length)]}
+function rint(r,a,b){return a+Math.floor(r()*(b-a+1))}
+
+const S={ // состояние
+  step:'intro', hero:null, place:null, time:null, mood:null, prop:null, style:null,
+  acc:null, angle:null, master:false, living:false, seed:4821, name:'', title:'',
+  line:'', author:'', age:'', forwho:'', fA:null, fB:null, fC:null,
+  shot1:null, cmpPick:null, page:0, revealStep:0, eggUsed:false, textSeed:1,
+};
+
+/* ── SVG: герой ── */
+function svgHero(h,mood,seed,style,acc,scale){
+  const r=rng(seed*7+11);
+  const [main,lite,dark,belly]=h.c;
+  const pat=rint(r,0,4);         // окрас
+  const st=style?style.stroke:0;
+  const sc=(v)=>v;
+  const sw=st?`stroke="${dark}" stroke-width="${st}" stroke-linejoin="round"`:'';
+  const lean=(r()*8-4).toFixed(1);
+  const M=MOODS.find(m=>m.id===mood)||MOODS[0];
+  let o='';
+
+  // тень
+  o+=`<ellipse cx="100" cy="186" rx="${38+rint(r,-3,3)}" ry="7" fill="rgba(60,40,20,.16)"/>`;
+  o+=`<g transform="rotate(${lean} 100 130)">`;
+
+  // хвост
+  if(h.tail==='bush')o+=`<path d="M72 150 q-34 -6 -30 -38 q10 20 32 22z" fill="${lite}" ${sw}/>`;
+  if(h.tail==='huge')o+=`<path d="M74 152 q-46 -14 -30 -62 q4 34 34 44z" fill="${lite}" ${sw}/>`;
+  if(h.tail==='long')o+=`<path d="M74 152 q-32 4 -30 -30" fill="none" stroke="${main}" stroke-width="9" stroke-linecap="round"/>`;
+  if(h.tail==='thin')o+=`<path d="M74 154 q-30 8 -26 -18" fill="none" stroke="${dark}" stroke-width="3.5" stroke-linecap="round"/>`;
+  if(h.tail==='spike')o+=`<path d="M74 152 q-32 0 -34 -26 l10 4 l-2 -12 l10 6z" fill="${dark}" ${sw}/>`;
+  if(h.tail==='fan')o+=`<path d="M78 158 q-22 22 -6 30 q10 -12 18 -16z" fill="${dark}" ${sw}/>`;
+
+  // тело
+  const B={slim:'M100 88 q30 0 30 40 l0 34 q0 16 -30 16 q-30 0 -30 -16 l0 -34 q0 -40 30 -40z',
+           round:'M100 86 q38 0 38 48 q0 34 -38 34 q-38 0 -38 -34 q0 -48 38 -48z',
+           wide:'M100 88 q42 0 42 44 q0 36 -42 36 q-42 0 -42 -36 q0 -44 42 -44z',
+           box:'M64 96 h72 q6 0 6 8 v58 q0 8 -8 8 h-68 q-8 0 -8 -8 v-58 q0 -8 6 -8z',
+           small:'M100 96 q28 0 28 36 q0 28 -28 28 q-28 0 -28 -28 q0 -36 28 -36z',
+           egg:'M100 84 q36 0 36 50 q0 34 -36 34 q-36 0 -36 -34 q0 -50 36 -50z',
+           shell:'M100 92 q44 0 44 40 q0 34 -44 34 q-44 0 -44 -34 q0 -40 44 -40z'};
+  o+=`<path d="${B[h.body]||B.round}" fill="${main}" ${sw}/>`;
+  // живот
+  if(h.body!=='box'&&h.body!=='shell')o+=`<ellipse cx="100" cy="142" rx="20" ry="24" fill="${belly}" opacity=".85"/>`;
+  if(h.body==='shell'){o+=`<path d="M100 92 q44 0 44 40 q0 34 -44 34 q-44 0 -44 -34 q0 -40 44 -40z" fill="${dark}" opacity=".28"/>`;
+    o+=`<path d="M100 96 v66 M62 132 h76 M74 106 l52 52 M126 106 l-52 52" stroke="${belly}" stroke-width="2.5" opacity=".55" fill="none"/>`;}
+  // окрас
+  if(pat===1)for(let i=0;i<5;i++)o+=`<circle cx="${76+rint(r,0,48)}" cy="${104+rint(r,0,50)}" r="${4+rint(r,0,4)}" fill="${dark}" opacity=".3"/>`;
+  if(pat===2)for(let i=0;i<4;i++)o+=`<rect x="66" y="${104+i*15}" width="68" height="5" rx="2.5" fill="${dark}" opacity=".26"/>`;
+  if(pat===3)for(let i=0;i<9;i++)o+=`<circle cx="${72+rint(r,0,56)}" cy="${102+rint(r,0,54)}" r="1.8" fill="${dark}" opacity=".4"/>`;
+  if(h.body==='round'&&h.id==='hog')for(let i=0;i<10;i++){const a=-2.5+i*0.28;o+=`<path d="M${100+Math.cos(a)*36} ${132+Math.sin(a)*40} l${Math.cos(a)*13} ${Math.sin(a)*13}" stroke="${dark}" stroke-width="3.4" stroke-linecap="round"/>`}
+
+  // лапы
+  o+=`<ellipse cx="82" cy="176" rx="12" ry="7" fill="${dark}"/><ellipse cx="118" cy="176" rx="12" ry="7" fill="${dark}"/>`;
+
+  // голова
+  const hy=h.body==='box'?66:62;
+  // уши (за головой)
+  if(h.ears==='sharp'){o+=`<path d="M76 ${hy-16} l-6 -30 l26 14z" fill="${dark}" ${sw}/><path d="M124 ${hy-16} l6 -30 l-26 14z" fill="${dark}" ${sw}/>`}
+  if(h.ears==='tri'){o+=`<path d="M78 ${hy-18} l-4 -24 l24 12z" fill="${main}" ${sw}/><path d="M122 ${hy-18} l4 -24 l-24 12z" fill="${main}" ${sw}/>`}
+  if(h.ears==='big'){o+=`<circle cx="72" cy="${hy-22}" r="19" fill="${lite}" ${sw}/><circle cx="128" cy="${hy-22}" r="19" fill="${lite}" ${sw}/>`}
+  if(h.ears==='rnd'){o+=`<circle cx="74" cy="${hy-24}" r="14" fill="${main==='#2E2E33'?'#2E2E33':dark}" ${sw}/><circle cx="126" cy="${hy-24}" r="14" fill="${main==='#2E2E33'?'#2E2E33':dark}" ${sw}/>`}
+  if(h.ears==='tiny'){o+=`<circle cx="80" cy="${hy-22}" r="8" fill="${dark}"/><circle cx="120" cy="${hy-22}" r="8" fill="${dark}"/>`}
+  if(h.ears==='horn'){o+=`<path d="M80 ${hy-24} q-4 -20 8 -24 q0 14 4 20z" fill="${dark}" ${sw}/><path d="M120 ${hy-24} q4 -20 -8 -24 q0 14 -4 20z" fill="${dark}" ${sw}/>`}
+  if(h.ears==='tuft'){o+=`<path d="M78 ${hy-22} l-4 -18 l16 10z" fill="${dark}"/><path d="M122 ${hy-22} l4 -18 l-16 10z" fill="${dark}"/>`}
+  if(h.ears==='ant'){o+=`<line x1="100" y1="${hy-34}" x2="100" y2="${hy-20}" stroke="${dark}" stroke-width="3"/><circle cx="100" cy="${hy-38}" r="5" fill="${style&&style.id==='comic'?'#E65C00':'#E8863C'}"/>`}
+
+  const HH={box:`<rect x="68" y="${hy-30}" width="64" height="60" rx="12" fill="${main}" ${sw}/>`,
+            default:`<circle cx="100" cy="${hy}" r="34" fill="${main}" ${sw}/>`};
+  o+=h.body==='box'?HH.box:HH.default;
+  // морда
+  if(h.body!=='box')o+=`<ellipse cx="100" cy="${hy+13}" rx="16" ry="12" fill="${belly}" opacity=".7"/>`;
+
+  // глаза
+  const ey=hy-4, ex=13;
+  const E={
+    brave:`<circle cx="${100-ex}" cy="${ey}" r="7" fill="#fff"/><circle cx="${100+ex}" cy="${ey}" r="7" fill="#fff"/><circle cx="${100-ex+1}" cy="${ey+1}" r="4" fill="#22201E"/><circle cx="${100+ex+1}" cy="${ey+1}" r="4" fill="#22201E"/><path d="M${100-ex-8} ${ey-10} l15 4 M${100+ex+8} ${ey-10} l-15 4" stroke="#22201E" stroke-width="2.6" stroke-linecap="round"/>`,
+    wide: `<circle cx="${100-ex}" cy="${ey}" r="10" fill="#fff"/><circle cx="${100+ex}" cy="${ey}" r="10" fill="#fff"/><circle cx="${100-ex}" cy="${ey}" r="4.6" fill="#22201E"/><circle cx="${100+ex}" cy="${ey}" r="4.6" fill="#22201E"/><circle cx="${100-ex-2}" cy="${ey-2}" r="1.7" fill="#fff"/><circle cx="${100+ex-2}" cy="${ey-2}" r="1.7" fill="#fff"/>`,
+    sly:  `<path d="M${100-ex-8} ${ey} q8 -7 16 0 q-8 4 -16 0z" fill="#fff"/><path d="M${100+ex-8} ${ey} q8 -7 16 0 q-8 4 -16 0z" fill="#fff"/><circle cx="${100-ex}" cy="${ey-1}" r="3.2" fill="#22201E"/><circle cx="${100+ex}" cy="${ey-1}" r="3.2" fill="#22201E"/><path d="M${100-ex-9} ${ey-9} l17 5 M${100+ex+9} ${ey-9} l-17 5" stroke="#22201E" stroke-width="2.4" stroke-linecap="round"/>`,
+    sleepy:`<path d="M${100-ex-8} ${ey} q8 6 16 0" stroke="#22201E" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M${100+ex-8} ${ey} q8 6 16 0" stroke="#22201E" stroke-width="3" fill="none" stroke-linecap="round"/>`,
+    sad:  `<circle cx="${100-ex}" cy="${ey+1}" r="7.5" fill="#fff"/><circle cx="${100+ex}" cy="${ey+1}" r="7.5" fill="#fff"/><circle cx="${100-ex}" cy="${ey+3}" r="4" fill="#22201E"/><circle cx="${100+ex}" cy="${ey+3}" r="4" fill="#22201E"/><path d="M${100-ex-9} ${ey-8} q8 -5 17 -1 M${100+ex+9} ${ey-8} q-8 -5 -17 -1" stroke="#22201E" stroke-width="2.4" fill="none" stroke-linecap="round"/>`,
+  };
+  o+=E[M.eye]||E.wide;
+
+  // рот
+  const my=hy+17;
+  const MO={grin:`<path d="M${100-11} ${my} q11 10 22 0" stroke="#22201E" stroke-width="2.8" fill="none" stroke-linecap="round"/>`,
+    o:`<ellipse cx="100" cy="${my+2}" rx="7" ry="9" fill="#5A3428"/>`,
+    smirk:`<path d="M${100-10} ${my+2} q12 6 20 -4" stroke="#22201E" stroke-width="2.8" fill="none" stroke-linecap="round"/>`,
+    small:`<path d="M${100-6} ${my} q6 4 12 0" stroke="#22201E" stroke-width="2.6" fill="none" stroke-linecap="round"/>`,
+    frown:`<path d="M${100-10} ${my+5} q10 -9 20 0" stroke="#22201E" stroke-width="2.8" fill="none" stroke-linecap="round"/>`};
+  o+=MO[M.mouth]||MO.grin;
+
+  // аксессуар
+  if(acc){
+    const A=acc.id;
+    if(A==='scarf')o+=`<path d="M74 ${hy+28} q26 12 52 0 l0 10 q-26 12 -52 0z" fill="#D14545"/><path d="M120 ${hy+36} l10 26 l-11 3 l-6 -26z" fill="#D14545"/>`;
+    if(A==='round')o+=`<circle cx="${100-ex}" cy="${ey}" r="11" fill="none" stroke="#3A3A44" stroke-width="2.4"/><circle cx="${100+ex}" cy="${ey}" r="11" fill="none" stroke="#3A3A44" stroke-width="2.4"/><line x1="${100-ex+11}" y1="${ey}" x2="${100+ex-11}" y2="${ey}" stroke="#3A3A44" stroke-width="2.4"/>`;
+    if(A==='hat')o+=`<ellipse cx="100" cy="${hy-30}" rx="40" ry="8" fill="#6B4A2F"/><path d="M80 ${hy-32} q0 -26 20 -26 q20 0 20 26z" fill="#7C5636"/>`;
+    if(A==='crown')o+=`<path d="M76 ${hy-30} l6 -22 l10 12 l8 -18 l8 18 l10 -12 l6 22z" fill="#F2C337" stroke="#C89A16" stroke-width="1.6"/><circle cx="100" cy="${hy-34}" r="3.2" fill="#E8503C"/>`;
+    if(A==='phones')o+=`<path d="M70 ${hy-4} q0 -34 30 -34 q30 0 30 34" fill="none" stroke="#3A3A44" stroke-width="5"/><rect x="62" y="${hy-8}" width="14" height="22" rx="6" fill="#3A3A44"/><rect x="124" y="${hy-8}" width="14" height="22" rx="6" fill="#3A3A44"/>`;
+    if(A==='cloak'||A==='starc'){const cc=A==='starc'?'#3B3D8F':'#7A2B4E';o+=`<path d="M66 ${hy+26} q34 -12 68 0 l10 78 q-44 12 -88 0z" fill="${cc}" opacity=".92"/>`;
+      if(A==='starc')for(let i=0;i<9;i++)o+=`<circle cx="${72+rint(r,0,58)}" cy="${hy+38+rint(r,0,58)}" r="1.9" fill="#FFE47A"/>`;}
+    if(A==='bag')o+=`<rect x="128" y="${hy+40}" width="26" height="32" rx="7" fill="#8C6239"/><path d="M128 ${hy+48} h26" stroke="#6B4A2F" stroke-width="3"/>`;
+    if(A==='head')o+=`<rect x="76" y="${hy-26}" width="48" height="11" rx="5" fill="#4A4A55"/><circle cx="100" cy="${hy-21}" r="8" fill="#FFE47A"/>`;
+    if(A==='patch')o+=`<circle cx="${100+ex}" cy="${ey}" r="11" fill="#2E2E33"/><path d="M${100+ex-13} ${ey-8} l30 -6" stroke="#2E2E33" stroke-width="3"/>`;
+    if(A==='badge')o+=`<circle cx="128" cy="${hy+52}" r="10" fill="#E8B923" stroke="#B8890B" stroke-width="1.6"/><path d="M128 ${hy+47} l2 4 h4 l-3 3 l1 4 l-4 -2 l-4 2 l1 -4 l-3 -3 h4z" fill="#fff"/>`;
+    if(A==='wings')o+=`<path d="M64 ${hy+40} q-34 -22 -26 12 q4 22 26 14z" fill="#EFEAF6" opacity=".9"/><path d="M136 ${hy+40} q34 -22 26 12 q-4 22 -26 14z" fill="#EFEAF6" opacity=".9"/>`;
+    if(A==='arm')o+=`<rect x="130" y="${hy+52}" width="14" height="34" rx="6" fill="#9AA0B0"/><circle cx="137" cy="${hy+90}" r="8" fill="#7C8290"/>`;
+    if(A==='wreath')o+=`<path d="M70 ${hy-18} q30 -22 60 0" fill="none" stroke="#5C9A4E" stroke-width="5"/>`+[0,1,2,3,4].map(i=>`<circle cx="${76+i*12}" cy="${hy-26+Math.abs(i-2)*3}" r="4.4" fill="${['#E8637C','#F2C337','#E8637C','#F2C337','#E8637C'][i]}"/>`).join('');
+    if(A==='fly')o+=`<circle cx="146" cy="${hy-12}" r="6" fill="#FFE47A"/><circle cx="146" cy="${hy-12}" r="12" fill="#FFE47A" opacity=".28"/>`;
+    if(A==='medal')o+=`<line x1="100" y1="${hy+30}" x2="100" y2="${hy+52}" stroke="#C89A16" stroke-width="2.4"/><circle cx="100" cy="${hy+58}" r="11" fill="#F2C337" stroke="#C89A16" stroke-width="1.8"/><path d="M100 ${hy+52} v6 h5" stroke="#8C6A0E" stroke-width="1.8" fill="none"/>`;
+  }
+  o+='</g>';
+  return o;
+}
+
+/* ── SVG: предмет в лапах ── */
+function svgProp(p,seed){
+  const r=rng(seed*13+7);const x=100,y=168;
+  const P={
+   key:`<g transform="translate(${x} ${y}) rotate(${rint(r,-18,18)})"><circle cx="-8" cy="0" r="7" fill="none" stroke="#C99A2E" stroke-width="3.4"/><rect x="-2" y="-2" width="20" height="4" fill="#C99A2E"/><rect x="12" y="0" width="4" height="6" fill="#C99A2E"/></g>`,
+   stone:`<g transform="translate(${x} ${y})"><circle r="18" fill="#7FD8F0" opacity=".26"/><path d="M0 -11 l9 6 l-3 11 h-12 l-3 -11z" fill="#5EC5E8" stroke="#3A9BC0" stroke-width="1.6"/></g>`,
+   map:`<g transform="translate(${x} ${y}) rotate(${rint(r,-8,8)})"><path d="M-15 -10 l10 4 l10 -4 l10 4 v16 l-10 -4 l-10 4 l-10 -4z" fill="#EBD9AE" stroke="#B8965A" stroke-width="1.5"/><path d="M-5 -6 v16 M5 -2 v16" stroke="#B8965A" stroke-width="1"/><path d="M6 2 l4 4 l-4 4" stroke="#C4553A" stroke-width="1.6" fill="none"/></g>`,
+   letter:`<g transform="translate(${x} ${y}) rotate(${rint(r,-10,10)})"><rect x="-15" y="-10" width="30" height="20" rx="2" fill="#FBF3E2" stroke="#C4A87A" stroke-width="1.5"/><path d="M-15 -10 l15 11 l15 -11" fill="none" stroke="#C4A87A" stroke-width="1.5"/></g>`,
+   comp:`<g transform="translate(${x} ${y})"><circle r="13" fill="#D9C79A" stroke="#8C7440" stroke-width="2"/><circle r="9" fill="#F5EEDC"/><path d="M0 -7 l3 7 l-3 7 l-3 -7z" fill="#C4553A"/></g>`,
+   glass:`<g transform="translate(${x} ${y})"><circle cx="-9" r="7" fill="none" stroke="#4A4A55" stroke-width="2.4"/><circle cx="9" r="7" fill="none" stroke="#4A4A55" stroke-width="2.4"/><line x1="-2" x2="2" stroke="#4A4A55" stroke-width="2.4"/></g>`,
+   lamp:`<g transform="translate(${x} ${y}) rotate(${rint(r,-14,14)})"><rect x="-6" y="-12" width="12" height="20" rx="3" fill="#5A6270"/><path d="M-9 -12 h18 l-3 -6 h-12z" fill="#F2C337"/><path d="M-14 -22 l28 0 l-14 -14z" fill="#FFE47A" opacity=".38"/></g>`,
+   egg:`<g transform="translate(${x} ${y})"><ellipse rx="11" ry="14" fill="#FBF0DC" stroke="#D4BC94" stroke-width="1.5"/><circle cx="-3" cy="-4" r="2.6" fill="#E8DCC0"/></g>`,
+   seed:`<g transform="translate(${x} ${y})"><ellipse rx="7" ry="10" fill="#A8814C"/><path d="M0 -10 q6 -10 2 -14 q-8 4 -2 14z" fill="#6FA05A"/></g>`,
+   shard:`<g transform="translate(${x} ${y}) rotate(${rint(r,-22,22)})"><path d="M-9 -12 l14 3 l4 18 l-14 -4z" fill="#C8E4F0" stroke="#8AAFC0" stroke-width="1.4"/><path d="M-5 -8 l8 16" stroke="#fff" stroke-width="2" opacity=".7"/></g>`,
+   watch:`<g transform="translate(${x} ${y})"><circle r="12" fill="#E0D2AC" stroke="#8C7440" stroke-width="2.2"/><path d="M0 0 v-7 M0 0 l5 4" stroke="#4A3A20" stroke-width="1.8" stroke-linecap="round"/></g>`,
+   feath:`<g transform="translate(${x} ${y}) rotate(${rint(r,-24,24)})"><path d="M0 14 q-8 -12 0 -26 q8 14 0 26z" fill="#E8EDF5" stroke="#9AA6BA" stroke-width="1.2"/><line y1="14" y2="-10" stroke="#9AA6BA" stroke-width="1.2"/></g>`,
+   coin:`<g transform="translate(${x} ${y})"><circle r="11" fill="#F2C337" stroke="#C89A16" stroke-width="2"/><circle r="6" fill="none" stroke="#C89A16" stroke-width="1.4"/></g>`,
+   box:`<g transform="translate(${x} ${y})"><rect x="-14" y="-9" width="28" height="19" rx="2" fill="#B08A56" stroke="#7C5F36" stroke-width="1.6"/><path d="M-14 -3 h28" stroke="#7C5F36" stroke-width="1.6"/><rect x="-3" y="-3" width="6" height="6" fill="#7C5F36"/></g>`,
+  };
+  return P[p.id]||'';
+}
+
+/* ── SVG: лицо на объекте фона (шутка «испуганная луна») ── */
+function svgFace(x,y,s,mood){
+  const M=MOODS.find(m=>m.id===mood)||MOODS[1];
+  const w=M.eye==='wide'?4.2:3;
+  let o=`<g transform="translate(${x} ${y}) scale(${s})">`;
+  o+=`<circle cx="-7" cy="0" r="${w+1.6}" fill="#fff"/><circle cx="7" cy="0" r="${w+1.6}" fill="#fff"/>`;
+  o+=`<circle cx="-7" cy="0" r="${w-1}" fill="#22201E"/><circle cx="7" cy="0" r="${w-1}" fill="#22201E"/>`;
+  if(M.mouth==='o')o+=`<ellipse cy="10" rx="4" ry="5.4" fill="#5A3428"/>`;
+  else if(M.mouth==='frown')o+=`<path d="M-6 12 q6 -6 12 0" stroke="#22201E" stroke-width="2" fill="none" stroke-linecap="round"/>`;
+  else o+=`<path d="M-6 9 q6 6 12 0" stroke="#22201E" stroke-width="2" fill="none" stroke-linecap="round"/>`;
+  if(M.eye==='wide')o+=`<path d="M-13 -8 q6 -4 12 -1 M13 -8 q-6 -4 -12 -1" stroke="#22201E" stroke-width="1.7" fill="none" stroke-linecap="round"/>`;
+  return o+'</g>';
+}
+
+/* ── SVG: фон ── */
+function svgBG(place,time,seed,living,mood){
+  const r=rng(seed*31+5);const T=time||TIMES[1];const K=place?place.kind:'forest';
+  let o=`<defs><linearGradient id="sky${seed}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${T.sky[0]}"/><stop offset="1" stop-color="${T.sky[1]}"/></linearGradient></defs>`;
+  o+=`<rect width="300" height="200" fill="url(#sky${seed})"/>`;
+  if(T.star)for(let i=0;i<26;i++)o+=`<circle cx="${rint(r,0,300)}" cy="${rint(r,0,110)}" r="${(r()*1.3+.5).toFixed(1)}" fill="#fff" opacity="${(r()*.6+.35).toFixed(2)}"/>`;
+
+  const faces=[];  // куда сажать лица, если living
+  if(K==='forest'){
+    if(T.star){o+=`<circle cx="238" cy="42" r="21" fill="#FFF3C4"/>`;faces.push([238,42,1]);}
+    else {o+=`<circle cx="242" cy="38" r="18" fill="#FFEFA8" opacity=".85"/>`;}
+    for(let i=0;i<7;i++){const x=rint(r,-10,300),h=rint(r,70,130);
+      o+=`<path d="M${x} 200 v-${h} q0 -12 8 -12 q8 0 8 12 v${h}z" fill="#3E5A3A" opacity="${(.5+i*.06).toFixed(2)}"/>`;
+      o+=`<path d="M${x-22} ${200-h} q22 -40 44 0z" fill="#4A6B42" opacity="${(.55+i*.06).toFixed(2)}"/>`;
+      if(i===2)faces.push([x+8,200-h+34,.85]);}
+    o+=`<rect y="168" width="300" height="32" fill="#5A4A34"/>`;
+    o+=`<ellipse cx="52" cy="176" rx="26" ry="11" fill="#6B6459"/>`;faces.push([52,174,.8]);
+  }
+  if(K==='libr'){
+    o+=`<rect width="300" height="200" fill="#4A3826"/>`;
+    for(let s=0;s<4;s++){o+=`<rect y="${18+s*44}" width="300" height="7" fill="#33251A"/>`;
+      for(let b=0;b<19;b++){const bh=rint(r,20,34);o+=`<rect x="${4+b*16}" y="${25+s*44-bh+34}" width="${rint(r,7,13)}" height="${bh}" fill="${['#8C4A3A','#6B7A4A','#4A6B7A','#7A6B4A','#5A4A6B'][rint(r,0,4)]}" opacity=".9"/>`;}}
+    faces.push([60,60,.9]);faces.push([220,148,.9]);
+  }
+  if(K==='roofs'){
+    if(T.star){o+=`<circle cx="252" cy="34" r="17" fill="#FFF3C4"/>`;faces.push([252,34,.9]);}
+    for(let i=0;i<9;i++){const x=i*36-8,h=rint(r,48,110);
+      o+=`<rect x="${x}" y="${200-h}" width="34" height="${h}" fill="#39415A" opacity="${(.6+i*.04).toFixed(2)}"/>`;
+      for(let w=0;w<4;w++)if(r()>.45)o+=`<rect x="${x+5+(w%2)*15}" y="${208-h+Math.floor(w/2)*20}" width="9" height="11" fill="#FFD98C" opacity=".82"/>`;
+      if(i===3)faces.push([x+17,200-h+26,.8]);}
+  }
+  if(K==='sea'){
+    o+=`<rect width="300" height="200" fill="#1E5A78"/>`;
+    for(let i=0;i<16;i++)o+=`<circle cx="${rint(r,0,300)}" cy="${rint(r,0,180)}" r="${rint(r,2,6)}" fill="#8FD4E8" opacity=".3"/>`;
+    for(let i=0;i<6;i++){const x=rint(r,0,300);o+=`<path d="M${x} 200 q${rint(r,-16,16)} -50 ${rint(r,-8,8)} -86" stroke="#3E8C6A" stroke-width="${rint(r,5,10)}" fill="none" stroke-linecap="round" opacity=".8"/>`;}
+    o+=`<ellipse y="190" cx="150" cy="196" rx="180" ry="18" fill="#C4A87A"/>`;
+    o+=`<path d="M226 150 q14 -12 26 0 q-6 16 -26 0z" fill="#E8A03C"/>`;faces.push([238,150,.7]);
+  }
+  if(K==='space'){
+    o+=`<rect width="300" height="200" fill="#0E1330"/>`;
+    for(let i=0;i<52;i++)o+=`<circle cx="${rint(r,0,300)}" cy="${rint(r,0,200)}" r="${(r()*1.2+.4).toFixed(1)}" fill="#fff" opacity="${(r()*.7+.3).toFixed(2)}"/>`;
+    o+=`<circle cx="252" cy="48" r="30" fill="#5C7BC4" opacity=".9"/><ellipse cx="252" cy="48" rx="46" ry="9" fill="none" stroke="#9AAFE0" stroke-width="3" opacity=".65"/>`;
+    faces.push([252,48,1]);
+    o+=`<rect y="150" width="300" height="50" fill="#2A3050"/>`;
+    for(let i=0;i<5;i++)o+=`<circle cx="${28+i*62}" cy="172" r="15" fill="#0E1330" stroke="#5A6890" stroke-width="3"/>`;
+    faces.push([90,172,.65]);
+  }
+  if(K==='snow'){
+    o+=`<path d="M0 200 l70 -104 l52 66 l46 -52 l132 90z" fill="#E8EEF5"/>`;
+    o+=`<path d="M0 200 l70 -104 l30 40z" fill="#CDD8E5"/>`;
+    for(let i=0;i<34;i++)o+=`<circle cx="${rint(r,0,300)}" cy="${rint(r,0,190)}" r="${(r()*1.8+.8).toFixed(1)}" fill="#fff" opacity=".85"/>`;
+    faces.push([70,110,.8]);faces.push([214,158,.7]);
+  }
+  if(K==='ruins'){
+    o+=`<rect y="130" width="300" height="70" fill="#D9B681"/>`;
+    o+=`<path d="M0 138 q70 -18 150 -4 q80 14 150 -6 v18 h-300z" fill="#C9A46E"/>`;
+    for(let i=0;i<4;i++){const x=30+i*72,h=rint(r,46,86);
+      o+=`<rect x="${x}" y="${172-h}" width="19" height="${h}" fill="#B8A582"/><rect x="${x-4}" y="${168-h}" width="27" height="8" fill="#A8946E"/>`;
+      if(i===1)faces.push([x+10,180-h,.75]);}
+    o+=`<circle cx="248" cy="40" r="22" fill="${T.star?'#FFF3C4':'#FFE08C'}"/>`;faces.push([248,40,.9]);
+  }
+  if(K==='metro'){
+    o+=`<rect width="300" height="200" fill="#2A2A33"/>`;
+    o+=`<path d="M150 96 m-96 104 q0 -104 96 -104 q96 0 96 104z" fill="#3A3A47"/>`;
+    for(let i=0;i<5;i++)o+=`<circle cx="${34+i*58}" cy="${52+Math.abs(i-2)*10}" r="6" fill="#FFE08C" opacity=".9"/>`;
+    o+=`<rect y="176" width="300" height="24" fill="#22222A"/>`;
+    o+=`<rect y="180" width="300" height="4" fill="#5A5A6A"/><rect y="192" width="300" height="4" fill="#5A5A6A"/>`;
+    faces.push([92,62,.7]);faces.push([208,62,.7]);
+  }
+
+  // затемнение по времени
+  if(T.dark>0)o+=`<rect width="300" height="200" fill="#0A1030" opacity="${T.dark}"/>`;
+  if(place&&place.kind==='forest'&&time&&time.id==='fog')o+=`<rect width="300" height="200" fill="#E4E2DC" opacity=".34"/>`;
+
+  // ЛИЦА — шутка «весь мир чувствует то же»
+  if(living&&mood)faces.slice(0,3).forEach(f=>{o+=svgFace(f[0],f[1],f[2],mood)});
+  return o;
+}
+
+/* ── СЦЕНА ── */
+function scene(st,opt){
+  opt=opt||{};
+  const seed=opt.seed!==undefined?opt.seed:st.seed;
+  const ang=opt.angle||(st.angle?st.angle.id:'full');
+  const vb=ang==='close'?'62 30 176 132':ang==='far'?'-40 -14 380 250':'0 0 300 200';
+  const stl=st.style;
+  let inner='';
+  inner+=svgBG(st.place,st.time,seed,st.living,st.mood?st.mood.id:null);
+  if(st.hero){
+    inner+=`<g transform="translate(0 0)">`+svgHero(st.hero,st.mood?st.mood.id:'brave',seed,stl,st.acc)+`</g>`;
+    if(st.prop)inner+=svgProp(st.prop,seed);
+  }
+  // стиль-оверлей
+  if(stl){
+    if(stl.tex==='aqua')inner+=`<rect width="300" height="200" fill="#FFF4E0" opacity=".16"/>`;
+    if(stl.tex==='pencil')inner+=`<rect width="300" height="200" fill="#F2EFE8" opacity=".42"/>`;
+    if(stl.tex==='paper')inner+=`<rect width="300" height="200" fill="#FFF8EC" opacity=".14"/>`;
+    if(stl.tex==='chalk')inner+=`<rect width="300" height="200" fill="#4A4A52" opacity=".1"/>`;
+    if(stl.tex==='pixel'){const r2=rng(seed);for(let i=0;i<70;i++)inner+=`<rect x="${rint(r2,0,290)}" y="${rint(r2,0,190)}" width="6" height="6" fill="#000" opacity=".045"/>`;}
+  }
+  const filt=stl&&stl.sat!==1?`filter:saturate(${stl.sat})`:'';
+  return `<svg viewBox="${vb}" preserveAspectRatio="xMidYMid slice" style="${filt}">${inner}</svg>`;
+}
+
+/* ═══════════════ ТЕКСТ ═══════════════ */
+
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
+function polish(s){
+  return s.replace(/\bв ([взсшжщ][бвгджзклмнпрстфхцчшщ])/g,'во $1')
+   .replace(/\bс ([сшзжщ][бвгджзклмнпрстфхцчшщ])/g,'со $1')
+   .replace(/ {2,}/g,' ').replace(/ ([,.!?…])/g,'$1')
+   .replace(/([.!?…]) ([а-яё])/g,(m,p,c)=>p+' '+c.toUpperCase())
+   .trim().replace(/([^.!?…])$/,'$1.');
+}
+/* родовые окончания глаголов */
+function vb(sex,stem){return stem+(sex==='f'?'а':'')}
+
+function makeStory(st){
+  const r=rng(st.seed*97+st.textSeed*13);
+  const H=st.hero,P=st.place,T=st.time,M=st.mood,PR=st.prop;
+  const nm=st.name||cap(H.n);
+  const sx=H.sex;
+  const he=sx==='f'?'она':'он';
+  const moodW=sx==='f'?M.f:M.n;
+  const V=(stem)=>vb(sx,stem);
+
+  // Бит 1 — обычный день
+  const b1=[
+    `${nm} жил${V('')} ${P.p}. ${cap(T.n)} здесь было тихо, и ${he===  'она'?'её':'его'} это устраивало.`,
+    `${cap(P.p)} никто не удивлялся ${H.g}. ${nm} был${V('')} тут своим.`,
+    `Каждое утро ${nm} делал${V('')} одно и то же. В это утро — не стал${V('')}.`,
+    `Никто ${P.p} не знал, откуда взял${V('ся')} ${H.n} по имени ${nm}.`,
+    `${cap(P.n)} умел${P.n.endsWith('а')?'а':''} молчать. ${nm} умел${V('')} слушать. Они ладили.`,
+  ];
+  // Бит 2 — находка
+  const b2=[
+    `${T.id==='night'||T.id==='dusk'?'В темноте':'Среди камней'} что-то блеснуло. ${cap(PR.n)} — холодн${PR.sex==='f'?'ая':PR.sex==='n'?'ое':PR.sex==='p'?'ые':'ый'}, настоящ${PR.sex==='f'?'ая':PR.sex==='n'?'ее':PR.sex==='p'?'ие':'ий'}.`,
+    `${nm} споткнул${V('ся')} обо что-то. Это был${PR.sex==='f'?'а':PR.sex==='n'?'о':PR.sex==='p'?'и':''} ${PR.n}.`,
+    `${cap(PR.n)} лежал${PR.sex==='f'?'а':PR.sex==='n'?'о':PR.sex==='p'?'и':''} так, будто ждал${PR.sex==='f'?'а':PR.sex==='n'?'о':PR.sex==='p'?'и':''} именно ${H.a}.`,
+    `Сначала ${nm} решил${V('')}, что показалось. Но ${PR.n} никуда не делся.`,
+  ];
+  // Бит 3 — проблема (по развилке A)
+  const A=st.fA;
+  const b3map={
+    alive:[`Но ${PR.n} шевельнул${PR.sex==='f'?'ась':'ся'}. Сам${PR.sex==='f'?'а':''}.`,`И тут стало понятно: ${PR.n} — живой.`],
+    stolen:[`Но кто-то выхватил ${PR.a} и исчез между теней.`,`Только вот ${PR.g} больше не было. Ни в лапах, ни рядом.`],
+    door:[`Но там, где ничего не было, появилась дверь.`,`И тут стена разошлась. За ней стояла дверь, которой здесь не было ни вчера, ни сто лет назад.`],
+    call:[`Но издалека кто-то позвал. Тихо и очень далеко.`,`И тут ${nm} услышал${V('')}: кто-то звал на помощь.`],
+    fade:[`Но ${PR.n} начал${PR.sex==='f'?'а':PR.sex==='n'?'о':''} таять прямо в лапах.`,`Только вот края ${PR.g} становились всё прозрачнее.`],
+    owner:[`Но за ${PR.i} пришли. И это были не друзья.`,`И тут выяснилось: ${PR.n} — чуж${PR.sex==='f'?'ая':'ой'}.`],
+  };
+  const b3=b3map[A?A.id:'alive'];
+  // Бит 4 — решение (по развилке B)
+  const B=st.fB;
+  const b4map={
+    trick:[`Ломиться напрямую ${nm} не стал${V('')}. Придумал${V('')} хитрее — и это сработало.`],
+    help:[`${nm} не стал${V('')} справляться в одиночку. Позвал${V('')} — и пришли.`],
+    brave:[`${nm} не стал${V('')} ждать. Пошёл${sx==='f'?'ла':''} прямо, как есть.`],
+    give:[`${nm} отдал${V('')} ${PR.a}. И стало легче — всем.`],
+    fix:[`${nm} сел${V('')} и починил${V('')} то, что сломалось. Медленно, но до конца.`],
+    talk:[`${nm} не стал${V('')} драться. Договорил${V('ся')} — оказалось, можно.`],
+  };
+  const b4=b4map[B?B.id:'trick'];
+  // Бит 5 — финал (по развилке C) + ОБЯЗАТЕЛЬНЫЙ callback предмета
+  const C=st.fC;
+  const b5map={
+    home:[`${nm} вернул${V('ся')} домой другим. ${cap(PR.n)} остал${PR.sex==='f'?'ась':PR.sex==='n'?'ось':'ся'} с ${he==='она'?'ней':'ним'} — на память.`],
+    stay:[`${nm} остал${V('ся')} там навсегда. А ${PR.n} так и лежит рядом.`],
+    friend:[`Теперь ${nm} не один${sx==='f'?'а':''}. И ${PR.n} — общ${PR.sex==='f'?'ая':'ий'}.`],
+    road:[`Дорога открыта для всех. А ${PR.n} держит её открытой.`],
+    secret:[`${nm} никому не рассказал${V('')}. Только ${PR.n} знает, как было на самом деле.`],
+    again:[`С тех пор всё началось заново. И снова с ${PR.g}.`],
+  };
+  const b5=b5map[C?C.id:'home'];
+
+  const P4=[pick(r,b1),pick(r,b2),pick(r,b3),pick(r,b4),pick(r,b5)];
+  return P4.map(polish);
+}
+
+/* ═══════════════ ЭКРАНЫ ═══════════════ */
+const $=id=>document.getElementById(id);
+const B=()=>$('body'), F=()=>$('foot');
+
+const STEPS=['intro','s1','s2','s3','s4','cmp','name','fA','fB','fC','build','title','line','author','art','reveal','end'];
+function pct(){const i=STEPS.indexOf(S.step);return Math.max(0,Math.round(i/(STEPS.length-1)*100))}
+
+function say(t){return `<div class="say"><div class="say-av">🤖</div><div class="say-b">${t}</div></div>`}
+function sceneBox(extra){return `<div class="scene${S.hero?'':' empty'}" id="sc">${S.hero?scene(S):''}</div>${extra||''}`}
+function seedRow(){return `<div class="seedrow"><span>Зерно #${S.seed}</span><button class="reroll" onclick="reroll()">↻ Ещё вариант</button></div><div class="reroll-note">тот же запрос, другое зерно — как у настоящей нейросети</div>`}
+
+/* конструктор промпта */
+function promptCard(level){
+  const sl=(key,label,val)=>`<button class="slot ${val?'':'todo pulse'}" onclick="openSheet('${key}')">${val||label}<em>▾</em></button>`;
+  let p=`Нарисуй `+sl('hero','кого?',S.hero&&S.hero.a);
+  if(level>=2)p+=` в `+sl('place','где?',S.place&&S.place.p.replace(/^(в|на) /,''));
+  if(level>=3)p+=`, `+sl('time','когда?',S.time&&S.time.n)+`, герой `+sl('mood','какой?',S.mood&&(S.hero&&S.hero.sex==='f'?S.mood.f:S.mood.n));
+  if(level>=4)p+=`, у него `+sl('prop','что?',S.prop&&S.prop.a)+`, рисуй в стиле `+sl('style','какой?',S.style&&S.style.n);
+  if(level>=4&&S.master)p+=`, на нём `+sl('acc','аксессуар?',S.acc&&S.acc.n)+`, покажи `+sl('angle','ракурс?',S.angle&&S.angle.n);
+  return `<div class="pcard">${p}</div>`;
+}
+
+function ready(level){
+  if(level===1)return !!S.hero;
+  if(level===2)return !!S.place;
+  if(level===3)return S.time&&S.mood;
+  if(level===4)return S.prop&&S.style&&(!S.master||(S.acc&&S.angle));
+  return false;
+}
+
+const SHEETS={
+ hero:{t:'Кто герой?',list:()=>HEROES.map(h=>({v:h,n:h.n,svg:miniHero(h)})),set:v=>S.hero=v},
+ place:{t:'Где он живёт?',list:()=>PLACES.map(p=>({v:p,n:p.n,svg:miniBG(p)})),set:v=>S.place=v},
+ time:{t:'Когда это было?',list:()=>TIMES.map(t=>({v:t,n:cap(t.n),svg:miniTime(t)})),set:v=>S.time=v},
+ mood:{t:'Какой герой?',list:()=>MOODS.map(m=>({v:m,n:S.hero&&S.hero.sex==='f'?cap(m.f):cap(m.n),svg:miniMood(m)})),set:v=>S.mood=v},
+ prop:{t:'Что у него в лапах?',list:()=>PROPS.map(p=>({v:p,n:cap(p.n),emo:p.ic})),set:v=>S.prop=v},
+ style:{t:'Как рисовать?',list:()=>STYLES.map(s=>({v:s,n:cap(s.n),svg:miniStyle(s)})),set:v=>S.style=v},
+ acc:{t:'Что на нём?',list:()=>{const r=rng(S.seed*3);const out=ACCS.map(a=>({v:a,n:cap(a.n)}));
+   if(r()<0.35){const rr=RARE[rint(r,0,3)];out.splice(rint(r,0,out.length),0,{v:rr,n:cap(rr.n),rare:1})}
+   return out},set:v=>S.acc=v},
+ angle:{t:'Какой ракурс?',list:()=>ANGLES.map(a=>({v:a,n:cap(a.n)})),set:v=>S.angle=v},
+};
+function miniHero(h){return `<svg viewBox="40 20 120 170">${svgHero(h,'brave',7,null,null)}</svg>`}
+function miniBG(p){return `<svg viewBox="0 0 300 200">${svgBG(p,TIMES[1],3,false,null)}</svg>`}
+function miniTime(t){return `<svg viewBox="0 0 300 200"><defs><linearGradient id="g${t.id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${t.sky[0]}"/><stop offset="1" stop-color="${t.sky[1]}"/></linearGradient></defs><rect width="300" height="200" fill="url(#g${t.id})"/>${t.star?'<circle cx="80" cy="60" r="7" fill="#fff"/><circle cx="200" cy="40" r="4" fill="#fff"/><circle cx="150" cy="110" r="3" fill="#fff"/>':''}</svg>`}
+function miniMood(m){return `<svg viewBox="-24 -20 48 48"><circle r="20" fill="#FFE0BC"/>${svgFace(0,0,.95,m.id)}</svg>`}
+function miniStyle(s){return `<svg viewBox="0 0 40 40"><rect width="40" height="40" fill="#F0E4D2"/><circle cx="20" cy="20" r="12" fill="#E8863C" ${s.stroke?`stroke="#8C4A20" stroke-width="${s.stroke}"`:''} style="filter:saturate(${s.sat})"/>${s.tex==='pixel'?'<rect x="8" y="8" width="5" height="5" fill="#000" opacity=".12"/><rect x="26" y="24" width="5" height="5" fill="#000" opacity=".12"/>':''}</svg>`}
+
+let sheetKey=null;
+function openSheet(k){
+  sheetKey=k;const C=SHEETS[k];
+  $('sheetT').textContent=C.t;
+  const cur={hero:S.hero,place:S.place,time:S.time,mood:S.mood,prop:S.prop,style:S.style,acc:S.acc,angle:S.angle}[k];
+  $('sheetL').innerHTML=C.list().map((o,i)=>`<button class="opt${cur&&cur.id===o.v.id?' on':''}${o.rare?' rare':''}" onclick="pickOpt(${i})">
+    <div class="opt-ic">${o.svg||`<span style="font-size:22px">${o.emo||'•'}</span>`}</div>
+    <span class="opt-n">${o.n}</span>
+    ${o.rare?'<span class="opt-tag">редкий</span>':''}
+    ${cur&&cur.id===o.v.id?'<span class="opt-ck">✓</span>':''}
+  </button>`).join('');
+  $('ovl').classList.add('on');$('sheet').classList.add('on');
+}
+function closeSheet(){$('ovl').classList.remove('on');$('sheet').classList.remove('on')}
+function pickOpt(i){
+  const C=SHEETS[sheetKey];const o=C.list()[i];
+  C.set(o.v);closeSheet();render();
+}
+$('ovl').onclick=closeSheet; $('sheetX').onclick=closeSheet;
+
+/* ── генерация ── */
+const GEN_STAGES=[
+  {n:'Читаю твой запрос',k:'tok'},
+  {n:'Отбираю детали из библиотеки',k:'pool'},
+  {n:'Собираю слой за слоем',k:'build'},
+];
+function slotsCount(){let c=0;['hero','place','time','mood','prop','style','acc','angle'].forEach(k=>{if(S[k])c++});return c}
+function generate(after){
+  const slots=slotsCount();
+  const per=Math.min(380+80*slots,1130);
+  const toks=[];
+  if(S.hero)toks.push(S.hero.a);
+  if(S.place)toks.push(S.place.p);
+  if(S.time)toks.push(S.time.n);
+  if(S.mood)toks.push(S.hero.sex==='f'?S.mood.f:S.mood.n);
+  if(S.prop)toks.push(S.prop.a);
+  if(S.style)toks.push(S.style.n);
+  if(S.acc)toks.push(S.acc.n);
+
+  const g=document.createElement('div');g.className='gen';
+  g.innerHTML=`<div class="gen-toks" id="gtok"></div>
+    <div class="gen-pool" id="gpool" style="display:none">${Array.from({length:40},()=>'<div class="pdot"></div>').join('')}</div>
+    <div class="gen-stage">${GEN_STAGES.map((s,i)=>`<div class="gst" id="gst${i}"><div class="gst-b">${i+1}</div>${s.n}</div>`).join('')}</div>`;
+  document.querySelector('.root').appendChild(g);
+
+  let i=0;
+  const run=()=>{
+    if(i>0)$('gst'+(i-1)).className='gst done';
+    if(i>=GEN_STAGES.length){setTimeout(()=>{g.remove();after&&after()},180);return}
+    $('gst'+i).className='gst on';
+    if(i===0){$('gtok').innerHTML='';toks.forEach((t,j)=>setTimeout(()=>{const e=document.createElement('span');e.className='tok';e.textContent=t;$('gtok')&&$('gtok').appendChild(e)},j*70))}
+    if(i===1){$('gtok').style.display='none';$('gpool').style.display='grid';
+      const d=g.querySelectorAll('.pdot');const r=rng(S.seed);
+      d.forEach((el,j)=>setTimeout(()=>{if(r()>.42)el.classList.add('off')},j*11))}
+    if(i===2){$('gpool').style.display='none'}
+    i++;setTimeout(run,per);
+  };
+  setTimeout(run,110);
+}
+function reroll(){S.seed=1000+Math.floor(Math.random()*9000);
+  const el=$('sc');if(el){el.innerHTML='';setTimeout(()=>{el.innerHTML=scene(S)},60)}
+  const sr=document.querySelector('.seedrow span');if(sr)sr.textContent='Зерно #'+S.seed;}
+
+/* ── шаги ── */
+function go(s){S.step=s;render();B().scrollTo({top:0,behavior:'smooth'})}
+function doGen(next){generate(()=>{go(next)})}
+
+function render(){
+  $('pbar').style.width=pct()+'%';
+  const st=S.step;
+  const stepNo={s1:1,s2:2,s3:3,s4:4,cmp:4,name:4,fA:5,fB:5,fC:5,build:5,title:6,line:6,author:6}[st];
+  $('hstep').textContent=stepNo?stepNo+'/6':'';
+  $('back').style.visibility=st==='intro'?'hidden':'visible';
+
+  if(st==='intro'){
+    B().innerHTML=`<div class="center">
+      <div style="width:150px;height:150px;margin-bottom:6px">${'<svg viewBox="0 0 300 200" style="width:100%;height:100%;border-radius:20px">'+svgBG(PLACES[0],TIMES[0],9,false,null)+'</svg>'}</div>
+      <h1 class="h1">Твоя история</h1>
+      <p class="lead">В игре ты разобрался, как я понимаю картинки и собираю новые.\nТеперь наоборот: командуешь ты.</p>
+      <div class="card"><p class="mini">Сделаем книжку. Пять картинок, обложка, твоё имя на ней. Настоящую — её можно будет показать.</p></div>
+    </div>`;
+    F().innerHTML=`<button class="btn" onclick="go('s1')">Начать</button>`;return;
+  }
+
+  if(st==='s1'||st==='s2'||st==='s3'||st==='s4'){
+    const lv={s1:1,s2:2,s3:3,s4:4}[st];
+    const SAY={1:'Начнём с главного. Кто у нас герой?',
+      2:'Герой есть, а мира нет — он висит в пустоте. Где он живёт?',
+      3:'Два слова — и картинка меняется целиком. Проверим?',
+      4:'Последнее про картинку. Дай ему в лапы одну вещь — с неё начнётся вся история. И скажи, как рисовать.'}[lv];
+    B().innerHTML=sceneBox(S.hero&&lv>1?seedRow():'')+say(SAY)+promptCard(lv)
+      +(lv===3&&!S.master?`<button class="harder" onclick="S.master=true;render()">Хочу сложнее →</button>`:'');
+    F().innerHTML=`<button class="btn" ${ready(lv)?'':'disabled'} onclick="onGen(${lv})">Собрать</button>`;
+    return;
+  }
+
+  if(st==='joke'){
+    B().innerHTML=sceneBox()+say(`Ой.\nТы сказал «${S.hero.sex==='f'?S.mood.f:S.mood.n}». А про кого — не сказал.\nЯ и сделал таким всё, что было в кадре. Даже луну.\n\nТак и оставить?`);
+    F().innerHTML=`<div class="btnrow"><button class="btn btn2 btn-sm" onclick="S.living=false;go('s4')">Только герой</button><button class="btn btn-sm" onclick="S.living=true;go('s4')">Оставь, так смешнее</button></div>`;
+    return;
+  }
+
+  if(st==='cmp'){
+    B().innerHTML=`<div class="cmp">
+      <div class="cmp-i"><div class="scene">${S.shot1}</div><div class="cmp-cap"><b>Ты сказал</b>«${S.hero.a}»</div></div>
+      <div class="cmp-ar">↓</div>
+      <div class="cmp-i"><div class="scene">${scene(S)}</div><div class="cmp-cap"><b>Ты сказал</b>«${promptText()}»</div></div>
+    </div>`+say('Я за эти четыре шага умнее не стал. Точнее стал ты.\nКакая ближе к тому, что было у тебя в голове?');
+    F().innerHTML=`<div class="btnrow"><button class="btn btn2 btn-sm" onclick="S.cmpPick=1;go('name')">Первая</button><button class="btn btn2 btn-sm" onclick="S.cmpPick=2;go('name')">Вторая</button></div>`;
+    return;
+  }
+
+  if(st==='name'){
+    B().innerHTML=say(`У него есть всё. Кроме имени.\nИмя я придумать не могу — я не знаю, какой он на самом деле. Знаешь только ты.`)
+      +`<input class="field" id="fn" maxlength="16" placeholder="Как его зовут?" value="${S.name}" autocomplete="off">
+        <button class="txtbtn" onclick="suggestName()">Не придумывается</button>`;
+    F().innerHTML=`<button class="btn" onclick="saveName()">Дальше</button>`;
+    setTimeout(()=>{const f=$('fn');if(f){f.oninput=()=>{};f.focus()}},120);
+    return;
+  }
+
+  if(st==='fA'||st==='fB'||st==='fC'){
+    const D={fA:{t:'Что случилось?',l:FORK_A,k:'fA',n:'fB'},
+             fB:{t:'Как он справился?',l:FORK_B,k:'fB',n:'fC'},
+             fC:{t:'Чем всё кончилось?',l:FORK_C,k:'fC',n:'build'}}[st];
+    const intro=st==='fA'?'Картинка есть. Истории нет.\nИстория — это когда что-то пошло не так. Три вопроса, и книжка соберётся.':'';
+    B().innerHTML=`<div class="scene">${scene(S,{angle:'close'})}</div>`
+      +(intro?say(intro):'')
+      +`<div class="pcard" style="line-height:1.4;font-size:16px">${D.t}</div>
+        <div class="forks">${D.l.map((f,i)=>`<button class="fork${S[D.k]&&S[D.k].id===f.id?' on':''}" onclick="pickFork('${D.k}',${i})"><span class="fork-ic">${f.ic}</span>${f.n}</button>`).join('')}</div>`;
+    F().innerHTML=`<button class="btn" ${S[D.k]?'':'disabled'} onclick="go('${D.n}')">Дальше</button>`;
+    return;
+  }
+
+  if(st==='build'){
+    const pages=makeStory(S);S.pages=pages;
+    B().innerHTML=`<div id="asm"></div>`;
+    F().innerHTML='';
+    const box=$('asm');
+    pages.forEach((p,i)=>setTimeout(()=>{
+      const d=document.createElement('div');d.className='page flyin';d.style.width='100%';d.style.marginBottom='10px';
+      d.innerHTML=`<div class="scene">${scene(S,{seed:S.seed+i*17,angle:i===0?'full':i===1?'close':i===4?'far':'full'})}</div><div class="page-txt">${p}</div>`;
+      box.appendChild(d);B().scrollTo({top:box.scrollHeight,behavior:'smooth'});
+      if(i===pages.length-1)setTimeout(()=>{
+        box.insertAdjacentHTML('beforeend',say(`Готово. Пять картинок, один герой, одна история.\nЗаметил? ${cap(S.prop.n)}, котор${S.prop.sex==='f'?'ую':S.prop.sex==='n'?'ое':S.prop.sex==='p'?'ые':'ый'} ты дал${''} ему в самом начале, вернул${S.prop.sex==='f'?'ась':S.prop.sex==='n'?'ось':S.prop.sex==='p'?'ись':'ся'} на последней странице. Я ${S.prop.sex==='p'?'их':'его'} не потерял.`));
+        F().innerHTML=`<div class="btnrow"><button class="btn btn2 btn-sm" onclick="S.textSeed++;go('build')">Другими словами</button><button class="btn btn-sm" onclick="go('title')">Дальше</button></div>`;
+        B().scrollTo({top:99999,behavior:'smooth'});
+      },700);
+    },i*720));
+    return;
+  }
+
+  if(st==='title'){
+    const sug=titleSuggest();
+    B().innerHTML=say('Как называется?')
+      +`<input class="field" id="ft" maxlength="40" placeholder="Название книжки" value="${S.title}" autocomplete="off">
+        <div class="card"><div class="mini" style="margin-bottom:9px;font-weight:800">Подскажи</div>
+        ${sug.map(t=>`<button class="opt" style="min-height:46px;font-size:14.5px" onclick="setTitle(this)">${t}</button>`).join('')}</div>`;
+    F().innerHTML=`<button class="btn" onclick="S.title=($('ft').value||sugFallback());go('line')">Дальше</button>`;
+    setTimeout(()=>$('ft')&&$('ft').focus(),120);return;
+  }
+
+  if(st==='line'){
+    B().innerHTML=`<div class="scene">${scene(S,{angle:'close',seed:S.seed+3*17})}</div>`
+      +say('Один вопрос, и я отстану. В самый страшный момент — что твой герой сказал?')
+      +`<input class="field" id="fl" maxlength="60" placeholder="Например: «Я не боюсь»" value="${S.line}" autocomplete="off">`;
+    F().innerHTML=`<button class="btn" onclick="S.line=$('fl').value;go('author')">Дальше</button>`;
+    setTimeout(()=>$('fl')&&$('fl').focus(),120);return;
+  }
+
+  if(st==='author'){
+    B().innerHTML=say('И последнее. Кто это сделал?')
+      +`<input class="field" id="fa" maxlength="20" placeholder="Твоё имя" value="${S.author}" autocomplete="off">
+        <input class="field" id="fg" maxlength="2" inputmode="numeric" placeholder="Сколько тебе лет" value="${S.age}">
+        <input class="field" id="fw" maxlength="30" placeholder="Для кого эта история? (можно пропустить)" value="${S.forwho}">`;
+    F().innerHTML=`<button class="btn" onclick="finishBook()">Собрать книжку</button>`;
+    return;
+  }
+
+  if(st==='art'){renderArt();return}
+  if(st==='reveal'){renderReveal();return}
+
+  if(st==='end'){
+    B().innerHTML=say('Последнее. Одной фразой — что ты понял про меня?')
+      +`<div style="margin-top:12px">${[
+        'Он собирает из того, что уже видел',
+        'Чем точнее скажешь — тем ближе получится',
+        'Придумывать всё равно должен человек',
+      ].map(t=>`<button class="opt" style="min-height:56px;font-size:15px;line-height:1.35" onclick="go('art')">${t}</button>`).join('')}</div>`;
+    F().innerHTML=`<button class="btn btn2" onclick="go('art')">К моей книжке</button>`;
+    return;
+  }
+}
+
+function promptText(){
+  let p=S.hero.a;
+  if(S.place)p+=' в '+S.place.p.replace(/^(в|на) /,'');
+  if(S.time)p+=', '+S.time.n;
+  if(S.mood)p+=', '+(S.hero.sex==='f'?S.mood.f:S.mood.n);
+  if(S.prop)p+=', с '+S.prop.i;
+  if(S.style)p+=', '+S.style.n;
+  return p;
+}
+function onGen(lv){
+  if(lv===1){S.seed=1000+Math.floor(Math.random()*9000);generate(()=>{S.shot1=scene(S);go('s2')});return}
+  if(lv===2){generate(()=>go('s3'));return}
+  if(lv===3){generate(()=>{
+    // шутка «испуганная луна» — один раз за прохождение
+    if(!S.jokeShown){S.jokeShown=true;S.living=true;go('joke')}else go('s4')});return}
+  if(lv===4){generate(()=>go('cmp'));return}
+}
+function pickFork(k,i){S[k]=({fA:FORK_A,fB:FORK_B,fC:FORK_C})[k][i];render()}
+function suggestName(){
+  const m=['Рыж','Тимка','Шустрик','Барс','Кузя','Гром','Тишка','Финик'];
+  const f=['Гайка','Ласка','Мила','Стрелка','Нюша','Пуговка','Ирис','Соня'];
+  const l=S.hero.sex==='f'?f:m;
+  const r=rng(S.seed+7);$('fn').value=pick(r,l);
+}
+function saveName(){const v=$('fn').value.trim();S.name=v||(S.hero.sex==='f'?'Ласка':'Рыж');go('fA')}
+function titleSuggest(){
+  const P=S.place,PR=S.prop,T=S.time,n=S.name;
+  return [`${cap(T.n)} ${P.p}`,`${cap(PR.n)} и то, чего не было`,`${n} и ${PR.n}`,
+    `Что нашли ${T.n}`,`История про ${PR.g}`,`${n} уходит`].slice(0,6);
+}
+function sugFallback(){return titleSuggest()[0]}
+function setTitle(el){$('ft').value=el.textContent.trim()}
+function finishBook(){
+  S.author=$('fa').value.trim()||'Автор';S.age=$('fg').value.trim();S.forwho=$('fw').value.trim();
+  go('art');
+}
+
+/* ── артефакт ── */
+function renderArt(){
+  const pages=S.pages||makeStory(S);
+  const d=new Date(2026,8,8);
+  const dstr=d.getDate()+' '+['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'][d.getMonth()];
+  const comb=(12*8*6*6*14*8*6*6*6).toLocaleString('ru-RU');
+  let html=`<div class="bookwrap"><div class="pages" id="pgs">`;
+  // обложка
+  html+=`<div class="page"><div class="cover"><div class="scene">${scene(S,{angle:'close'})}</div>
+    <div class="cover-b"><div class="cover-t">${S.title||'Моя история'}</div>
+    <div class="cover-a">Сделал${S.author&&/[аяь]$/i.test(S.author)?'а':''} ${S.author}${S.age?', '+S.age+' лет':''} · ${dstr}</div></div></div></div>`;
+  // страницы
+  pages.forEach((p,i)=>{
+    html+=`<div class="page"><div class="scene">${scene(S,{seed:S.seed+i*17,angle:i===1?'close':i===4?'far':'full'})}</div>
+      <div class="page-txt">${p}${i===3&&S.line?`<div style="margin-top:10px;background:var(--accbg);border-radius:13px;padding:9px 13px;font-weight:800;color:var(--acc)">— ${S.line}</div>`:''}</div></div>`;
+  });
+  // разворот «как придумал»
+  html+=`<div class="page"><div class="howp"><div class="howp-h">Как я это придумал</div>
+    <div class="pquote"><small>Шаг 1</small>«Нарисуй ${S.hero.a}»</div>
+    <div class="pdown">↓</div>
+    <div class="pquote"><small>Шаг 4</small>«Нарисуй ${promptText()}»</div>
+    <p class="mini" style="margin-top:13px;text-align:center">Одно и то же я. Разные слова.</p></div></div>`;
+  // последняя
+  html+=`<div class="page"><div class="lastp">
+    ${S.forwho?`<div class="forwho">Для ${S.forwho}</div>`:''}
+    <div class="uniq">Таких историй, как твоя:<br>1 из ${comb}</div>
+    <div class="uniq-f">12 героев × 8 мест × 6 времён × 6 настроений × 14 вещей × 8 стилей × 6 × 6 × 6 поворотов</div>
+    <div class="honest">Иллюстрации собраны из библиотеки Nooka.<br>Историю придумал автор.</div>
+  </div></div>`;
+  html+=`</div><div class="dots" id="dots"></div></div>`;
+  B().innerHTML=html;
+  const n=pages.length+3;
+  $('dots').innerHTML=Array.from({length:n},(_,i)=>`<div class="dot${i===0?' on':''}"></div>`).join('');
+  const pg=$('pgs');
+  pg.onscroll=()=>{const i=Math.round(pg.scrollLeft/pg.clientWidth);
+    [...$('dots').children].forEach((d,j)=>d.classList.toggle('on',j===i))};
+  F().innerHTML=`<div class="btnrow"><button class="btn btn2 btn-sm" onclick="share()">Показать</button><button class="btn btn-sm" onclick="go('reveal')">Дальше</button></div>`;
+  $('htitle').textContent='Моя книжка';
+}
+
+function share(){
+  const enc=[S.hero.id,S.place.id,S.time.id,S.mood.id,S.prop.id,S.style.id,
+    S.fA.id,S.fB.id,S.fC.id,S.seed,S.living?1:0].join('.');
+  const u=location.origin+location.pathname+'?a='+encodeURIComponent(enc)
+    +'&n='+encodeURIComponent(S.name)+'&t='+encodeURIComponent(S.title)+'&by='+encodeURIComponent(S.author);
+  if(navigator.share)navigator.share({title:S.title,url:u}).catch(()=>{});
+  else{navigator.clipboard&&navigator.clipboard.writeText(u);alert('Ссылка скопирована!')}
+}
+
+/* ── разбор ── */
+const LAYERS=[
+ ['Фон',        '8 мест × 6 времён'],
+ ['Свет',       '6 градиентов'],
+ ['Тело',       '7 форм'],
+ ['Окрас',      '5 узоров'],
+ ['Голова',     '12 вариантов'],
+ ['Глаза',      '6 — по настроению'],
+ ['Рот',        '5 форм'],
+ ['Вещь',       '14 предметов'],
+ ['Стиль',      '8 обработок'],
+];
+function renderReveal(){
+  $('htitle').textContent='Как это было устроено';
+  B().innerHTML=`<div class="scene">${scene(S)}</div>
+    <div id="revl" style="margin-top:12px"></div>`;
+  F().innerHTML='';
+  const box=$('revl');
+  LAYERS.forEach((l,i)=>setTimeout(()=>{
+    box.insertAdjacentHTML('beforeend',`<div class="rev-l"><div class="rev-n">${i+1}</div><b>${l[0]}</b><span>${l[1]}</span></div>`);
+    B().scrollTo({top:99999,behavior:'smooth'});
+    if(i===LAYERS.length-1)setTimeout(()=>{
+      box.insertAdjacentHTML('beforeend',say(`Секрет.\nУ меня в памяти лежат нарисованные детали — тела, головы, глаза, фоны, вещи. Я не рисовал их сейчас. Я сложил твою картинку из кусочков.\n\nНастоящий ИИ рисует иначе — точку за точкой, с нуля. Но главное у нас одинаковое: <b>мы оба ничего не берём из воздуха. Мы собираем из того, что уже видели.</b>\n\nРазница только в размере библиотеки: у меня десятки деталей, у больших моделей — миллиарды.\n\nТвоя история от этого хуже не стала. Придумал её всё равно ты.`));
+      F().innerHTML=`<button class="btn" onclick="go('end')">Понятно</button>`;
+      B().scrollTo({top:99999,behavior:'smooth'});
+    },600);
+  },i*260));
+}
+
+/* ── навигация назад ── */
+$('back').onclick=()=>{
+  const i=STEPS.indexOf(S.step);
+  if(i<=0){location.href='index.html';return}
+  S.step=STEPS[Math.max(0,i-1)];render();
+};
+
+render();
+</script>
+</body>
+</html>
