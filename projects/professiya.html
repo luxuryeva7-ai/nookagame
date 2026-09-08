@@ -449,16 +449,16 @@ function svgPerson(o){
   g+=`<ellipse cx="150" cy="152" rx="36" ry="40" fill="${sk}"/>`;
   // причёска
   if(hair&&hair.id!=='bald'){
-    if(hair.id==='short')g+=`<path d="M114 148 q0 -44 36 -44 q36 0 36 44 q-6 -22 -36 -22 q-30 0 -36 22z" fill="${hc}"/>`;
-    if(hair.id==='bob')g+=`<path d="M112 156 q0 -52 38 -52 q38 0 38 52 q-8 -8 -14 -6 l0 -22 q-24 8 -48 0 l0 22 q-6 -2 -14 6z" fill="${hc}"/>`;
-    if(hair.id==='long')g+=`<path d="M112 150 q0 -46 38 -46 q38 0 38 46 l6 76 q-14 6 -18 -4 l-4 -66 q-22 8 -44 0 l-4 66 q-4 10 -18 4z" fill="${hc}"/>`;
-    if(hair.id==='buns'){g+=`<path d="M114 148 q0 -44 36 -44 q36 0 36 44 q-6 -22 -36 -22 q-30 0 -36 22z" fill="${hc}"/>`;
-      g+=`<circle cx="112" cy="126" r="14" fill="${hc}"/><circle cx="188" cy="126" r="14" fill="${hc}"/>`}
-    if(hair.id==='curly'){g+=`<path d="M114 150 q0 -46 36 -46 q36 0 36 46z" fill="${hc}"/>`;
-      for(let i=0;i<7;i++)g+=`<circle cx="${116+i*11}" cy="${114+(i%2)*7}" r="11" fill="${hc}"/>`}
-    if(hair.id==='tail'){g+=`<path d="M114 148 q0 -44 36 -44 q36 0 36 44 q-6 -22 -36 -22 q-30 0 -36 22z" fill="${hc}"/>`;
-      g+=`<path d="M186 140 q26 10 20 52 q-4 14 -14 6 q6 -34 -12 -50z" fill="${hc}"/>`}
-    if(hair.id==='mohawk')g+=`<path d="M138 122 q12 -42 24 0 q-12 -12 -24 0z" fill="${hc}"/><path d="M114 150 q4 -30 36 -30 q32 0 36 30 q-14 -14 -36 -14 q-22 0 -36 14z" fill="${hc}"/>`;
+    if(hair.id==='short')g+=`<path d="M116 138 q0 -42 34 -42 q34 0 34 42 q-8 -20 -34 -20 q-26 0 -34 20z" fill="${hc}"/>`;
+    if(hair.id==='bob')g+=`<path d="M114 146 q0 -48 36 -48 q36 0 36 48 q-8 -6 -13 -4 l0 -18 q-23 7 -46 0 l0 18 q-5 -2 -13 4z" fill="${hc}"/>`;
+    if(hair.id==='long')g+=`<path d="M114 142 q0 -44 36 -44 q36 0 36 44 l6 72 q-13 6 -17 -4 l-4 -62 q-21 7 -42 0 l-4 62 q-4 10 -17 4z" fill="${hc}"/>`;
+    if(hair.id==='buns'){g+=`<path d="M116 138 q0 -42 34 -42 q34 0 34 42 q-8 -20 -34 -20 q-26 0 -34 20z" fill="${hc}"/>`;
+      g+=`<circle cx="114" cy="118" r="13" fill="${hc}"/><circle cx="186" cy="118" r="13" fill="${hc}"/>`}
+    if(hair.id==='curly'){g+=`<path d="M116 140 q0 -44 34 -44 q34 0 34 44z" fill="${hc}"/>`;
+      for(let i=0;i<7;i++)g+=`<circle cx="${116+i*11}" cy="${106+(i%2)*6}" r="11" fill="${hc}"/>`}
+    if(hair.id==='tail'){g+=`<path d="M116 138 q0 -42 34 -42 q34 0 34 42 q-8 -20 -34 -20 q-26 0 -34 20z" fill="${hc}"/>`;
+      g+=`<path d="M184 134 q25 10 19 50 q-4 13 -13 6 q6 -32 -12 -48z" fill="${hc}"/>`}
+    if(hair.id==='mohawk')g+=`<path d="M139 114 q11 -40 22 0 q-11 -11 -22 0z" fill="${hc}"/><path d="M116 140 q4 -28 34 -28 q30 0 34 28 q-13 -13 -34 -13 q-21 0 -34 13z" fill="${hc}"/>`;
   }
   // лицо
   if(face){
@@ -482,8 +482,8 @@ function svgPerson(o){
     if(hd.id==='helm')g+=`<path d="M110 152 q0 -48 40 -48 q40 0 40 48 z" fill="#DCE2EC"/><rect x="112" y="146" width="76" height="10" rx="5" fill="#9AA8BC"/>`;
     if(hd.id==='cap'){g+=`<path d="M114 136 q0 -32 36 -32 q36 0 36 32z" fill="#4A6BC4"/><rect x="112" y="132" width="80" height="8" rx="4" fill="#3A559E"/>`}
     if(hd.id==='lamp'){g+=`<rect x="114" y="132" width="72" height="11" rx="5" fill="#4A4A55"/><circle cx="150" cy="137" r="8" fill="#FFE47A"/>`}
-    if(hd.id==='mask')g+=`<rect x="126" y="160" width="48" height="24" rx="10" fill="#DCE4EC" opacity=".92"/><circle cx="150" cy="172" r="7" fill="#9AA8BC"/>`;
-    if(hd.id==='hood')g+=`<path d="M108 158 q0 -56 42 -56 q42 0 42 56 q-10 -20 -42 -20 q-32 0 -42 20z" fill="#5C6470"/>`;
+    if(hd.id==='mask')g+=`<rect x="130" y="166" width="40" height="19" rx="9" fill="#DCE4EC" opacity=".78"/><circle cx="150" cy="175" r="5.5" fill="#9AA8BC"/>`;
+    if(hd.id==='hood')g+=`<path d="M110 146 q0 -52 40 -52 q40 0 40 52 q-10 -18 -40 -18 q-30 0 -40 18z" fill="#5C6470"/>`;
     if(hd.id==='band')g+=`<rect x="112" y="138" width="76" height="9" rx="4" fill="#D14545"/>`;
   }
   // инструмент в руке
@@ -863,13 +863,13 @@ function miniHair(i){const h=HAIR[i],c=HAIRC[S.hairc];
   const save=S.hair;S.hair=i;
   const p=`<svg viewBox="105 100 90 90"><ellipse cx="150" cy="152" rx="36" ry="40" fill="${SKIN[S.skin]}"/>`
     +(h.id==='bald'?'':{
-      short:`<path d="M114 148 q0 -44 36 -44 q36 0 36 44 q-6 -22 -36 -22 q-30 0 -36 22z" fill="${c}"/>`,
-      bob:`<path d="M112 156 q0 -52 38 -52 q38 0 38 52 q-8 -8 -14 -6 l0 -22 q-24 8 -48 0 l0 22 q-6 -2 -14 6z" fill="${c}"/>`,
+      short:`<path d="M116 138 q0 -42 34 -42 q34 0 34 42 q-8 -20 -34 -20 q-26 0 -34 20z" fill="${c}"/>`,
+      bob:`<path d="M114 146 q0 -48 36 -48 q36 0 36 48 q-8 -6 -13 -4 l0 -18 q-23 7 -46 0 l0 18 q-5 -2 -13 4z" fill="${c}"/>`,
       long:`<path d="M112 150 q0 -46 38 -46 q38 0 38 46 l6 40 q-14 6 -18 -4 l-4 -30 q-22 8 -44 0 l-4 30 q-4 10 -18 4z" fill="${c}"/>`,
-      buns:`<path d="M114 148 q0 -44 36 -44 q36 0 36 44 q-6 -22 -36 -22 q-30 0 -36 22z" fill="${c}"/><circle cx="112" cy="126" r="14" fill="${c}"/><circle cx="188" cy="126" r="14" fill="${c}"/>`,
-      curly:`<path d="M114 150 q0 -46 36 -46 q36 0 36 46z" fill="${c}"/>`+[0,1,2,3,4,5,6].map(k=>`<circle cx="${116+k*11}" cy="${114+(k%2)*7}" r="11" fill="${c}"/>`).join(''),
-      tail:`<path d="M114 148 q0 -44 36 -44 q36 0 36 44 q-6 -22 -36 -22 q-30 0 -36 22z" fill="${c}"/><path d="M186 140 q26 10 20 44 q-4 12 -14 5 q6 -28 -12 -44z" fill="${c}"/>`,
-      mohawk:`<path d="M138 122 q12 -42 24 0 q-12 -12 -24 0z" fill="${c}"/><path d="M114 150 q4 -30 36 -30 q32 0 36 30 q-14 -14 -36 -14 q-22 0 -36 14z" fill="${c}"/>`,
+      buns:`<path d="M116 138 q0 -42 34 -42 q34 0 34 42 q-8 -20 -34 -20 q-26 0 -34 20z" fill="${c}"/><circle cx="114" cy="118" r="13" fill="${c}"/><circle cx="186" cy="118" r="13" fill="${c}"/>`,
+      curly:`<path d="M116 140 q0 -44 34 -44 q34 0 34 44z" fill="${c}"/>`+[0,1,2,3,4,5,6].map(k=>`<circle cx="${116+k*11}" cy="${106+(k%2)*6}" r="11" fill="${c}"/>`).join(''),
+      tail:`<path d="M116 138 q0 -42 34 -42 q34 0 34 42 q-8 -20 -34 -20 q-26 0 -34 20z" fill="${c}"/><path d="M186 140 q26 10 20 44 q-4 12 -14 5 q6 -28 -12 -44z" fill="${c}"/>`,
+      mohawk:`<path d="M139 114 q11 -40 22 0 q-11 -11 -22 0z" fill="${c}"/><path d="M116 140 q4 -28 34 -28 q30 0 34 28 q-13 -13 -34 -13 q-21 0 -34 13z" fill="${c}"/>`,
     }[h.id]||'')
     +`</svg>`;
   S.hair=save;return p;
@@ -889,8 +889,8 @@ function miniHead(i){const h=HEADS[i];
     helm:'<path d="M110 152 q0 -48 40 -48 q40 0 40 48 z" fill="#DCE2EC"/><rect x="112" y="146" width="76" height="10" rx="5" fill="#9AA8BC"/>',
     cap:'<path d="M114 136 q0 -32 36 -32 q36 0 36 32z" fill="#4A6BC4"/><rect x="112" y="132" width="80" height="8" rx="4" fill="#3A559E"/>',
     lamp:'<rect x="114" y="132" width="72" height="11" rx="5" fill="#4A4A55"/><circle cx="150" cy="137" r="8" fill="#FFE47A"/>',
-    mask:'<rect x="126" y="160" width="48" height="24" rx="10" fill="#DCE4EC"/><circle cx="150" cy="172" r="7" fill="#9AA8BC"/>',
-    hood:'<path d="M108 158 q0 -56 42 -56 q42 0 42 56 q-10 -20 -42 -20 q-32 0 -42 20z" fill="#5C6470"/>',
+    mask:'<rect x="130" y="166" width="40" height="19" rx="9" fill="#DCE4EC" opacity=".78"/><circle cx="150" cy="175" r="5.5" fill="#9AA8BC"/>',
+    hood:'<path d="M110 146 q0 -52 40 -52 q40 0 40 52 q-10 -18 -40 -18 q-30 0 -40 18z" fill="#5C6470"/>',
     none:'', band:'<rect x="112" y="138" width="76" height="9" rx="4" fill="#D14545"/>'}[h.id]||'';
   return `<svg viewBox="100 96 100 100"><ellipse cx="150" cy="152" rx="36" ry="40" fill="${SKIN[S.skin]}"/>${inner}</svg>`;
 }
