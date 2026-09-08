@@ -1053,7 +1053,13 @@ function LevelForge({
       setPhase('solved');
       setSay('Точно так. Та же вещь — собрана по одной картинке.');
       setBad(false);
-      if (window.nooka) window.nooka.missionWin('riddle1', 90, { title: 'Загадка разгадана!' });
+      /* Друг пришёл по ссылке-загадке: курса у него нет, и звать его «к уровням»
+         бессмысленно. Ему показываем всю платформу — это единственный экран,
+         где он может решить, что играть дальше. */
+      if (window.nooka) window.nooka.missionWin('riddle1', 90, riddle
+        ? { title: 'Загадка разгадана!', nextLabel: 'Что это за игры \u2192',
+            onNext: function () { location.href = '../'; } }
+        : { title: 'Загадка разгадана!' });
     } else {
       setSay(miss.length === 1
         ? 'Почти. Одна деталь другая: посмотри на ' + FG_FIELD[miss[0]] + '.'

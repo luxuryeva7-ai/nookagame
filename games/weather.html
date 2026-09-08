@@ -42,6 +42,9 @@
 .wtscene{margin:11px 14px 0;border-radius:20px;overflow:hidden;
   background:#0A1220;box-shadow:inset 0 0 0 1.5px rgba(126,190,255,.14);}
 .wtscene svg{width:100%;display:block;}
+.wtscene--off svg{opacity:.55;}
+.wtday em.wtlow{color:#FFD84D;}
+.wtday em.wtout{color:#FF8A6B;}
 
 .wthow{margin:10px 14px 0;padding:10px 14px;border-radius:15px;text-align:center;
   font-weight:800;font-size:12.5px;line-height:1.4;color:#9FD4FF;
@@ -468,6 +471,9 @@ function LevelWeather({ onWin, onHome }) {
       React.createElement('div', { className: 'wtsay' + (done ? (log[log.length - 1].good ? ' wtsay--ok' : ' wtsay--wet') : '') },
         React.createElement('i', null, NKM(done ? (log[log.length - 1].good ? 'win' : 'think') : 'hello', 30)),
         React.createElement('span', null, done ? result
+          /* Вызовы кончились — станции перестают отвечать. Раньше подсказка всё
+             равно звала спрашивать, и уровень выглядел сломанным. */
+          : budget <= 0 ? 'Вызовы кончились. Решай по тому, что уже знаешь.'
           : opened.length ? 'Спроси ещё станцию или решай.'
           : 'Нажми на станцию, чтобы её опросить.')),
 
@@ -475,9 +481,10 @@ function LevelWeather({ onWin, onHome }) {
         React.createElement('div', null,
           React.createElement('b', null, cur.d),
           React.createElement('span', null, cur.plan)),
-        React.createElement('em', null, 'вызовов' + ' ' + budget)),
+        React.createElement('em', { className: budget <= 0 ? 'wtout' : (budget <= 3 ? 'wtlow' : null) },
+          budget > 0 ? 'осталось ' + budget : 'вызовы кончились')),
 
-      React.createElement('div', { className: 'wtscene' },
+      React.createElement('div', { className: 'wtscene' + (budget <= 0 && !done ? ' wtscene--off' : '') },
         React.createElement(WtScene, { sig: cur.sig, opened: opened, show: done, rain: cur.rain })),
 
       /* по станциям кликают прямо на сцене — дублирую кнопками,

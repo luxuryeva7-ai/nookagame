@@ -1113,6 +1113,10 @@ function LevelDraw({ n, onWin, onHome }) {
   const [dirtyAcc, setDirtyAcc] = useState(null);  // точность до чистки набора
   const [flash, setFlash] = useState(false);       // «улетело в набор» — отклик на действие
   const [rounds, setRounds] = useState([]);        // история кругов: с какой уверенностью отвечал
+  /* Круги разбора ошибок — свой журнал. Раньше они писались в rounds рядом с
+     кругами дообучения, у записей разные поля, и полоса уверенности показывала
+     «undefined%» на шестом уровне, где есть и то и другое. */
+  const [judged, setJudged] = useState([]);        // история кругов разбора: сколько ошибок нашли
   const [take, setTake] = useState(1);             // сколько рисунков каждого вида берём
   const [exam, setExam] = useState(null);          // ход экзамена: {i, res:[]}
   const [tryLog, setTryLog] = useState([]);        // попытки: {take, ok, total}
@@ -1358,7 +1362,7 @@ function LevelDraw({ n, onWin, onHome }) {
   };
 
   useEffect(() => {
-    if (step && step.kind === 'judge' && !judge && model.length >= 2) dealRound(model, rounds.length);
+    if (step && step.kind === 'judge' && !judge && model.length >= 2) dealRound(model, judged.length);
   }, [si, model.length]);
 
   const mark = i => {
@@ -1373,7 +1377,7 @@ function LevelDraw({ n, onWin, onHome }) {
     const wrong = judge.cards.map((c, i) => c.said !== c.truth ? i : -1).filter(i => i > -1);
     const found = judge.marked.filter(i => wrong.indexOf(i) > -1);
     setJudge(Object.assign({}, judge, { checked: true }));
-    setRounds(rounds.concat([{ errs: wrong.length, found: found.length, total: judge.cards.length }]));
+    setJudged(judged.concat([{ errs: wrong.length, found: found.length, total: judge.cards.length }]));
     /* в набор идёт то, что ребёнок отметил, — с верной подписью */
     const add = judge.marked.map(i => ({
       label: judge.cards[i].truth, f: judge.cards[i].f, thumb: judge.cards[i].thumb,
@@ -1383,7 +1387,7 @@ function LevelDraw({ n, onWin, onHome }) {
 
   const nextRound = () => {
     if (rounds.length >= (L.rounds || 3)) { setPhase('quiz'); return; }
-    dealRound(model, rounds.length);
+    dealRound(model, judged.length);
   };
 
   /* экзамен: Нейро отвечает на рисунки, которых в обучении не было */
@@ -1490,15 +1494,15 @@ function LevelDraw({ n, onWin, onHome }) {
           ? React.createElement('div', { className: 'dwwords' },
               React.createElement('div', { className: 'dwwords__t' }, 'Ошибки Нейро по кругам'),
               React.createElement('div', { className: 'dwrounds__r', style: { marginTop: 14 } },
-                rounds.map((r, i) => React.createElement('div', { key: i, className: 'dwrd' },
+                judged.map((r, i) => React.createElement('div', { key: i, className: 'dwrd' },
                   React.createElement('i', { style: { height: Math.max(12, r.errs / r.total * 100) + '%' } }),
                   React.createElement('b', null, r.errs + ' из ' + r.total),
                   React.createElement('span', null, 'круг ' + (i + 1))))),
               React.createElement('div', { className: 'dwwords__n' },
-                rounds.length > 1
-                  ? 'В первом круге он ошибся ' + rounds[0].errs + ' ' +
-                    plural(rounds[0].errs, 'раз', 'раза', 'раз') + ', в последнем — ' +
-                    rounds[rounds.length - 1].errs + '. Между ними только твой разбор.'
+                judged.length > 1
+                  ? 'В первом круге он ошибся ' + judged[0].errs + ' ' +
+                    plural(judged[0].errs, 'раз', 'раза', 'раз') + ', в последнем — ' +
+                    judged[judged.length - 1].errs + '. Между ними только твой разбор.'
                   : 'Промахи ему показываешь ты — и он их учит.'))
           : L.win.show === 'lab'
           ? React.createElement('div', { className: 'dwwords' },

@@ -110,6 +110,18 @@
     setTimeout(function () { logPush('открыт', document.title); }, 900);
   }
 
+  /* Служебный параметр перехода между уровнями одного файла в адресе не нужен:
+     ребёнок копирует ссылку, показывает её другу — там должен быть чистый адрес. */
+  (function tidyGo() {
+    try {
+      var q = new URLSearchParams(location.search);
+      if (!q.has('_go')) return;
+      q.delete('_go');
+      var qs = q.toString();
+      history.replaceState(null, '', location.pathname + (qs ? '?' + qs : '') + location.hash);
+    } catch (e) {}
+  })();
+
   window.nooka = {
     icon: icon,
     log: logPush,
@@ -337,9 +349,30 @@
       var pct = rank.next ? Math.min(100, Math.round((total - rank.at) / (rank.next.at - rank.at) * 100)) : 100;
       requestAnimationFrame(function () { wrap.querySelector('.nk-bar i').style.width = pct + '%'; });
 
+      /* Переход дальше. Несколько уровней живут в одном файле и отличаются только
+         решёткой (prompt.html#l1 → #l2). Браузер в этом случае меняет адрес, но
+         страницу не перезагружает — и ребёнок остаётся на уже пройденном уровне.
+         Кнопка «Дальше» из-за этого выглядела сломанной. Перезагружаем руками. */
+      function goNext(href) {
+        var a = document.createElement('a');
+        a.href = href;                       // разворачиваем относительный адрес
+        var samePage = a.pathname === location.pathname && a.search === location.search;
+        if (samePage) {
+          /* Тот же файл, отличается только решётка. Программная перезагрузка тут
+             ненадёжна — браузер занят обработкой смены решётки и глотает её.
+             Поэтому уходим обычным переходом на адрес, который отличается ещё и
+             параметром: такую навигацию браузер выполняет всегда. Параметр
+             убирается из адреса сразу после загрузки (см. tidyGo ниже). */
+          var q = a.search ? a.search + '&' : '?';
+          location.href = a.pathname + q + '_go=' + Date.now() + a.hash;
+          return;
+        }
+        location.href = href;
+      }
+
       wrap.querySelector('.nk-next').onclick = function () {
         if (opts.onNext) { wrap.remove(); opts.onNext(); return; }
-        window.location.href = next ? next.href : hub.href;
+        goNext(next ? next.href : hub.href);
       };
 
       // конфетти
