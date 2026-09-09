@@ -202,15 +202,22 @@ body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);-w
 .rail-lbl{position:absolute;right:8px;bottom:0;font-size:11px;font-weight:900;color:#4A3418;
  background:rgba(255,248,238,.75);padding:2px 8px;border-radius:999px}
 /* планка кадров */
-.strip5{display:flex;gap:6px;margin:6px 0 10px;position:relative;z-index:6}
+.filmwrap{position:relative;z-index:6;margin:8px 0 12px;background:rgba(58,42,24,.16);
+ border-radius:12px;padding:8px 9px 9px}
+.film-t{font-size:10.5px;font-weight:900;letter-spacing:.6px;text-transform:uppercase;
+ color:rgba(255,248,238,.72);margin-bottom:6px}
+.strip5{display:flex;gap:6px;position:relative;z-index:6}
 .sl{flex:1;aspect-ratio:3/2;border-radius:7px;overflow:hidden;background:rgba(255,248,238,.35);
- box-shadow:inset 0 0 0 1.5px rgba(90,60,25,.3)}
+ box-shadow:inset 0 0 0 1.5px rgba(90,60,25,.3);position:relative}
+.sl::after{content:attr(data-i);position:absolute;left:4px;top:2px;font-size:9.5px;font-weight:900;
+ color:rgba(58,42,24,.5)}
+.sl.on::after{color:rgba(255,248,238,.85);text-shadow:0 1px 2px rgba(0,0,0,.5)}
 .sl.on{background:none}
 .sl svg{width:100%;height:100%;display:block}
 /* станции-входы */
 .stations{display:flex;flex-direction:column;gap:10px;position:relative;z-index:6}
 .st{position:relative;z-index:6;border:none;border-radius:16px;cursor:pointer;font-family:inherit;text-align:left;
- padding:13px 15px;display:flex;flex-direction:column;gap:3px;
+ padding:11px 14px 11px 62px;display:flex;flex-direction:column;gap:1px;min-height:0;
  background:linear-gradient(165deg,#FFF8EE,#F2E4CC);
  box-shadow:0 1px 0 rgba(43,33,24,.28), 0 10px 18px -8px rgba(43,33,24,.4);
  animation:float 4.2s ease-in-out infinite}
@@ -219,11 +226,11 @@ body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);-w
 .st:nth-child(4){animation-duration:4.8s;animation-delay:.2s}
 .st:active{transform:scale(.985)}
 .st.done{filter:saturate(.45) brightness(.96);animation:none}
-.st-e{font-size:28px;line-height:1}
-.st-n{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:16px;color:#2B2118}
+.st-e{position:absolute;left:15px;top:50%;transform:translateY(-50%);font-size:30px;line-height:1}
+.st-n{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:15px;color:#2B2118}
 .st-s{font-size:12.5px;font-weight:700;color:#8A7A68}
-.st-h{position:absolute;right:13px;top:14px;font-size:11px;font-weight:800;color:var(--acc);
- background:var(--accbg);padding:4px 10px;border-radius:999px}
+.st-h{position:absolute;right:13px;top:11px;font-size:10.5px;font-weight:800;color:var(--acc);
+ background:var(--accbg);padding:3px 9px;border-radius:999px}
 .st.done .st-h{background:#DFF5EA;color:#2E9E5B}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-2.5px)}}
 /* мелочь на столе */
@@ -255,9 +262,9 @@ body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);-w
 .st-gives{font-size:12px;font-weight:800;color:var(--acc);margin-top:1px}
 .st.done .st-gives{color:#2E9E5B}
 .st.next{box-shadow:0 0 0 2.5px var(--acc), 0 1px 0 rgba(43,33,24,.28), 0 10px 18px -8px rgba(43,33,24,.4)}
-.st-badge{position:absolute;left:13px;bottom:11px;font-size:10.5px;font-weight:900;
- background:var(--acc);color:#fff;padding:4px 10px;border-radius:999px}
-.st{padding-bottom:34px}
+.st-badge{position:absolute;right:13px;bottom:10px;font-size:10px;font-weight:900;
+ background:var(--acc);color:#fff;padding:3px 9px;border-radius:999px}
+.st.next{padding-bottom:30px}
 /* цель внутри пазла */
 .pzgoal{background:var(--accbg);border-radius:14px;padding:10px 12px;margin-top:10px}
 .pzgoal-t{font-size:10px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;
@@ -1556,8 +1563,11 @@ function tableHTML(){
       <div class="rail-lbl" id="raillbl">${cap(T6.n)}</div>
     </div>
     ${needHTML()}
-    <div class="strip5" id="strip5">${[0,1,2,3,4].map(i=>
-      `<div class="sl${S.frames&&S.frames[i]?' on':''}" id="sl${i}">${S.frames&&S.frames[i]?scene(S,{seed:S.seed+i*17,angle:'cover'}):''}</div>`).join('')}</div>
+    <div class="filmwrap">
+      <div class="film-t">Твоя плёнка · 5 кадров</div>
+      <div class="strip5" id="strip5">${[0,1,2,3,4].map(i=>
+        `<div class="sl${S.frames&&S.frames[i]?' on':''}" id="sl${i}" data-i="${i+1}">${S.frames&&S.frames[i]?scene(S,{seed:S.seed+i*17,compose:(S.shots||[])[i]||null,angle:'cover'}):''}</div>`).join('')}</div>
+    </div>
     <div class="stations">${STATIONS.map(st=>`
       <button class="st${T.done[st.id]?' done':''}${nextStation()===st.id?' next':''}" id="st_${st.id}" onclick="openPuzzle('${st.id}')">
         <span class="st-e">${st.e}</span>
@@ -2316,7 +2326,7 @@ function syncStrip(){
   const st=$('strip5'); if(!st)return;
   [0,1,2,3,4].forEach(i=>{
     const sl=$('sl'+i);
-    if(sl&&S.hero){sl.classList.add('on'); sl.innerHTML=scene(S,{seed:S.seed+i*17,angle:'cover'})}
+    if(sl&&S.hero){sl.classList.add('on'); sl.innerHTML=scene(S,{seed:S.seed+i*17,compose:(S.shots||[])[i]||null,angle:'cover'})}
   });
 }
 
