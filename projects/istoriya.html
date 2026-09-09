@@ -1382,11 +1382,12 @@ function savePoster(){
     .replace('<svg','<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080"');
   const img=new Image();
   img.onload=()=>{
-    cx.drawImage(img,0,0,W,1080-90);
-    // подпись
-    const g=cx.createLinearGradient(0,760,0,990);
+    // квадрат рисуем без искажений, лишнее снизу просто обрезаем
+    cx.drawImage(img,0,0,1080,1010,0,0,W,1010);
+    const g=cx.createLinearGradient(0,790,0,1010);
     g.addColorStop(0,'rgba(255,248,238,0)'); g.addColorStop(1,'#FFF8EE');
-    cx.fillStyle=g; cx.fillRect(0,760,W,230);
+    cx.fillStyle=g; cx.fillRect(0,790,W,222);
+    cx.fillStyle='#FFF8EE'; cx.fillRect(0,1008,W,H-1008);
     cx.fillStyle='#2B2118'; cx.textAlign='center';
     cx.font='800 74px Unbounded, system-ui, sans-serif';
     let t=(S.title||'Моя история'); if(t.length>26)t=t.slice(0,25)+'…';
