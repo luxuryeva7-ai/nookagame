@@ -266,6 +266,28 @@ body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);-w
 .pg{font-size:12.5px;font-weight:800;color:var(--acc);background:#fff;
  padding:5px 11px;border-radius:999px}
 .pg.has{background:#DFF5EA;color:#2E9E5B}
+/* студия: ребёнок сам ставит кадр */
+.studio{margin-top:10px;background:var(--card);border-radius:18px;box-shadow:var(--sh);padding:12px}
+.stage-wrap{position:relative;border-radius:14px;overflow:hidden;background:#EFE6D6}
+.stg{aspect-ratio:3/2}
+.stg svg{width:100%;height:100%;display:block}
+.drag-h,.drag-p{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;
+ background:rgba(255,255,255,.72);box-shadow:0 2px 8px rgba(60,40,10,.35);cursor:grab;
+ touch-action:none;display:flex;align-items:center;justify-content:center;font-size:17px;
+ border:2.5px dashed var(--acc);transition:transform .1s}
+.drag-p{border-color:#2E9E5B;width:36px;height:36px;margin:-18px 0 0 -18px;font-size:14px}
+.drag-h.grab,.drag-p.grab{transform:scale(1.15);background:#fff}
+.sizerow{display:flex;align-items:center;gap:9px;margin-top:11px}
+.szl{flex:1;font-size:12px;font-weight:800;color:var(--ink3)}
+.szb{width:40px;height:36px;border:none;border-radius:11px;background:var(--accbg);color:var(--acc);
+ font-size:19px;font-weight:900;cursor:pointer;font-family:inherit}
+.szv{font-size:12.5px;font-weight:900;color:var(--ink);min-width:44px;text-align:center}
+.frames5{display:flex;gap:7px;margin-top:11px}
+.f5{flex:1;height:38px;border:2px solid var(--line);border-radius:11px;background:var(--card);
+ font-family:inherit;font-weight:900;font-size:14px;color:var(--ink3);cursor:pointer}
+.f5.on{border-color:var(--acc);background:var(--accbg);color:var(--acc)}
+.f5.has{border-color:#2E9E5B;color:#2E9E5B}
+.f5.on.has{background:#DFF5EA}
 .demohand{position:absolute;left:50%;bottom:-4px;transform:translateX(-50%);z-index:40;
  pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:6px;
  transition:opacity .3s}
@@ -304,14 +326,19 @@ body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);-w
  box-shadow:inset 0 3px 10px rgba(90,60,25,.35);display:flex;align-items:center;justify-content:center;
  gap:8px;font-size:30px;margin-bottom:10px}
 .bowl-h{font-size:11.5px;font-weight:800;color:rgba(70,45,15,.5)}
-.bw{animation:pop .3s cubic-bezier(.2,.8,.3,1)}
+.bw{animation:pop .3s cubic-bezier(.2,.8,.3,1);font-size:13px;font-weight:800;color:#4A3418;
+ text-align:center;line-height:1.25;padding:0 8px}
 .shelf-t{font-size:10px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;
  color:var(--ink3);margin:9px 0 5px}
 .shelf{display:flex;flex-wrap:wrap;gap:7px;background:#F6EEE2;border-radius:12px;padding:9px;
  box-shadow:inset 0 -3px 0 rgba(150,110,60,.18)}
 .shelf-e{font-size:11.5px;color:var(--ink3);font-weight:700}
-.bi{font-size:26px;cursor:grab;touch-action:none;user-select:none;transition:transform .12s;
- width:38px;height:38px;display:flex;align-items:center;justify-content:center}
+.bi{cursor:grab;touch-action:none;user-select:none;transition:transform .12s;
+ width:56px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 2px;
+ border-radius:11px;background:#FFFDF8;box-shadow:0 1px 0 rgba(120,80,30,.18)}
+.bi b{font-size:8.5px;font-weight:800;color:var(--ink3);line-height:1.05;text-align:center;
+ max-width:52px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bi svg{pointer-events:none}
 .bi.hot{transform:scale(1.22);filter:drop-shadow(0 0 8px rgba(230,92,0,.8))}
 .bi.ghost{position:fixed;z-index:99;pointer-events:none;transform:translate(-50%,-50%) scale(1.3);opacity:.9}
 .bench-res{margin-top:10px;font-size:11.5px;font-weight:800;color:var(--ink3);text-align:center}
@@ -743,6 +770,7 @@ function svgBG(place,time,seed,living,mood){
 /* ── СЦЕНА ── */
 function scene(st,opt){
   opt=opt||{};
+  const CMP=opt.compose||null;   // ребёнок сам поставил героя и предмет
   if(opt.forceState){/* рисуем переданное состояние как есть */}
   const seed=opt.seed!==undefined?opt.seed:st.seed;
   const ang=opt.angle||(st.angle?st.angle.id:'full');
@@ -751,12 +779,15 @@ function scene(st,opt){
   let inner='';
   inner+=svgBG(st.place,st.time,seed,st.living,st.mood?st.mood.id:null);
   if(st.hero){
-    inner+=`<g transform="translate(0 0)">`+svgHero(st.hero,st.mood?st.mood.id:'brave',seed,stl,st.acc)+`</g>`;
+    const hx=CMP?(CMP.hx-50)*3:0, hy=CMP?(CMP.hy-64)*2:0, hs=CMP?CMP.hs:1;
+    inner+=`<g transform="translate(${hx} ${hy}) translate(100 130) scale(${hs}) translate(-100 -130)">`
+      +svgHero(st.hero,st.mood?st.mood.id:'brave',seed,stl,st.acc)+`</g>`;
     // последствие выбранного поворота сюжета видно прямо в кадре
     const fk=opt.fork;
     if(st.prop&&fk!=='stolen'){
       const fade=fk==='fade'?' opacity=".38"':'';
-      inner+=`<g${fade}>`+svgProp(st.prop,seed)+`</g>`;
+      const px=CMP?(CMP.px-50)*3:0, py=CMP?(CMP.py-78)*2:0;
+      inner+=`<g${fade} transform="translate(${px} ${py})">`+svgProp(st.prop,seed)+`</g>`;
       if(fk==='alive')inner+=svgFace(100,163,.42,'amazed');
       if(fk==='door')inner+=`<rect x="236" y="120" width="34" height="56" rx="4" fill="#3A2A18" opacity=".85"/><circle cx="262" cy="150" r="2.6" fill="#F2C337"/>`;
     }
@@ -789,6 +820,10 @@ function vb(sex,stem){return stem+(sex==='f'?'а':'')}
 /* возвратные: взялся / взялась — «ся» и «а» не складываются, а замещаются */
 function rf(sex,stem){return stem+(sex==='f'?'ась':'ся')}
 
+/* подписи ребёнка из студии идут в книжку вместо машинного текста */
+function shotNotes(){
+  return (S.shots||[]).map(x=>x&&x.note?x.note.trim():'');
+}
 function makeStory(st){
   const r=rng(st.seed*97+st.textSeed*13);
   const H=st.hero,P=st.place,T=st.time,M=st.mood,PR=st.prop;
@@ -849,7 +884,9 @@ function makeStory(st){
   const b5=b5map[C?C.id:'home'];
 
   const P4=[pick(r,b1),pick(r,b2),pick(r,b3),pick(r,b4),pick(r,b5)];
-  return P4.map(polish);
+  const mine=shotNotes();
+  // где ребёнок подписал сам — оставляем его слова, они важнее моих
+  return P4.map((t,i)=>mine[i]?polish(mine[i]):polish(t));
 }
 
 /* ═══════════════ ЭКРАНЫ ═══════════════ */
@@ -1267,7 +1304,7 @@ function renderArt(){
     <div class="cover-a">Сделал${S.author&&/[аяь]$/i.test(S.author)?'а':''} ${S.author}${S.age?', '+S.age+' лет':''} · ${dstr}</div></div></div></div>`;
   // страницы
   pages.forEach((p,i)=>{
-    html+=`<div class="page"><div class="scene">${scene(S,{seed:S.seed+i*17,angle:i===1?'close':i===4?'far':'full'})}</div>
+    html+=`<div class="page"><div class="scene">${scene(S,{seed:S.seed+i*17,compose:(S.shots||[])[i]||null,angle:(S.shots||[])[i]&&S.shots[i].done?'full':(i===1?'close':i===4?'far':'full')})}</div>
       <div class="page-txt">${p}${i===3&&S.line?`<div style="margin-top:10px;background:var(--accbg);border-radius:13px;padding:9px 13px;font-weight:800;color:var(--acc)">— ${S.line}</div>`:''}</div></div>`;
   });
   // разворот «как придумал»
@@ -1384,6 +1421,7 @@ const STATIONS=[
  {id:'belt',  n:'Лента',    sub:'разбери на признаки',     e:'📦', y:314, h:112, hint:'смахивай в корзины'},
  {id:'glass', n:'Стёкла',   sub:'протри и увидь',          e:'🪟', y:440, h:112, hint:'три пальцем'},
  {id:'fresco',n:'Фреска',   sub:'почини кадры',            e:'🖼', y:566, h:150, hint:'крути заплатки'},
+ {id:'studio',n:'Студия',   sub:'поставь кадр сам',        e:'🎬', y:730, h:150, hint:'двигай пальцем'},
 ];
 
 /* Что должно быть в книжке. Ребёнок всё время видит, чего не хватает. */
@@ -1394,10 +1432,17 @@ const NEED=[
  {k:'time', n:'Время',   e:'🌙', from:'rail',   fromN:'солнце вверху'},
  {k:'mood', n:'Характер',e:'💫', from:'belt',   fromN:'Лента'},
  {k:'style',n:'Как рисовать',e:'🎨',from:'fresco',fromN:'Фреска'},
+ {k:'shots',n:'Твои кадры',e:'🎬',from:'studio',fromN:'Студия'},
 ];
 function needList(){
-  return NEED.map(x=>({...x, have:!!S[x.k],
-    val:S[x.k]?(x.k==='mood'&&S.hero&&S.hero.sex==='f'?S[x.k].f:S[x.k].n):null}));
+  return NEED.map(x=>{
+    if(x.k==='shots'){
+      const n=(S.shots||[]).filter(y=>y&&y.done).length;
+      return {...x,have:n>0,val:n?n+' из 5':null};
+    }
+    return {...x,have:!!S[x.k],
+      val:S[x.k]?(x.k==='mood'&&S.hero&&S.hero.sex==='f'?S[x.k].f:S[x.k].n):null};
+  });
 }
 function needHTML(){
   const L=needList(), got=L.filter(x=>x.have).length;
@@ -1413,8 +1458,9 @@ function needHTML(){
 }
 /* что даёт каждый пазл — пишем прямо на карточке */
 function stationGives(id){
-  const mine=NEED.filter(x=>x.from===id);
-  const left=mine.filter(x=>!S[x.k]);
+  const L=needList();
+  const mine=L.filter(x=>x.from===id);
+  const left=mine.filter(x=>!x.have);
   if(!mine.length)return '';
   if(!left.length)return '✓ всё собрано';
   return 'даст: '+left.map(x=>x.n.toLowerCase()).join(' и ');
@@ -1452,9 +1498,9 @@ function tableHTML(){
 }
 /* какой пазл подсветить как следующий — первый, который ещё что-то даёт */
 function nextStation(){
+  const L=needList();
   for(const st of STATIONS){
-    const mine=NEED.filter(x=>x.from===st.id);
-    if(mine.some(x=>!S[x.k]))return st.id;
+    if(L.some(x=>x.from===st.id&&!x.have))return st.id;
   }
   return null;
 }
@@ -1552,6 +1598,40 @@ function dropJunk(kind){
   });
 }
 
+/* Детали верстака рисуются одной рукой: общая палитра, общая обводка.
+   Эмодзи из разных наборов давали пестроту. */
+const INK='#3A2A18', W1='#F2E4CC', W2='#D9BE94', ACC1='#E08A3C', ACC2='#6E9E7A';
+function dSVG(inner,vb){
+  return `<svg viewBox="${vb||'0 0 40 40'}" width="34" height="34" style="display:block">
+    <g fill="none" stroke="${INK}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${inner}</g></svg>`;
+}
+const DRAW={
+ // части живого
+ ear_s:`<path d="M12 30 L20 8 L28 30 Z" fill="${W2}"/>`,
+ ear_r:`<circle cx="20" cy="20" r="11" fill="${W2}"/><circle cx="20" cy="20" r="5" fill="${W1}"/>`,
+ tail_b:`<path d="M10 30 q2 -18 20 -20 q-6 10 -6 20 q-8 4 -14 0z" fill="${W2}"/>`,
+ tail_l:`<path d="M8 26 q10 4 14 -6 q4 -10 12 -8" fill="none" stroke-width="3"/>`,
+ shell:`<path d="M8 26 q12 -16 24 0 q-12 6 -24 0z" fill="${ACC2}"/><path d="M20 12 v14 M12 20 h16"/>`,
+ wing:`<path d="M10 28 q4 -18 22 -18 q-4 12 -14 20 q-6 2 -8 -2z" fill="${W1}"/>`,
+ paw:`<rect x="14" y="10" width="12" height="18" rx="4" fill="${W2}"/><path d="M14 16 h12 M14 22 h12"/>`,
+ beak:`<path d="M12 20 L30 14 L30 26 Z" fill="${ACC1}"/>`,
+ // вещи
+ key:`<circle cx="14" cy="20" r="6" fill="${W1}"/><path d="M20 20 h14 M30 20 v5"/>`,
+ stone:`<path d="M12 24 L18 10 L28 14 L30 26 L18 30 Z" fill="${ACC2}"/>`,
+ feath:`<path d="M20 32 q-6 -12 0 -22 q6 10 0 22z" fill="${W1}"/><path d="M20 32 v-20"/>`,
+ coin:`<circle cx="20" cy="20" r="10" fill="${ACC1}"/><circle cx="20" cy="20" r="5"/>`,
+ egg:`<ellipse cx="20" cy="21" rx="9" ry="11" fill="${W1}"/>`,
+ seed:`<ellipse cx="20" cy="24" rx="6" ry="8" fill="${W2}"/><path d="M20 16 q6 -8 2 -10 q-6 4 -2 10z" fill="${ACC2}"/>`,
+ shard:`<path d="M13 10 L28 14 L24 32 L14 26 Z" fill="${W1}"/><path d="M17 14 L22 28"/>`,
+ lamp:`<rect x="15" y="16" width="10" height="16" rx="3" fill="${W2}"/><path d="M12 16 h16 l-4 -6 h-8z" fill="${ACC1}"/>`,
+ // признаки
+ soft:`<path d="M20 8 q9 12 9 17 a9 9 0 0 1 -18 0 q0 -5 9 -17z" fill="#9FD3E8"/>`,
+ iron:`<circle cx="20" cy="20" r="8" fill="${W2}"/><path d="M20 8 v5 M20 27 v5 M8 20 h5 M27 20 h5"/>`,
+ glow:`<path d="M20 7 l3 9 l9 3 l-9 3 l-3 9 l-3 -9 l-9 -3 l9 -3z" fill="#F2C94C"/>`,
+ loud:`<path d="M8 24 q6 -8 12 0 q6 8 12 0" stroke-width="2.6"/><path d="M8 16 q6 -8 12 0 q6 8 12 0" opacity=".5"/>`,
+};
+function detailIcon(id){ return DRAW[id]?dSVG(DRAW[id]):'<span style="font-size:22px">•</span>' }
+
 /* ═══════ ПАЗЛ 1: ВЕРСТАК — тащи одно на другое ═══════
    Слияние тратит ОБА исходника: полка беднеет, каждое соединение — выбор. */
 const PARTS=[
@@ -1600,11 +1680,11 @@ function benchHTML(){
   return say('Ни одной новой детали тут нет. Всё уже лежало на полке.\nТащи одно на другое — получится третье.','idle')
    +`<div class="bench">
       <div class="bowl" id="bowl">${BENCH.bowl.length
-        ? BENCH.bowl.map(b=>`<span class="bw">${b.e||''}</span>`).join('')
-        : '<span class="bowl-h">чаша слияния</span>'}</div>
+        ? BENCH.bowl.map(b=>`<span class="bw">${b.n||''}</span>`).join('')
+        : '<span class="bowl-h">брось сюда — или прямо одну деталь на другую</span>'}</div>
       ${rows.map(([k,t])=>`<div class="shelf-t">${t}</div>
         <div class="shelf" data-k="${k}">${BENCH.items.filter(i=>i.kind===k).map(i=>
-          `<span class="bi" data-id="${i.id}" title="${i.n}">${i.e}</span>`).join('')||'<span class="shelf-e">пусто</span>'}</div>`).join('')}
+          `<span class="bi" data-id="${i.id}" title="${i.n}">${detailIcon(i.id)}<b>${i.n}</b></span>`).join('')||'<span class="shelf-e">пусто</span>'}</div>`).join('')}
       <div class="bench-res" id="benchres">Осталось деталей: ${BENCH.items.length}</div>
     </div>`;
 }
@@ -1833,42 +1913,68 @@ function glassStart(){
     const mx=mc.getContext('2d'); mx.fillStyle='#fff'; mx.fillRect(0,0,w,h);
     GLASS.masks.push({cv:mc,ctx:mx});
   });
+  // один переиспользуемый буфер вместо четырёх новых на каждый кадр
+  GLASS.tmp=document.createElement('canvas'); GLASS.tmp.width=w; GLASS.tmp.height=h;
+  GLASS.tctx=GLASS.tmp.getContext('2d');
+  GLASS.dirty=true; GLASS.last={x:0,y:0,on:false};
+
   let drag=false;
   const rub=(cx,cy)=>{
     if(GLASS.used>=0.4)return;
-    for(let i=0;i<3;i++){
-      const mx=GLASS.masks[i].ctx;
-      const px=mx.getImageData(Math.max(0,Math.min(w-1,cx|0)),Math.max(0,Math.min(h-1,cy|0)),1,1).data;
-      if(px[3]>10){
-        mx.globalCompositeOperation='destination-out';
-        mx.beginPath(); mx.arc(cx,cy,26,0,7); mx.fill();
-        mx.globalCompositeOperation='source-over';
-        GLASS.used+=Math.PI*26*26/(w*h)/4;
-        break;
+    // выбираем верхний непротёртый слой один раз за штрих, а не на каждую точку
+    let layer=GLASS.strokeLayer;
+    if(layer===undefined||layer===null){
+      layer=0;
+      for(let i=0;i<3;i++){
+        const mx=GLASS.masks[i].ctx;
+        const px=mx.getImageData(Math.max(0,Math.min(w-1,cx|0)),Math.max(0,Math.min(h-1,cy|0)),1,1).data;
+        if(px[3]>10){layer=i;break}
       }
+      GLASS.strokeLayer=layer;
     }
+    const mx=GLASS.masks[layer].ctx;
+    mx.globalCompositeOperation='destination-out';
+    mx.lineCap='round'; mx.lineJoin='round'; mx.lineWidth=52;
+    mx.beginPath();
+    if(GLASS.last.on){mx.moveTo(GLASS.last.x,GLASS.last.y);mx.lineTo(cx,cy);mx.stroke()}
+    mx.beginPath(); mx.arc(cx,cy,26,0,7); mx.fill();
+    mx.globalCompositeOperation='source-over';
+    const d=GLASS.last.on?Math.hypot(cx-GLASS.last.x,cy-GLASS.last.y):0;
+    GLASS.used+=(Math.PI*26*26+d*52)/(w*h)/4;
+    GLASS.last={x:cx,y:cy,on:true};
     const b=$('breath'); if(b)b.style.width=Math.min(100,GLASS.used/0.4*100)+'%';
-    const g=$('glassres'); if(g)g.textContent='Протёрто: '+Math.round(GLASS.used*250)+'%';
-    glassDraw();
+    const g=$('glassres'); if(g)g.textContent='Протёрто: '+Math.min(100,Math.round(GLASS.used*250))+'%';
+    GLASS.dirty=true;
   };
   cv.onpointerdown=e=>{drag=true;cv.setPointerCapture(e.pointerId);
+    GLASS.strokeLayer=null; GLASS.last={x:0,y:0,on:false};
     const r2=cv.getBoundingClientRect(); rub(e.clientX-r2.left,e.clientY-r2.top); e.preventDefault()};
   cv.onpointermove=e=>{if(!drag)return;
-    const r2=cv.getBoundingClientRect(); rub(e.clientX-r2.left,e.clientY-r2.top)};
-  cv.onpointerup=()=>{drag=false;glassPick()};
-  GLASS.run=1; glassDraw();
+    const r2=cv.getBoundingClientRect();
+    // берём все промежуточные точки — иначе на быстром движении остаются пропуски
+    const pts=e.getCoalescedEvents?e.getCoalescedEvents():[e];
+    pts.forEach(p=>rub(p.clientX-r2.left,p.clientY-r2.top));};
+  cv.onpointerup=()=>{drag=false;GLASS.strokeLayer=null;GLASS.last.on=false;glassPick()};
+  cv.onpointercancel=()=>{drag=false;GLASS.strokeLayer=null;GLASS.last.on=false};
+  // рисуем раз в кадр, а не на каждое касание
+  GLASS.run=1;
+  const loop=()=>{ if(!GLASS.run)return;
+    if(GLASS.dirty){GLASS.dirty=false;glassDraw()}
+    GLASS.raf=requestAnimationFrame(loop); };
+  loop();
 }
 function glassDraw(){
-  const {ctx,w,h}=GLASS; if(!ctx)return;
+  const {ctx,w,h,tctx,tmp}=GLASS; if(!ctx)return;
   ctx.clearRect(0,0,w,h);
   for(let i=3;i>=0;i--){
     const im=GLASS.imgs[i]; if(!im)continue;
     if(i===3){ctx.drawImage(im,0,0,w,h);continue}
-    const tmp=document.createElement('canvas'); tmp.width=w; tmp.height=h;
-    const tx=tmp.getContext('2d');
-    tx.drawImage(im,0,0,w,h);
-    tx.globalCompositeOperation='destination-in';
-    tx.drawImage(GLASS.masks[i].cv,0,0);
+    if(!tctx)continue;
+    tctx.clearRect(0,0,w,h);
+    tctx.globalCompositeOperation='source-over';
+    tctx.drawImage(im,0,0,w,h);
+    tctx.globalCompositeOperation='destination-in';
+    tctx.drawImage(GLASS.masks[i].cv,0,0);
     ctx.drawImage(tmp,0,0);
   }
 }
@@ -1998,13 +2104,75 @@ function demoHand(kind){
     {bench:'тащи одну деталь на другую',
      belt:'смахни вниз, в свою корзину',
      glass:'веди пальцем — увидишь, что под стеклом',
-     fresco:'выбери заплатку, потом крути её'}[kind]+'</span>';
+     fresco:'выбери заплатку, потом крути её',
+     studio:'двигай героя — ставь кадр как хочешь'}[kind]+'</span>';
   box.appendChild(h);
   const kill=()=>{h.classList.add('off');setTimeout(()=>h.remove(),300)};
   box.addEventListener('pointerdown',kill,{once:true});
   setTimeout(kill,5200);
 }
 let CUR=null;
+/* ═══════ СТУДИЯ — здесь ребёнок не находит, а СОЗДАЁТ ═══════ */
+const STUDIO={frame:0};
+function shotOf(i){
+  S.shots=S.shots||[];
+  S.shots[i]=S.shots[i]||{hx:50,hy:64,hs:1,px:74,py:78,note:'',done:false};
+  return S.shots[i];
+}
+function studioHTML(){
+  const i=STUDIO.frame, sh=shotOf(i);
+  if(!(S.hero&&S.place))return say('Сначала найди героя и место — потом поставим кадр.','oops')
+    +'<div class="pznote">Загляни в Верстак и Стёкла.</div>';
+  return say(i===0?'Теперь твоя работа. Двигай героя пальцем — где поставишь, там и будет.\nЭто уже не я придумал, а ты.'
+                  :'Кадр '+(i+1)+' из 5. Ставь как хочешь.','happy')
+   +`<div class="studio">
+      <div class="stage-wrap">
+        <div class="stg" id="stg">${scene(S,{seed:S.seed+i*17,compose:sh})}</div>
+        <div class="drag-h" id="dragh" style="left:${sh.hx}%;top:${sh.hy}%">✋</div>
+        <div class="drag-p" id="dragp" style="left:${sh.px}%;top:${sh.py}%">✋</div>
+      </div>
+      <div class="sizerow">
+        <span class="szl">Размер героя</span>
+        <button class="szb" onclick="studioSize(-1)">−</button>
+        <span class="szv" id="szv">${Math.round(sh.hs*100)}%</span>
+        <button class="szb" onclick="studioSize(1)">+</button>
+      </div>
+      <div class="frames5">${[0,1,2,3,4].map(k=>
+        `<button class="f5${k===i?' on':''}${S.shots&&S.shots[k]&&S.shots[k].done?' has':''}" onclick="studioGo(${k})">${k+1}</button>`).join('')}</div>
+      <input class="field" id="shotnote" maxlength="60" placeholder="Что здесь происходит? Твоими словами"
+        value="${(sh.note||'').replace(/"/g,'&quot;')}" oninput="shotOf(${i}).note=this.value;shotOf(${i}).done=true">
+      <div class="bench-res">Твоих кадров: ${(S.shots||[]).filter(x=>x&&x.done).length} из 5</div>
+    </div>`;
+}
+function studioGo(k){STUDIO.frame=k;refreshPuzzle()}
+function studioSize(d){
+  const sh=shotOf(STUDIO.frame);
+  sh.hs=Math.max(.55,Math.min(1.8,sh.hs+d*.15)); sh.done=true;
+  const v=$('szv'); if(v)v.textContent=Math.round(sh.hs*100)+'%';
+  studioRedraw();
+}
+function studioRedraw(){
+  const st=$('stg'); if(st)st.innerHTML=scene(S,{seed:S.seed+STUDIO.frame*17,compose:shotOf(STUDIO.frame)});
+}
+function studioBind(){
+  const wrap=document.querySelector('.stage-wrap'); if(!wrap)return;
+  [['dragh','h'],['dragp','p']].forEach(([id,kind])=>{
+    const el=$(id); if(!el)return;
+    let drag=false;
+    el.onpointerdown=e=>{drag=true;el.setPointerCapture(e.pointerId);el.classList.add('grab');e.preventDefault()};
+    el.onpointermove=e=>{
+      if(!drag)return;
+      const r=wrap.getBoundingClientRect();
+      const x=Math.max(8,Math.min(92,(e.clientX-r.left)/r.width*100));
+      const y=Math.max(22,Math.min(94,(e.clientY-r.top)/r.height*100));
+      el.style.left=x+'%'; el.style.top=y+'%';
+      const sh=shotOf(STUDIO.frame);
+      if(kind==='h'){sh.hx=x;sh.hy=y}else{sh.px=x;sh.py=y}
+      sh.done=true; studioRedraw();
+    };
+    el.onpointerup=()=>{drag=false;el.classList.remove('grab');syncStrip()};
+  });
+}
 function openPuzzle(id){
   CUR=id; S.step='pz'; render();
 }
@@ -2014,17 +2182,18 @@ function refreshPuzzle(){
   bindPuzzle(CUR);
 }
 function puzzleHTML(id){
-  return {bench:benchHTML,belt:beltHTML,glass:glassHTML,fresco:frescoHTML}[id]();
+  return {bench:benchHTML,belt:beltHTML,glass:glassHTML,fresco:frescoHTML,studio:studioHTML}[id]();
 }
 function bindPuzzle(id){
   if(id==='bench')benchBind();
   if(id==='belt')beltStart();
   if(id==='glass')glassStart();
   if(id==='fresco')frescoBind();
+  if(id==='studio')studioBind();
   if(!T.shown){T.shown={}}
   if(!T.shown[id]){T.shown[id]=1; setTimeout(()=>demoHand(id),350)}
 }
-function stopPuzzle(){ beltStop(); GLASS.run=0; }
+function stopPuzzle(){ beltStop(); GLASS.run=0; if(GLASS.raf)cancelAnimationFrame(GLASS.raf); GLASS.raf=0; }
 function finishPuzzle(id){
   T.done[id]=1;
   stopPuzzle(); CUR=null;
