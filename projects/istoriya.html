@@ -237,6 +237,35 @@ body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);-w
 .hintbar{text-align:center;font-size:13px;font-weight:800;color:var(--ink3);padding:14px}
 /* пазлы */
 /* рука-подсказка */
+/* чек-лист «что нужно собрать» */
+.need{background:rgba(255,248,238,.92);border-radius:14px;padding:10px 11px 11px;margin-bottom:10px;
+ position:relative;z-index:2;box-shadow:0 2px 8px rgba(90,60,25,.2)}
+.need-t{font-size:11.5px;font-weight:800;color:var(--ink3);margin-bottom:8px;text-align:center}
+.need-t b{color:var(--acc)}
+.need-r{display:flex;flex-wrap:wrap;gap:5px}
+.nd{flex:1 1 30%;min-width:96px;display:flex;align-items:center;gap:5px;background:#F2E8D8;
+ border-radius:10px;padding:6px 8px;opacity:.55}
+.nd.has{opacity:1;background:#DFF5EA}
+.nd-e{font-size:15px;line-height:1}
+.nd-n{font-size:11px;font-weight:800;color:var(--ink2)}
+.nd-v{font-size:10px;font-weight:700;color:var(--acc);margin-left:auto;
+ max-width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nd.has .nd-n{color:#2E9E5B}
+/* карточка станции: что она даёт */
+.st-gives{font-size:12px;font-weight:800;color:var(--acc);margin-top:1px}
+.st.done .st-gives{color:#2E9E5B}
+.st.next{box-shadow:0 0 0 2.5px var(--acc), 0 1px 0 rgba(43,33,24,.28), 0 10px 18px -8px rgba(43,33,24,.4)}
+.st-badge{position:absolute;left:13px;bottom:11px;font-size:10.5px;font-weight:900;
+ background:var(--acc);color:#fff;padding:4px 10px;border-radius:999px}
+.st{padding-bottom:34px}
+/* цель внутри пазла */
+.pzgoal{background:var(--accbg);border-radius:14px;padding:10px 12px;margin-top:10px}
+.pzgoal-t{font-size:10px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;
+ color:var(--ink3);margin-bottom:6px}
+.pzgoal-r{display:flex;flex-wrap:wrap;gap:6px}
+.pg{font-size:12.5px;font-weight:800;color:var(--acc);background:#fff;
+ padding:5px 11px;border-radius:999px}
+.pg.has{background:#DFF5EA;color:#2E9E5B}
 .demohand{position:absolute;left:50%;bottom:-4px;transform:translateX(-50%);z-index:40;
  pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:6px;
  transition:opacity .3s}
@@ -1020,8 +1049,18 @@ function render(){
     B().innerHTML=`<div class="center">
       <div style="width:150px;height:150px;margin-bottom:6px">${'<svg viewBox="0 0 300 200" style="width:100%;height:100%;border-radius:20px">'+svgBG(PLACES[0],TIMES[0],9,false,null)+'</svg>'}</div>
       <h1 class="h1">Твоя история</h1>
-      <p class="lead">Я прочитал тыщу книжек.\nЦеликом не помню ни одной — я их разобрал.</p>
-      <div class="card"><p class="mini">У меня есть стол с деталями. Собирай что хочешь и в любом порядке — из собранного сложится твоя книжка.</p></div>
+      <p class="lead">Мы сделаем книжку с картинками.\nНо все детали для неё я разобрал —\nони лежат на столе.</p>
+      <div class="card" style="text-align:left">
+        <p class="mini" style="margin-bottom:9px"><b style="color:var(--acc)">Что нужно найти:</b></p>
+        <div class="need-r" style="gap:6px">
+          <div class="nd"><span class="nd-e">🐾</span><span class="nd-n">Герой</span></div>
+          <div class="nd"><span class="nd-e">🗺</span><span class="nd-n">Место</span></div>
+          <div class="nd"><span class="nd-e">🔑</span><span class="nd-n">Вещь</span></div>
+          <div class="nd"><span class="nd-e">🌙</span><span class="nd-n">Время</span></div>
+        </div>
+        <p class="mini" style="margin-top:10px">На столе четыре занятия. Каждое даёт своё.
+        Порядок любой — что соберёшь, то и попадёт в книжку.</p>
+      </div>
     </div>`;
     F().innerHTML=`<button class="btn" onclick="startTable()">Начать</button>`;return;
   }
@@ -1053,10 +1092,17 @@ function render(){
   if(st==='pz'){
     const meta=STATIONS.find(x=>x.id===CUR)||{n:''};
     $('htitle').textContent=meta.n;
-    B().innerHTML=`<div id="pzbody" style="position:relative">${puzzleHTML(CUR)}</div><div class="pznote" id="pznote"></div>`;
+    const mine=NEED.filter(x=>x.from===CUR);
+    B().innerHTML=`<div class="pzgoal">
+        <div class="pzgoal-t">Здесь добываем</div>
+        <div class="pzgoal-r">${mine.map(x=>`
+          <span class="pg${S[x.k]?' has':''}">${x.e} ${x.n}${S[x.k]?': '+(x.k==='mood'&&S.hero&&S.hero.sex==='f'?S[x.k].f:S[x.k].n):''}</span>`).join('')}</div>
+      </div>
+      <div id="pzbody" style="position:relative">${puzzleHTML(CUR)}</div>
+      <div class="pznote" id="pznote"></div>`;
     F().innerHTML=`<div class="btnrow">
       <button class="btn btn2 btn-sm" onclick="stopPuzzle();CUR=null;go('table')">На стол</button>
-      <button class="btn btn-sm" onclick="finishPuzzle('${CUR}')">Готово</button></div>`;
+      <button class="btn btn-sm" onclick="finishPuzzle('${CUR}')">Хватит, на стол</button></div>`;
     setTimeout(()=>bindPuzzle(CUR),60);
     return;
   }
@@ -1340,6 +1386,39 @@ const STATIONS=[
  {id:'fresco',n:'Фреска',   sub:'почини кадры',            e:'🖼', y:566, h:150, hint:'крути заплатки'},
 ];
 
+/* Что должно быть в книжке. Ребёнок всё время видит, чего не хватает. */
+const NEED=[
+ {k:'hero', n:'Герой',   e:'🐾', from:'bench',  fromN:'Верстак'},
+ {k:'prop', n:'Вещь',    e:'🔑', from:'bench',  fromN:'Верстак'},
+ {k:'place',n:'Место',   e:'🗺', from:'glass',  fromN:'Стёкла'},
+ {k:'time', n:'Время',   e:'🌙', from:'rail',   fromN:'солнце вверху'},
+ {k:'mood', n:'Характер',e:'💫', from:'belt',   fromN:'Лента'},
+ {k:'style',n:'Как рисовать',e:'🎨',from:'fresco',fromN:'Фреска'},
+];
+function needList(){
+  return NEED.map(x=>({...x, have:!!S[x.k],
+    val:S[x.k]?(x.k==='mood'&&S.hero&&S.hero.sex==='f'?S[x.k].f:S[x.k].n):null}));
+}
+function needHTML(){
+  const L=needList(), got=L.filter(x=>x.have).length;
+  return `<div class="need">
+    <div class="need-t">Для книжки нужно собрать <b>${got} из 6</b></div>
+    <div class="need-r">${L.map(x=>`
+      <div class="nd${x.have?' has':''}">
+        <span class="nd-e">${x.e}</span>
+        <span class="nd-n">${x.n}</span>
+        <span class="nd-v">${x.have?x.val:'—'}</span>
+      </div>`).join('')}</div>
+  </div>`;
+}
+/* что даёт каждый пазл — пишем прямо на карточке */
+function stationGives(id){
+  const mine=NEED.filter(x=>x.from===id);
+  const left=mine.filter(x=>!S[x.k]);
+  if(!mine.length)return '';
+  if(!left.length)return '✓ всё собрано';
+  return 'даст: '+left.map(x=>x.n.toLowerCase()).join(' и ');
+}
 function tableHTML(){
   const T6=S.time||TIMES[3];
   return `<div class="table" id="tbl">
@@ -1354,19 +1433,30 @@ function tableHTML(){
       <div class="rail-cart" id="cart">☀️</div>
       <div class="rail-lbl" id="raillbl">${cap(T6.n)}</div>
     </div>
+    ${needHTML()}
     <div class="strip5" id="strip5">${[0,1,2,3,4].map(i=>
       `<div class="sl${S.frames&&S.frames[i]?' on':''}" id="sl${i}">${S.frames&&S.frames[i]?scene(S,{seed:S.seed+i*17,angle:'cover'}):''}</div>`).join('')}</div>
     <div class="stations">${STATIONS.map(st=>`
-      <button class="st${T.done[st.id]?' done':''}" id="st_${st.id}" onclick="openPuzzle('${st.id}')" style="min-height:${st.h}px">
+      <button class="st${T.done[st.id]?' done':''}${nextStation()===st.id?' next':''}" id="st_${st.id}" onclick="openPuzzle('${st.id}')">
         <span class="st-e">${st.e}</span>
         <span class="st-n">${st.n}</span>
-        <span class="st-s">${T.done[st.id]?'собрано':st.sub}</span>
-        <span class="st-h">${T.done[st.id]?'✓':st.hint}</span>
+        <span class="st-gives">${stationGives(st.id)}</span>
+        <span class="st-s">${st.sub}</span>
+        <span class="st-h">${T.done[st.id]?'✓ был':st.hint}</span>
+        ${nextStation()===st.id?'<span class="st-badge">начни отсюда</span>':''}
       </button>`).join('')}</div>
     <div class="clutter" id="clutter">${CLUTTER.map(c=>
       `<span class="cl" data-id="${c.id}" style="left:${c.x}px;top:${c.y}px;font-size:${c.s}px">${c.e}</span>`).join('')}</div>
     <div class="junk" id="junk"></div>
   </div>`;
+}
+/* какой пазл подсветить как следующий — первый, который ещё что-то даёт */
+function nextStation(){
+  for(const st of STATIONS){
+    const mine=NEED.filter(x=>x.from===st.id);
+    if(mine.some(x=>!S[x.k]))return st.id;
+  }
+  return null;
 }
 function tblMood(){
   const n=Object.keys(T.done).length;
