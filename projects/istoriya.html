@@ -167,10 +167,18 @@ body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);-w
 .rev-n{flex:none;width:30px;height:30px;border-radius:9px;background:var(--accbg);color:var(--acc);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900}
 
 /* ── прочее ── */
-.huntwrap{margin-top:10px;background:var(--card);border-radius:20px;box-shadow:var(--sh);
- padding:10px;display:flex;flex-direction:column;align-items:center;gap:8px}
-.huntwrap canvas{border-radius:14px;touch-action:none;display:block;background:#DCCFAE}
-.huntbar{font-size:12.5px;font-weight:800;color:var(--ink3);padding:2px 0 0}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}
+.duo-c{background:var(--card);border-radius:16px;box-shadow:var(--sh);padding:8px}
+.duo-l{font-size:10px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;
+ color:var(--ink3);text-align:center;padding-bottom:6px}
+.mini-scene{aspect-ratio:3/2;border-radius:10px;overflow:hidden;background:#EFE6D6;position:relative}
+.mini-scene svg{width:100%;height:100%;display:block}
+.mini-scene.blank{background:repeating-linear-gradient(45deg,#F6EEE2,#F6EEE2 7px,#EFE4D2 7px,#EFE4D2 14px)}
+.marks{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;justify-content:center}
+.mark{font-size:12px;font-weight:800;padding:5px 11px;border-radius:999px}
+.mark.ok{background:#DFF5EA;color:#2E9E5B}
+.mark.no{background:#FDEAEA;color:#D93030}
+.tries{text-align:center;font-size:12px;font-weight:700;color:var(--ink3);padding:9px 0 0}
 .center{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:62vh;text-align:center;padding:20px 8px}
 .h1{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:25px;line-height:1.2;color:var(--ink);margin-bottom:13px}
 .lead{font-size:16px;line-height:1.6;color:var(--ink2);font-weight:600;white-space:pre-line}
@@ -322,6 +330,7 @@ const S={ // состояние
   acc:null, angle:null, master:false, living:false, seed:4821, name:'', title:'',
   line:'', author:'', age:'', forwho:'', fA:null, fB:null, fC:null,
   shot1:null, cmpPick:null, page:0, revealStep:0, eggUsed:false, textSeed:1,
+  target:null, tries:0, hintsUsed:0,   // загадка: что загадал Нейро и сколько попыток
 };
 
 /* ── SVG: герой ── */
@@ -560,6 +569,7 @@ function svgBG(place,time,seed,living,mood){
 /* ── СЦЕНА ── */
 function scene(st,opt){
   opt=opt||{};
+  if(opt.forceState){/* рисуем переданное состояние как есть */}
   const seed=opt.seed!==undefined?opt.seed:st.seed;
   const ang=opt.angle||(st.angle?st.angle.id:'full');
   const vb=ang==='cover'?'36 22 128 128':ang==='close'?'52 26 196 147':ang==='far'?'-40 -14 380 250':'0 0 300 200';
@@ -894,14 +904,33 @@ function render(){
     return;
   }
 
-  if(st==='hunt'){
-    B().innerHTML=say('Детали истории разбросаны по миру.\nВеди пальцем — собери их.','happy')
-      +`<div class="huntwrap">
-          <div class="huntbar" id="huntbar">Найдено 0</div>
-          <canvas id="hcv"></canvas>
-        </div>`;
-    F().innerHTML=`<button class="btn" onclick="huntStop();go('s4')">Хватит, дальше →</button>`;
-    setTimeout(huntStart,60);
+  /* ЗАГАДКА: Нейро уже нарисовал картинку. Твоя задача — СЛОВАМИ добиться такой же.
+     Это игра ровно про то, чему учит Мастерская: точные слова → точный результат. */
+  if(st==='riddle'){
+    $('htitle').textContent='Повтори картинку';
+    const T=S.target;
+    const guessed=riddleScore();
+    const done=guessed.every(g=>g.ok);
+    B().innerHTML=say(S.tries===0
+        ? 'Я загадал картинку. Ты её видишь.\nСкажи словами так, чтобы у тебя вышла такая же.'
+        : (done ? 'Один в один. Ты объяснил точно.' :
+           'Смотри, что сошлось, а что нет. Уточняй.'), done?'happy':(S.tries?'think':'idle'))
+      +`<div class="duo">
+          <div class="duo-c"><div class="duo-l">Загадка</div>
+            <div class="mini-scene">${scene(T,{angle:'full',forceState:1})}</div></div>
+          <div class="duo-c"><div class="duo-l">${S.tries?'Твоя':'Пока пусто'}</div>
+            <div class="mini-scene${S.tries?'':' blank'}">${S.tries?scene(S):''}</div></div>
+        </div>`
+      +(S.tries?`<div class="marks">${guessed.map(g=>
+          `<span class="mark ${g.ok?'ok':'no'}">${g.ok?'✓':'✗'} ${g.label}</span>`).join('')}</div>`:'')
+      +promptCard(4)
+      +(S.tries?`<div class="tries">Попыток: ${S.tries}</div>`:'');
+    F().innerHTML=done
+      ? `<button class="btn" onclick="go('meet')">Отлично, дальше →</button>`
+      : `<div class="btnrow">
+           <button class="btn btn2 btn-sm" onclick="riddleHint()">Подсказка</button>
+           <button class="btn btn-sm" ${ready(4)?'':'disabled'} onclick="riddleTry()">Собрать</button>
+         </div>`;
     return;
   }
 
@@ -1145,251 +1174,65 @@ function renderReveal(){
   },i*260));
 }
 
-/* ═══════ ЭКСПЕДИЦИЯ — игровой сбор деталей ═══════
-   Списки остаются, но основной путь — побегать и найти.
-   Что нашёл, то и попадёт в историю. */
-const HUNT={raf:0,run:0,last:0,acc:0,tick:0};
-const HUNT_N=16, HUNT_VIEW=9;
-
-function huntStart(){
-  const cv=$('hcv'); if(!cv)return;
-  const size=Math.min(360,window.innerWidth-28,Math.max(240,window.innerHeight-330));
-  const dpr=Math.min(2,window.devicePixelRatio||1);
-  cv.width=size*dpr; cv.height=size*dpr; cv.style.width=size+'px'; cv.style.height=size+'px';
-  const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
-  const cell=size/HUNT_VIEW;
-  const r=rng(S.seed*13+7);
-
-  // поляна с деревьями-препятствиями
-  const g=[]; for(let y=0;y<HUNT_N;y++){g.push([]);for(let x=0;x<HUNT_N;x++)
-    g[y].push(x===0||y===0||x===HUNT_N-1||y===HUNT_N-1?1:0)}
-  // кусты ставим редко и по одному — поляна должна оставаться проходимой
-  for(let i=0;i<26;i++){const bx=rint(r,2,HUNT_N-3),by=rint(r,2,HUNT_N-3);
-    if(bx>3||by>3)g[by][bx]=1}
-  // достижимые клетки считаем волной от старта — искру нельзя ставить за стеной
-  const dist=[];for(let y=0;y<HUNT_N;y++){dist.push([]);for(let x=0;x<HUNT_N;x++)dist[y].push(-1)}
-  dist[1][1]=0; const q=[{x:1,y:1}];
-  while(q.length){const c=q.shift();
-    [[1,0],[-1,0],[0,1],[0,-1]].forEach(([dx,dy])=>{const x=c.x+dx,y=c.y+dy;
-      if(x>=0&&y>=0&&x<HUNT_N&&y<HUNT_N&&!g[y][x]&&dist[y][x]<0){dist[y][x]=dist[c.y][c.x]+1;q.push({x,y})}})}
-  const free=[]; for(let y=1;y<HUNT_N-1;y++)for(let x=1;x<HUNT_N-1;x++)
-    if(!g[y][x]&&dist[y][x]>=0&&!(x<3&&y<3))free.push({x,y});
-
-  // что можно найти: недостающие детали истории
-  const need=[];
-  if(!S.place)need.push('place');
-  if(!S.time)need.push('time');
-  if(!S.mood)need.push('mood');
-  if(!S.prop)need.push('prop');
-  if(!S.style)need.push('style');
-  const finds=[];
-  const pool=free.slice();
-  for(let i=pool.length-1;i>0;i--){const j=rint(r,0,i);[pool[i],pool[j]]=[pool[j],pool[i]]}
-  need.forEach((k,i)=>{const c=pool[i*2+1]||pool[i];
-    finds.push({x:c.x+.5,y:c.y+.5,kind:k,got:0,ph:r()*6.28})});
-
-  HUNT.st={p:{x:1.5,y:1.5},target:null,g,free,finds,parts:[],pops:[],
-    trail:[],found:0,total:need.length,glow:0,face:0,moving:0,
-    vx:0,vy:0};        // скорость живёт на состоянии, а не внутри p — иначе NaN
-  HUNT.cv=cv; HUNT.ctx=ctx; HUNT.cell=cell; HUNT.size=size;
-  HUNT.cam={x:1.5,y:1.5};
-  HUNT.run=1; HUNT.last=performance.now(); HUNT.acc=0; HUNT.tick=0;
-
-  const pos=e=>{const b=cv.getBoundingClientRect();const t=e.touches?e.touches[0]:e;
-    return {x:(t.clientX-b.left)/cell+HUNT.cam.x-HUNT_VIEW/2,
-            y:(t.clientY-b.top)/cell+HUNT.cam.y-HUNT_VIEW/2}};
-  cv.onpointerdown=e=>{e.preventDefault();HUNT.st.target=pos(e)};
-  cv.onpointermove=e=>{if(HUNT.st.target){e.preventDefault();HUNT.st.target=pos(e)}};
-  cv.onpointerup=()=>{HUNT.st.target=null};
-  cv.onpointercancel=()=>{HUNT.st.target=null};
-  HUNT.keys={};
-  HUNT.kd=e=>{HUNT.keys[e.key.toLowerCase()]=1}; HUNT.ku=e=>{HUNT.keys[e.key.toLowerCase()]=0};
-  addEventListener('keydown',HUNT.kd); addEventListener('keyup',HUNT.ku);
-  huntDraw();
-  HUNT.raf=requestAnimationFrame(huntLoop);
+/* ═══════ ЗАГАДКА — игра про подбор слов ═══════
+   Нейро загадал картинку. Ребёнок должен ОПИСАТЬ её словами так,
+   чтобы получилась такая же. Это и есть урок Мастерской, но в форме игры:
+   есть цель, попытки, обратная связь по каждому слову и победа. */
+function riddleNew(){
+  const r=rng(1000+Math.floor(Math.random()*9000));
+  S.target={hero:S.hero, place:pick(r,PLACES), time:pick(r,TIMES),
+    mood:pick(r,MOODS), prop:pick(r,PROPS), style:pick(r,STYLES),
+    seed:S.seed, living:false, master:false, acc:null, angle:null};
+  S.place=null;S.time=null;S.mood=null;S.prop=null;S.style=null;
+  S.tries=0; S.hintsUsed=0;
 }
-function huntStop(){
-  if(HUNT.raf)cancelAnimationFrame(HUNT.raf);
-  HUNT.raf=0; HUNT.run=0;
-  if(HUNT.kd){removeEventListener('keydown',HUNT.kd);removeEventListener('keyup',HUNT.ku);HUNT.kd=null}
+/* что сошлось, а что нет — по каждому слову отдельно */
+function riddleScore(){
+  const T=S.target||{};
+  return [
+    {k:'place', label:'место',      ok:!!(S.place&&T.place&&S.place.id===T.place.id)},
+    {k:'time',  label:'время',      ok:!!(S.time&&T.time&&S.time.id===T.time.id)},
+    {k:'mood',  label:'настроение', ok:!!(S.mood&&T.mood&&S.mood.id===T.mood.id)},
+    {k:'prop',  label:'вещь',       ok:!!(S.prop&&T.prop&&S.prop.id===T.prop.id)},
+    {k:'style', label:'стиль',      ok:!!(S.style&&T.style&&S.style.id===T.style.id)},
+  ];
 }
-function huntLoop(t){
-  if(!HUNT.run)return;
-  const dt=Math.min((t-HUNT.last)/1000,.05); HUNT.last=t; HUNT.acc+=dt;
-  let n=0; while(HUNT.acc>=1/60&&n<3){huntStep(1/60);HUNT.acc-=1/60;HUNT.tick++;n++}
-  if(HUNT.acc>1/60)HUNT.acc=0;
-  huntDraw();
-  if(HUNT.run)HUNT.raf=requestAnimationFrame(huntLoop);
-}
-function huntSolid(x,y){const cx=Math.floor(x),cy=Math.floor(y);
-  if(cx<0||cy<0||cx>=HUNT_N||cy>=HUNT_N)return 1; return HUNT.st.g[cy][cx]}
-function huntMove(p,dx,dy){
-  const R=.34;
-  if(dx){const nx=p.x+dx;
-    if(!huntSolid(nx+Math.sign(dx)*R,p.y-R*.9)&&!huntSolid(nx+Math.sign(dx)*R,p.y+R*.9))p.x=nx}
-  if(dy){const ny=p.y+dy;
-    if(!huntSolid(p.x-R*.9,ny+Math.sign(dy)*R)&&!huntSolid(p.x+R*.9,ny+Math.sign(dy)*R))p.y=ny}
-}
-function huntStep(dt){
-  const st=HUNT.st; if(!st)return;
-  let dx=0,dy=0;
-  if(st.target){dx=st.target.x-st.p.x;dy=st.target.y-st.p.y;
-    const d=Math.hypot(dx,dy); if(d<.25){dx=dy=0}else{dx/=d;dy/=d}}
-  const K=HUNT.keys||{};
-  if(K['arrowleft']||K['a'])dx=-1; if(K['arrowright']||K['d'])dx=1;
-  if(K['arrowup']||K['w'])dy=-1; if(K['arrowdown']||K['s'])dy=1;
-  if(dx||dy){const m=Math.hypot(dx,dy)||1;dx/=m;dy/=m}
-  const sp=.062;
-  st.vx+=((dx*sp)-st.vx)*Math.min(1,13*dt);
-  st.vy+=((dy*sp)-st.vy)*Math.min(1,13*dt);
-  const spd=Math.hypot(st.vx,st.vy);
-  if(spd>.004){st.face=Math.atan2(st.vy,st.vx);st.moving=1}else st.moving=0;
-  if(spd>.03){st.trail.push({x:st.p.x,y:st.p.y,t:1});if(st.trail.length>7)st.trail.shift()}
-  st.trail.forEach(p=>p.t-=dt*3.1); st.trail=st.trail.filter(p=>p.t>0);
-  huntMove(st.p,st.vx,st.vy);
-  // находки
-  st.finds.forEach(f=>{
-    if(f.got)return;
-    if(Math.hypot(f.x-st.p.x,f.y-st.p.y)<.72){
-      f.got=1; st.found++; st.glow=22;
-      huntBurst(f.x,f.y,'#FFD84D',14);
-      const label=huntApply(f.kind);
-      st.pops.push({x:f.x,y:f.y-.3,t:1.4,v:label});
-    }});
-  (st.parts||[]).forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=dt*.5;p.t-=dt*1.7});
-  st.parts=(st.parts||[]).filter(p=>p.t>0);
-  (st.pops||[]).forEach(p=>{p.y-=dt*.8;p.t-=dt*.7});
-  st.pops=(st.pops||[]).filter(p=>p.t>0);
-  if(st.glow>0)st.glow--;
-  const half=HUNT_VIEW/2;
-  const tx=Math.max(half,Math.min(HUNT_N-half,st.p.x));
-  const ty=Math.max(half,Math.min(HUNT_N-half,st.p.y));
-  HUNT.cam.x+=(tx-HUNT.cam.x)*Math.min(1,7*dt);
-  HUNT.cam.y+=(ty-HUNT.cam.y)*Math.min(1,7*dt);
-  const bar=$('huntbar');
-  if(bar)bar.textContent='Найдено '+st.found+' из '+st.total;
-  if(st.found>=st.total&&!st.done){st.done=1;setTimeout(()=>{huntStop();go('s4')},900)}
-}
-function huntBurst(x,y,c,n){
-  const st=HUNT.st; st.parts=st.parts||[];
-  for(let i=0;i<n;i++){const a=Math.random()*6.283,v=.03+Math.random()*.07;
-    st.parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-.02,t:1,c,r:.06+Math.random()*.06})}
-}
-/* найденное сразу становится частью истории */
-function huntApply(kind){
-  const r=rng(Math.floor(performance.now())&0xffff);
-  if(kind==='place'){S.place=pick(r,PLACES); return S.place.n}
-  if(kind==='time'){S.time=pick(r,TIMES); return cap(S.time.n)}
-  if(kind==='mood'){S.mood=pick(r,MOODS); return S.hero&&S.hero.sex==='f'?cap(S.mood.f):cap(S.mood.n)}
-  if(kind==='prop'){S.prop=pick(r,PROPS); return cap(S.prop.n)}
-  if(kind==='style'){S.style=pick(r,STYLES); return cap(S.style.n)}
-  return '?';
-}
-function huntDraw(){
-  const st=HUNT.st,ctx=HUNT.ctx,cell=HUNT.cell,size=HUNT.size;
-  if(!ctx||!st)return;
-  const camX=HUNT.cam.x-HUNT_VIEW/2, camY=HUNT.cam.y-HUNT_VIEW/2;
-  ctx.clearRect(0,0,size,size);
-  ctx.save(); ctx.translate(-camX*cell,-camY*cell);
-  ctx.fillStyle='#DCCFAE'; ctx.fillRect(0,0,HUNT_N*cell,HUNT_N*cell);
-  const gx0=Math.max(0,Math.floor(camX)),gx1=Math.min(HUNT_N,Math.ceil(camX+HUNT_VIEW)+1);
-  const gy0=Math.max(0,Math.floor(camY)),gy1=Math.min(HUNT_N,Math.ceil(camY+HUNT_VIEW)+1);
-  ctx.strokeStyle='rgba(0,0,0,.045)'; ctx.lineWidth=1;
-  for(let i=gx0;i<=gx1;i++){ctx.beginPath();ctx.moveTo(i*cell,gy0*cell);ctx.lineTo(i*cell,gy1*cell);ctx.stroke()}
-  for(let i=gy0;i<=gy1;i++){ctx.beginPath();ctx.moveTo(gx0*cell,i*cell);ctx.lineTo(gx1*cell,i*cell);ctx.stroke()}
-  // кусты-препятствия с объёмом
-  for(let y=gy0;y<gy1;y++)for(let x=gx0;x<gx1;x++)if(st.g[y]&&st.g[y][x]){
-    const px=x*cell,py=y*cell,rr=cell*.3;
-    ctx.fillStyle='rgba(0,0,0,.14)';
-    ctx.beginPath();ctx.ellipse(px+cell/2,py+cell*.78,cell*.36,cell*.16,0,0,7);ctx.fill();
-    ctx.fillStyle='#4A6B42';
-    ctx.beginPath();ctx.arc(px+cell*.36,py+cell*.55,rr,0,7);
-    ctx.arc(px+cell*.66,py+cell*.5,rr*.9,0,7);
-    ctx.arc(px+cell*.5,py+cell*.34,rr*.85,0,7);ctx.fill();
-    ctx.fillStyle='#5E8455';
-    ctx.beginPath();ctx.arc(px+cell*.44,py+cell*.36,rr*.5,0,7);ctx.fill();
-  }
-  // искры-находки
-  st.finds.forEach(f=>{
-    if(f.got)return;
-    const ph=HUNT.tick*.06+f.ph;
-    const bob=Math.sin(ph)*cell*.09;
-    const R=cell*(.3+Math.sin(ph)*.04);
-    ctx.save(); ctx.translate(f.x*cell,f.y*cell+bob);
-    ctx.globalAlpha=.3; ctx.fillStyle='#FFD84D';
-    ctx.beginPath();ctx.arc(0,0,R*1.9,0,7);ctx.fill();
-    ctx.globalAlpha=1; ctx.fillStyle='#FFD84D';
-    ctx.beginPath();
-    for(let i=0;i<8;i++){const a=i*Math.PI/4+ph*.3;const rr=i%2?R*.42:R;
-      ctx.lineTo(Math.cos(a)*rr,Math.sin(a)*rr)}
-    ctx.closePath();ctx.fill();
-    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-R*.2,-R*.2,R*.22,0,7);ctx.fill();
-    ctx.restore();
+function riddleTry(){
+  S.tries++;
+  generate(()=>{
+    const g=riddleScore();
+    if(g.every(x=>x.ok)){
+      // отгадал — эта картинка и станет началом истории
+      S.living=false;
+      render();
+    }else render();
   });
-  // след и герой
-  (st.trail||[]).forEach(p=>{ctx.save();ctx.globalAlpha=p.t*.18;
-    ctx.fillStyle=S.hero?S.hero.c[0]:'#E8863C';
-    ctx.beginPath();ctx.arc(p.x*cell,p.y*cell,cell*.28*p.t,0,7);ctx.fill();ctx.restore()});
-  ctx.save(); ctx.translate(st.p.x*cell,st.p.y*cell);
-  const sc=cell*.0105;
-  ctx.scale(sc,sc); ctx.translate(-100,-118);
-  if(S.hero){
-    const g2=document.createElement('div');
-    g2.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">'+
-      svgHero(S.hero,S.mood?S.mood.id:'brave',S.seed,null,null)+'</svg>';
-  }
-  ctx.restore();
-  // простая фигурка героя поверх (canvas-версия)
-  huntHero(ctx,st.p.x*cell,st.p.y*cell,cell*.32);
-  // частицы
-  (st.parts||[]).forEach(p=>{ctx.save();ctx.globalAlpha=Math.max(0,p.t);
-    ctx.fillStyle=p.c;ctx.beginPath();ctx.arc(p.x*cell,p.y*cell,p.r*cell*p.t,0,7);ctx.fill();ctx.restore()});
-  // подписи находок
-  (st.pops||[]).forEach(p=>{ctx.save();ctx.globalAlpha=Math.max(0,Math.min(1,p.t));
-    ctx.font='800 '+Math.round(cell*.3)+'px Nunito, system-ui';ctx.textAlign='center';
-    ctx.strokeStyle='rgba(255,255,255,.9)';ctx.lineWidth=4;
-    ctx.strokeText(p.v,p.x*cell,p.y*cell);
-    ctx.fillStyle='#2B2118';ctx.fillText(p.v,p.x*cell,p.y*cell);ctx.restore()});
-  ctx.restore();
-  // вспышка находки
-  if(st.glow>0){ctx.fillStyle='rgba(255,216,77,'+(st.glow/90)+')';ctx.fillRect(0,0,size,size)}
-  // компас к ближайшей искре
-  let best=null,bd=1e9;
-  st.finds.forEach(f=>{if(f.got)return;const d=Math.hypot(f.x-st.p.x,f.y-st.p.y);if(d<bd){bd=d;best=f}});
-  if(best&&bd>HUNT_VIEW*0.42){
-    const a=Math.atan2(best.y-st.p.y,best.x-st.p.x);
-    ctx.save();ctx.translate(size/2+Math.cos(a)*size*.4,size/2+Math.sin(a)*size*.4);ctx.rotate(a);
-    ctx.globalAlpha=.8;ctx.fillStyle='#FFD84D';
-    ctx.beginPath();ctx.moveTo(cell*.3,0);ctx.lineTo(-cell*.18,cell*.18);ctx.lineTo(-cell*.18,-cell*.18);
-    ctx.closePath();ctx.fill();ctx.restore();
-  }
 }
-/* герой на канвасе — узнаваемый силуэт с ушами по типу */
-function huntHero(ctx,x,y,r){
-  const h=S.hero; if(!h)return;
-  const [main,lite,dark]=h.c;
-  ctx.save(); ctx.translate(x,y);
-  ctx.fillStyle='rgba(60,40,20,.2)';
-  ctx.beginPath();ctx.ellipse(0,r*.92,r*.8,r*.26,0,0,7);ctx.fill();
-  ctx.fillStyle=dark;
-  if(h.ears==='sharp'||h.ears==='tri'){[-1,1].forEach(s=>{ctx.beginPath();
-    ctx.moveTo(s*r*.45,-r*.5);ctx.lineTo(s*r*.72,-r*1.3);ctx.lineTo(s*r*.04,-r*.72);ctx.closePath();ctx.fill()})}
-  else if(h.ears==='big'||h.ears==='rnd'){[-1,1].forEach(s=>{ctx.beginPath();
-    ctx.arc(s*r*.66,-r*.62,r*.36,0,7);ctx.fill()})}
-  else if(h.ears==='tuft'){[-1,1].forEach(s=>{ctx.beginPath();
-    ctx.moveTo(s*r*.4,-r*.55);ctx.lineTo(s*r*.6,-r*1.1);ctx.lineTo(s*r*.06,-r*.75);ctx.closePath();ctx.fill()})}
-  else if(h.ears==='ant'){ctx.strokeStyle=dark;ctx.lineWidth=r*.12;
-    ctx.beginPath();ctx.moveTo(0,-r*.7);ctx.lineTo(0,-r*1.15);ctx.stroke();
-    ctx.beginPath();ctx.arc(0,-r*1.28,r*.16,0,7);ctx.fill()}
-  else if(h.ears==='horn'){[-1,1].forEach(s=>{ctx.beginPath();
-    ctx.moveTo(s*r*.34,-r*.6);ctx.quadraticCurveTo(s*r*.7,-r*1.25,s*r*.2,-r*.9);ctx.closePath();ctx.fill()})}
-  else if(h.ears==='tiny'){[-1,1].forEach(s=>{ctx.beginPath();ctx.arc(s*r*.44,-r*.58,r*.17,0,7);ctx.fill()})}
-  ctx.fillStyle=main; ctx.beginPath();ctx.arc(0,0,r,0,7);ctx.fill();
-  ctx.fillStyle=lite; ctx.beginPath();ctx.ellipse(0,r*.24,r*.42,r*.34,0,0,7);ctx.fill();
-  ctx.fillStyle='#fff';[-1,1].forEach(s=>{ctx.beginPath();ctx.arc(s*r*.32,-r*.1,r*.25,0,7);ctx.fill()});
-  ctx.fillStyle='#22201E';[-1,1].forEach(s=>{ctx.beginPath();ctx.arc(s*r*.32,-r*.08,r*.13,0,7);ctx.fill()});
-  ctx.restore();
+/* подсказка открывает одно неугаданное слово */
+function riddleHint(){
+  const g=riddleScore().filter(x=>!x.ok);
+  if(!g.length)return;
+  const miss=g[0];
+  const T=S.target;
+  S[miss.k]=T[miss.k];
+  S.hintsUsed++;
+  toast('Подсказка: '+miss.label+' — '+riddleName(miss.k));
+  render();
 }
+function riddleName(k){
+  const v=S.target[k]; if(!v)return '';
+  if(k==='place')return v.n;
+  if(k==='time')return cap(v.n);
+  if(k==='mood')return S.hero&&S.hero.sex==='f'?cap(v.f):cap(v.n);
+  if(k==='prop')return cap(v.n);
+  if(k==='style')return cap(v.n);
+  return '';
+}
+function toast(t){const e=document.createElement('div');
+  e.style.cssText='position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:#2B2118;'
+   +'color:#fff;padding:11px 19px;border-radius:999px;font-weight:800;font-size:13.5px;z-index:60;'
+   +'font-family:Nunito,system-ui;box-shadow:0 4px 16px rgba(60,40,20,.3)';
+  e.textContent=t;document.body.appendChild(e);setTimeout(()=>e.remove(),2200)}
 
 /* ── навигация назад ── */
 $('back').onclick=()=>{
