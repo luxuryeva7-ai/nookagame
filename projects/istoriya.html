@@ -1325,7 +1325,7 @@ function finishBook(){
 function renderArt(){
   fillGaps();
   const pages=S.pages||makeStory(S);
-  const d=new Date(2026,8,8);
+  const d=new Date();
   const dstr=d.getDate()+' '+['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'][d.getMonth()];
   const comb=(12*8*6*6*14*8*6*6*6).toLocaleString('ru-RU');
   let html=`<div class="bookwrap"><div class="pages" id="pgs">`;
