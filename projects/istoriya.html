@@ -1188,8 +1188,9 @@ function huntStart(){
   need.forEach((k,i)=>{const c=pool[i*2+1]||pool[i];
     finds.push({x:c.x+.5,y:c.y+.5,kind:k,got:0,ph:r()*6.28})});
 
-  HUNT.st={p:{x:1.5,y:1.5,vx:0,vy:0},target:null,g,free,finds,parts:[],pops:[],
-    trail:[],found:0,total:need.length,glow:0,face:0,moving:0};
+  HUNT.st={p:{x:1.5,y:1.5},target:null,g,free,finds,parts:[],pops:[],
+    trail:[],found:0,total:need.length,glow:0,face:0,moving:0,
+    vx:0,vy:0};        // скорость живёт на состоянии, а не внутри p — иначе NaN
   HUNT.cv=cv; HUNT.ctx=ctx; HUNT.cell=cell; HUNT.size=size;
   HUNT.cam={x:1.5,y:1.5};
   HUNT.run=1; HUNT.last=performance.now(); HUNT.acc=0; HUNT.tick=0;
