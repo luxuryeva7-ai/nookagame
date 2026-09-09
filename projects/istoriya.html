@@ -1353,7 +1353,8 @@ function renderArt(){
   if(posed)mineList.push(['Как стоит герой','ты сам поставил '+posed+' кадр'+(posed===1?'':posed<5?'а':'ов')]);
   if(S.line)mineList.push(['Фраза героя','«'+S.line+'»']);
   if(S.name)mineList.push(['Имя героя',S.name]);
-  if(S.fA||S.fB||S.fC)mineList.push(['Повороты сюжета','3 развилки — твой выбор']);
+  if(S.propMagic)mineList.push(['Чего не было в моей библиотеке','«'+cap(S.propMagic)+'» — ты склеил это сам']);
+  if(S.style)mineList.push(['Как всё нарисовано',S.style.n+' — твоя заплатка']);
   html+=`<div class="page"><div class="minep">
     <div class="minep-h">Что тут твоё</div>
     <div class="minep-l">${mineList.map(x=>`<div class="mn"><span class="mn-k">${x[0]}</span><span class="mn-v">${x[1]}</span></div>`).join('')}</div>
