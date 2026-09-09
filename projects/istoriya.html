@@ -1163,10 +1163,17 @@ function huntStart(){
   // поляна с деревьями-препятствиями
   const g=[]; for(let y=0;y<HUNT_N;y++){g.push([]);for(let x=0;x<HUNT_N;x++)
     g[y].push(x===0||y===0||x===HUNT_N-1||y===HUNT_N-1?1:0)}
-  for(let i=0;i<46;i++){const bx=rint(r,2,HUNT_N-3),by=rint(r,2,HUNT_N-3);
+  // кусты ставим редко и по одному — поляна должна оставаться проходимой
+  for(let i=0;i<26;i++){const bx=rint(r,2,HUNT_N-3),by=rint(r,2,HUNT_N-3);
     if(bx>3||by>3)g[by][bx]=1}
+  // достижимые клетки считаем волной от старта — искру нельзя ставить за стеной
+  const dist=[];for(let y=0;y<HUNT_N;y++){dist.push([]);for(let x=0;x<HUNT_N;x++)dist[y].push(-1)}
+  dist[1][1]=0; const q=[{x:1,y:1}];
+  while(q.length){const c=q.shift();
+    [[1,0],[-1,0],[0,1],[0,-1]].forEach(([dx,dy])=>{const x=c.x+dx,y=c.y+dy;
+      if(x>=0&&y>=0&&x<HUNT_N&&y<HUNT_N&&!g[y][x]&&dist[y][x]<0){dist[y][x]=dist[c.y][c.x]+1;q.push({x,y})}})}
   const free=[]; for(let y=1;y<HUNT_N-1;y++)for(let x=1;x<HUNT_N-1;x++)
-    if(!g[y][x]&&!(x<3&&y<3))free.push({x,y});
+    if(!g[y][x]&&dist[y][x]>=0&&!(x<3&&y<3))free.push({x,y});
 
   // что можно найти: недостающие детали истории
   const need=[];
@@ -1231,7 +1238,7 @@ function huntStep(dt){
   if(K['arrowleft']||K['a'])dx=-1; if(K['arrowright']||K['d'])dx=1;
   if(K['arrowup']||K['w'])dy=-1; if(K['arrowdown']||K['s'])dy=1;
   if(dx||dy){const m=Math.hypot(dx,dy)||1;dx/=m;dy/=m}
-  const sp=.052;
+  const sp=.062;
   st.vx+=((dx*sp)-st.vx)*Math.min(1,13*dt);
   st.vy+=((dy*sp)-st.vy)*Math.min(1,13*dt);
   const spd=Math.hypot(st.vx,st.vy);
