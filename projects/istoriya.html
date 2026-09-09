@@ -132,8 +132,8 @@ body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);-w
 .bookwrap{margin-top:8px}
 .pages{display:flex;align-items:stretch;overflow-x:auto;scroll-snap-type:x mandatory;gap:10px;padding-bottom:6px;scrollbar-width:none}
 .pages::-webkit-scrollbar{display:none}
-.page{flex:none;width:100%;scroll-snap-align:center;background:var(--card);border-radius:20px;box-shadow:var(--sh);overflow:hidden;display:flex;flex-direction:column}
-.page .scene{flex:1;min-height:150px;aspect-ratio:auto;margin:0;border-radius:0;box-shadow:none}
+.page{flex:none;width:100%;scroll-snap-align:center;background:var(--card);border-radius:20px;box-shadow:var(--sh);overflow:hidden;display:flex;flex-direction:column;justify-content:center}
+.page .scene{flex:none;aspect-ratio:3/2;margin:0;border-radius:0;box-shadow:none}
 .page-txt{flex:none;padding:15px 16px 17px;font-size:16px;line-height:1.55;color:var(--ink2);font-weight:500}
 .dots{display:flex;gap:6px;justify-content:center;padding:11px}
 .dot{width:7px;height:7px;border-radius:50%;background:var(--line);transition:all .25s}
