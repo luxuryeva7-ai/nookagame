@@ -185,7 +185,7 @@ body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);-w
  background:repeating-linear-gradient(96deg,transparent 0 6px,rgba(90,55,20,.5) 6px 7px)}
 .lampglow{position:absolute;inset:0;pointer-events:none;
  background:radial-gradient(ellipse 300px 340px at 220px 90px,rgba(255,217,168,.55),transparent 70%)}
-.tbl-head{position:relative;display:flex;align-items:center;gap:10px;z-index:2;min-height:66px}
+.tbl-head{position:relative;display:flex;align-items:center;gap:10px;z-index:6;min-height:66px}
 .tbl-neuro{flex:none}
 .tbl-title{flex:1;font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:15px;
  color:#3A2A14;transform:rotate(-3deg);text-shadow:0 1px 0 rgba(255,255,255,.35)}
@@ -194,7 +194,7 @@ body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);-w
 .lamp{position:absolute;top:-2px;font-size:26px;cursor:grab;touch-action:none;z-index:6;
  filter:drop-shadow(0 3px 5px rgba(60,40,10,.45))}
 /* рельса времени */
-.rail{position:relative;height:56px;margin:8px 0 4px;touch-action:none;z-index:3}
+.rail{position:relative;height:56px;margin:8px 0 4px;touch-action:none;z-index:6}
 .rail-arc{position:absolute;left:6px;right:6px;top:26px;height:3px;border-radius:2px;
  background:linear-gradient(90deg,#8C6A3A,#D8B57A,#8C6A3A);box-shadow:0 1px 0 rgba(255,255,255,.25)}
 .rail-cart{position:absolute;font-size:24px;transform:translate(-50%,-50%);top:20px;left:50%;
@@ -202,7 +202,7 @@ body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);-w
 .rail-lbl{position:absolute;right:8px;bottom:0;font-size:11px;font-weight:900;color:#4A3418;
  background:rgba(255,248,238,.75);padding:2px 8px;border-radius:999px}
 /* планка кадров */
-.strip5{display:flex;gap:6px;margin:6px 0 10px;position:relative;z-index:2}
+.strip5{display:flex;gap:6px;margin:6px 0 10px;position:relative;z-index:6}
 .sl{flex:1;aspect-ratio:3/2;border-radius:7px;overflow:hidden;background:rgba(255,248,238,.35);
  box-shadow:inset 0 0 0 1.5px rgba(90,60,25,.3)}
 .sl.on{background:none}
@@ -238,8 +238,8 @@ body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);-w
 /* пазлы */
 /* рука-подсказка */
 /* чек-лист «что нужно собрать» */
-.need{background:rgba(255,248,238,.92);border-radius:14px;padding:10px 11px 11px;margin-bottom:10px;
- position:relative;z-index:2;box-shadow:0 2px 8px rgba(90,60,25,.2)}
+.need{background:rgba(255,248,238,.96);border-radius:14px;padding:10px 11px 11px;margin-bottom:10px;
+ position:relative;z-index:6;box-shadow:0 2px 8px rgba(90,60,25,.2)}
 .need-t{font-size:11.5px;font-weight:800;color:var(--ink3);margin-bottom:8px;text-align:center}
 .need-t b{color:var(--acc)}
 .need-r{display:flex;flex-wrap:wrap;gap:5px}
