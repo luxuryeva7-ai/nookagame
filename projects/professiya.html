@@ -179,6 +179,11 @@ body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);-w
 .gcard:active{transform:scale(.96)}
 .gcard.on{box-shadow:inset 0 0 0 2px var(--acc);background:var(--accbg)}
 .gcard-ic{font-size:26px;line-height:1}
+.dgwrap{margin-top:10px;background:var(--card);border-radius:20px;box-shadow:var(--sh);
+ padding:10px;display:flex;flex-direction:column;align-items:center;gap:7px}
+.dgwrap canvas{border-radius:14px;touch-action:none;display:block;background:#C9B79A}
+.dgbar{font-size:12.5px;font-weight:800;color:var(--ink3);padding:2px 0 0}
+.dghint{font-size:11.5px;font-weight:700;color:var(--ink3);opacity:.8}
 .center{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:58vh;text-align:center;padding:18px 8px}
 .h1{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:24px;line-height:1.2;margin-bottom:12px}
 .lead{font-size:16px;line-height:1.6;color:var(--ink2);font-weight:600;white-space:pre-line}
@@ -345,9 +350,9 @@ const STARTERS=['Сегодня начнём с…','Опять эта…','Та
 const S={step:'s0',child:'',age:'',problem:null,action:null,object:null,
  seed:4821,hair:0,hairc:0,skin:2,face:0,wear:null,tool:null,head:null,pal:null,
  inp:null,mdl:null,out:null,goalOut:null,chainDone:0,chain:null,
- deed:0,robot:0,me:0,deeds:[],title:'',hero:'',line:'',
+ deed:0,robot:0,me:0,deeds:[],title:'',hero:'',line:'',dataGood:0,dataJunk:0,
  morning:null,main:null,evening:null,tab:'in',beltMode:'free',revealed:0};
-const STEPS=['s0','s1','belt','goal','deeds','desk','look','gear','cmp','names','day','reveal','card','shake'];
+const STEPS=['s0','s1','met','gather','belt','goal','deeds','desk','look','gear','cmp','names','day','reveal','card','shake'];
 
 const $=id=>document.getElementById(id);
 const B=()=>$('body'), F=()=>$('foot');
@@ -604,7 +609,20 @@ function render(){
     B().innerHTML=`<div class="plate"><div class="stage">${personScene()}</div>
       <div class="plate-foot"><span>Кадр #${S.seed}</span><button class="reroll" onclick="rerollGear()">↻ Ещё вариант</button></div></div>`
       +say('Знаю про него всего три слова — оделся как попало.\nРасскажешь больше — переоденем.','oops');
-    F().innerHTML=`<button class="btn" onclick="go('belt')">Дальше →</button>`;
+    F().innerHTML=`<button class="btn" onclick="go('gather')">Дальше →</button>`;
+    return;
+  }
+
+  if(st==='gather'){
+    $('htitle').textContent='Сбор данных';
+    B().innerHTML=say('Модели нужны данные. Собери их сам.\nНо смотри — не всё, что валяется, годится.','think')
+      +`<div class="dgwrap">
+          <div class="dgbar" id="dgbar">Собрано данных: 0</div>
+          <canvas id="dcv"></canvas>
+          <div class="dghint">🗑 мусор лучше обходить</div>
+        </div>`;
+    F().innerHTML=`<button class="btn" onclick="dgStop();go('belt')">Хватит, дальше →</button>`;
+    setTimeout(dgStart,60);
     return;
   }
 
@@ -817,7 +835,10 @@ function runBelt(withGoal){
   const out=withGoal?S.goalOut:S.out;
   const ok1=S.inp.mod===S.mdl.takes, ok2=S.mdl.emits===out.mod;
   let txt,cls;
-  if(ok1&&ok2){txt=`Модель ${S.inp.v} ${S.inp.cnt} — и выдала: <b>${out.n}</b>.`;cls='good'}
+  if(ok1&&ok2){
+    txt=`Модель ${S.inp.v} ${S.inp.cnt} — и выдала: <b>${out.n}</b>.`;
+    if(S.dataJunk>0)txt+=`<br><br>Правда, ты принёс <b>${S.dataJunk} ${plural(S.dataJunk,'кусок','куска','кусков')} мусора</b> — часть ответа получилась мутной.`;
+    cls='good'}
   else if(!ok1){txt=`Модель честно ${S.mdl.past} то, что ты дал. Получилось не то.<br><br>Ты дал ей <b>${S.inp.mod}</b>, а она умеет только <b>${S.mdl.takes}</b>.`;cls='bad'}
   else {txt=`Модель выдала <b>${S.mdl.emitsName}</b>, а ты просил <b>${out.n}</b>. Не совпало.`;cls='bad'}
   const box=$('beltres');
@@ -989,6 +1010,7 @@ function renderCard(){
         <span>${ch.o.mod} ${ch.o.n}</span></span></div>`:''}
       <div class="enc-row"><b>Снаряжение</b><span>${[S.wear&&S.wear.n,S.tool&&S.tool.n,S.head&&S.head.id!=='none'&&S.head.n,S.pal&&S.pal.n].filter(Boolean).join(', ')}</span></div>
       ${S.morning?`<div class="enc-row"><b>День</b><span>${S.morning.n}. ${S.main?S.main.n+'. ':''}${S.evening?'Оставляет: '+S.evening.n.toLowerCase()+'.':''}</span></div>`:''}
+      ${S.dataGood?`<div class="enc-row"><b>Данные</b><span>собрано ${S.dataGood} ${plural(S.dataGood,'порция','порции','порций')}${S.dataJunk?', мусора '+S.dataJunk:', без мусора'}</span></div>`:''}
       <div class="enc-row"><b>Делает сам</b><span>${S.me} ${plural(S.me,'дело','дела','дел')} из шести — остальное считает робот</span></div>
     </div>
     <div class="enc-foot">
@@ -1008,9 +1030,226 @@ function shareCard(){
   else toast('Скопируй адрес из строки браузера');
 }
 
+/* ═════════ СБОР ДАННЫХ — игровая часть ═════════
+   Бегаешь по локации профессии и собираешь данные для модели.
+   Хорошие данные — плюс, мусор — минус. Это и есть урок
+   «мусор на входе — мусор на выходе», прожитый руками. */
+const DG={raf:0,run:0,last:0,acc:0,tick:0};
+const DG_N=16, DG_VIEW=9;
+const DATA_KINDS=[
+ {mod:'👁',n:'снимок',c:'#5FA8D9'},
+ {mod:'👂',n:'запись',c:'#8A6BC4'},
+ {mod:'#️⃣',n:'цифры',c:'#4A8C6B'},
+ {mod:'📄',n:'заметка',c:'#D9A32C'},
+];
+function dgStart(){
+  const cv=$('dcv'); if(!cv)return;
+  const size=Math.min(360,window.innerWidth-28,Math.max(240,window.innerHeight-330));
+  const dpr=Math.min(2,window.devicePixelRatio||1);
+  cv.width=size*dpr; cv.height=size*dpr; cv.style.width=size+'px'; cv.style.height=size+'px';
+  const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+  const cell=size/DG_VIEW;
+  const r=rng(S.seed*29+11);
+
+  const g=[]; for(let y=0;y<DG_N;y++){g.push([]);for(let x=0;x<DG_N;x++)
+    g[y].push(x===0||y===0||x===DG_N-1||y===DG_N-1?1:0)}
+  for(let i=0;i<24;i++){const bx=rint(r,2,DG_N-3),by=rint(r,2,DG_N-3);
+    if(bx>3||by>3)g[by][bx]=1}
+  const dist=[];for(let y=0;y<DG_N;y++){dist.push([]);for(let x=0;x<DG_N;x++)dist[y].push(-1)}
+  dist[1][1]=0; const q=[{x:1,y:1}];
+  while(q.length){const c=q.shift();
+    [[1,0],[-1,0],[0,1],[0,-1]].forEach(([dx,dy])=>{const x=c.x+dx,y=c.y+dy;
+      if(x>=0&&y>=0&&x<DG_N&&y<DG_N&&!g[y][x]&&dist[y][x]<0){dist[y][x]=dist[c.y][c.x]+1;q.push({x,y})}})}
+  const free=[];for(let y=1;y<DG_N-1;y++)for(let x=1;x<DG_N-1;x++)
+    if(!g[y][x]&&dist[y][x]>=0&&!(x<3&&y<3))free.push({x,y});
+  for(let i=free.length-1;i>0;i--){const j=rint(r,0,i);[free[i],free[j]]=[free[j],free[i]]}
+
+  // 9 хороших порций данных и 5 кусков мусора
+  const bits=[];
+  for(let i=0;i<9;i++){const c=free[i];const k=DATA_KINDS[i%DATA_KINDS.length];
+    bits.push({x:c.x+.5,y:c.y+.5,got:0,bad:0,k,ph:r()*6.28})}
+  for(let i=0;i<5;i++){const c=free[9+i];
+    bits.push({x:c.x+.5,y:c.y+.5,got:0,bad:1,k:{mod:'🗑',n:'мусор',c:'#9A8878'},ph:r()*6.28})}
+
+  DG.st={p:{x:1.5,y:1.5},vx:0,vy:0,target:null,g,free,bits,parts:[],pops:[],trail:[],
+    good:0,junk:0,glow:0,shake:0,face:0,moving:0,done:0};
+  DG.cv=cv; DG.ctx=ctx; DG.cell=cell; DG.size=size; DG.cam={x:1.5,y:1.5};
+  DG.run=1; DG.last=performance.now(); DG.acc=0; DG.tick=0;
+
+  const pos=e=>{const b=cv.getBoundingClientRect();const t=e.touches?e.touches[0]:e;
+    return {x:(t.clientX-b.left)/cell+DG.cam.x-DG_VIEW/2,
+            y:(t.clientY-b.top)/cell+DG.cam.y-DG_VIEW/2}};
+  cv.onpointerdown=e=>{e.preventDefault();DG.st.target=pos(e)};
+  cv.onpointermove=e=>{if(DG.st.target){e.preventDefault();DG.st.target=pos(e)}};
+  cv.onpointerup=()=>{DG.st.target=null};
+  cv.onpointercancel=()=>{DG.st.target=null};
+  DG.keys={};
+  DG.kd=e=>{DG.keys[e.key.toLowerCase()]=1}; DG.ku=e=>{DG.keys[e.key.toLowerCase()]=0};
+  addEventListener('keydown',DG.kd); addEventListener('keyup',DG.ku);
+  dgDraw();
+  DG.raf=requestAnimationFrame(dgLoop);
+}
+function dgStop(){
+  if(DG.raf)cancelAnimationFrame(DG.raf);
+  DG.raf=0; DG.run=0;
+  if(DG.kd){removeEventListener('keydown',DG.kd);removeEventListener('keyup',DG.ku);DG.kd=null}
+}
+function dgLoop(t){
+  if(!DG.run)return;
+  const dt=Math.min((t-DG.last)/1000,.05); DG.last=t; DG.acc+=dt;
+  let n=0; while(DG.acc>=1/60&&n<3){dgStep(1/60);DG.acc-=1/60;DG.tick++;n++}
+  if(DG.acc>1/60)DG.acc=0;
+  dgDraw();
+  if(DG.run)DG.raf=requestAnimationFrame(dgLoop);
+}
+function dgSolid(x,y){const cx=Math.floor(x),cy=Math.floor(y);
+  if(cx<0||cy<0||cx>=DG_N||cy>=DG_N)return 1; return DG.st.g[cy][cx]}
+function dgMove(p,dx,dy){
+  const R=.34;
+  if(dx){const nx=p.x+dx;
+    if(!dgSolid(nx+Math.sign(dx)*R,p.y-R*.9)&&!dgSolid(nx+Math.sign(dx)*R,p.y+R*.9))p.x=nx}
+  if(dy){const ny=p.y+dy;
+    if(!dgSolid(p.x-R*.9,ny+Math.sign(dy)*R)&&!dgSolid(p.x+R*.9,ny+Math.sign(dy)*R))p.y=ny}
+}
+function dgStep(dt){
+  const st=DG.st; if(!st)return;
+  let dx=0,dy=0;
+  if(st.target){dx=st.target.x-st.p.x;dy=st.target.y-st.p.y;
+    const d=Math.hypot(dx,dy); if(d<.25){dx=dy=0}else{dx/=d;dy/=d}}
+  const K=DG.keys||{};
+  if(K['arrowleft']||K['a'])dx=-1; if(K['arrowright']||K['d'])dx=1;
+  if(K['arrowup']||K['w'])dy=-1; if(K['arrowdown']||K['s'])dy=1;
+  if(dx||dy){const m=Math.hypot(dx,dy)||1;dx/=m;dy/=m}
+  const sp=.062;
+  st.vx+=((dx*sp)-st.vx)*Math.min(1,13*dt);
+  st.vy+=((dy*sp)-st.vy)*Math.min(1,13*dt);
+  const spd=Math.hypot(st.vx,st.vy);
+  if(spd>.004){st.face=Math.atan2(st.vy,st.vx);st.moving=1}else st.moving=0;
+  if(spd>.03){st.trail.push({x:st.p.x,y:st.p.y,t:1});if(st.trail.length>7)st.trail.shift()}
+  st.trail.forEach(p=>p.t-=dt*3.1); st.trail=st.trail.filter(p=>p.t>0);
+  dgMove(st.p,st.vx,st.vy);
+  st.bits.forEach(b=>{
+    if(b.got)return;
+    if(Math.hypot(b.x-st.p.x,b.y-st.p.y)<.72){
+      b.got=1;
+      if(b.bad){st.junk++; st.shake=14; dgBurst(b.x,b.y,'#9A8878',10);
+        st.pops.push({x:b.x,y:b.y-.3,t:1.3,v:'мусор',bad:1});}
+      else{st.good++; st.glow=20; dgBurst(b.x,b.y,b.k.c,12);
+        st.pops.push({x:b.x,y:b.y-.3,t:1.3,v:b.k.mod+' '+b.k.n,bad:0});}
+    }});
+  (st.parts||[]).forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=dt*.5;p.t-=dt*1.7});
+  st.parts=(st.parts||[]).filter(p=>p.t>0);
+  (st.pops||[]).forEach(p=>{p.y-=dt*.8;p.t-=dt*.7});
+  st.pops=(st.pops||[]).filter(p=>p.t>0);
+  if(st.glow>0)st.glow--;
+  if(st.shake>0)st.shake--;
+  const half=DG_VIEW/2;
+  const tx=Math.max(half,Math.min(DG_N-half,st.p.x));
+  const ty=Math.max(half,Math.min(DG_N-half,st.p.y));
+  DG.cam.x+=(tx-DG.cam.x)*Math.min(1,7*dt);
+  DG.cam.y+=(ty-DG.cam.y)*Math.min(1,7*dt);
+  const bar=$('dgbar');
+  if(bar)bar.innerHTML='Собрано данных: <b style="color:var(--acc)">'+st.good+'</b>'
+    +(st.junk?' · мусора: <b style="color:#D93030">'+st.junk+'</b>':'');
+  if(st.good>=6&&!st.done){st.done=1;
+    S.dataGood=st.good; S.dataJunk=st.junk;
+    setTimeout(()=>{dgStop();go('belt')},900)}
+}
+function dgBurst(x,y,c,n){
+  const st=DG.st; st.parts=st.parts||[];
+  for(let i=0;i<n;i++){const a=Math.random()*6.283,v=.03+Math.random()*.07;
+    st.parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-.02,t:1,c,r:.06+Math.random()*.06})}
+}
+function dgDraw(){
+  const st=DG.st,ctx=DG.ctx,cell=DG.cell,size=DG.size;
+  if(!ctx||!st)return;
+  const camX=DG.cam.x-DG_VIEW/2, camY=DG.cam.y-DG_VIEW/2;
+  ctx.clearRect(0,0,size,size);
+  ctx.save();
+  if(st.shake>0)ctx.translate((Math.random()-.5)*st.shake*.4,(Math.random()-.5)*st.shake*.4);
+  ctx.save(); ctx.translate(-camX*cell,-camY*cell);
+  const W=BGS[S.problem?S.problem.bg:'forest']||BGS.forest;
+  ctx.fillStyle=W.ground; ctx.fillRect(0,0,DG_N*cell,DG_N*cell);
+  ctx.fillStyle='rgba(255,255,255,.14)'; ctx.fillRect(0,0,DG_N*cell,DG_N*cell);
+  const gx0=Math.max(0,Math.floor(camX)),gx1=Math.min(DG_N,Math.ceil(camX+DG_VIEW)+1);
+  const gy0=Math.max(0,Math.floor(camY)),gy1=Math.min(DG_N,Math.ceil(camY+DG_VIEW)+1);
+  ctx.strokeStyle='rgba(0,0,0,.05)'; ctx.lineWidth=1;
+  for(let i=gx0;i<=gx1;i++){ctx.beginPath();ctx.moveTo(i*cell,gy0*cell);ctx.lineTo(i*cell,gy1*cell);ctx.stroke()}
+  for(let i=gy0;i<=gy1;i++){ctx.beginPath();ctx.moveTo(gx0*cell,i*cell);ctx.lineTo(gx1*cell,i*cell);ctx.stroke()}
+  for(let y=gy0;y<gy1;y++)for(let x=gx0;x<gx1;x++)if(st.g[y]&&st.g[y][x]){
+    const px=x*cell,py=y*cell,rr=cell*.22;
+    ctx.fillStyle='rgba(0,0,0,.15)';
+    ctx.beginPath();ctx.ellipse(px+cell/2,py+cell*.8,cell*.34,cell*.14,0,0,7);ctx.fill();
+    ctx.fillStyle='#8A7358';
+    ctx.beginPath();ctx.moveTo(px+rr,py+cell*.16);
+    ctx.arcTo(px+cell,py+cell*.16,px+cell,py+cell*.8,rr);
+    ctx.arcTo(px+cell,py+cell*.8,px,py+cell*.8,rr);
+    ctx.arcTo(px,py+cell*.8,px,py+cell*.16,rr);
+    ctx.arcTo(px,py+cell*.16,px+cell,py+cell*.16,rr);ctx.fill();
+    ctx.fillStyle='#A08A6C';
+    ctx.fillRect(px+cell*.16,py+cell*.2,cell*.68,cell*.14);
+  }
+  st.bits.forEach(b=>{
+    if(b.got)return;
+    const ph=DG.tick*.06+b.ph, bob=Math.sin(ph)*cell*.09;
+    ctx.save(); ctx.translate(b.x*cell,b.y*cell+bob);
+    ctx.globalAlpha=.26; ctx.fillStyle=b.k.c;
+    ctx.beginPath();ctx.arc(0,0,cell*.42,0,7);ctx.fill();
+    ctx.globalAlpha=1; ctx.fillStyle='#fff';
+    ctx.beginPath();ctx.arc(0,0,cell*.28,0,7);ctx.fill();
+    ctx.strokeStyle=b.k.c; ctx.lineWidth=2.4; ctx.stroke();
+    ctx.font=Math.round(cell*.32)+'px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(b.k.mod,0,1);
+    ctx.restore();
+  });
+  (st.trail||[]).forEach(p=>{ctx.save();ctx.globalAlpha=p.t*.16;
+    ctx.fillStyle='#5FA8D9';
+    ctx.beginPath();ctx.arc(p.x*cell,p.y*cell,cell*.26*p.t,0,7);ctx.fill();ctx.restore()});
+  dgHero(ctx,st.p.x*cell,st.p.y*cell,cell*.3);
+  (st.parts||[]).forEach(p=>{ctx.save();ctx.globalAlpha=Math.max(0,p.t);
+    ctx.fillStyle=p.c;ctx.beginPath();ctx.arc(p.x*cell,p.y*cell,p.r*cell*p.t,0,7);ctx.fill();ctx.restore()});
+  (st.pops||[]).forEach(p=>{ctx.save();ctx.globalAlpha=Math.max(0,Math.min(1,p.t));
+    ctx.font='800 '+Math.round(cell*.28)+'px Nunito, system-ui';ctx.textAlign='center';
+    ctx.strokeStyle='rgba(255,255,255,.9)';ctx.lineWidth=4;
+    ctx.strokeText(p.v,p.x*cell,p.y*cell);
+    ctx.fillStyle=p.bad?'#D93030':'#2B2118';ctx.fillText(p.v,p.x*cell,p.y*cell);ctx.restore()});
+  ctx.restore();
+  if(st.glow>0){ctx.fillStyle='rgba(95,168,217,'+(st.glow/110)+')';ctx.fillRect(0,0,size,size)}
+  let best=null,bd=1e9;
+  st.bits.forEach(b=>{if(b.got||b.bad)return;const d=Math.hypot(b.x-st.p.x,b.y-st.p.y);if(d<bd){bd=d;best=b}});
+  if(best&&bd>DG_VIEW*0.42){
+    const a=Math.atan2(best.y-st.p.y,best.x-st.p.x);
+    ctx.save();ctx.translate(size/2+Math.cos(a)*size*.4,size/2+Math.sin(a)*size*.4);ctx.rotate(a);
+    ctx.globalAlpha=.8;ctx.fillStyle=best.k.c;
+    ctx.beginPath();ctx.moveTo(cell*.3,0);ctx.lineTo(-cell*.18,cell*.18);ctx.lineTo(-cell*.18,-cell*.18);
+    ctx.closePath();ctx.fill();ctx.restore();
+  }
+  ctx.restore();
+}
+/* человечек-исследователь на канвасе */
+function dgHero(ctx,x,y,r){
+  ctx.save(); ctx.translate(x,y);
+  ctx.fillStyle='rgba(40,26,10,.2)';
+  ctx.beginPath();ctx.ellipse(0,r*1.05,r*.75,r*.24,0,0,7);ctx.fill();
+  const wc=S.wear?S.wear.c:'#2E6B8A';
+  ctx.fillStyle='#3A3A44';
+  ctx.fillRect(-r*.28,r*.2,r*.22,r*.8); ctx.fillRect(r*.06,r*.2,r*.22,r*.8);
+  ctx.fillStyle=wc;
+  ctx.beginPath();ctx.roundRect?ctx.roundRect(-r*.5,-r*.18,r,r*.95,r*.22):ctx.rect(-r*.5,-r*.18,r,r*.95);
+  ctx.fill();
+  ctx.fillStyle=SKIN[S.skin]||'#E8BC98';
+  ctx.beginPath();ctx.arc(0,-r*.52,r*.42,0,7);ctx.fill();
+  ctx.fillStyle=HAIRC[S.hairc]||'#2B2118';
+  ctx.beginPath();ctx.arc(0,-r*.62,r*.42,Math.PI,0);ctx.fill();
+  ctx.fillStyle='#fff';[-1,1].forEach(s=>{ctx.beginPath();ctx.arc(s*r*.15,-r*.5,r*.11,0,7);ctx.fill()});
+  ctx.fillStyle='#22201E';[-1,1].forEach(s=>{ctx.beginPath();ctx.arc(s*r*.15,-r*.49,r*.06,0,7);ctx.fill()});
+  ctx.restore();
+}
+
 /* ═════════ НАВИГАЦИЯ ═════════ */
 $('back').onclick=()=>{
-  const map={s1:'s0',met:'s1',belt:'met',goal:'belt',deeds:'goal',desk:'deeds',look:'desk',
+  if(typeof dgStop==='function')dgStop();
+  const map={s1:'s0',met:'s1',gather:'met',belt:'gather',goal:'belt',deeds:'goal',desk:'deeds',look:'desk',
     gear:'look',cmp:'gear',names:'cmp',day:'names',reveal:'day',card:'reveal',shake:'card'};
   S.step=map[S.step]||'s0'; render();
 };
