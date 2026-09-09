@@ -2158,7 +2158,9 @@ function frescoBind(){
           const pm=el.querySelector('.pmark'); if(pm)pm.style.transform='rotate('+p.ang+'deg)';
           const ok=frescoAligned(p);
           el.classList.toggle('ok',ok);
-          const sm=el.querySelector('small'); if(sm)sm.textContent=ok?'линия сошлась':p.style.n}
+          let bd=el.querySelector('.pok');
+          if(ok&&!bd){bd=document.createElement('b');bd.className='pok';bd.textContent='линия сошлась';el.appendChild(bd)}
+          if(!ok&&bd)bd.remove()}
       }
     };
     el.onpointerup=e=>{
