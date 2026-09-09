@@ -322,6 +322,7 @@ body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);-w
 .pmark{position:absolute;width:3px;height:13px;background:var(--acc);border-radius:2px;
  top:3px;left:50%;margin-left:-1.5px;transform-origin:50% 22px;transition:transform .1s}
 .patch{position:relative}
+.pok{display:block;margin-top:3px;font-size:9px;font-weight:900;letter-spacing:.3px;color:#2E9E5B;text-transform:uppercase}
 .hole{position:relative}
 .patch.ok{box-shadow:inset 0 0 0 2.5px #2E9E5B;background:#EAF8F0}
 .patch.ok .pmark{background:#2E9E5B}
@@ -2092,16 +2093,18 @@ const FRESCO={patches:[],holes:[],picked:null,torn:0};
 function frescoInit(){
   if(FRESCO.patches.length)return;
   const r=rng(S.seed*53+7);
+  // стартовый угол — заведомо кривой, иначе заплатка «сошлась» сама и крутить нечего
+  const skew=()=>{const k=2+Math.floor(r()*20); return k*15;};
   const st=STYLES.slice(); for(let i=st.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[st[i],st[j]]=[st[j],st[i]]}
   const turnsB=FORK_B.slice(0,3), turnsC=FORK_C.slice(0,3);
   // 6 заплаток на 5 дыр — право ровно на одну ошибку
   FRESCO.patches=[
-    {i:0,style:st[0],ang:Math.floor(r()*24)*15,need:0,turn:null,e:styleIcon(st[0].id)},
-    {i:1,style:st[1],ang:Math.floor(r()*24)*15,need:0,turn:null,e:styleIcon(st[1].id)},
-    {i:2,style:st[2],ang:Math.floor(r()*24)*15,need:0,turn:null,e:styleIcon(st[2].id)},
-    {i:3,style:st[3],ang:Math.floor(r()*24)*15,need:0,turn:turnsB[0],e:styleIcon(st[3].id)},
-    {i:4,style:st[4],ang:Math.floor(r()*24)*15,need:0,turn:turnsC[0],e:styleIcon(st[4].id)},
-    {i:5,style:st[5],ang:Math.floor(r()*24)*15,need:0,turn:turnsB[1],e:styleIcon(st[5].id)},
+    {i:0,style:st[0],ang:skew(),need:0,turn:null,e:styleIcon(st[0].id)},
+    {i:1,style:st[1],ang:skew(),need:0,turn:null,e:styleIcon(st[1].id)},
+    {i:2,style:st[2],ang:skew(),need:0,turn:null,e:styleIcon(st[2].id)},
+    {i:3,style:st[3],ang:skew(),need:0,turn:turnsB[0],e:styleIcon(st[3].id)},
+    {i:4,style:st[4],ang:skew(),need:0,turn:turnsC[0],e:styleIcon(st[4].id)},
+    {i:5,style:st[5],ang:skew(),need:0,turn:turnsB[1],e:styleIcon(st[5].id)},
   ];
   FRESCO.holes=[null,null,null,null,null];
 }
@@ -2119,7 +2122,8 @@ function frescoHTML(){
         <div class="patch${FRESCO.picked===p.i?' pick':''}${frescoAligned(p)?' ok':''}" id="pt${p.i}" data-i="${p.i}">
           <span style="transform:rotate(${p.ang}deg)">${p.e}</span>
           <i class="pmark" style="transform:rotate(${p.ang}deg)"></i>
-          <small>${frescoAligned(p)?'линия сошлась':p.style.n}</small>
+          <small>${p.style.n}</small>
+          ${frescoAligned(p)?'<b class="pok">линия сошлась</b>':''}
         </div>`).join('')}</div>
       <div class="bench-res" id="frres">Заплаток: ${FRESCO.patches.filter(p=>!p.used&&!p.torn).length} · порвано: ${FRESCO.torn}</div>
     </div>`;
