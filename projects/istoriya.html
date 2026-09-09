@@ -288,6 +288,16 @@ body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);-w
 .f5.on{border-color:var(--acc);background:var(--accbg);color:var(--acc)}
 .f5.has{border-color:#2E9E5B;color:#2E9E5B}
 .f5.on.has{background:#DFF5EA}
+/* разворот «что тут твоё» */
+.minep{height:100%;display:flex;flex-direction:column;justify-content:center;padding:26px 22px;background:var(--card)}
+.minep-h{font-family:Unbounded,system-ui,sans-serif;font-size:20px;font-weight:800;color:var(--ink);text-align:center;margin-bottom:16px}
+.minep-l{display:flex;flex-direction:column;gap:9px}
+.mn{display:flex;flex-direction:column;gap:2px;background:var(--accbg);border-radius:13px;padding:9px 13px}
+.mn-k{font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--ink3)}
+.mn-v{font-size:14.5px;font-weight:800;color:var(--ink);line-height:1.3}
+.minep-f{margin-top:16px;text-align:center;font-size:14px;font-weight:700;color:var(--ink2);line-height:1.5}
+.minep-f b{color:var(--acc)}
+.minep-g{margin-top:11px;text-align:center;font-size:11.5px;font-weight:700;color:var(--ink3);line-height:1.45}
 .demohand{position:absolute;left:50%;bottom:-4px;transform:translateX(-50%);z-index:40;
  pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:6px;
  transition:opacity .3s}
@@ -825,6 +835,7 @@ function shotNotes(){
   return (S.shots||[]).map(x=>x&&x.note?x.note.trim():'');
 }
 function makeStory(st){
+  if(!(st.hero&&st.place&&st.time&&st.mood&&st.prop&&st.style))fillGaps();
   const r=rng(st.seed*97+st.textSeed*13);
   const H=st.hero,P=st.place,T=st.time,M=st.mood,PR=st.prop;
   const nm=st.name||cap(H.n);
@@ -1129,11 +1140,11 @@ function render(){
   if(st==='pz'){
     const meta=STATIONS.find(x=>x.id===CUR)||{n:''};
     $('htitle').textContent=meta.n;
-    const mine=NEED.filter(x=>x.from===CUR);
+    const mine=needList().filter(x=>x.from===CUR);
     B().innerHTML=`<div class="pzgoal">
         <div class="pzgoal-t">Здесь добываем</div>
         <div class="pzgoal-r">${mine.map(x=>`
-          <span class="pg${S[x.k]?' has':''}">${x.e} ${x.n}${S[x.k]?': '+(x.k==='mood'&&S.hero&&S.hero.sex==='f'?S[x.k].f:S[x.k].n):''}</span>`).join('')}</div>
+          <span class="pg${x.have?' has':''}">${x.e} ${x.n}${x.have&&x.val?': '+x.val:''}</span>`).join('')}</div>
       </div>
       <div id="pzbody" style="position:relative">${puzzleHTML(CUR)}</div>
       <div class="pznote" id="pznote"></div>`;
@@ -1293,6 +1304,7 @@ function finishBook(){
 
 /* ── артефакт ── */
 function renderArt(){
+  fillGaps();
   const pages=S.pages||makeStory(S);
   const d=new Date(2026,8,8);
   const dstr=d.getDate()+' '+['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'][d.getMonth()];
@@ -1313,6 +1325,22 @@ function renderArt(){
     <div class="pdown">↓</div>
     <div class="pquote"><small>Шаг 4</small>«Нарисуй ${promptText()}»</div>
     <p class="mini" style="margin-top:13px;text-align:center">Одно и то же я. Разные слова.</p></div></div>`;
+  // разворот «что тут твоё» — вклад ребёнка списком, чтобы он его видел
+  const mineList=[];
+  if(S.title)mineList.push(['Название книжки','«'+S.title+'»']);
+  const notes=(S.shots||[]).filter(x=>x&&x.note&&x.note.trim());
+  if(notes.length)mineList.push(['Подписи к кадрам',notes.length+' из 5, твоими словами']);
+  const posed=(S.shots||[]).filter(x=>x&&x.done).length;
+  if(posed)mineList.push(['Как стоит герой','ты сам поставил '+posed+' кадр'+(posed===1?'':posed<5?'а':'ов')]);
+  if(S.line)mineList.push(['Фраза героя','«'+S.line+'»']);
+  if(S.name)mineList.push(['Имя героя',S.name]);
+  if(S.fA||S.fB||S.fC)mineList.push(['Повороты сюжета','3 развилки — твой выбор']);
+  html+=`<div class="page"><div class="minep">
+    <div class="minep-h">Что тут твоё</div>
+    <div class="minep-l">${mineList.map(x=>`<div class="mn"><span class="mn-k">${x[0]}</span><span class="mn-v">${x[1]}</span></div>`).join('')}</div>
+    <div class="minep-f">Я нарисовал по твоим словам.<br><b>Придумал — ты.</b></div>
+    ${S.gaps&&S.gaps.length?`<div class="minep-g">Чего не собрал — я добрал сам: ${S.gaps.join(', ')}.</div>`:''}
+  </div></div>`;
   // последняя
   html+=`<div class="page"><div class="lastp">
     ${S.forwho?`<div class="forwho">Для ${S.forwho}</div>`:''}
@@ -1322,17 +1350,54 @@ function renderArt(){
   </div></div>`;
   html+=`</div><div class="dots" id="dots"></div></div>`;
   B().innerHTML=html;
-  const n=pages.length+3;
+  const n=pages.length+4;
   $('dots').innerHTML=Array.from({length:n},(_,i)=>`<div class="dot${i===0?' on':''}"></div>`).join('');
   const pg=$('pgs');
   pg.onscroll=()=>{const i=Math.round(pg.scrollLeft/pg.clientWidth);
     [...$('dots').children].forEach((d,j)=>d.classList.toggle('on',j===i))};
   F().innerHTML=S.shared
     ? `<button class="btn" onclick="location.href=location.pathname">Сделать свою историю</button>`
-    : `<div class="btnrow"><button class="btn btn2 btn-sm" onclick="share()">Показать</button><button class="btn btn-sm" onclick="go('reveal')">Дальше</button></div>`;
+    : `<div class="btnrow"><button class="btn btn2 btn-sm" onclick="savePoster()">Сохранить постер</button><button class="btn btn2 btn-sm" onclick="share()">Ссылка</button><button class="btn btn-sm" onclick="go('reveal')">Дальше</button></div>`;
   $('htitle').textContent=S.shared?('Книжка · '+(S.author||'друг')):'Моя книжка';
 }
 
+/* постер в PNG — то, что ребёнок реально уносит и показывает */
+function savePoster(){
+  const W=1080,H=1350;
+  const cv=document.createElement('canvas'); cv.width=W; cv.height=H;
+  const cx=cv.getContext('2d');
+  cx.fillStyle='#FFF8EE'; cx.fillRect(0,0,W,H);
+  const svg=scene(S,{angle:'cover',compose:(S.shots||[])[0]||null})
+    .replace('<svg','<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080"');
+  const img=new Image();
+  img.onload=()=>{
+    cx.drawImage(img,0,0,W,1080-90);
+    // подпись
+    const g=cx.createLinearGradient(0,760,0,990);
+    g.addColorStop(0,'rgba(255,248,238,0)'); g.addColorStop(1,'#FFF8EE');
+    cx.fillStyle=g; cx.fillRect(0,760,W,230);
+    cx.fillStyle='#2B2118'; cx.textAlign='center';
+    cx.font='800 74px Unbounded, system-ui, sans-serif';
+    let t=(S.title||'Моя история'); if(t.length>26)t=t.slice(0,25)+'…';
+    cx.fillText(t,W/2,1075);
+    cx.fillStyle='#8A7A68'; cx.font='700 34px Nunito, system-ui, sans-serif';
+    const by='Сделал'+(S.author&&/[аяь]$/i.test(S.author)?'а':'')+' '+(S.author||'я')+(S.age?', '+S.age+' лет':'');
+    cx.fillText(by,W/2,1140);
+    if(S.line){cx.fillStyle='#E65C00'; cx.font='800 40px Nunito, system-ui, sans-serif';
+      let l=S.line; if(l.length>34)l=l.slice(0,33)+'…'; cx.fillText('« '+l+' »',W/2,1215)}
+    cx.fillStyle='#C4B4A2'; cx.font='700 28px Nunito, system-ui, sans-serif';
+    cx.fillText('Мастерская Nooka · nookagame.ru',W/2,1295);
+    cv.toBlob(b=>{
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(b);
+      a.download=(S.title||'moya-istoriya').replace(/[^\wа-яА-ЯёЁ -]/g,'')+'.png';
+      document.body.appendChild(a); a.click();
+      setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove()},1500);
+    },'image/png');
+  };
+  img.onerror=()=>alert('Не получилось сохранить картинку');
+  img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+}
 function share(){
   const enc=[S.hero.id,S.place.id,S.time.id,S.mood.id,S.prop.id,S.style.id,
     S.fA.id,S.fB.id,S.fC.id,S.seed,S.living?1:0].join('.');
@@ -1447,7 +1512,7 @@ function needList(){
 function needHTML(){
   const L=needList(), got=L.filter(x=>x.have).length;
   return `<div class="need">
-    <div class="need-t">Для книжки нужно собрать <b>${got} из 6</b></div>
+    <div class="need-t">Для книжки нужно собрать <b>${got} из ${L.length}</b></div>
     <div class="need-r">${L.map(x=>`
       <div class="nd${x.have?' has':''}">
         <span class="nd-e">${x.e}</span>
@@ -1507,6 +1572,18 @@ function nextStation(){
 function tblMood(){
   const n=Object.keys(T.done).length;
   return n===0?'idle':n<3?'think':'happy';
+}
+/* чего ребёнок не собрал — Нейро добирает сам и честно называет это вслух */
+function fillGaps(){
+  const r=rng((S.seed||1)*31+7), miss=[];
+  if(!S.hero){S.hero=pick(r,HEROES); miss.push('героя')}
+  if(!S.place){S.place=pick(r,PLACES); miss.push('место')}
+  if(!S.time){S.time=pick(r,TIMES); miss.push('время суток')}
+  if(!S.mood){S.mood=pick(r,MOODS); miss.push('характер')}
+  if(!S.prop){S.prop=pick(r,PROPS); miss.push('вещь')}
+  if(!S.style){S.style=pick(r,STYLES); miss.push('стиль')}
+  S.gaps=miss;
+  return miss;
 }
 /* сколько частей истории уже есть */
 function tblReady(){
