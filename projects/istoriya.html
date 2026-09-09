@@ -298,6 +298,8 @@ body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);-w
 .minep-f{margin-top:16px;text-align:center;font-size:14px;font-weight:700;color:var(--ink2);line-height:1.5}
 .minep-f b{color:var(--acc)}
 .minep-g{margin-top:11px;text-align:center;font-size:11.5px;font-weight:700;color:var(--ink3);line-height:1.45}
+.mytag{display:inline-block;margin-left:7px;padding:2px 8px;border-radius:8px;background:var(--accbg);
+ color:var(--acc);font-size:10px;font-weight:900;letter-spacing:.3px;text-transform:uppercase;vertical-align:middle}
 .demohand{position:absolute;left:50%;bottom:-4px;transform:translateX(-50%);z-index:40;
  pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:6px;
  transition:opacity .3s}
@@ -1186,11 +1188,18 @@ function render(){
     const box=$('asm');
     pages.forEach((p,i)=>setTimeout(()=>{
       const d=document.createElement('div');d.className='page flyin';d.style.width='100%';d.style.marginBottom='10px';
-      d.innerHTML=`<div class="scene">${scene(S,{seed:S.seed+i*17,angle:i===0?'full':i===1?'close':i===4?'far':'full'})}</div><div class="page-txt">${p}</div>`;
+      const sh=(S.shots||[])[i];
+      d.innerHTML=`<div class="scene">${scene(S,{seed:S.seed+i*17,compose:sh||null,angle:sh&&sh.done?'full':(i===0?'full':i===1?'close':i===4?'far':'full')})}</div>
+        <div class="page-txt">${p}${sh&&sh.note&&sh.note.trim()?'<span class="mytag">твои слова</span>':''}</div>`;
       box.appendChild(d);window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
       if(i===pages.length-1)setTimeout(()=>{
-        box.insertAdjacentHTML('beforeend',say(`Готово. Пять картинок, один герой, одна история.\nЗаметил? ${cap(S.prop.n)}, котор${S.prop.sex==='f'?'ую':S.prop.sex==='n'?'ое':S.prop.sex==='p'?'ые':'ый'} ты дал${''} ему в самом начале, вернул${S.prop.sex==='f'?'ась':S.prop.sex==='n'?'ось':S.prop.sex==='p'?'ись':'ся'} на последней странице. Я ${S.prop.sex==='p'?'их':'его'} не потерял.`));
-        F().innerHTML=`<div class="btnrow"><button class="btn btn2 btn-sm" onclick="S.textSeed++;go('build')">Другими словами</button><button class="btn btn-sm" onclick="go('title')">Дальше</button></div>`;
+        const mine=(S.shots||[]).filter(x=>x&&x.note&&x.note.trim()).length;
+        box.insertAdjacentHTML('beforeend',say(mine>=5
+          ? `Все пять страниц — твои слова. Я не написал тут ни одной.\nЯ только нарисовал то, что ты сказал.`
+          : mine>0
+          ? `${mine} ${mine===1?'страницу':mine<5?'страницы':'страниц'} написал ты, остальное досочинил я.\nХочешь больше своих — вернись в Студию и подпиши кадры.`
+          : `Готово. Пять картинок, один герой, одна история.\nЗаметил? ${cap(S.prop.n)}, котор${S.prop.sex==='f'?'ую':S.prop.sex==='n'?'ое':S.prop.sex==='p'?'ые':'ый'} ты дал ему в самом начале, вернул${S.prop.sex==='f'?'ась':S.prop.sex==='n'?'ось':S.prop.sex==='p'?'ись':'ся'} на последней странице. Я ${S.prop.sex==='p'?'их':'его'} не потерял.`));
+        F().innerHTML=`<div class="btnrow">${mine>=5?'':`<button class="btn btn2 btn-sm" onclick="S.textSeed++;S.pages=null;go('build')">Другими словами</button>`}<button class="btn btn-sm" onclick="go('title')">Дальше</button></div>`;
         window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
       },700);
     },i*720));
