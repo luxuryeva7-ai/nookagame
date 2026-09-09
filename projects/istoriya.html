@@ -130,31 +130,31 @@ body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);-w
 
 /* ── книжка ── */
 .bookwrap{margin-top:8px}
-.pages{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:10px;padding-bottom:6px;scrollbar-width:none}
+.pages{display:flex;align-items:stretch;overflow-x:auto;scroll-snap-type:x mandatory;gap:10px;padding-bottom:6px;scrollbar-width:none}
 .pages::-webkit-scrollbar{display:none}
-.page{flex:none;width:100%;scroll-snap-align:center;background:var(--card);border-radius:20px;box-shadow:var(--sh);overflow:hidden}
+.page{flex:none;width:100%;scroll-snap-align:center;background:var(--card);border-radius:20px;box-shadow:var(--sh);overflow:hidden;display:flex;flex-direction:column}
 .page .scene{margin:0;border-radius:0;box-shadow:none}
-.page-txt{padding:14px 16px;font-size:16px;line-height:1.55;color:var(--ink2);font-weight:500;min-height:92px}
+.page-txt{flex:1;padding:14px 16px;font-size:16px;line-height:1.55;color:var(--ink2);font-weight:500;min-height:92px}
 .dots{display:flex;gap:6px;justify-content:center;padding:11px}
 .dot{width:7px;height:7px;border-radius:50%;background:var(--line);transition:all .25s}
 .dot.on{background:var(--acc);width:19px;border-radius:4px}
 
 /* обложка */
-.cover{background:linear-gradient(160deg,#FFF3E2,#FFE9D2);border-radius:20px;box-shadow:var(--sh);overflow:hidden}
+.cover{flex:1;display:flex;flex-direction:column;justify-content:center;background:linear-gradient(160deg,#FFF3E2,#FFE9D2);border-radius:20px;overflow:hidden}
 .cover .scene{margin:0;border-radius:0;box-shadow:none;aspect-ratio:1/1}
 .cover-b{padding:17px 18px 20px;text-align:center}
 .cover-t{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:23px;line-height:1.22;color:var(--ink);margin-bottom:9px;word-break:break-word}
 .cover-a{font-size:13px;font-weight:700;color:var(--ink3)}
 
 /* финальная страница */
-.lastp{background:var(--card);border-radius:20px;box-shadow:var(--sh);padding:22px 18px;text-align:center;min-height:280px;display:flex;flex-direction:column;justify-content:center;gap:14px}
+.lastp{flex:1;background:var(--card);border-radius:20px;padding:22px 18px;text-align:center;min-height:280px;display:flex;flex-direction:column;justify-content:center;gap:14px}
 .uniq{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:17px;color:var(--acc);line-height:1.35}
 .uniq-f{font-size:11px;color:var(--ink3);font-weight:600;line-height:1.5}
 .forwho{font-size:16px;font-weight:800;color:var(--ink)}
 .honest{font-size:11px;color:var(--ink3);font-weight:600;line-height:1.5;border-top:1px solid var(--line);padding-top:13px}
 
 /* разворот «как придумал» */
-.howp{background:var(--card);border-radius:20px;box-shadow:var(--sh);padding:20px 17px}
+.howp{flex:1;display:flex;flex-direction:column;justify-content:center;background:var(--card);border-radius:20px;padding:20px 17px}
 .howp-h{font-size:11px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);text-align:center;margin-bottom:15px}
 .pquote{background:var(--accbg);border-radius:13px;padding:12px 14px;font-size:14.5px;font-weight:700;color:var(--ink);line-height:1.45}
 .pquote small{display:block;font-size:10.5px;font-weight:900;color:var(--acc);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
@@ -297,7 +297,7 @@ body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);-w
 .f5.has{border-color:#2E9E5B;color:#2E9E5B}
 .f5.on.has{background:#DFF5EA}
 /* разворот «что тут твоё» */
-.minep{height:100%;display:flex;flex-direction:column;justify-content:center;padding:26px 22px;background:var(--card)}
+.minep{flex:1;display:flex;flex-direction:column;justify-content:center;padding:26px 22px;background:var(--card)}
 .minep-h{font-family:Unbounded,system-ui,sans-serif;font-size:20px;font-weight:800;color:var(--ink);text-align:center;margin-bottom:16px}
 .minep-l{display:flex;flex-direction:column;gap:9px}
 .mn{display:flex;flex-direction:column;gap:2px;background:var(--accbg);border-radius:13px;padding:9px 13px}
@@ -1377,7 +1377,7 @@ function renderArt(){
     [...$('dots').children].forEach((d,j)=>d.classList.toggle('on',j===i))};
   F().innerHTML=S.shared
     ? `<button class="btn" onclick="location.href=location.pathname">Сделать свою историю</button>`
-    : `<div class="btnrow"><button class="btn btn2 btn-sm" onclick="savePoster()">Сохранить постер</button><button class="btn btn2 btn-sm" onclick="share()">Ссылка</button><button class="btn btn-sm" onclick="go('reveal')">Дальше</button></div>`;
+    : `<div class="btnrow"><button class="btn btn2 btn-sm" onclick="savePoster()">Картинка</button><button class="btn btn2 btn-sm" onclick="share()">Ссылка</button><button class="btn btn-sm" onclick="go('reveal')">Дальше</button></div>`;
   $('htitle').textContent=S.shared?('Книжка · '+(S.author||'друг')):'Моя книжка';
 }
 
