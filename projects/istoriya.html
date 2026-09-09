@@ -133,8 +133,8 @@ body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);-w
 .pages{display:flex;align-items:stretch;overflow-x:auto;scroll-snap-type:x mandatory;gap:10px;padding-bottom:6px;scrollbar-width:none}
 .pages::-webkit-scrollbar{display:none}
 .page{flex:none;width:100%;scroll-snap-align:center;background:var(--card);border-radius:20px;box-shadow:var(--sh);overflow:hidden;display:flex;flex-direction:column}
-.page .scene{margin:0;border-radius:0;box-shadow:none}
-.page-txt{flex:1;padding:14px 16px;font-size:16px;line-height:1.55;color:var(--ink2);font-weight:500;min-height:92px}
+.page .scene{flex:1;min-height:150px;aspect-ratio:auto;margin:0;border-radius:0;box-shadow:none}
+.page-txt{flex:none;padding:15px 16px 17px;font-size:16px;line-height:1.55;color:var(--ink2);font-weight:500}
 .dots{display:flex;gap:6px;justify-content:center;padding:11px}
 .dot{width:7px;height:7px;border-radius:50%;background:var(--line);transition:all .25s}
 .dot.on{background:var(--acc);width:19px;border-radius:4px}
@@ -1336,7 +1336,7 @@ function renderArt(){
   // страницы
   pages.forEach((p,i)=>{
     html+=`<div class="page"><div class="scene">${scene(S,{seed:S.seed+i*17,compose:(S.shots||[])[i]||null,angle:(S.shots||[])[i]&&S.shots[i].done?'full':(i===1?'close':i===4?'far':'full')})}</div>
-      <div class="page-txt">${p}${i===3&&S.line?`<div style="margin-top:10px;background:var(--accbg);border-radius:13px;padding:9px 13px;font-weight:800;color:var(--acc)">— ${S.line}</div>`:''}</div></div>`;
+      <div class="page-txt">${p}${(S.shots||[])[i]&&S.shots[i].note&&S.shots[i].note.trim()?'<span class="mytag">твои слова</span>':''}${i===3&&S.line?`<div style="margin-top:10px;background:var(--accbg);border-radius:13px;padding:9px 13px;font-weight:800;color:var(--acc)">— ${S.line}</div>`:''}</div></div>`;
   });
   // разворот «как придумал»
   html+=`<div class="page"><div class="howp"><div class="howp-h">Как я это придумал</div>
