@@ -1324,7 +1324,7 @@ function renderArt(){
   // обложка
   html+=`<div class="page"><div class="cover"><div class="scene">${scene(S,{angle:'cover'})}</div>
     <div class="cover-b"><div class="cover-t">${S.title||'Моя история'}</div>
-    <div class="cover-a">Сделал${S.author&&/[аяь]$/i.test(S.author)?'а':''} ${S.author}${S.age?', '+S.age+' лет':''} · ${dstr}</div></div></div></div>`;
+    <div class="cover-a">Автор: ${S.author}${S.age?', '+S.age+' лет':''} · ${dstr}</div></div></div></div>`;
   // страницы
   pages.forEach((p,i)=>{
     html+=`<div class="page"><div class="scene">${scene(S,{seed:S.seed+i*17,compose:(S.shots||[])[i]||null,angle:(S.shots||[])[i]&&S.shots[i].done?'full':(i===1?'close':i===4?'far':'full')})}</div>
@@ -1374,31 +1374,30 @@ function renderArt(){
 
 /* постер в PNG — то, что ребёнок реально уносит и показывает */
 function savePoster(){
-  const W=1080,H=1350;
+  const W=1080,H=1080,IMGH=720;
   const cv=document.createElement('canvas'); cv.width=W; cv.height=H;
   const cx=cv.getContext('2d');
   cx.fillStyle='#FFF8EE'; cx.fillRect(0,0,W,H);
-  const svg=scene(S,{angle:'cover',compose:(S.shots||[])[0]||null})
-    .replace('<svg','<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080"');
+  // кадр целиком — герой не обрезается
+  const svg=scene(S,{angle:'full',compose:(S.shots||[])[0]||null})
+    .replace('<svg','<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="720"');
   const img=new Image();
   img.onload=()=>{
-    // квадрат рисуем без искажений, лишнее снизу просто обрезаем
-    cx.drawImage(img,0,0,1080,1010,0,0,W,1010);
-    const g=cx.createLinearGradient(0,790,0,1010);
+    cx.drawImage(img,0,0,W,IMGH);
+    const g=cx.createLinearGradient(0,IMGH-150,0,IMGH);
     g.addColorStop(0,'rgba(255,248,238,0)'); g.addColorStop(1,'#FFF8EE');
-    cx.fillStyle=g; cx.fillRect(0,790,W,222);
-    cx.fillStyle='#FFF8EE'; cx.fillRect(0,1008,W,H-1008);
-    cx.fillStyle='#2B2118'; cx.textAlign='center';
-    cx.font='800 74px Unbounded, system-ui, sans-serif';
-    let t=(S.title||'Моя история'); if(t.length>26)t=t.slice(0,25)+'…';
-    cx.fillText(t,W/2,1075);
-    cx.fillStyle='#8A7A68'; cx.font='700 34px Nunito, system-ui, sans-serif';
-    const by='Сделал'+(S.author&&/[аяь]$/i.test(S.author)?'а':'')+' '+(S.author||'я')+(S.age?', '+S.age+' лет':'');
-    cx.fillText(by,W/2,1140);
-    if(S.line){cx.fillStyle='#E65C00'; cx.font='800 40px Nunito, system-ui, sans-serif';
-      let l=S.line; if(l.length>34)l=l.slice(0,33)+'…'; cx.fillText('« '+l+' »',W/2,1215)}
-    cx.fillStyle='#C4B4A2'; cx.font='700 28px Nunito, system-ui, sans-serif';
-    cx.fillText('Мастерская Nooka · nookagame.ru',W/2,1295);
+    cx.fillStyle=g; cx.fillRect(0,IMGH-150,W,150);
+    cx.fillStyle='#FFF8EE'; cx.fillRect(0,IMGH-2,W,H-IMGH+2);
+    cx.textAlign='center';
+    cx.fillStyle='#2B2118'; cx.font='800 68px Unbounded, system-ui, sans-serif';
+    let t=(S.title||'Моя история'); if(t.length>24)t=t.slice(0,23)+'…';
+    cx.fillText(t,W/2,IMGH+96);
+    cx.fillStyle='#8A7A68'; cx.font='700 33px Nunito, system-ui, sans-serif';
+    cx.fillText('Автор: '+(S.author||'я')+(S.age?', '+S.age+' лет':''),W/2,IMGH+150);
+    if(S.line){cx.fillStyle='#E65C00'; cx.font='800 38px Nunito, system-ui, sans-serif';
+      let l=S.line; if(l.length>32)l=l.slice(0,31)+'…'; cx.fillText('« '+l+' »',W/2,IMGH+218)}
+    cx.fillStyle='#C4B4A2'; cx.font='700 26px Nunito, system-ui, sans-serif';
+    cx.fillText('Мастерская Nooka · nookagame.ru',W/2,IMGH+308);
     cv.toBlob(b=>{
       const a=document.createElement('a');
       a.href=URL.createObjectURL(b);
