@@ -167,6 +167,15 @@ body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);-w
 .rev-n{flex:none;width:30px;height:30px;border-radius:9px;background:var(--accbg);color:var(--acc);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900}
 
 /* ── прочее ── */
+.memwrap{margin-top:10px;background:var(--card);border-radius:20px;box-shadow:var(--sh);
+ padding:10px;display:flex;flex-direction:column;align-items:center;gap:9px}
+.memwrap canvas{border-radius:14px;touch-action:none;display:block;background:#F3EADC;cursor:pointer}
+.memsay{font-size:12.5px;font-weight:800;color:var(--ink3);min-height:17px;text-align:center}
+.paws{display:flex;gap:7px}
+.paw{width:64px;height:34px;border-radius:11px;border:2px dashed var(--line);
+ display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:800;
+ color:var(--ink3);background:#FFFAF3;padding:0 4px;text-align:center;line-height:1.1}
+.paw.full{border-style:solid;border-color:var(--acc);background:var(--accbg);color:var(--acc)}
 .duo{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}
 .duo-c{background:var(--card);border-radius:16px;box-shadow:var(--sh);padding:8px}
 .duo-l{font-size:10px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;
@@ -330,7 +339,7 @@ const S={ // состояние
   acc:null, angle:null, master:false, living:false, seed:4821, name:'', title:'',
   line:'', author:'', age:'', forwho:'', fA:null, fB:null, fC:null,
   shot1:null, cmpPick:null, page:0, revealStep:0, eggUsed:false, textSeed:1,
-  target:null, tries:0, hintsUsed:0,   // загадка: что загадал Нейро и сколько попыток
+  frames:[],   // пять собранных кадров: что поймал и что закрыл Нейро
 };
 
 /* ── SVG: герой ── */
@@ -682,7 +691,7 @@ function makeStory(st){
 const $=id=>document.getElementById(id);
 const B=()=>$('body'), F=()=>$('foot');
 
-const STEPS=['intro','s1','meet','hunt','s4','joke','cmp','fA','fB','fC','build','title','line','author','art','reveal','end'];
+const STEPS=['intro','s1','show','build1','name','build','title','line','author','art','reveal','end'];
 function pct(){const i=STEPS.indexOf(S.step);return Math.max(0,Math.round(i/(STEPS.length-1)*100))}
 
 /* Нейро — собственный персонаж, а не эмодзи из системного шрифта.
@@ -904,33 +913,38 @@ function render(){
     return;
   }
 
-  /* ЗАГАДКА: Нейро уже нарисовал картинку. Твоя задача — СЛОВАМИ добиться такой же.
-     Это игра ровно про то, чему учит Мастерская: точные слова → точный результат. */
-  if(st==='riddle'){
-    $('htitle').textContent='Повтори картинку';
-    const T=S.target;
-    const guessed=riddleScore();
-    const done=guessed.every(g=>g.ok);
-    B().innerHTML=say(S.tries===0
-        ? 'Я загадал картинку. Ты её видишь.\nСкажи словами так, чтобы у тебя вышла такая же.'
-        : (done ? 'Один в один. Ты объяснил точно.' :
-           'Смотри, что сошлось, а что нет. Уточняй.'), done?'happy':(S.tries?'think':'idle'))
-      +`<div class="duo">
-          <div class="duo-c"><div class="duo-l">Загадка</div>
-            <div class="mini-scene">${scene(T,{angle:'full',forceState:1})}</div></div>
-          <div class="duo-c"><div class="duo-l">${S.tries?'Твоя':'Пока пусто'}</div>
-            <div class="mini-scene${S.tries?'':' blank'}">${S.tries?scene(S):''}</div></div>
-        </div>`
-      +(S.tries?`<div class="marks">${guessed.map(g=>
-          `<span class="mark ${g.ok?'ok':'no'}">${g.ok?'✓':'✗'} ${g.label}</span>`).join('')}</div>`:'')
-      +promptCard(4)
-      +(S.tries?`<div class="tries">Попыток: ${S.tries}</div>`:'');
-    F().innerHTML=done
-      ? `<button class="btn" onclick="go('meet')">Отлично, дальше →</button>`
-      : `<div class="btnrow">
-           <button class="btn btn2 btn-sm" onclick="riddleHint()">Подсказка</button>
-           <button class="btn btn-sm" ${ready(4)?'':'disabled'} onclick="riddleTry()">Собрать</button>
-         </div>`;
+  /* ПОКАЗ: картинка осыпается, ловим куски */
+  if(st==='show'){
+    $('htitle').textContent='Нейро вспоминает · '+(MEM.round+1)+' из 5';
+    B().innerHTML=say(MEM.round===0
+        ? 'Я помню тысячи картинок. Только они не лежат целиком — они осыпаются.\nЛови то, что нужно тебе. В лапу влезет четыре.'
+        : 'Дальше помню хуже. Куски полетят быстрее.','think')
+      +`<div class="memwrap">
+          <canvas id="mcv"></canvas>
+          <div class="memsay" id="memsay">Лови, что успеешь</div>
+          <div class="paws" id="mempaw"></div>
+        </div>`;
+    F().innerHTML='';
+    setTimeout(memStart,60);
+    return;
+  }
+
+  /* СБОРКА КАДРА: что поймал — то и в кадре, остальное закроет Нейро */
+  if(st==='build1'){
+    $('htitle').textContent='Кадр '+(MEM.round+1);
+    const bias=memApply();
+    S.frames=S.frames||[];
+    S.frames[MEM.round]={place:S.place,time:S.time,mood:S.mood,prop:S.prop,style:S.style,
+      seed:S.seed+MEM.round*17,caught:MEM.caught.map(c=>c.label),bias:bias.slice()};
+    B().innerHTML=`<div class="plate"><div class="scene">${scene(S,{seed:S.seed+MEM.round*17})}</div>
+        <div class="plate-foot"><span>Кадр ${MEM.round+1} из 5</span><span></span></div></div>`
+      +say(bias.length
+        ? 'Ты поймал '+MEM.caught.length+'. Пустые места я закрыл сам: '+bias.join(', ')+'.\nЗаметь — я всегда затыкаю одним и тем же.'
+        : 'Всё твоё. Ни одного места я не закрывал.', bias.length?'oops':'happy')
+      +`<div class="marks">${CUTS.filter(c=>c.k!=='hero').map(c=>{
+          const mine=MEM.caught.some(x=>x.k===c.k);
+          return `<span class="mark ${mine?'ok':'no'}">${mine?'✓ твоё':'✗ моё'} · ${c.label}</span>`}).join('')}</div>`;
+    F().innerHTML=`<button class="btn" onclick="memNext()">${MEM.round>=4?'Собрать книжку →':'Дальше →'}</button>`;
     return;
   }
 
@@ -1055,7 +1069,7 @@ function surprise(lv){
 function onGen(lv){
   // каждое «Собрать» — новая сборка: свежий сид, иначе кадр не меняется
   S.seed=1000+Math.floor(Math.random()*9000);
-  if(lv===1){generate(()=>{S.shot1=scene(S);go('meet')});return}
+  if(lv===1){generate(()=>{S.shot1=scene(S);MEM.round=0;MEM.donors=null;go('show')});return}
   if(lv===2){generate(()=>go('s3'));return}
   if(lv===3){generate(()=>{
     if(!S.jokeShown){S.jokeShown=true;S.living=true;go('joke')}else go('s4')});return}
@@ -1081,7 +1095,10 @@ function suggestName(){
 function saveNameGo(){const f=$('fn');const v=f?f.value.trim():'';
   S.name=v||(S.hero.sex==='f'?'Ласка':'Рыж');
   go('hunt');}
-function saveName(){const v=$('fn').value.trim();S.name=v||(S.hero.sex==='f'?'Ласка':'Рыж');go('fA')}
+function saveName(){const v=$('fn').value.trim();
+  S.name=v||(S.hero.sex==='f'?'Ласка':'Рыж');
+  S.pages=makeStory(S);
+  go('build');}
 function titleSuggest(){
   const P=S.place,PR=S.prop,T=S.time,n=S.name;
   return [`${cap(T.n)} ${P.p}`,`${cap(PR.n)} и то, чего не было`,`${n} и ${PR.n}`,
@@ -1174,65 +1191,246 @@ function renderReveal(){
   },i*260));
 }
 
-/* ═══════ ЗАГАДКА — игра про подбор слов ═══════
-   Нейро загадал картинку. Ребёнок должен ОПИСАТЬ её словами так,
-   чтобы получилась такая же. Это и есть урок Мастерской, но в форме игры:
-   есть цель, попытки, обратная связь по каждому слову и победа. */
-function riddleNew(){
-  const r=rng(1000+Math.floor(Math.random()*9000));
-  S.target={hero:S.hero, place:pick(r,PLACES), time:pick(r,TIMES),
-    mood:pick(r,MOODS), prop:pick(r,PROPS), style:pick(r,STYLES),
-    seed:S.seed, living:false, master:false, acc:null, angle:null};
-  S.place=null;S.time=null;S.mood=null;S.prop=null;S.style=null;
-  S.tries=0; S.hintsUsed=0;
+/* ═══════════ «НЕЙРО ВСПОМИНАЕТ» ═══════════
+   Нейро вспоминает чужую картинку — она осыпается кусками и уплывает.
+   В лапу влезает 4 куска из 8: ребёнок вынужден решать, что важнее.
+   Чего не поймал — Нейро дорисует сам, всегда своим перекосом.
+   Это и есть тема Мастерской: модель хранит не картинки, а признаки. */
+
+const CUTS=[  // что отделяется от донора: тип, прямоугольник в сцене 300×200
+ {k:'hero',  label:'кто',            x:56, y:16, w:90, h:128},
+ {k:'time',  label:'когда',          x:4,  y:4,  w:52, h:56},
+ {k:'mood',  label:'какой',          x:222,y:6,  w:60, h:60},
+ {k:'prop',  label:'чем',            x:10, y:148, w:56, h:48},
+ {k:'place', label:'где',            x:146,y:90, w:66, h:60},
+ {k:'style', label:'чем нарисовано', x:74, y:148, w:60, h:48},
+];
+/* перекос Нейро — чем он затыкает дырки. Всегда один и тот же, это видно */
+const BIAS={time:'night', mood:'scared', prop:'key', place:'forest', style:'pencil'};
+
+const MEM={raf:0,run:0,last:0,round:0,donors:null,img:null,
+  pieces:[],caught:[],lost:[],t:0,next:0,idx:0,done:0,ripples:[]};
+
+/* пять доноров: разные картинки, которые Нейро «вспоминает» */
+function memDonors(){
+  const r=rng(S.seed*77+3);
+  const shuf=a=>{const c=a.slice();for(let i=c.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[c[i],c[j]]=[c[j],c[i]]}return c};
+  const H=shuf(HEROES),P=shuf(PLACES),T=shuf(TIMES),M=shuf(MOODS),PR=shuf(PROPS),ST=shuf(STYLES);
+  const out=[];
+  for(let i=0;i<5;i++)out.push({hero:H[i%H.length],place:P[i%P.length],time:T[i%T.length],
+    mood:M[i%M.length],prop:PR[i%PR.length],style:ST[i%ST.length],seed:1000+Math.floor(r()*9000)});
+  return out;
 }
-/* что сошлось, а что нет — по каждому слову отдельно */
-function riddleScore(){
-  const T=S.target||{};
-  return [
-    {k:'place', label:'место',      ok:!!(S.place&&T.place&&S.place.id===T.place.id)},
-    {k:'time',  label:'время',      ok:!!(S.time&&T.time&&S.time.id===T.time.id)},
-    {k:'mood',  label:'настроение', ok:!!(S.mood&&T.mood&&S.mood.id===T.mood.id)},
-    {k:'prop',  label:'вещь',       ok:!!(S.prop&&T.prop&&S.prop.id===T.prop.id)},
-    {k:'style', label:'стиль',      ok:!!(S.style&&T.style&&S.style.id===T.style.id)},
-  ];
+/* донор рисуется той же функцией scene(), что и вся Мастерская */
+function memDonorSVG(d){
+  const st={hero:d.hero,place:d.place,time:d.time,mood:d.mood,prop:d.prop,style:d.style,
+    acc:null,angle:null,living:false,seed:d.seed,master:false};
+  let svg=scene(st,{seed:d.seed,angle:'full'});
+  // Safari/Firefox без явных width/height растеризуют в 300×150
+  svg=svg.replace('<svg ','<svg width="600" height="400" xmlns="http://www.w3.org/2000/svg" ');
+  return svg;
 }
-function riddleTry(){
-  S.tries++;
-  generate(()=>{
-    const g=riddleScore();
-    if(g.every(x=>x.ok)){
-      // отгадал — эта картинка и станет началом истории
-      S.living=false;
-      render();
-    }else render();
+function memRaster(d,cb){
+  const img=new Image();
+  img.onload=()=>cb(img);
+  img.onerror=()=>cb(null);
+  img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(memDonorSVG(d));
+}
+
+function memStart(){
+  const cv=$('mcv'); if(!cv)return;
+  if(!MEM.donors)MEM.donors=memDonors();
+  const d=MEM.donors[MEM.round];
+  const w=Math.min(366,window.innerWidth-32);
+  const h=Math.round(w*2/3);
+  const dpr=Math.min(2,window.devicePixelRatio||1);
+  cv.width=w*dpr; cv.height=h*dpr; cv.style.width=w+'px'; cv.style.height=h+'px';
+  const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+  MEM.cv=cv; MEM.ctx=ctx; MEM.W=w; MEM.H=h; MEM.k=w/300;
+  MEM.pieces=[]; MEM.caught=[]; MEM.lost=[]; MEM.ripples=[];
+  MEM.t=0; MEM.idx=0; MEM.done=0; MEM.img=null;
+  // темп: чем дальше, тем быстрее вспоминается
+  const R=MEM.round;
+  MEM.gap = R===0?2000 : R===1?1700 : 1500;
+  MEM.life= R===0?3400 : R===1?3000 : 2600;
+  MEM.next=600;
+
+  memRaster(d,(img)=>{ MEM.img=img; });
+
+  cv.onpointerdown=e=>{
+    e.preventDefault();
+    const b=cv.getBoundingClientRect();
+    memTap(e.clientX-b.left, e.clientY-b.top);
+  };
+  MEM.run=1; MEM.last=performance.now();
+  MEM.raf=requestAnimationFrame(memLoop);
+}
+function memStop(){ if(MEM.raf)cancelAnimationFrame(MEM.raf); MEM.raf=0; MEM.run=0 }
+
+function memLoop(t){
+  if(!MEM.run)return;
+  const dt=Math.min((t-MEM.last),50); MEM.last=t;
+  memStep(dt); memDraw();
+  if(MEM.run)MEM.raf=requestAnimationFrame(memLoop);
+}
+function memStep(dt){
+  MEM.t+=dt;
+  // выпускаем куски по одному
+  if(MEM.idx<CUTS.length && MEM.t>=MEM.next){
+    const c=CUTS[MEM.idx];
+    const cx=(c.x+c.w/2)*MEM.k, cy=(c.y+c.h/2)*MEM.k;
+    // улетает к ближайшему краю
+    const toLeft=cx<MEM.W/2;
+    const ex=toLeft?-140:MEM.W+140;
+    const ey=cy+(Math.random()*120-60);
+    MEM.pieces.push({c,idx:MEM.idx,born:MEM.t,life:MEM.life,
+      x:cx,y:cy,sx:cx,sy:cy,ex,ey,
+      mx:(cx+ex)/2+(Math.random()*70-35), my:cy-70-Math.random()*50,
+      rot:(Math.random()*8-4)*Math.PI/180, a:1, gone:0});
+    MEM.idx++;
+    MEM.next=MEM.t+MEM.gap;
+  }
+  MEM.pieces.forEach(p=>{
+    const age=MEM.t-p.born, u=Math.min(1,age/p.life);
+    const q=1-u;
+    p.x=q*q*p.sx+2*q*u*p.mx+u*u*p.ex;
+    p.y=q*q*p.sy+2*q*u*p.my+u*u*p.ey + Math.sin(age/1000*2.4)*7;
+    p.sc=1+Math.min(1,age/220)*0.06;
+    p.a=age>p.life-400?Math.max(0,(p.life-age)/400):1;
+    if(u>=1&&!p.gone){p.gone=1;MEM.lost.push(p.c);
+      const say=$('memsay'); if(say)say.textContent='Ушло. Этого я уже не вспомню.';}
   });
+  MEM.pieces=MEM.pieces.filter(p=>!p.gone);
+  MEM.ripples.forEach(r=>r.t+=dt);
+  MEM.ripples=MEM.ripples.filter(r=>r.t<180);
+  // показ закончился
+  if(!MEM.done && MEM.idx>=CUTS.length && MEM.pieces.length===0){
+    MEM.done=1;
+    setTimeout(()=>{memStop();go('build1')},700);
+  }
+  const bar=$('mempaw');
+  if(bar)bar.innerHTML=[0,1,2,3].map(i=>{
+    const c=MEM.caught[i];
+    return `<span class="paw${c?' full':''}">${c?c.label:''}</span>`}).join('');
 }
-/* подсказка открывает одно неугаданное слово */
-function riddleHint(){
-  const g=riddleScore().filter(x=>!x.ok);
-  if(!g.length)return;
-  const miss=g[0];
-  const T=S.target;
-  S[miss.k]=T[miss.k];
-  S.hintsUsed++;
-  toast('Подсказка: '+miss.label+' — '+riddleName(miss.k));
-  render();
+function memTap(x,y){
+  // верхний кусок выигрывает
+  for(let i=MEM.pieces.length-1;i>=0;i--){
+    const p=MEM.pieces[i];
+    const w=p.c.w*MEM.k*p.sc, h=p.c.h*MEM.k*p.sc;
+    if(x>p.x-w/2-14&&x<p.x+w/2+14&&y>p.y-h/2-14&&y<p.y+h/2+14){
+      if(MEM.caught.length>=4){
+        const say=$('memsay'); if(say)say.textContent='Лапа полная. Больше четырёх не унесу.';
+        MEM.ripples.push({x,y,t:0}); return;
+      }
+      MEM.caught.push(p.c);
+      MEM.pieces.splice(i,1);
+      const say=$('memsay');
+      if(say)say.textContent='Поймал: '+p.c.label+'. Осталось мест: '+(4-MEM.caught.length);
+      return;
+    }
+  }
+  MEM.ripples.push({x,y,t:0});
 }
-function riddleName(k){
-  const v=S.target[k]; if(!v)return '';
-  if(k==='place')return v.n;
-  if(k==='time')return cap(v.n);
-  if(k==='mood')return S.hero&&S.hero.sex==='f'?cap(v.f):cap(v.n);
-  if(k==='prop')return cap(v.n);
-  if(k==='style')return cap(v.n);
-  return '';
+function memDraw(){
+  const {ctx,W,H,k}=MEM; if(!ctx)return;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#F3EADC'; ctx.fillRect(0,0,W,H);
+  if(MEM.img){
+    ctx.drawImage(MEM.img,0,0,W,H);
+    // дырки на месте уже отделившихся кусков
+    const goneIdx=new Set();
+    MEM.lost.forEach(c=>goneIdx.add(c.k));
+    MEM.caught.forEach(c=>goneIdx.add(c.k));
+    MEM.pieces.forEach(p=>goneIdx.add(p.c.k));
+    CUTS.forEach((c,i)=>{
+      if(i>=MEM.idx)return;
+      if(!goneIdx.has(c.k))return;
+      ctx.save();
+      ctx.fillStyle='rgba(255,248,238,.9)';
+      rr(ctx,c.x*k,c.y*k,c.w*k,c.h*k,10*k); ctx.fill();
+      ctx.strokeStyle='#E8D9C4'; ctx.lineWidth=1.5; ctx.setLineDash([5,4]);
+      rr(ctx,c.x*k,c.y*k,c.w*k,c.h*k,10*k); ctx.stroke();
+      ctx.restore();
+    });
+  }else{
+    ctx.fillStyle='#B8A88F'; ctx.font='600 14px Nunito, system-ui'; ctx.textAlign='center';
+    ctx.fillText('вспоминаю…',W/2,H/2);
+  }
+  // летящие куски
+  MEM.pieces.forEach(p=>{
+    if(!MEM.img)return;
+    ctx.save();
+    ctx.globalAlpha=p.a;
+    ctx.translate(p.x,p.y); ctx.rotate(p.rot); ctx.scale(p.sc,p.sc);
+    ctx.shadowColor='rgba(90,60,20,.3)'; ctx.shadowBlur=8; ctx.shadowOffsetY=3;
+    const w=p.c.w*k, h=p.c.h*k;
+    ctx.beginPath(); rr(ctx,-w/2,-h/2,w,h,10*k); ctx.clip();
+    ctx.drawImage(MEM.img, p.c.x*2, p.c.y*2, p.c.w*2, p.c.h*2, -w/2,-h/2,w,h);
+    ctx.shadowBlur=0;
+    ctx.strokeStyle='rgba(255,255,255,.85)'; ctx.lineWidth=2.5;
+    rr(ctx,-w/2,-h/2,w,h,10*k); ctx.stroke();
+    ctx.restore();
+    // подпись типа
+    ctx.save(); ctx.globalAlpha=p.a*.95;
+    ctx.font='800 11px Nunito, system-ui'; ctx.textAlign='center';
+    ctx.fillStyle='#fff'; ctx.strokeStyle='rgba(43,33,24,.55)'; ctx.lineWidth=3;
+    ctx.strokeText(p.c.label,p.x,p.y+p.c.h*k/2*p.sc+14);
+    ctx.fillText(p.c.label,p.x,p.y+p.c.h*k/2*p.sc+14);
+    ctx.restore();
+  });
+  // рябь на промах
+  MEM.ripples.forEach(r=>{
+    const u=r.t/180;
+    ctx.save(); ctx.globalAlpha=.35*(1-u);
+    ctx.strokeStyle='#E65C00'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.arc(r.x,r.y,26*u,0,7); ctx.stroke(); ctx.restore();
+  });
+  // полоса времени
+  const total=600+CUTS.length*MEM.gap+MEM.life;
+  const u=Math.min(1,MEM.t/total);
+  ctx.fillStyle='rgba(180,110,40,.15)'; ctx.fillRect(0,0,W,3);
+  ctx.fillStyle='#E65C00'; ctx.fillRect(0,0,W*(1-u),3);
 }
-function toast(t){const e=document.createElement('div');
-  e.style.cssText='position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:#2B2118;'
-   +'color:#fff;padding:11px 19px;border-radius:999px;font-weight:800;font-size:13.5px;z-index:60;'
-   +'font-family:Nunito,system-ui;box-shadow:0 4px 16px rgba(60,40,20,.3)';
-  e.textContent=t;document.body.appendChild(e);setTimeout(()=>e.remove(),2200)}
+function rr(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
+}
+/* пойманное — в историю; чего нет, Нейро затыкает своим перекосом */
+function memNext(){
+  if(MEM.round>=4){ buildBook(); return }
+  MEM.round++;
+  // сквозные признаки остаются, кадровые сбрасываем — их снова надо ловить
+  S.time=null; S.mood=null; S.prop=null;
+  go('show');
+}
+/* пять собранных кадров → книжка */
+function buildBook(){
+  const f=S.frames&&S.frames[0];
+  if(f){S.place=f.place;S.style=f.style}
+  S.pages=makeStory(S);
+  go('name');
+}
+function memApply(){
+  const d=MEM.donors[MEM.round];
+  const got=new Set(MEM.caught.map(c=>c.k));
+  const biasUsed=[];
+  CUTS.forEach(c=>{
+    const k=c.k;
+    if(got.has(k)){ S[k]=d[k]; }
+    else if(!S[k]){
+      // перекос: всегда одно и то же
+      const arr={time:TIMES,mood:MOODS,prop:PROPS,place:PLACES,style:STYLES,hero:HEROES}[k];
+      const bid=BIAS[k];
+      const v=bid?arr.find(x=>x.id===bid):null;
+      S[k]=v||arr[0];
+      if(k!=='hero')biasUsed.push(c.label);
+    }
+  });
+  return biasUsed;
+}
 
 /* ── навигация назад ── */
 $('back').onclick=()=>{
