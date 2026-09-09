@@ -208,8 +208,8 @@ body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);-w
 .sl.on{background:none}
 .sl svg{width:100%;height:100%;display:block}
 /* станции-входы */
-.stations{display:flex;flex-direction:column;gap:10px;position:relative;z-index:2}
-.st{position:relative;border:none;border-radius:16px;cursor:pointer;font-family:inherit;text-align:left;
+.stations{display:flex;flex-direction:column;gap:10px;position:relative;z-index:6}
+.st{position:relative;z-index:6;border:none;border-radius:16px;cursor:pointer;font-family:inherit;text-align:left;
  padding:13px 15px;display:flex;flex-direction:column;gap:3px;
  background:linear-gradient(165deg,#FFF8EE,#F2E4CC);
  box-shadow:0 1px 0 rgba(43,33,24,.28), 0 10px 18px -8px rgba(43,33,24,.4);
@@ -227,10 +227,10 @@ body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);-w
 .st.done .st-h{background:#DFF5EA;color:#2E9E5B}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-2.5px)}}
 /* мелочь на столе */
-.clutter{position:absolute;inset:0;pointer-events:none;z-index:4}
+.clutter{position:absolute;inset:0;pointer-events:none;z-index:3}
 .cl{position:absolute;cursor:grab;touch-action:none;pointer-events:auto;
  text-shadow:0 3px 5px rgba(43,33,24,.32);transition:transform .12s;user-select:none}
-.junk{position:absolute;inset:0;pointer-events:none;z-index:5}
+.junk{position:absolute;inset:0;pointer-events:none;z-index:4}
 .jk{position:absolute;font-size:17px;opacity:0;animation:fall .5s ease forwards}
 @keyframes fall{0%{opacity:0;transform:translateY(-24px) rotate(0)}
  70%{opacity:1;transform:translateY(4px) rotate(12deg)}100%{opacity:.9;transform:translateY(0) rotate(8deg)}}
