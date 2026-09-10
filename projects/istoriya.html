@@ -1917,7 +1917,7 @@ function beltHTML(){
 }
 function beltStart(){
   const cv=$('bcv'); if(!cv)return;
-  const w=Math.min(360,(cv.parentElement?cv.parentElement.clientWidth:window.innerWidth-48)), h=150;
+  const w=fitW(cv,360), h=150;
   const dpr=Math.min(2,devicePixelRatio||1);
   cv.width=w*dpr; cv.height=h*dpr; cv.style.width=w+'px'; cv.style.height=h+'px';
   const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
@@ -2005,6 +2005,14 @@ function beltDraw(){
 
 /* ═══════ ПАЗЛ 3: СТЁКЛА — три пальцем ═══════ */
 const GLASS={run:0,masks:[],places:[],budget:1,raf:0};
+/* ширина контента родителя: clientWidth считает padding, а канвас должен влезть в контент */
+function fitW(cv,max){
+  const par=cv.parentElement;
+  if(!par)return Math.min(max,window.innerWidth-48);
+  const cs=getComputedStyle(par);
+  const inner=par.clientWidth-parseFloat(cs.paddingLeft||0)-parseFloat(cs.paddingRight||0);
+  return Math.max(200,Math.min(max,Math.floor(inner)));
+}
 function glassHTML(){
   return say('Подо мной четыре места сразу. Протри — увидишь, какое тебе нужно.\nЧто не протрёшь — придумаю сам.','think')
    +`<div class="glasswrap"><canvas id="gcv"></canvas>
@@ -2013,7 +2021,7 @@ function glassHTML(){
 }
 function glassStart(){
   const cv=$('gcv'); if(!cv)return;
-  const w=Math.min(360,(cv.parentElement?cv.parentElement.clientWidth:window.innerWidth-48)), h=Math.round(w*2/3);
+  const w=fitW(cv,360), h=Math.round(w*2/3);
   const dpr=Math.min(2,devicePixelRatio||1);
   cv.width=w*dpr; cv.height=h*dpr; cv.style.width=w+'px'; cv.style.height=h+'px';
   const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
