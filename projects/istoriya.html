@@ -2187,12 +2187,13 @@ function glassStart(){
       // чем выше стекло, тем сильнее запотело: снял верхнее — стало заметно чище.
       // без этого два похожих ночных фона выглядят одинаково и кажется, что тряпка не работает
       if(i<3){
-        octx.fillStyle='rgba(232,242,248,'+(0.58-i*0.17)+')';
+        octx.fillStyle='rgba(226,238,246,'+[0.86,0.56,0.26][i]+')';
         octx.fillRect(0,0,oc.width,oc.height);
         const r3=rng(S.seed+i*31);
-        octx.fillStyle='rgba(255,255,255,.16)';
-        for(let k=0;k<160;k++){
-          const bx=r3()*oc.width, by=r3()*oc.height, br=3+r3()*11;
+        // разводы конденсата — чтобы верхнее стекло читалось именно как запотевшее
+        octx.fillStyle='rgba(255,255,255,'+(0.20-i*0.05)+')';
+        for(let k=0;k<190;k++){
+          const bx=r3()*oc.width, by=r3()*oc.height, br=4+r3()*16;
           octx.beginPath(); octx.arc(bx,by,br,0,7); octx.fill();
         }
       }
