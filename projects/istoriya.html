@@ -2014,7 +2014,7 @@ function glassStart(){
   const dpr=Math.min(2,devicePixelRatio||1);
   cv.width=w*dpr; cv.height=h*dpr; cv.style.width=w+'px'; cv.style.height=h+'px';
   const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
-  GLASS.ctx=ctx; GLASS.w=w; GLASS.h=h; GLASS.budget=1; GLASS.used=0;
+  GLASS.ctx=ctx; GLASS.w=w; GLASS.h=h; GLASS.budget=1; GLASS.used=0; GLASS.toldDry=0;
   const r=rng(S.seed*41+9);
   const sh=PLACES.slice(); for(let i=sh.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[sh[i],sh[j]]=[sh[j],sh[i]]}
   GLASS.places=sh.slice(0,4);
@@ -2029,17 +2029,22 @@ function glassStart(){
     GLASS.masks.push({cv:mc,ctx:mx});
   });
   // один переиспользуемый буфер вместо четырёх новых на каждый кадр
-  GLASS.tmp=document.createElement('canvas'); GLASS.tmp.width=w; GLASS.tmp.height=h;
-  GLASS.tctx=GLASS.tmp.getContext('2d');
+  GLASS.tmp=document.createElement('canvas'); GLASS.tmp.width=w*dpr; GLASS.tmp.height=h*dpr;
+  GLASS.tctx=GLASS.tmp.getContext('2d'); GLASS.tctx.setTransform(dpr,0,0,dpr,0,0);
+  GLASS.dpr=dpr;
   GLASS.dirty=true; GLASS.last={x:0,y:0,on:false};
 
   let drag=false;
+  const R=26, LIMIT=0.55;
   const rub=(cx,cy)=>{
-    if(GLASS.used>=0.4)return;
+    if(GLASS.used>=LIMIT){
+      if(!GLASS.toldDry){GLASS.toldDry=1;setNote('Всё, тряпка сухая. Что успел открыть — то и пойдёт в книжку.')}
+      return;
+    }
     // выбираем верхний непротёртый слой один раз за штрих, а не на каждую точку
     let layer=GLASS.strokeLayer;
     if(layer===undefined||layer===null){
-      layer=0;
+      layer=2;   // если все три уже сняты — трём нижнее стекло, а не верхнее заново
       for(let i=0;i<3;i++){
         const mx=GLASS.masks[i].ctx;
         const px=mx.getImageData(Math.max(0,Math.min(w-1,cx|0)),Math.max(0,Math.min(h-1,cy|0)),1,1).data;
@@ -2054,12 +2059,14 @@ function glassStart(){
     if(GLASS.last.on){mx.moveTo(GLASS.last.x,GLASS.last.y);mx.lineTo(cx,cy);mx.stroke()}
     mx.beginPath(); mx.arc(cx,cy,26,0,7); mx.fill();
     mx.globalCompositeOperation='source-over';
+    // площадь считаем честно: круг — один раз за штрих, дальше только заметённая полоса 2R*длина.
+    // старая формула клала полный круг на КАЖДУЮ коалесед-точку и сжигала бюджет за полсекунды.
     const d=GLASS.last.on?Math.hypot(cx-GLASS.last.x,cy-GLASS.last.y):0;
-    GLASS.used+=(Math.PI*26*26+d*52)/(w*h)/4;
+    GLASS.used+=(GLASS.last.on?(2*R*d):(Math.PI*R*R))/(w*h);
     GLASS.last={x:cx,y:cy,on:true};
-    const b=$('breath'); if(b)b.style.width=Math.min(100,GLASS.used/0.4*100)+'%';
-    const g=$('glassres'); if(g)g.textContent='Протёрто: '+Math.min(100,Math.round(GLASS.used*250))+'%';
+    const b=$('breath'); if(b)b.style.width=Math.min(100,GLASS.used/LIMIT*100)+'%';
     GLASS.dirty=true;
+    glassLive();
   };
   cv.onpointerdown=e=>{drag=true;cv.setPointerCapture(e.pointerId);
     GLASS.strokeLayer=null; GLASS.last={x:0,y:0,on:false};
@@ -2067,7 +2074,10 @@ function glassStart(){
   cv.onpointermove=e=>{if(!drag)return;
     const r2=cv.getBoundingClientRect();
     // берём все промежуточные точки — иначе на быстром движении остаются пропуски
-    const pts=e.getCoalescedEvents?e.getCoalescedEvents():[e];
+    // ВАЖНО: getCoalescedEvents() существует, но отдаёт ПУСТОЙ массив для синтетических событий —
+    // без проверки на длину rub() не вызовется ни разу, и любой тест будет ложно-зелёным.
+    let pts=[e];
+    if(e.getCoalescedEvents){const c=e.getCoalescedEvents(); if(c&&c.length)pts=c}
     pts.forEach(p=>rub(p.clientX-r2.left,p.clientY-r2.top));};
   cv.onpointerup=()=>{drag=false;GLASS.strokeLayer=null;GLASS.last.on=false;glassPick()};
   cv.onpointercancel=()=>{drag=false;GLASS.strokeLayer=null;GLASS.last.on=false};
@@ -2093,16 +2103,37 @@ function glassDraw(){
     ctx.drawImage(tmp,0,0);
   }
 }
+/* Что РЕАЛЬНО видно на экране: для каждой точки — самое верхнее непротёртое стекло.
+   Раньше считался самый СТЁРТЫЙ слой, то есть место, которое ребёнок как раз убрал из кадра. */
+function glassVisible(){
+  const w=GLASS.w,h=GLASS.h;
+  if(!GLASS.masks.length)return {best:0,counts:[0,0,0,0]};
+  const md=GLASS.masks.slice(0,3).map(m=>m.ctx.getImageData(0,0,w,h).data);
+  const counts=[0,0,0,0];
+  const step=6;
+  for(let y=0;y<h;y+=step)for(let x=0;x<w;x+=step){
+    const o=(y*w+x)*4+3;
+    let top=3;
+    for(let i=0;i<3;i++){if(md[i][o]>10){top=i;break}}
+    counts[top]++;
+  }
+  // побеждает то, что ребёнок ОТКРЫЛ; если ещё ничего не открыл — верхнее стекло
+  let best=-1,bv=0;
+  for(let i=1;i<4;i++)if(counts[i]>bv){bv=counts[i];best=i}
+  if(best<0)best=0;
+  return {best,counts};
+}
+let glassLiveT=0;
+function glassLive(){
+  const now=performance.now();
+  if(now-glassLiveT<200)return; glassLiveT=now;
+  const v=glassVisible();
+  const pl=GLASS.places[v.best]; if(!pl)return;
+  const g=$('glassres'); if(g)g.textContent='Видно: '+pl.n;
+}
 function glassPick(){
-  // какое место осталось виднее всех — то и в историю
-  let best=0,bv=-1;
-  GLASS.masks.forEach((m,i)=>{
-    const d=m.ctx.getImageData(0,0,GLASS.w,GLASS.h).data;
-    let cnt=0; for(let p=3;p<d.length;p+=4*64)if(d[p]>10)cnt++;
-    const vis=(GLASS.w*GLASS.h/64)-cnt;
-    if(vis>bv){bv=vis;best=i}
-  });
-  S.place=GLASS.places[best]||PLACES[0];
+  const v=glassVisible();
+  S.place=GLASS.places[v.best]||PLACES[0];
   const g=$('glassres');
   if(g)g.textContent='Видно: '+S.place.n;
   syncStrip();
