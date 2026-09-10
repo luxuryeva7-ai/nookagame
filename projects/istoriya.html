@@ -364,6 +364,23 @@ body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);-w
 .bi.ghost{position:fixed;z-index:99;pointer-events:none;transform:translate(-50%,-50%) scale(1.3);opacity:.9}
 .btn,.btn-sm,.st,.f5,.szb,.hole,.fork,.txtbtn,.bin,.nd,.opt{touch-action:manipulation}
 html,body{overflow-x:hidden}
+/* ── станция «Походка» ── */
+.gaitwrap{margin-top:10px;background:var(--card);border-radius:18px;box-shadow:var(--sh);
+ padding:12px;display:flex;flex-direction:column;align-items:center;gap:9px;position:relative}
+.gaitwrap canvas{border-radius:12px;touch-action:none;display:block;max-width:100%;cursor:grab}
+.gait-hint{font-size:11.5px;font-weight:800;color:var(--ink3);text-align:center;transition:opacity .25s}
+.gait-read{width:100%}
+.gr-t{font-size:10.5px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;
+ color:var(--ink3);text-align:center;margin-bottom:7px}
+.gr-f{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:9px}
+.grf{background:var(--accbg);color:var(--acc);border-radius:999px;padding:5px 12px;
+ font-size:12.5px;font-weight:900}
+.gr-v{text-align:center;font-size:15px;font-weight:800;color:var(--ink2);margin-bottom:11px}
+.gr-v b{color:var(--acc);font-size:17px}
+.gr-b{display:flex;gap:8px}
+.gr-b .btn{flex:1}
+.gr-ok{text-align:center;font-size:13.5px;font-weight:800;color:#2E9E5B;line-height:1.45;
+ background:#DFF5EA;border-radius:13px;padding:11px 13px}
 .bench-res{margin-top:10px;font-size:11.5px;font-weight:800;color:var(--ink3);text-align:center}
 .beltwrap,.glasswrap{margin-top:10px;background:var(--card);border-radius:18px;box-shadow:var(--sh);
  padding:12px;display:flex;flex-direction:column;align-items:center;gap:9px}
@@ -1505,7 +1522,7 @@ const CLUTTER=[
 /* пять входов: у каждого своя зона на столе и свой жест */
 const STATIONS=[
  {id:'bench', n:'Верстак',  sub:'соедини и получи третье', e:'🔨', y:150, h:150, hint:'тащи одно на другое'},
- {id:'belt',  n:'Лента',    sub:'разбери на признаки',     e:'📦', y:314, h:112, hint:'смахивай в корзины'},
+ {id:'belt',  n:'Походка',  sub:'покажи, как он ходит',    e:'👣', y:314, h:112, hint:'веди пальцем'},
  {id:'glass', n:'Стёкла',   sub:'протри и увидь',          e:'🪟', y:440, h:112, hint:'три пальцем'},
  {id:'fresco',n:'Фреска',   sub:'почини кадры',            e:'🖼', y:566, h:150, hint:'крути заплатки'},
  {id:'studio',n:'Студия',   sub:'поставь кадр сам',        e:'🎬', y:730, h:150, hint:'двигай пальцем'},
@@ -1517,7 +1534,7 @@ const NEED=[
  {k:'prop', n:'Вещь',    e:'🔑', from:'bench',  fromN:'Верстак'},
  {k:'place',n:'Место',   e:'🗺', from:'glass',  fromN:'Стёкла'},
  {k:'time', n:'Время',   e:'🌙', from:'rail',   fromN:'солнце вверху'},
- {k:'mood', n:'Характер',e:'💫', from:'belt',   fromN:'Лента'},
+ {k:'mood', n:'Характер',e:'💫', from:'belt',   fromN:'Походка'},
  {k:'style',n:'Как рисовать',e:'🎨',from:'fresco',fromN:'Фреска'},
  {k:'shots',n:'Твои кадры',e:'🎬',from:'studio',fromN:'Студия'},
 ];
@@ -1906,101 +1923,213 @@ function benchMerge(idA,idB){
 }
 function setNote(t){const n=$('pznote'); if(n){n.textContent=t; n.animate([{opacity:0},{opacity:1}],{duration:220})}}
 
-/* ═══════ ПАЗЛ 2: ЛЕНТА — смахивай в корзины ═══════ */
-const BELT={run:0,items:[],t:0,spawn:0,left:14,bins:{soft:0,iron:0,glow:0,loud:0},raf:0,last:0};
-function beltHTML(){
-  return say('Я не вижу «ключ». Я вижу: железный, холодный, звенит.\nСмахивай вниз — в ту корзину, куда просится.','think')
-   +`<div class="beltwrap"><canvas id="bcv"></canvas>
-      <div class="binhint">↓ смахивай вниз, в подходящую ↓</div>
-      <div class="bins">${TRAITS.map(t=>`<div class="bin" id="bin_${t.id}"><span>${t.e}</span><u>${t.n}</u><b id="bc_${t.id}">0</b></div>`).join('')}</div>
-      <div class="bench-res" id="beltres">Осталось на ленте: 14</div></div>`;
+/* ── общие помощники для походки и мультика ── */
+function rasterize(svgStr,w,h){
+  return new Promise((res,rej)=>{
+    // без явных width/height Safari растрирует SVG как 300×150 — грабли уже ловили
+    const withSize=svgStr.replace('<svg','<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'"');
+    const img=new Image();
+    img.onload=()=>res(img);
+    img.onerror=()=>rej(new Error('svg не растеризовался'));
+    img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(withSize);
+  });
 }
-function beltStart(){
-  const cv=$('bcv'); if(!cv)return;
-  const w=fitW(cv,360), h=150;
+function smoothPath(pts){
+  if(!pts||pts.length<4)return pts||[];
+  const out=[];
+  for(let i=0;i<pts.length;i++){
+    let sx=0,sy=0,n=0;
+    for(let j=Math.max(0,i-2);j<=Math.min(pts.length-1,i+2);j++){sx+=pts[j].hx;sy+=pts[j].hy;n++}
+    out.push({hx:sx/n,hy:sy/n,t:pts[i].t});
+  }
+  return out;
+}
+function thinPath(pts,maxN){
+  if(!pts||pts.length<=maxN)return pts||[];
+  const step=pts.length/maxN, out=[];
+  for(let i=0;i<maxN;i++)out.push(pts[Math.floor(i*step)]);
+  out.push(pts[pts.length-1]);
+  return out;
+}
+function pathAt(pts,t){
+  if(!pts||!pts.length)return null;
+  if(pts.length===1)return pts[0];
+  const dur=pts[pts.length-1].t-pts[0].t||1;
+  const target=pts[0].t+dur*Math.max(0,Math.min(1,t));
+  for(let i=1;i<pts.length;i++){
+    if(pts[i].t>=target){
+      const a=pts[i-1],b=pts[i],sp=(b.t-a.t)||1,k=(target-a.t)/sp;
+      return {hx:a.hx+(b.hx-a.hx)*k, hy:a.hy+(b.hy-a.hy)*k};
+    }
+  }
+  return pts[pts.length-1];
+}
+function wrapLines(ctx,text,maxW){
+  const words=String(text||'').split(/\s+/).filter(Boolean), lines=[]; let line='';
+  words.forEach(wd=>{const t=line?line+' '+wd:wd;
+    if(ctx.measureText(t).width<=maxW||!line)line=t; else{lines.push(line);line=wd}});
+  if(line)lines.push(line);
+  return lines;
+}
+/* ═══════ ПАЗЛ 2: ПОХОДКА — покажи пальцем, КАК он ходит ═══════
+   Здесь ребёнок впервые видит, что машина считывает признаки не из предмета,
+   а из его собственных данных: он ведёт палец, а Нейро вслух называет,
+   что измерил — быстро/медленно, рывками/ровно, петляет/по прямой — и только
+   потом делает вывод о характере. С выводом можно не согласиться и переписать. */
+const GAIT={run:0,pts:[],raf:0,hero:null,drag:0,read:null,w:0,h:0,ctx:null,tries:0};
+
+function gaitHTML(){
+  return say('Я знаю, как он выглядит. Не знаю, как он ходит.\nПроведи пальцем по земле — покажи, как он идёт.','think')
+   +`<div class="gaitwrap">
+      <canvas id="gtc"></canvas>
+      <div class="gait-hint" id="gthint">веди пальцем слева направо</div>
+      <div class="gait-read" id="gtread"></div>
+    </div>`;
+}
+
+function gaitStart(){
+  const cv=$('gtc'); if(!cv)return;
+  const w=fitW(cv,360), h=176;
   const dpr=Math.min(2,devicePixelRatio||1);
   cv.width=w*dpr; cv.height=h*dpr; cv.style.width=w+'px'; cv.style.height=h+'px';
   const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
-  BELT.ctx=ctx; BELT.w=w; BELT.h=h;
-  BELT.items=[]; BELT.t=0; BELT.spawn=0; BELT.left=14;
-  BELT.bins={soft:0,iron:0,glow:0,loud:0};
-  BELT.run=1; BELT.last=performance.now();
-  const pool=['🔑','💎','🪶','🪙','🥚','🌱','🪞','🔦','📐','⭕','🛡','🪽','🦾','🔺'];
-  BELT.pool=pool.slice();
-  let sw=null;
-  cv.onpointerdown=e=>{const r=cv.getBoundingClientRect();
-    sw={x:e.clientX-r.left,y:e.clientY-r.top,t:performance.now()}};
-  cv.onpointerup=e=>{
-    if(!sw)return;
-    const r=cv.getBoundingClientRect();
-    const dx=e.clientX-r.left-sw.x, dy=e.clientY-r.top-sw.y;
-    const dt=performance.now()-sw.t;
-    if(Math.hypot(dx,dy)>34&&dt<400){
-      // ищем предмет под началом свайпа
-      for(let i=BELT.items.length-1;i>=0;i--){
-        const it=BELT.items[i];
-        if(Math.abs(it.x-sw.x)<28&&Math.abs(it.y-sw.y)<32&&!it.fly){
-          const bins=['soft','iron','glow','loud'];
-          const k=Math.max(0,Math.min(3,Math.floor((sw.x+dx)/(BELT.w/4))));
-          it.fly=1; it.bin=bins[k]; it.vy=-1.4; it.vx=dx/26;
-          break;
-        }
-      }
-    }
-    sw=null;
-  };
-  BELT.raf=requestAnimationFrame(beltLoop);
+  GAIT.ctx=ctx; GAIT.w=w; GAIT.h=h; GAIT.pts=[]; GAIT.read=null; GAIT.drag=0;
+  // герой печётся в растр один раз — иначе SVG перерисовывается каждый кадр
+  const hs=`<svg viewBox="58 74 92 104" preserveAspectRatio="xMidYMid meet">`
+    +svgHero(S.hero||HEROES[0],(S.mood&&S.mood.id)||'brave',S.seed,S.style,S.acc)+`</svg>`;
+  rasterize(hs,132,150).then(im=>{
+    const oc=document.createElement('canvas'); oc.width=132; oc.height=150;
+    oc.getContext('2d').drawImage(im,0,0,132,150);
+    GAIT.hero=oc; gaitDraw();
+  }).catch(()=>{});
+  const pos=e=>{const r=cv.getBoundingClientRect();
+    return {x:Math.max(0,Math.min(w,e.clientX-r.left)), y:Math.max(0,Math.min(h,e.clientY-r.top)), t:performance.now()}};
+  const end=()=>{ if(!GAIT.drag)return; GAIT.drag=0;
+    if(GAIT.pts.length>6 && gaitSpan()>60){ GAIT.read=gaitJudge(GAIT.pts); gaitShow(); }
+    else { GAIT.pts=[]; setNote('Слишком коротко. Проведи через всю землю.'); }
+    gaitDraw(); };
+  cv.onpointerdown=e=>{ e.preventDefault();
+    try{cv.setPointerCapture(e.pointerId)}catch(_){}
+    GAIT.drag=1; GAIT.pts=[pos(e)]; GAIT.read=null;
+    const hn=$('gthint'); if(hn)hn.style.opacity='0';
+    const rd=$('gtread'); if(rd)rd.innerHTML='';
+    gaitDraw(); };
+  cv.onpointermove=e=>{ if(!GAIT.drag)return;
+    let list=[e];
+    if(e.getCoalescedEvents){const c=e.getCoalescedEvents(); if(c&&c.length)list=c}
+    list.forEach(q=>GAIT.pts.push(pos(q)));
+    if(GAIT.pts.length>900)GAIT.pts=GAIT.pts.slice(-900);
+    gaitDraw(); };
+  cv.onpointerup=end;
+  cv.onpointercancel=end;
+  cv.onlostpointercapture=end;
+  GAIT.run=1; gaitDraw();
 }
-function beltStop(){if(BELT.raf)cancelAnimationFrame(BELT.raf);BELT.raf=0;BELT.run=0}
-function beltLoop(t){
-  if(!BELT.run)return;
-  const dt=Math.min(t-BELT.last,50); BELT.last=t;
-  beltStep(dt); beltDraw();
-  if(BELT.run)BELT.raf=requestAnimationFrame(beltLoop);
+function gaitStop(){ GAIT.run=0; if(GAIT.raf)cancelAnimationFrame(GAIT.raf); GAIT.raf=0; }
+function gaitSpan(){
+  if(GAIT.pts.length<2)return 0;
+  let mn=1e9,mx=-1e9; GAIT.pts.forEach(p=>{if(p.x<mn)mn=p.x;if(p.x>mx)mx=p.x});
+  return mx-mn;
 }
-function beltStep(dt){
-  BELT.t+=dt;
-  const speed=(34+(14-BELT.left)*2)/1000;
-  if(BELT.pool.length&&BELT.t>BELT.spawn){
-    BELT.items.push({e:BELT.pool.shift(),x:-30,y:BELT.h/2,fly:0});
-    BELT.spawn=BELT.t+Math.max(1200,2000-(14-BELT.left)*60);
+
+/* ── чтение признаков: ровно то, что делает модель, только вслух ── */
+function gaitJudge(pts){
+  const n=pts.length;
+  let dist=0, speeds=[], rev=0, minY=1e9, maxY=-1e9, dir=0;
+  for(let i=1;i<n;i++){
+    const a=pts[i-1], b=pts[i];
+    const d=Math.hypot(b.x-a.x,b.y-a.y);
+    const dt=Math.max(8,b.t-a.t);
+    dist+=d; speeds.push(d/dt*1000);
+    const dx=b.x-a.x;
+    if(Math.abs(dx)>2){ const nd=dx>0?1:-1; if(dir&&nd!==dir)rev++; dir=nd; }
   }
-  BELT.items.forEach(it=>{
-    if(it.fly){it.x+=it.vx*dt*.06;it.y+=it.vy*dt*.06;it.vy+=dt*.012;
-      if(it.y>BELT.h+30){it.dead=1;
-        BELT.bins[it.bin]=(BELT.bins[it.bin]||0)+1; BELT.left--;
-        const b=$('bc_'+it.bin); if(b)b.textContent=BELT.bins[it.bin];
-        const bin=$('bin_'+it.bin); if(bin)bin.animate([{transform:'scale(1)'},{transform:'scale(1.16)'},{transform:'scale(1)'}],{duration:200});
-        const r=$('beltres'); if(r)r.textContent='Осталось на ленте: '+Math.max(0,BELT.left);
-      }}
-    else{it.x+=speed*dt*10;
-      if(it.x>BELT.w+30){it.dead=1;BELT.left--;
-        setNote('Уехал. Ну и ладно — я про него всё равно не помню.');
-        const r=$('beltres'); if(r)r.textContent='Осталось на ленте: '+Math.max(0,BELT.left);}}
-  });
-  BELT.items=BELT.items.filter(i=>!i.dead);
-  if(BELT.left<=0&&!BELT.fin){
-    BELT.fin=1;
-    // самая полная корзина задаёт настроение
-    let best='glow',bv=-1;
-    Object.keys(BELT.bins).forEach(k=>{if(BELT.bins[k]>bv){bv=BELT.bins[k];best=k}});
-    const tr=TRAITS.find(t=>t.id===best);
-    if(tr&&bv>0)S.mood=MOODS.find(m=>m.id===tr.mood)||S.mood;
-    setTimeout(()=>{beltStop();finishPuzzle('belt')},700);
-  }
+  pts.forEach(q=>{if(q.y<minY)minY=q.y;if(q.y>maxY)maxY=q.y});
+  const dur=(pts[n-1].t-pts[0].t)/1000 || 0.5;
+  const avg=dist/dur;
+  const mean=speeds.reduce((a,b)=>a+b,0)/(speeds.length||1);
+  const varc=speeds.reduce((a,b)=>a+(b-mean)*(b-mean),0)/(speeds.length||1);
+  const jerk=Math.sqrt(varc)/(mean||1);
+  const bounce=maxY-minY;
+  const drop=pts[n-1].y-pts[0].y;
+
+  const feats=[];
+  feats.push(avg>250?'быстро':avg<95?'медленно':'спокойно');
+  feats.push(jerk>0.85?'рывками':'ровно');
+  feats.push(rev>=2?'петляет':'по прямой');
+  if(bounce>34)feats.push('подпрыгивает');
+
+  let id;
+  if(rev>=2) id='sly';
+  else if(jerk>0.85 && avg>170) id='scared';
+  else if(bounce>34) id='amazed';
+  else if(avg<95 && drop>18) id='sad';
+  else if(avg<95) id='sleepy';
+  else id='brave';
+  return {id, feats, avg:Math.round(avg), jerk:+jerk.toFixed(2), bounce:Math.round(bounce), rev};
 }
-function beltDraw(){
-  const {ctx,w,h}=BELT; if(!ctx)return;
+
+function gaitShow(){
+  const r=GAIT.read; if(!r)return;
+  const m=MOODS.find(x=>x.id===r.id)||MOODS[0];
+  const fem=S.hero&&S.hero.sex==='f';
+  GAIT.tries++;
+  const box=$('gtread'); if(!box)return;
+  box.innerHTML=`<div class="gr-t">Вот что я измерил:</div>
+    <div class="gr-f">${r.feats.map(f=>`<span class="grf">${f}</span>`).join('')}</div>
+    <div class="gr-v">Значит — <b>${fem?m.f:m.n}</b></div>
+    <div class="gr-b">
+      <button class="btn btn-sm" onclick="gaitAccept()">Да, такой</button>
+      <button class="btn btn2 btn-sm" onclick="gaitAgain()">Не, ещё раз</button>
+    </div>`;
+}
+function gaitAccept(){
+  const r=GAIT.read; if(!r)return;
+  S.mood=MOODS.find(x=>x.id===r.id)||MOODS[0];
+  // походку забираем в мультик: та же система координат, что у композиции кадра
+  S.gait=thinPath(smoothPath(GAIT.pts.map(q=>({
+    hx:50+((q.x/GAIT.w)-0.5)*66, hy:64+((q.y/GAIT.h)-0.5)*26, t:q.t}))),40);
+  syncStrip();
+  const box=$('gtread');
+  if(box)box.innerHTML=`<div class="gr-ok">✓ Характер: ${S.hero&&S.hero.sex==='f'?S.mood.f:S.mood.n}.<br>Походку я забрал в мультик — он пойдёт именно так.</div>`;
+}
+function gaitAgain(){
+  GAIT.pts=[]; GAIT.read=null;
+  const box=$('gtread'); if(box)box.innerHTML='';
+  const hn=$('gthint'); if(hn){hn.style.opacity='1';
+    hn.textContent=GAIT.tries===1?'а теперь по-другому — быстрее или вразвалочку'
+      :GAIT.tries===2?'попетляй — или иди строго по прямой':'веди как хочешь, я подстроюсь'}
+  gaitDraw();
+}
+
+function gaitDraw(){
+  const ctx=GAIT.ctx, w=GAIT.w, h=GAIT.h; if(!ctx)return;
   ctx.clearRect(0,0,w,h);
-  ctx.fillStyle='#E8DCC6'; ctx.fillRect(0,0,w,h);
-  ctx.fillStyle='#D6C6A8'; ctx.fillRect(0,h/2+22,w,10);
-  for(let i=0;i<14;i++){ctx.fillStyle='rgba(0,0,0,.06)';
-    ctx.fillRect(((i*40+BELT.t*.03)%(w+40))-20,h/2+22,16,10)}
-  BELT.items.forEach(it=>{
-    ctx.save(); ctx.translate(it.x,it.y);
-    ctx.font='26px system-ui'; ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText(it.e,0,0); ctx.restore();
-  });
+  ctx.fillStyle='#EFE4D2'; ctx.fillRect(0,0,w,h);
+  const gy=h-34;
+  ctx.fillStyle='#D9BE94'; ctx.fillRect(0,gy,w,h-gy);
+  ctx.strokeStyle='rgba(58,42,24,.22)'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(w,gy); ctx.stroke();
+  if(GAIT.pts.length>1){
+    let acc=0;
+    ctx.fillStyle='rgba(58,42,24,.30)';
+    for(let i=1;i<GAIT.pts.length;i++){
+      const a=GAIT.pts[i-1], b=GAIT.pts[i];
+      acc+=Math.hypot(b.x-a.x,b.y-a.y);
+      if(acc>27){ acc=0;
+        ctx.save(); ctx.translate(b.x,gy+9+((i%2)?5:-5));
+        ctx.beginPath(); ctx.ellipse(0,0,6,4,0,0,7); ctx.fill(); ctx.restore(); }
+    }
+    ctx.strokeStyle='rgba(230,92,0,.45)'; ctx.lineWidth=3; ctx.lineCap='round'; ctx.lineJoin='round';
+    ctx.beginPath(); ctx.moveTo(GAIT.pts[0].x,GAIT.pts[0].y);
+    GAIT.pts.forEach(q=>ctx.lineTo(q.x,q.y)); ctx.stroke();
+  }
+  if(GAIT.hero){
+    const last=GAIT.pts.length?GAIT.pts[GAIT.pts.length-1]:null;
+    const hx=last?last.x:46;
+    const hy=last?Math.min(gy-4,last.y):gy-26;
+    ctx.drawImage(GAIT.hero,hx-33,hy-112,66,75);
+  }
 }
 
 /* ═══════ ПАЗЛ 3: СТЁКЛА — три пальцем ═══════ */
@@ -2272,7 +2401,7 @@ function demoHand(kind){
   h.id='demohand'; h.className='demohand '+kind;
   h.innerHTML='<span class="dh-f">👆</span><span class="dh-t">'+
     {bench:'тащи одну деталь на другую',
-     belt:'смахни вниз, в свою корзину',
+     belt:'веди пальцем — покажи, как он ходит',
      glass:'веди пальцем — увидишь, что под стеклом',
      fresco:'выбери заплатку, потом крути её',
      studio:'двигай героя — ставь кадр как хочешь'}[kind]+'</span>';
@@ -2352,11 +2481,11 @@ function refreshPuzzle(){
   bindPuzzle(CUR);
 }
 function puzzleHTML(id){
-  return {bench:benchHTML,belt:beltHTML,glass:glassHTML,fresco:frescoHTML,studio:studioHTML}[id]();
+  return {bench:benchHTML,belt:gaitHTML,glass:glassHTML,fresco:frescoHTML,studio:studioHTML}[id]();
 }
 function bindPuzzle(id){
   if(id==='bench')benchBind();
-  if(id==='belt')beltStart();
+  if(id==='belt')gaitStart();
   if(id==='glass')glassStart();
   if(id==='fresco')frescoBind();
   if(id==='studio')studioBind();
@@ -2364,7 +2493,7 @@ function bindPuzzle(id){
   if(!T.shown[id]){T.shown[id]=1; setTimeout(()=>demoHand(id),350)}
 }
 function stopPuzzle(){
-  beltStop();
+  gaitStop();
   if(GLASS.run&&GLASS.masks&&GLASS.masks.length){clearTimeout(GLASS.pickT); glassPick()}
   GLASS.run=0; GLASS.gen=(GLASS.gen||0)+1;
   if(GLASS.raf)cancelAnimationFrame(GLASS.raf); GLASS.raf=0;
