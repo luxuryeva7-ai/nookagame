@@ -2053,18 +2053,21 @@ function gaitJudge(pts){
   const bounce=maxY-minY;
   const drop=pts[n-1].y-pts[0].y;
 
+  // пороги выставлены по реальному темпу детского пальца:
+  // неспешно провести экран ~3 c = 100 px/c, обычно ~200, резкий свайп ~500
+  const SLOW=130, FAST=300, JERK=1.1, BOUNCE=24;
   const feats=[];
-  feats.push(avg>250?'быстро':avg<95?'медленно':'спокойно');
-  feats.push(jerk>0.85?'рывками':'ровно');
+  feats.push(avg>FAST?'быстро':avg<SLOW?'медленно':'спокойно');
+  feats.push(jerk>JERK?'рывками':'ровно');
   feats.push(rev>=2?'петляет':'по прямой');
-  if(bounce>34)feats.push('подпрыгивает');
+  if(bounce>BOUNCE)feats.push('вприпрыжку');
 
   let id;
   if(rev>=2) id='sly';
-  else if(jerk>0.85 && avg>170) id='scared';
-  else if(bounce>34) id='amazed';
-  else if(avg<95 && drop>18) id='sad';
-  else if(avg<95) id='sleepy';
+  else if(bounce>BOUNCE) id='amazed';
+  else if(jerk>JERK && avg>200) id='scared';
+  else if(avg<SLOW && drop>16) id='sad';
+  else if(avg<SLOW) id='sleepy';
   else id='brave';
   return {id, feats, avg:Math.round(avg), jerk:+jerk.toFixed(2), bounce:Math.round(bounce), rev};
 }
