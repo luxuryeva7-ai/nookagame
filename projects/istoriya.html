@@ -362,10 +362,12 @@ body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);-w
 .bi svg{pointer-events:none}
 .bi.hot{transform:scale(1.22);filter:drop-shadow(0 0 8px rgba(230,92,0,.8))}
 .bi.ghost{position:fixed;z-index:99;pointer-events:none;transform:translate(-50%,-50%) scale(1.3);opacity:.9}
+.btn,.btn-sm,.st,.f5,.szb,.hole,.fork,.txtbtn,.bin,.nd,.opt{touch-action:manipulation}
+html,body{overflow-x:hidden}
 .bench-res{margin-top:10px;font-size:11.5px;font-weight:800;color:var(--ink3);text-align:center}
 .beltwrap,.glasswrap{margin-top:10px;background:var(--card);border-radius:18px;box-shadow:var(--sh);
  padding:12px;display:flex;flex-direction:column;align-items:center;gap:9px}
-.beltwrap canvas,.glasswrap canvas{border-radius:12px;touch-action:none;display:block}
+.beltwrap canvas,.glasswrap canvas{border-radius:12px;touch-action:none;display:block;max-width:100%}
 .bins{display:flex;gap:8px;width:100%}
 .bin{flex:1;background:#F6EEE2;border-radius:12px;padding:9px;text-align:center;
  box-shadow:inset 0 -3px 0 rgba(150,110,60,.18);transition:transform .15s}
@@ -1843,7 +1845,8 @@ function benchBind(){
   });
   function moveGhost(x,y){if(ghost){ghost.style.left=x+'px';ghost.style.top=(y-40)+'px'}}
   function targetUnder(x,y,self){
-    let best=null,bd=52;
+    y-=40;              // целимся тем, что ВИДНО — призраком, а он поднят на 40px
+    let best=null,bd=40;
     document.querySelectorAll('.bi').forEach(o=>{
       if(o===self)return;
       const r=o.getBoundingClientRect();
@@ -1914,7 +1917,7 @@ function beltHTML(){
 }
 function beltStart(){
   const cv=$('bcv'); if(!cv)return;
-  const w=Math.min(360,window.innerWidth-34), h=150;
+  const w=Math.min(360,(cv.parentElement?cv.parentElement.clientWidth:window.innerWidth-48)), h=150;
   const dpr=Math.min(2,devicePixelRatio||1);
   cv.width=w*dpr; cv.height=h*dpr; cv.style.width=w+'px'; cv.style.height=h+'px';
   const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
@@ -2010,7 +2013,7 @@ function glassHTML(){
 }
 function glassStart(){
   const cv=$('gcv'); if(!cv)return;
-  const w=Math.min(360,window.innerWidth-34), h=Math.round(w*2/3);
+  const w=Math.min(360,(cv.parentElement?cv.parentElement.clientWidth:window.innerWidth-48)), h=Math.round(w*2/3);
   const dpr=Math.min(2,devicePixelRatio||1);
   cv.width=w*dpr; cv.height=h*dpr; cv.style.width=w+'px'; cv.style.height=h+'px';
   const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
@@ -2021,11 +2024,17 @@ function glassStart(){
   GLASS.imgs=[]; GLASS.masks=[];
   GLASS.places.forEach((pl,i)=>{
     const im=new Image();
-    im.onload=()=>{GLASS.imgs[i]=im; glassDraw()};
+    // печём растр один раз: WebKit ненадёжно кэширует растр SVG-картинки,
+    // и повторный drawImage перерисовывал вектор заново каждый кадр
+    im.onload=()=>{
+      const oc=document.createElement('canvas'); oc.width=w*dpr; oc.height=h*dpr;
+      oc.getContext('2d').drawImage(im,0,0,oc.width,oc.height);
+      GLASS.imgs[i]=oc; glassDraw();
+    };
     let svg=`<svg width="600" height="400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200">${svgBG(pl,S.time||TIMES[1],S.seed+i*7,false,null)}</svg>`;
     im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
     const mc=document.createElement('canvas'); mc.width=w; mc.height=h;
-    const mx=mc.getContext('2d'); mx.fillStyle='#fff'; mx.fillRect(0,0,w,h);
+    const mx=mc.getContext('2d',{willReadFrequently:true}); mx.fillStyle='#fff'; mx.fillRect(0,0,w,h);
     GLASS.masks.push({cv:mc,ctx:mx});
   });
   // один переиспользуемый буфер вместо четырёх новых на каждый кадр
@@ -2035,7 +2044,7 @@ function glassStart(){
   GLASS.dirty=true; GLASS.last={x:0,y:0,on:false};
 
   let drag=false;
-  const R=26, LIMIT=0.55;
+  const R=26, LIMIT=1.15;   // ~3 штриха во всю ширину: потереть в удовольствие, но не открыть всё
   const rub=(cx,cy)=>{
     if(GLASS.used>=LIMIT){
       if(!GLASS.toldDry){GLASS.toldDry=1;setNote('Всё, тряпка сухая. Что успел открыть — то и пойдёт в книжку.')}
@@ -2079,11 +2088,13 @@ function glassStart(){
     let pts=[e];
     if(e.getCoalescedEvents){const c=e.getCoalescedEvents(); if(c&&c.length)pts=c}
     pts.forEach(p=>rub(p.clientX-r2.left,p.clientY-r2.top));};
-  cv.onpointerup=()=>{drag=false;GLASS.strokeLayer=null;GLASS.last.on=false;glassPick()};
-  cv.onpointercancel=()=>{drag=false;GLASS.strokeLayer=null;GLASS.last.on=false};
+  cv.onpointerup=()=>{drag=false;GLASS.strokeLayer=null;GLASS.last.on=false;
+    clearTimeout(GLASS.pickT); GLASS.pickT=setTimeout(glassPick,420)};
+  cv.onpointercancel=()=>{drag=false;GLASS.strokeLayer=null;GLASS.last.on=false;
+    clearTimeout(GLASS.pickT); glassPick()};   // иначе станция могла не отдать место вообще
   // рисуем раз в кадр, а не на каждое касание
-  GLASS.run=1;
-  const loop=()=>{ if(!GLASS.run)return;
+  GLASS.run=1; const myGen=(GLASS.gen=(GLASS.gen||0)+1);
+  const loop=()=>{ if(!GLASS.run||myGen!==GLASS.gen)return;   // старые копии цикла умирают гарантированно
     if(GLASS.dirty){GLASS.dirty=false;glassDraw()}
     GLASS.raf=requestAnimationFrame(loop); };
   loop();
@@ -2093,7 +2104,7 @@ function glassDraw(){
   ctx.clearRect(0,0,w,h);
   for(let i=3;i>=0;i--){
     const im=GLASS.imgs[i]; if(!im)continue;
-    if(i===3){ctx.drawImage(im,0,0,w,h);continue}
+    if(i===3){ctx.drawImage(im,0,0,w,h);continue}   // im здесь уже растр, не SVG
     if(!tctx)continue;
     tctx.clearRect(0,0,w,h);
     tctx.globalCompositeOperation='source-over';
@@ -2205,7 +2216,7 @@ function frescoBind(){
         rot=true;
         const a=Math.atan2(e.clientY-cy,e.clientX-cx)*180/Math.PI;
         const p=FRESCO.patches.find(x=>x.i===i);
-        if(p){p.ang=Math.round(a/15)*15;
+        if(p){p.ang=Math.round((a+90)/15)*15;   // atan2 даёт 0° справа, а метка смотрит вверх
           const sp=el.querySelector('span'); if(sp)sp.style.transform='rotate('+p.ang+'deg)';
           const pm=el.querySelector('.pmark'); if(pm)pm.style.transform='rotate('+p.ang+'deg)';
           const ok=frescoAligned(p);
@@ -2344,7 +2355,12 @@ function bindPuzzle(id){
   if(!T.shown){T.shown={}}
   if(!T.shown[id]){T.shown[id]=1; setTimeout(()=>demoHand(id),350)}
 }
-function stopPuzzle(){ beltStop(); GLASS.run=0; if(GLASS.raf)cancelAnimationFrame(GLASS.raf); GLASS.raf=0; }
+function stopPuzzle(){
+  beltStop();
+  if(GLASS.run&&GLASS.masks&&GLASS.masks.length){clearTimeout(GLASS.pickT); glassPick()}
+  GLASS.run=0; GLASS.gen=(GLASS.gen||0)+1;
+  if(GLASS.raf)cancelAnimationFrame(GLASS.raf); GLASS.raf=0;
+}
 function finishPuzzle(id){
   T.done[id]=1;
   stopPuzzle(); CUR=null;
@@ -2365,7 +2381,7 @@ function syncStrip(){
 
 /* ── навигация назад ── */
 $('back').onclick=()=>{
-  huntStop();
+  stopPuzzle(); CUR=null;          // иначе rAF-циклы пазлов копятся при каждом заходе
   const i=STEPS.indexOf(S.step);
   if(i<=0){location.href='index.html';return}
   S.step=STEPS[Math.max(0,i-1)];render();
