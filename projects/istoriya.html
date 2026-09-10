@@ -1870,12 +1870,14 @@ function benchBind(){
   });
   function moveGhost(x,y){if(ghost){ghost.style.left=x+'px';ghost.style.top=(y-40)+'px'}}
   function targetUnder(x,y,self){
-    y-=40;              // целимся тем, что ВИДНО — призраком, а он поднят на 40px
-    let best=null,bd=40;
+    // ребёнок может целиться и пальцем, и призраком (он поднят на 40px) —
+    // засчитываем ближайшую цель по любому из двух прицелов
+    let best=null,bd=46;
     document.querySelectorAll('.bi').forEach(o=>{
       if(o===self)return;
       const r=o.getBoundingClientRect();
-      const d=Math.hypot(x-(r.left+r.width/2),y-(r.top+r.height/2));
+      const cx=r.left+r.width/2, cy=r.top+r.height/2;
+      const d=Math.min(Math.hypot(x-cx,y-cy), Math.hypot(x-cx,(y-40)-cy));
       if(d<bd){bd=d;best=o}
     });
     return best;
