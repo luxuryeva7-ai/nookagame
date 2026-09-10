@@ -1868,7 +1868,7 @@ function benchBind(){
       drag=null;
     };
   });
-  function moveGhost(x,y){if(ghost){ghost.style.left=x+'px';ghost.style.top=(y-40)+'px'}}
+  function moveGhost(x,y){if(ghost){ghost.style.left=x+'px';ghost.style.top=(y-26)+'px'}}
   function targetUnder(x,y,self){
     // ребёнок может целиться и пальцем, и призраком (он поднят на 40px) —
     // засчитываем ближайшую цель по любому из двух прицелов
@@ -1877,7 +1877,7 @@ function benchBind(){
       if(o===self)return;
       const r=o.getBoundingClientRect();
       const cx=r.left+r.width/2, cy=r.top+r.height/2;
-      const d=Math.min(Math.hypot(x-cx,y-cy), Math.hypot(x-cx,(y-40)-cy));
+      const d=Math.hypot(x-cx,(y-26)-cy);   // прицел — центр призрака
       if(d<bd){bd=d;best=o}
     });
     return best;
