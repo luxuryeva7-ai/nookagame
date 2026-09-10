@@ -1874,7 +1874,9 @@ function benchBind(){
     // засчитываем ближайшую цель по любому из двух прицелов
     let best=null,bd=46;
     document.querySelectorAll('.bi').forEach(o=>{
-      if(o===self)return;
+      // призрак — это КЛОН с тем же классом .bi и тем же data-id: если его не исключить,
+      // прицел всегда попадает сам в себя и склейка не срабатывает никогда
+      if(o===self||o.classList.contains('ghost'))return;
       const r=o.getBoundingClientRect();
       const cx=r.left+r.width/2, cy=r.top+r.height/2;
       const d=Math.hypot(x-cx,(y-26)-cy);   // прицел — центр призрака
