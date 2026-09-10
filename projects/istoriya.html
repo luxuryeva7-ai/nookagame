@@ -2129,9 +2129,11 @@ function gaitDraw(){
   }
   if(GAIT.hero){
     const last=GAIT.pts.length?GAIT.pts[GAIT.pts.length-1]:null;
-    const hx=last?last.x:46;
-    const hy=last?Math.min(gy-4,last.y):gy-26;
-    ctx.drawImage(GAIT.hero,hx-33,hy-112,66,75);
+    const hx=Math.max(34,Math.min(w-34,last?last.x:46));
+    // ноги всегда на земле, а высота пальца читается как подскок — так это и выглядит ходьбой
+    const lift=last?Math.max(0,Math.min(30,(gy-46)-last.y)):0;
+    const top=Math.max(2,gy-74-lift);
+    ctx.drawImage(GAIT.hero,hx-33,top,66,75);
   }
 }
 
