@@ -2182,7 +2182,20 @@ function glassStart(){
     // и повторный drawImage перерисовывал вектор заново каждый кадр
     im.onload=()=>{
       const oc=document.createElement('canvas'); oc.width=w*dpr; oc.height=h*dpr;
-      oc.getContext('2d').drawImage(im,0,0,oc.width,oc.height);
+      const octx=oc.getContext('2d');
+      octx.drawImage(im,0,0,oc.width,oc.height);
+      // чем выше стекло, тем сильнее запотело: снял верхнее — стало заметно чище.
+      // без этого два похожих ночных фона выглядят одинаково и кажется, что тряпка не работает
+      if(i<3){
+        octx.fillStyle='rgba(232,242,248,'+(0.58-i*0.17)+')';
+        octx.fillRect(0,0,oc.width,oc.height);
+        const r3=rng(S.seed+i*31);
+        octx.fillStyle='rgba(255,255,255,.16)';
+        for(let k=0;k<160;k++){
+          const bx=r3()*oc.width, by=r3()*oc.height, br=3+r3()*11;
+          octx.beginPath(); octx.arc(bx,by,br,0,7); octx.fill();
+        }
+      }
       GLASS.imgs[i]=oc; glassDraw();
     };
     let svg=`<svg width="600" height="400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200">${svgBG(pl,S.time||TIMES[1],S.seed+i*7,false,null)}</svg>`;
@@ -2198,7 +2211,7 @@ function glassStart(){
   GLASS.dirty=true; GLASS.last={x:0,y:0,on:false};
 
   let drag=false;
-  const R=26, LIMIT=1.15;   // ~3 штриха во всю ширину: потереть в удовольствие, но не открыть всё
+  const R=34, LIMIT=1.15;   // ~3 штриха во всю ширину: потереть в удовольствие, но не открыть всё
   const rub=(cx,cy)=>{
     if(GLASS.used>=LIMIT){
       if(!GLASS.toldDry){GLASS.toldDry=1;setNote('Всё, тряпка сухая. Что успел открыть — то и пойдёт в книжку.')}
@@ -2217,10 +2230,10 @@ function glassStart(){
     }
     const mx=GLASS.masks[layer].ctx;
     mx.globalCompositeOperation='destination-out';
-    mx.lineCap='round'; mx.lineJoin='round'; mx.lineWidth=52;
+    mx.lineCap='round'; mx.lineJoin='round'; mx.lineWidth=R*2;
     mx.beginPath();
     if(GLASS.last.on){mx.moveTo(GLASS.last.x,GLASS.last.y);mx.lineTo(cx,cy);mx.stroke()}
-    mx.beginPath(); mx.arc(cx,cy,26,0,7); mx.fill();
+    mx.beginPath(); mx.arc(cx,cy,R,0,7); mx.fill();
     mx.globalCompositeOperation='source-over';
     // площадь считаем честно: круг — один раз за штрих, дальше только заметённая полоса 2R*длина.
     // старая формула клала полный круг на КАЖДУЮ коалесед-точку и сжигала бюджет за полсекунды.
@@ -2265,7 +2278,7 @@ function glassDraw(){
     tctx.drawImage(im,0,0,w,h);
     tctx.globalCompositeOperation='destination-in';
     tctx.drawImage(GLASS.masks[i].cv,0,0);
-    ctx.drawImage(tmp,0,0);
+    ctx.drawImage(tmp,0,0,w,h);   // БЕЗ w,h буфер w*dpr рисуется вдвое больше холста
   }
 }
 /* Что РЕАЛЬНО видно на экране: для каждой точки — самое верхнее непротёртое стекло.
