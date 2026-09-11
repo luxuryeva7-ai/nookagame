@@ -908,7 +908,7 @@ function makeStory(st){
     fade:[`Но ${PR.n} начал${PR.sex==='f'?'а':PR.sex==='n'?'о':''} таять прямо в лапах.`,`Только вот края ${PR.g} становились всё прозрачнее.`],
     owner:[`Но за ${PR.i} пришли. И это были не друзья.`,`И тут выяснилось: ${PR.n} — чуж${PR.sex==='f'?'ая':'ой'}.`],
   };
-  const b3=b3map[A?A.id:'alive'];
+  const b3=b3map[A&&b3map[A.id]?A.id:'alive'];
   // Бит 4 — решение (по развилке B)
   const B=st.fB;
   const b4map={
@@ -919,7 +919,7 @@ function makeStory(st){
     fix:[`${nm} сел${V('')} и починил${V('')} то, что сломалось. Медленно, но до конца.`],
     talk:[`${nm} не стал${V('')} драться. ${cap(R('Договорил'))} — оказалось, можно.`],
   };
-  const b4=b4map[B?B.id:'trick'];
+  const b4=b4map[B&&b4map[B.id]?B.id:'trick'];
   // Бит 5 — финал (по развилке C) + ОБЯЗАТЕЛЬНЫЙ callback предмета
   const C=st.fC;
   const b5map={
@@ -930,7 +930,7 @@ function makeStory(st){
     secret:[`${nm} никому не рассказал${V('')}. Только ${PR.n} знает, как было на самом деле.`],
     again:[`С тех пор всё началось заново. И снова с ${PR.i}.`],
   };
-  const b5=b5map[C?C.id:'home'];
+  const b5=b5map[C&&b5map[C.id]?C.id:'home'];
 
   const P4=[pick(r,b1),pick(r,b2),pick(r,b3),pick(r,b4),pick(r,b5)];
   const mine=shotNotes();
@@ -1500,7 +1500,8 @@ function toBook(){
   if(!S.fB)S.fB=FORK_B[0];
   if(!S.fC)S.fC=FORK_C[0];
   S.neuroFilled=filled;
-  S.pages=makeStory(S);
+  try{ S.pages=makeStory(S); }
+  catch(e){ S.fA=FORK_A[0]; S.fB=FORK_B[0]; S.fC=FORK_C[0]; S.pages=makeStory(S); }
   go('name');
 }
 
@@ -2341,14 +2342,14 @@ function frescoInit(){
 }
 function frescoHTML(){
   frescoInit();
-  return say('Фреска треснула. Заплаток шесть, дыр пять — одну можно испортить.\nКрути, пока линии не сойдутся. Свайп вниз — порвать насовсем.','oops')
+  return say('Фреска треснула. Возьми заплатку и веди пальцем влево-вправо — она крутится.\nКогда линия совпадёт, заплатка сама встанет в дыру.','oops')
    +`<div class="fresco">
       <div class="holes">${FRESCO.holes.map((h,i)=>`
         <div class="hole${h?' filled':''}" id="hole${i}" onclick="frescoPut(${i})">
           ${h?`<span class="hp" style="transform:rotate(${h.ang}deg)">${h.e}</span>`
              :`<span class="hn">${i+1}</span><i class="hmark"></i>`}
         </div>`).join('')}</div>
-      <div class="patch-t">Тапни заплатку, потом крути</div>
+      <div class="patch-t">Веди по заплатке влево-вправо</div>
       <div class="patches">${FRESCO.patches.filter(p=>!p.used&&!p.torn).map(p=>`
         <div class="patch${FRESCO.picked===p.i?' pick':''}${frescoAligned(p)?' ok':''}" id="pt${p.i}" data-i="${p.i}">
           <span style="transform:rotate(${p.ang}deg)">${p.e}</span>
@@ -2367,42 +2368,54 @@ function frescoAligned(p){
 function frescoBind(){
   document.querySelectorAll('.patch').forEach(el=>{
     const i=+el.dataset.i;
-    let sy=0,st=0,rot=false,cx=0,cy=0,base=0;
+    let down=false,sx=0,sy=0,st=0,rot=false,base=0;
+    const setAng=(p,ang)=>{
+      p.ang=((Math.round(ang/15)*15)%360+360)%360;
+      const sp=el.querySelector('span'); if(sp)sp.style.transform='rotate('+p.ang+'deg)';
+      const pm=el.querySelector('.pmark'); if(pm)pm.style.transform='rotate('+p.ang+'deg)';
+      const ok=frescoAligned(p);
+      el.classList.toggle('ok',ok);
+      let bd=el.querySelector('.pok');
+      if(ok&&!bd){bd=document.createElement('b');bd.className='pok';bd.textContent='линия сошлась';el.appendChild(bd)}
+      if(!ok&&bd)bd.remove();
+    };
+    const end=e=>{
+      if(!down)return; down=false;
+      const p=FRESCO.patches.find(x=>x.i===i); if(!p)return;
+      const ex=(e&&typeof e.clientX==='number')?e.clientX:sx, ey=(e&&typeof e.clientY==='number')?e.clientY:sy;
+      const dx=ex-sx, dy=ey-sy, dt=performance.now()-st;
+      if(!rot&&dy>70&&Math.abs(dx)<40&&dt<450){           // быстрый свайп вниз — порвать
+        p.torn=1; FRESCO.torn++;
+        el.animate([{transform:'scale(1)',opacity:1},{transform:'scale(.6) rotate(28deg)',opacity:0}],{duration:380})
+          .onfinish=()=>{setNote('Всё, этой больше нет. Дырку закрою сам — своим обычным.');refreshPuzzle()};
+        return;
+      }
+      if(rot&&frescoAligned(p)){
+        // сошлась — фиксируем ровно и ставим в первую пустую дыру сами: ребёнку не надо искать второй шаг
+        setAng(p,0);
+        const hi=FRESCO.holes.findIndex(h=>!h);
+        if(hi>=0){FRESCO.picked=i; setTimeout(()=>frescoPut(hi),260)}
+      }else if(rot){
+        setNote('Линия ещё не совпала — покрути ещё.');
+      }
+    };
     el.onpointerdown=e=>{
-      e.preventDefault(); el.setPointerCapture(e.pointerId);
-      sy=e.clientY; st=performance.now();
-      const r=el.getBoundingClientRect(); cx=r.left+r.width/2; cy=r.top+r.height/2;
-      const p=FRESCO.patches.find(x=>x.i===i); base=p?p.ang:0;
-      FRESCO.picked=i; rot=false;
+      e.preventDefault(); try{el.setPointerCapture(e.pointerId)}catch(_){}
+      const p=FRESCO.patches.find(x=>x.i===i); if(!p||p.used||p.torn)return;
+      down=true; rot=false; sx=e.clientX; sy=e.clientY; st=performance.now(); base=p.ang;
+      FRESCO.picked=i;
       document.querySelectorAll('.patch').forEach(o=>o.classList.remove('pick'));
       el.classList.add('pick');
     };
     el.onpointermove=e=>{
-      const dy=e.clientY-sy;
-      const dist=Math.hypot(e.clientX-cx,e.clientY-cy);
-      if(dist>26){ // крутим
-        rot=true;
-        const a=Math.atan2(e.clientY-cy,e.clientX-cx)*180/Math.PI;
-        const p=FRESCO.patches.find(x=>x.i===i);
-        if(p){p.ang=Math.round((a+90)/15)*15;   // atan2 даёт 0° справа, а метка смотрит вверх
-          const sp=el.querySelector('span'); if(sp)sp.style.transform='rotate('+p.ang+'deg)';
-          const pm=el.querySelector('.pmark'); if(pm)pm.style.transform='rotate('+p.ang+'deg)';
-          const ok=frescoAligned(p);
-          el.classList.toggle('ok',ok);
-          let bd=el.querySelector('.pok');
-          if(ok&&!bd){bd=document.createElement('b');bd.className='pok';bd.textContent='линия сошлась';el.appendChild(bd)}
-          if(!ok&&bd)bd.remove()}
-      }
+      if(!down)return;                                   // раньше крутилось от ЛЮБОГО движения после касания
+      const dx=e.clientX-sx, dy=e.clientY-sy;
+      if(!rot&&Math.abs(dx)<8)return;                    // мёртвая зона: тап не крутит
+      if(!rot&&dy>20&&Math.abs(dy)>Math.abs(dx)*1.5)return;  // похоже на свайп вниз — не крутим
+      rot=true;
+      const p=FRESCO.patches.find(x=>x.i===i); if(p)setAng(p,base+dx*1.6);  // ведёшь вправо — крутится по часовой
     };
-    el.onpointerup=e=>{
-      const dy=e.clientY-sy, dt=performance.now()-st;
-      if(!rot&&dy>70&&dt<400){ // рвём
-        const p=FRESCO.patches.find(x=>x.i===i);
-        if(p){p.torn=1;FRESCO.torn++;
-          el.animate([{transform:'scale(1)',opacity:1},{transform:'scale(.6) rotate(28deg)',opacity:0}],{duration:380})
-            .onfinish=()=>{setNote('Всё, этой больше нет. Дырку закрою сам — своим обычным.');refreshPuzzle()}}
-      }
-    };
+    el.onpointerup=end; el.onpointercancel=end; el.onlostpointercapture=end;
   });
 }
 function frescoPut(hi){
@@ -2414,8 +2427,10 @@ function frescoPut(hi){
   // угол близко к нулю — линии сошлись
   const ok=Math.min(Math.abs(p.ang%360),360-Math.abs(p.ang%360))<=15;
   if(hi===0)S.style=p.style;
-  if(p.turn&&hi===3)S.fB=p.turn;
-  if(p.turn&&hi===4)S.fC=p.turn;
+  // поворот берём, только если он из своей таблицы: иначе в S.fC попадал поворот
+  // из FORK_B, makeStory падал, и «Сложить книжку» переставала нажиматься
+  if(p.turn&&hi===3&&FORK_B.includes(p.turn))S.fB=p.turn;
+  if(p.turn&&hi===4&&FORK_C.includes(p.turn))S.fC=p.turn;
   setNote(ok?'Линии сошлись. Такого куска у меня не было — я его выдумал по краям.'
             :'Линия обрывается уступом. Но так тоже бывает — оставим.');
   FRESCO.picked=null;
@@ -2434,7 +2449,7 @@ function demoHand(kind){
     {bench:'тащи одну деталь на другую',
      belt:'веди пальцем — покажи, как он ходит',
      glass:'веди пальцем — увидишь, что под стеклом',
-     fresco:'выбери заплатку, потом крути её',
+     fresco:'веди по заплатке влево-вправо',
      studio:'двигай героя — ставь кадр как хочешь'}[kind]+'</span>';
   box.appendChild(h);
   const kill=()=>{h.classList.add('off');setTimeout(()=>h.remove(),300)};
