@@ -227,6 +227,11 @@ body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);-w
 .st:active{transform:scale(.985)}
 .st.done{filter:saturate(.45) brightness(.96);animation:none}
 .st-e{position:absolute;left:15px;top:50%;transform:translateY(-50%);font-size:30px;line-height:1}
+.st-num{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;
+ background:var(--acc);color:#fff;font-family:'Unbounded','Nunito',sans-serif;font-weight:800;font-size:17px;
+ display:flex;align-items:center;justify-content:center;box-shadow:0 2px 0 rgba(120,50,0,.35)}
+.st.done .st-num{background:#2E9E5B;box-shadow:0 2px 0 rgba(20,80,40,.35)}
+.st-h:empty{display:none}
 .st-n{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:17.5px;color:#2B2118}
 .st-s{font-size:15px;font-weight:700;color:#8A7A68}
 .st-h{position:absolute;right:13px;top:11px;font-size:12.5px;font-weight:800;color:var(--acc);
@@ -1126,7 +1131,7 @@ function doGen(next){generate(()=>{go(next)})}
 function render(){
   $('pbar').style.width=pct()+'%';
   const st=S.step;
-  $('htitle').textContent = st==='art'?'Моя книжка':st==='reveal'?'Как это устроено':'Твоя история';
+  $('htitle').textContent = st==='art'?'Моя книжка':st==='reveal'?'Что ты понял про ИИ':'Твоя история';
   const stepNo={s1:1,s2:2,s3:3,s4:4,cmp:4,name:4,fA:5,fB:5,fC:5,build:5,title:6,line:6,author:6}[st];
   $('hstep').textContent=stepNo?stepNo+'/6':'';
   $('back').style.visibility=st==='intro'?'hidden':'visible';
@@ -1162,10 +1167,12 @@ function render(){
   if(st==='table'){
     $('htitle').textContent='Стол Нейро';
     const n=tblCount();
+    const ah=T.aha&&MEANING[T.aha]; T.aha=null;
+    const nx=nextStation(), nxM=nx&&MEANING[nx];
     B().innerHTML=(n===0
-        ? say('Я прочитал тыщу книжек. Целиком не помню ни одной — я их разобрал.\nВот детали. Собери свою.','idle')
-        : say(n>=3?'Уже почти история. Можно складывать книжку.'
-                  :'Дальше что хочешь. Порядок не важен.', n>=3?'happy':'think'))
+        ? say('Я прочитал тыщу книжек. Целиком не помню ни одной — я их разобрал.\nИди по номерам, от 1 до 5 — каждый покажет, как я устроен.','idle')
+        : ah ? say('<b>'+ah.aha+'</b>'+(nxM?'\nДальше — номер '+nxM.n+'.':'\nВсё собрано. Складываем книжку.'),'happy')
+        : say(nxM?'Дальше — номер '+nxM.n+'. '+nxM.title+'.':'Всё собрано. Складываем книжку.', 'think'))
       +tableHTML();
     F().innerHTML=(n>=2)
       ? `<button class="btn" onclick="toBook()">Сложить книжку →</button>`
@@ -1180,7 +1187,7 @@ function render(){
     $('htitle').textContent=meta.n;
     const mine=needList().filter(x=>x.from===CUR);
     B().innerHTML=`<div class="pzgoal">
-        <div class="pzgoal-t">Здесь добываем</div>
+        <div class="pzgoal-t">Уровень ${(MEANING[CUR]||{}).n||''} из 5 · ${(MEANING[CUR]||{}).title||''}</div>
         <div class="pzgoal-r">${mine.map(x=>`
           <span class="pg${x.have?' has':''}">${x.e} ${x.n}${x.have&&x.val?': '+x.val:''}</span>`).join('')}</div>
       </div>
@@ -1467,23 +1474,23 @@ const LAYERS=[
  ['Стиль',      '8 обработок'],
 ];
 function renderReveal(){
-  $('htitle').textContent='Как это было устроено';
+  $('htitle').textContent='Что ты понял про ИИ';
   B().innerHTML=`<div class="scene">${scene(S)}</div>
     <div id="revl" style="margin-top:12px"></div>`;
   F().innerHTML='';
   const box=$('revl');
-  LAYERS.forEach((l,i)=>setTimeout(()=>{
-    box.insertAdjacentHTML('beforeend',`<div class="rev-l"><div class="rev-n">${i+1}</div><b>${l[0]}</b><span>${l[1]}</span></div>`);
+  const LV=['bench','belt','glass','fresco','studio','film'];
+  LV.forEach((k,i)=>setTimeout(()=>{
+    const m=MEANING[k];
+    box.insertAdjacentHTML('beforeend',`<div class="rev-l"><div class="rev-n">${i+1}</div><b>${m.title}</b><span>${m.aha.replace(/^Вот так и нейросеть:\s*/,'')}</span></div>`);
     window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
-    if(i===LAYERS.length-1)setTimeout(()=>{
-      box.insertAdjacentHTML('beforeend',say(`Секрет.\nУ меня в памяти лежат нарисованные детали — тела, головы, глаза, фоны, вещи. Я не рисовал их сейчас. Я сложил твою картинку из кусочков.\n\nНастоящий ИИ рисует иначе — точку за точкой, с нуля. Но главное у нас одинаковое: <b>мы оба ничего не берём из воздуха. Мы собираем из того, что уже видели.</b>\n\nРазница только в размере библиотеки: у меня десятки деталей, у больших моделей — миллиарды.\n\nТвоя история от этого хуже не стала. Придумал её всё равно ты.`));
+    if(i===LV.length-1)setTimeout(()=>{
+      box.insertAdjacentHTML('beforeend',say('Всё это — правда про настоящие нейросети. Только у них деталей миллиарды, а у меня десятки.\n<b>А историю придумал ты.</b>','happy'));
       F().innerHTML=`<button class="btn" onclick="go('end')">Понятно</button>`;
       window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
     },600);
-  },i*260));
+  },i*320));
 }
-
-/* стартуем стол: дозаполняем то, что ребёнок не собрал */
 function startTable(){
   S.seed=1000+Math.floor(Math.random()*9000);
   S.step='table'; render();
@@ -1529,6 +1536,8 @@ const CLUTTER=[
 ];
 
 /* пять входов: у каждого своя зона на столе и свой жест */
+/* смысл уровней: что каждая станция показывает про ИИ */
+const MEANING={"bench": {"n": 1, "title": "Как ИИ придумывает новое", "act": "Тащи одно на другое", "before": "Новых деталей у меня нет. Только то, что я видел. Соедини две — выйдет третья.", "aha": "Вот так и нейросеть: новое она собирает из того, что уже видела.", "teacher": ""}, "belt": {"n": 2, "title": "Как ИИ угадывает по признакам", "act": "Веди пальцем по земле", "before": "Как он ходит, я не знаю. Покажи пальцем — я измерю и угадаю характер.", "aha": "Вот так и нейросеть: мерит признаки и угадывает. Угадать — ещё не знать. Проверяй.", "teacher": ""}, "glass": {"n": 3, "title": "Как ИИ рисует из тумана", "act": "Протирай туман пальцем", "before": "Сначала у меня только туман. Протирай — посмотрим, какое место из него выйдет.", "aha": "Вот так и нейросеть: рисует из тумана. С каждым шагом чётче — и вариантов меньше.", "teacher": ""}, "fresco": {"n": 4, "title": "Как ИИ дорисовывает дыры", "act": "Крути заплатку пальцем", "before": "Картина треснула. Крути заплатку, пока линия не совпадёт, — она встанет сама.", "aha": "Вот так и нейросеть: дорисует дыру, чтобы сошлось с краями. Сошлось — не значит, что так было.", "teacher": ""}, "studio": {"n": 5, "title": "Как ИИ делает по-твоему", "act": "Двигай героя, пиши подпись", "before": "Раньше выбирал я. Теперь ты: ставь героя и пиши, что тут происходит.", "aha": "Вот так и нейросеть: рисует она, а решаешь ты. Скажешь точнее — выйдет ближе.", "teacher": ""}, "film": {"n": 6, "title": "Как ИИ оживляет картинки", "act": "Смотри и сохрани", "before": "Сейчас он пойдёт по твоим кадрам — той походкой, которую ты показал.", "aha": "Вот так и нейросеть снимает мультик: много кадров подряд. А что снимать — придумал ты.", "teacher": ""}};
 const STATIONS=[
  {id:'bench', n:'Верстак',  sub:'соедини и получи третье', e:'🔨', y:150, h:150, hint:'тащи одно на другое'},
  {id:'belt',  n:'Походка',  sub:'покажи, как он ходит',    e:'👣', y:314, h:112, hint:'веди пальцем'},
@@ -1600,24 +1609,26 @@ function tableHTML(){
     </div>
     <div class="stations">${STATIONS.map(st=>`
       <button class="st${T.done[st.id]?' done':''}${nextStation()===st.id?' next':''}" id="st_${st.id}" onclick="openPuzzle('${st.id}')">
-        <span class="st-e">${st.e}</span>
-        <span class="st-n">${st.n}</span>
+        <span class="st-num">${MEANING[st.id].n}</span>
+        <span class="st-n">${MEANING[st.id].title}</span>
+        <span class="st-s">${st.n} · ${MEANING[st.id].act}</span>
         <span class="st-gives">${stationGives(st.id)}</span>
-        <span class="st-s">${st.sub}</span>
-        <span class="st-h">${T.done[st.id]?'✓ был':st.hint}</span>
-        ${nextStation()===st.id?'<span class="st-badge">начни отсюда</span>':''}
+        <span class="st-h">${T.done[st.id]?'✓ понял':''}</span>
+        ${nextStation()===st.id?'<span class="st-badge">сейчас</span>':''}
       </button>`).join('')}</div>
-    <div class="clutter" id="clutter">${CLUTTER.map(c=>
-      `<span class="cl" data-id="${c.id}" style="left:${c.x}px;top:${c.y}px;font-size:${c.s}px">${c.e}</span>`).join('')}</div>
+    <div class="clutter" id="clutter">${CLUTTER.filter((c,i)=>i%2===0).map(c=>
+      // мелочи вдвое меньше («много деталей»), и ни одна не торчит за край стола
+      `<span class="cl" data-id="${c.id}" style="left:${Math.min(c.x,Math.min(window.innerWidth,480)-62)}px;top:${c.y}px;font-size:${c.s}px">${c.e}</span>`).join('')}</div>
     <div class="junk" id="junk"></div>
   </div>`;
 }
 /* какой пазл подсветить как следующий — первый, который ещё что-то даёт */
 function nextStation(){
+  // алгоритм урока: идём по номерам, от понимания к созданию
+  const st=STATIONS.find(x=>!T.done[x.id]);
+  if(st)return st.id;
   const L=needList();
-  for(const st of STATIONS){
-    if(L.some(x=>x.from===st.id&&!x.have))return st.id;
-  }
+  for(const x of STATIONS){ if(L.some(y=>y.from===x.id&&!y.have))return x.id; }
   return null;
 }
 function tblMood(){
@@ -1820,7 +1831,7 @@ function benchInit(){
 function benchHTML(){
   benchInit();
   const rows=[['part','Части живого'],['thing','Вещи'],['trait','Признаки']];
-  return say('Ни одной новой детали тут нет. Всё уже лежало на полке.\nТащи одно на другое — получится третье.','idle')
+  return say(MEANING.bench.before,'idle')
    +`<div class="bench">
       <div class="bowl" id="bowl">${BENCH.bowl.length
         ? BENCH.bowl.map(b=>`<span class="bw">${b.n||''}</span>`).join('')
@@ -1992,7 +2003,7 @@ function wrapLines(ctx,text,maxW){
 const GAIT={run:0,pts:[],raf:0,hero:null,drag:0,read:null,w:0,h:0,ctx:null,tries:0};
 
 function gaitHTML(){
-  return say('Я знаю, как он выглядит. Не знаю, как он ходит.\nПроведи пальцем по земле — покажи, как он идёт.','think')
+  return say(MEANING.belt.before,'think')
    +`<div class="gaitwrap">
       <canvas id="gtc"></canvas>
       <div class="gait-hint" id="gthint">веди пальцем слева направо</div>
@@ -2161,10 +2172,10 @@ function fitW(cv,max){
   return Math.max(200,Math.min(max,Math.floor(inner)));
 }
 function glassHTML(){
-  return say('Подо мной четыре места сразу. Протри — увидишь, какое тебе нужно.\nЧто не протрёшь — придумаю сам.','think')
+  return say(MEANING.glass.before,'think')
    +`<div class="glasswrap"><canvas id="gcv"></canvas>
       <div class="breath"><i id="breath"></i></div>
-      <div class="bench-res" id="glassres">Протёрто: 0%</div></div>`;
+      <div class="bench-res" id="glassres">Протирай — место проявится</div></div>`;
 }
 function glassStart(){
   const cv=$('gcv'); if(!cv)return;
@@ -2342,7 +2353,7 @@ function frescoInit(){
 }
 function frescoHTML(){
   frescoInit();
-  return say('Фреска треснула. Возьми заплатку и веди пальцем влево-вправо — она крутится.\nКогда линия совпадёт, заплатка сама встанет в дыру.','oops')
+  return say(MEANING.fresco.before,'oops')
    +`<div class="fresco">
       <div class="holes">${FRESCO.holes.map((h,i)=>`
         <div class="hole${h?' filled':''}" id="hole${i}" onclick="frescoPut(${i})">
@@ -2658,7 +2669,7 @@ function filmStop(){FILM.run=0; FILM.gen++; if(FILM.raf)cancelAnimationFrame(FIL
 /* ── экран мультика ── */
 function renderFilm(){
   $('htitle').textContent='Твой мультик';
-  B().innerHTML=say('Пять твоих кадров. Сейчас он в них пойдёт — той походкой, которую ты записал.','happy')
+  B().innerHTML=say(MEANING.film.before,'happy')
     +`<div class="filmwrap">
         <canvas id="fcv"></canvas>
         <div class="film-bar"><i id="fbar"></i></div>
@@ -2714,7 +2725,7 @@ function studioHTML(){
   const i=STUDIO.frame, sh=shotOf(i);
   if(!(S.hero&&S.place))return say('Сначала найди героя и место — потом поставим кадр.','oops')
     +'<div class="pznote">Загляни в Верстак и Стёкла.</div>';
-  return say(i===0?'Теперь твоя работа. Двигай героя пальцем — где поставишь, там и будет.\nЭто уже не я придумал, а ты.'
+  return say(i===0?MEANING.studio.before
                   :'Кадр '+(i+1)+' из 5. Ставь как хочешь.','happy')
    +`<div class="studio">
       <div class="stage-wrap">
@@ -2791,7 +2802,7 @@ function stopPuzzle(){
   if(GLASS.raf)cancelAnimationFrame(GLASS.raf); GLASS.raf=0;
 }
 function finishPuzzle(id){
-  T.done[id]=1;
+  T.done[id]=1; T.aha=id;
   stopPuzzle(); CUR=null;
   dropJunkQueued=id;
   S.step='table'; render();
