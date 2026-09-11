@@ -442,6 +442,15 @@ html,body{overflow-x:hidden}
 @keyframes fly{from{opacity:0;transform:translateX(-60px) rotate(-6deg)}to{opacity:1;transform:none}}
 .flyin{animation:fly .55s cubic-bezier(.2,.85,.3,1) both}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* фреска: дыра с кадром внутри и линией того же цвета, что на заплатке */
+.hole{overflow:hidden}
+.hbg{position:absolute;inset:0;opacity:.3;pointer-events:none;filter:saturate(.7)}
+.hbg svg{width:100%;height:100%;display:block}
+.hn,.hmark,.hp{position:relative;z-index:1}
+.hmark{background:var(--acc)!important;width:4px!important;height:18px!important;border-radius:2px!important;opacity:1!important}
+.patch.ok .pmark,.hole.filled .hmark{background:#2E9E5B!important}
+.pok{font-size:12.5px!important}
 </style>
 </head>
 <body>
@@ -1537,7 +1546,7 @@ const CLUTTER=[
 
 /* пять входов: у каждого своя зона на столе и свой жест */
 /* смысл уровней: что каждая станция показывает про ИИ */
-const MEANING={"bench": {"n": 1, "title": "Как ИИ придумывает новое", "act": "Тащи одно на другое", "before": "Новых деталей у меня нет. Только то, что я видел. Соедини две — выйдет третья.", "aha": "Вот так и нейросеть: новое она собирает из того, что уже видела.", "teacher": ""}, "belt": {"n": 2, "title": "Как ИИ угадывает по признакам", "act": "Веди пальцем по земле", "before": "Как он ходит, я не знаю. Покажи пальцем — я измерю и угадаю характер.", "aha": "Вот так и нейросеть: мерит признаки и угадывает. Угадать — ещё не знать. Проверяй.", "teacher": ""}, "glass": {"n": 3, "title": "Как ИИ рисует из тумана", "act": "Протирай туман пальцем", "before": "Сначала у меня только туман. Протирай — посмотрим, какое место из него выйдет.", "aha": "Вот так и нейросеть: рисует из тумана. С каждым шагом чётче — и вариантов меньше.", "teacher": ""}, "fresco": {"n": 4, "title": "Как ИИ дорисовывает дыры", "act": "Крути заплатку пальцем", "before": "Картина треснула. Крути заплатку, пока линия не совпадёт, — она встанет сама.", "aha": "Вот так и нейросеть: дорисует дыру, чтобы сошлось с краями. Сошлось — не значит, что так было.", "teacher": ""}, "studio": {"n": 5, "title": "Как ИИ делает по-твоему", "act": "Двигай героя, пиши подпись", "before": "Раньше выбирал я. Теперь ты: ставь героя и пиши, что тут происходит.", "aha": "Вот так и нейросеть: рисует она, а решаешь ты. Скажешь точнее — выйдет ближе.", "teacher": ""}, "film": {"n": 6, "title": "Как ИИ оживляет картинки", "act": "Смотри и сохрани", "before": "Сейчас он пойдёт по твоим кадрам — той походкой, которую ты показал.", "aha": "Вот так и нейросеть снимает мультик: много кадров подряд. А что снимать — придумал ты.", "teacher": ""}};
+const MEANING={"bench": {"n": 1, "title": "Как ИИ придумывает новое", "act": "Тащи одно на другое", "before": "Новых деталей у меня нет — только то, что я уже видел. Склей две!", "aha": "Вот так и нейросеть: новое она собирает из того, что уже видела. Из воздуха — ничего.", "teacher": "Ребёнок понял: ИИ не берёт идеи из воздуха. Он соединяет то, чему научился на множестве примеров, и так выходит новое — «ключ, из которого растёт дверь»."}, "belt": {"n": 2, "title": "Как ИИ угадывает по признакам", "act": "Веди пальцем по земле", "before": "Характер я не вижу. Я меряю, как ведёт твой палец. Покажи походку!", "aha": "Вот так и нейросеть: не видит характер, а меряет скорость и рывки. И может ошибиться!", "teacher": "Ребёнок понял: ИИ ничего не «чувствует». Он считает признаки и угадывает, а угадать ещё не значит знать. Ребёнок сам поспорил с Нейро и поправил его вывод."}, "glass": {"n": 3, "title": "Как ИИ рисует из тумана", "act": "Протирай туман пальцем", "before": "Сначала у меня только туман. Протирай — посмотрим, какое место выйдет.", "aha": "Вот так и нейросеть: рисует из шума шаг за шагом. Что выйдет — решается по ходу.", "teacher": "Ребёнок понял: картинка у нейросети появляется не сразу, а из «шума» за много шагов. Кандинский и Шедеврум делают так 20–50 шагов, сегодня каждый шаг делал палец ребёнка."}, "fresco": {"n": 4, "title": "Как ИИ дорисовывает дыры", "act": "Крути, пока линии сойдутся", "before": "В картине дыры. Крути заплатку, пока её линия не продолжит край.", "aha": "Вот так и нейросеть: дорисует дыру, глядя на края. Выйдет похоже, но это выдумка.", "teacher": "Ребёнок понял: ИИ умеет дорисовать недостающий кусок, глядя на то, что вокруг. Так работает «волшебный ластик» в телефоне. Но дорисованное — выдумка, даже если выглядит как правда."}, "studio": {"n": 5, "title": "Как ИИ слушается тебя", "act": "Двигай героя, пиши подпись", "before": "Теперь главный — ты. Ставь героя и пиши, что в кадре.", "aha": "Вот так и нейросеть: рисует она, а что и где — решаешь ты. Автор — ты.", "teacher": "Ребёнок понял: ИИ — инструмент. Замысел, расстановку и слова даёт человек, поэтому автор книжки — он, а Нейро только нарисовал."}, "film": {"n": 6, "title": "Как ИИ оживляет картинки", "act": "Смотри и сохрани", "before": "Мультик — это много кадров подряд. Смотри: он идёт твоей походкой.", "aha": "Вот так и нейросеть делает видео: много кадров, герой в каждом тот же. А походка — твоя.", "teacher": "Ребёнок понял: видео — это много картинок подряд. ИИ следит, чтобы герой не менялся, а движение и сюжет дал сам ребёнок. Титры честно делят: придумал он, нарисовал Нейро."}};
 const STATIONS=[
  {id:'bench', n:'Верстак',  sub:'соедини и получи третье', e:'🔨', y:150, h:150, hint:'тащи одно на другое'},
  {id:'belt',  n:'Походка',  sub:'покажи, как он ходит',    e:'👣', y:314, h:112, hint:'веди пальцем'},
@@ -1593,7 +1602,7 @@ function tableHTML(){
     <div class="lampglow" id="lampglow"></div>
     <div class="tbl-head">
       <div class="tbl-neuro" id="tblneuro">${svgNeuro(62,tblMood())}</div>
-      <div class="tbl-title">СТОЛ НЕЙРО<span>всё, что он помнит</span></div>
+      <div class="tbl-title">СТОЛ НЕЙРО<span>как ИИ понимает и создаёт</span></div>
       <div class="lamp" id="lamp" style="left:${T.lamp}px">💡</div>
     </div>
     <div class="rail" id="rail">
@@ -1825,12 +1834,11 @@ function benchInit(){
     ...['key','stone','feath','coin','egg','seed','shard','lamp'].map(id=>{
       const p=PROPS.find(x=>x.id===id);
       return {id,n:p?p.n:id,e:{key:'🔑',stone:'💎',feath:'🪶',coin:'🪙',egg:'🥚',seed:'🌱',shard:'🪞',lamp:'🔦'}[id],kind:'thing'}}),
-    ...TRAITS.map(t=>({...t,kind:'trait'})),
   ];
 }
 function benchHTML(){
   benchInit();
-  const rows=[['part','Части живого'],['thing','Вещи'],['trait','Признаки']];
+  const rows=[['part','Части живого'],['thing','Вещи']];
   return say(MEANING.bench.before,'idle')
    +`<div class="bench">
       <div class="bowl" id="bowl">${BENCH.bowl.length
@@ -2183,7 +2191,7 @@ function glassStart(){
   const dpr=Math.min(2,devicePixelRatio||1);
   cv.width=w*dpr; cv.height=h*dpr; cv.style.width=w+'px'; cv.style.height=h+'px';
   const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
-  GLASS.ctx=ctx; GLASS.w=w; GLASS.h=h; GLASS.budget=1; GLASS.used=0; GLASS.toldDry=0;
+  GLASS.ctx=ctx; GLASS.w=w; GLASS.h=h; GLASS.budget=1; GLASS.used=0; GLASS.toldDry=0; GLASS.ahaShown=0;
   const r=rng(S.seed*41+9);
   const sh=PLACES.slice(); for(let i=sh.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[sh[i],sh[j]]=[sh[j],sh[i]]}
   GLASS.places=sh.slice(0,4);
@@ -2227,7 +2235,9 @@ function glassStart(){
   const R=34, LIMIT=1.9;   // тереть можно вволю: жадный бюджет читается как «не работает»   // ~3 штриха во всю ширину: потереть в удовольствие, но не открыть всё
   const rub=(cx,cy)=>{
     if(GLASS.used>=LIMIT){
-      if(!GLASS.toldDry){GLASS.toldDry=1;setNote('Всё, тряпка сухая. Что успел открыть — то и пойдёт в книжку.')}
+      if(!GLASS.toldDry){GLASS.toldDry=1; GLASS.ahaShown=1;
+        const v=glassVisible(), pl=GLASS.places[v.best];
+        setNote('Тряпка высохла. Проявилось: '+(pl?pl.n:'—')+'. '+MEANING.glass.aha)}
       return;
     }
     // выбираем верхний непротёртый слой один раз за штрих, а не на каждую точку
@@ -2320,13 +2330,14 @@ function glassLive(){
   if(now-glassLiveT<200)return; glassLiveT=now;
   const v=glassVisible();
   const pl=GLASS.places[v.best]; if(!pl)return;
-  const g=$('glassres'); if(g)g.textContent='Видно: '+pl.n;
+  const g=$('glassres'); if(g)g.textContent='Шаг '+(v.best+1)+' из 4 · проявляется: '+pl.n;
 }
 function glassPick(){
   const v=glassVisible();
   S.place=GLASS.places[v.best]||PLACES[0];
   const g=$('glassres');
-  if(g)g.textContent='Видно: '+S.place.n;
+  if(g)g.textContent='Шаг '+(v.best+1)+' из 4 · проявляется: '+S.place.n;
+  if(!GLASS.ahaShown){GLASS.ahaShown=1; setNote(MEANING.glass.aha)}   // «ага» сразу после первого мазка
   syncStrip();
 }
 
@@ -2357,10 +2368,11 @@ function frescoHTML(){
    +`<div class="fresco">
       <div class="holes">${FRESCO.holes.map((h,i)=>`
         <div class="hole${h?' filled':''}" id="hole${i}" onclick="frescoPut(${i})">
+          <span class="hbg">${S.hero?scene(S,{seed:S.seed+i*17,angle:'full',compose:(S.shots||[])[i]||null}):''}</span>
           ${h?`<span class="hp" style="transform:rotate(${h.ang}deg)">${h.e}</span>`
              :`<span class="hn">${i+1}</span><i class="hmark"></i>`}
         </div>`).join('')}</div>
-      <div class="patch-t">Веди по заплатке влево-вправо</div>
+      <div class="patch-t">Крути. Сойдётся — сама встанет</div>
       <div class="patches">${FRESCO.patches.filter(p=>!p.used&&!p.torn).map(p=>`
         <div class="patch${FRESCO.picked===p.i?' pick':''}${frescoAligned(p)?' ok':''}" id="pt${p.i}" data-i="${p.i}">
           <span style="transform:rotate(${p.ang}deg)">${p.e}</span>
@@ -2368,7 +2380,6 @@ function frescoHTML(){
           <small>${p.style.n}</small>
           ${frescoAligned(p)?'<b class="pok">линия сошлась</b>':''}
         </div>`).join('')}</div>
-      <div class="bench-res" id="frres">Заплаток: ${FRESCO.patches.filter(p=>!p.used&&!p.torn).length} · порвано: ${FRESCO.torn}</div>
     </div>`;
 }
 /* заплатка «сошлась», когда её метка смотрит вверх */
@@ -2437,13 +2448,17 @@ function frescoPut(hi){
   p.used=1; FRESCO.holes[hi]={...p};
   // угол близко к нулю — линии сошлись
   const ok=Math.min(Math.abs(p.ang%360),360-Math.abs(p.ang%360))<=15;
-  if(hi===0)S.style=p.style;
+  const firstPatch=!FRESCO.styleSet;
+  if(firstPatch){S.style=p.style; FRESCO.styleSet=1}   // стиль задаёт ПЕРВАЯ вставленная, в какую бы дыру ни легла
   // поворот берём, только если он из своей таблицы: иначе в S.fC попадал поворот
   // из FORK_B, makeStory падал, и «Сложить книжку» переставала нажиматься
   if(p.turn&&hi===3&&FORK_B.includes(p.turn))S.fB=p.turn;
   if(p.turn&&hi===4&&FORK_C.includes(p.turn))S.fC=p.turn;
-  setNote(ok?'Линии сошлись. Такого куска у меня не было — я его выдумал по краям.'
-            :'Линия обрывается уступом. Но так тоже бывает — оставим.');
+  let note=ok?(FRESCO.ahaShown?'Линии сошлись.':MEANING.fresco.aha)
+             :'Шов виден. У нейросети тоже бывают такие швы.';
+  if(ok)FRESCO.ahaShown=1;
+  if(firstPatch)note=cap(p.style.n)+' — так нарисую всю книжку. '+note;
+  setNote(note);
   FRESCO.picked=null;
   refreshPuzzle(); syncStrip();
   if(FRESCO.holes.filter(Boolean).length>=4)setTimeout(()=>finishPuzzle('fresco'),800);
@@ -2459,8 +2474,8 @@ function demoHand(kind){
   h.innerHTML='<span class="dh-f">👆</span><span class="dh-t">'+
     {bench:'тащи одну деталь на другую',
      belt:'веди пальцем — покажи, как он ходит',
-     glass:'веди пальцем — увидишь, что под стеклом',
-     fresco:'веди по заплатке влево-вправо',
+     glass:'протирай — туман уходит слой за слоем',
+     fresco:'крути, пока линии сойдутся',
      studio:'двигай героя — ставь кадр как хочешь'}[kind]+'</span>';
   box.appendChild(h);
   const kill=()=>{h.classList.add('off');setTimeout(()=>h.remove(),300)};
