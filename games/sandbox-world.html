@@ -447,20 +447,6 @@ function sceneSVG(things, p, W) {
         '<circle cx="4" cy="3" r="1.8" fill="' + p.spot + '" opacity="0.55"/>'
       : '') + '</g>';
 
-  /* жители: доли мира переводим в координаты картинки */
-  const m = S / W;
-  const items = things.filter(t => t.zone).map(t => {
-    const w = t.w * m, h = t.h * m;
-    const top = t.zone === 'land'
-      ? (0.70 - 0.012) * S - h
-      : (t.zone === 'sky' ? 0.15 : 0.85) * S - h / 2;
-    /* на картинке житель не должен торчать за край: в мире он мог
-       гулять у самой границы, а тут кадр фиксированный */
-    const left = Math.max(8, Math.min(S - w - 8, t.x * S - w / 2));
-    return '<image href="' + t.img + '" x="' + left.toFixed(1) + '" y="' + top.toFixed(1) +
-      '" width="' + w.toFixed(1) + '" height="' + h.toFixed(1) + '"/>';
-  }).join('');
-
   return '<svg xmlns="http://www.w3.org/2000/svg" width="' + S + '" height="' + S + '">' +
     '<defs>' +
       '<linearGradient id="a" x1="0" y1="0" x2="0" y2="1">' +
@@ -498,8 +484,32 @@ function sceneSVG(things, p, W) {
       '" width="' + (g[2] * 2.6).toFixed(0) + '" height="7" rx="3.5" fill="' + p.glare +
       '" opacity="' + p.glareOp + '"/>').join('') +
 
-    items +
     '</svg>';
+}
+
+/* Где на картинке стоит каждый житель. Считаем отдельно от сцены: рисовать
+   их будем поверх, средствами холста. */
+function layout(things, W) {
+  const S = CARD_W, m = S / W;
+  return things.filter(t => t.zone).map(t => {
+    const w = t.w * m, h = t.h * m;
+    const y = t.zone === 'land'
+      ? (0.70 - 0.012) * S - h
+      : (t.zone === 'sky' ? 0.15 : 0.85) * S - h / 2;
+    /* житель не должен торчать за край: в мире он мог гулять у самой
+       границы, а тут кадр фиксированный */
+    const x = Math.max(8, Math.min(S - w - 8, t.x * S - w / 2));
+    return { img: t.img, x: x, y: y, w: w, h: h };
+  });
+}
+
+function loadImg(src) {
+  return new Promise((resolve, reject) => {
+    const i = new Image();
+    i.onload = () => resolve(i);
+    i.onerror = () => reject(new Error('img'));
+    i.src = src;
+  });
 }
 
 function shrink(url, w) {
@@ -520,46 +530,56 @@ function shrink(url, w) {
 }
 
 function makeCard({ things, name, pal, W }) {
-  return new Promise((resolve, reject) => {
-    const svg = sceneSVG(things, pal, W);
-    const img = new Image();
-    img.onload = () => {
-      try {
-        const cv = document.createElement('canvas');
-        cv.width = CARD_W; cv.height = CARD_H;
-        const c = cv.getContext('2d');
-        c.fillStyle = '#0E0A1C';
-        c.fillRect(0, 0, CARD_W, CARD_H);
-        c.drawImage(img, 0, SCENE_Y, CARD_W, CARD_W);
+  /* Жителей не вкладываем в svg картинками: Safari отдаёт отрисованный svg
+     до того, как вложенные data-картинки загрузятся, и мир на открытке
+     выходит пустым. Поэтому фон — svg, а жители рисуются на холст по одному,
+     каждый после своего onload. */
+  const items = layout(things, W);
+  /* ждём шрифты: если открытку собрать сразу после загрузки страницы,
+     заголовок нарисуется системным шрифтом вместо фирменного */
+  const fonts = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+  return Promise.all([
+    loadImg('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(sceneSVG(things, pal, W))),
+    Promise.all(items.map(it => loadImg(it.img).catch(() => null))),
+    fonts.catch(() => null),
+  ]).then(([bg, imgs]) => {
+    const cv = document.createElement('canvas');
+    cv.width = CARD_W; cv.height = CARD_H;
+    const c = cv.getContext('2d');
+    c.fillStyle = '#0E0A1C';
+    c.fillRect(0, 0, CARD_W, CARD_H);
+    c.drawImage(bg, 0, SCENE_Y, CARD_W, CARD_W);
 
-        const brand = "'Unbounded','Nunito',system-ui,sans-serif";
-        const body = "'Nunito',system-ui,sans-serif";
-        c.textAlign = 'center';
+    imgs.forEach((im, k) => {
+      if (!im) return;
+      const it = items[k];
+      c.drawImage(im, it.x, SCENE_Y + it.y, it.w, it.h);
+    });
 
-        c.fillStyle = '#F4EEFF';
-        c.font = '700 62px ' + brand;
-        c.fillText(name || 'Мой мир', CARD_W / 2, 104, CARD_W - 90);
+    const brand = "'Unbounded','Nunito',system-ui,sans-serif";
+    const body = "'Nunito',system-ui,sans-serif";
+    c.textAlign = 'center';
 
-        const live = things.filter(t => t.zone).length;
-        c.fillStyle = '#B3A2D4';
-        c.font = '800 36px ' + body;
-        c.fillText('Тут ' + window.nooka.plural(live, 'живёт', 'живут', 'живут') + ' ' + live + ' ' +
-          window.nooka.plural(live, 'житель', 'жителя', 'жителей') + ' — все нарисованы от руки',
-          CARD_W / 2, CARD_H - 150, CARD_W - 80);
+    c.fillStyle = '#F4EEFF';
+    c.font = '700 62px ' + brand;
+    c.fillText(name || 'Мой мир', CARD_W / 2, 104, CARD_W - 90);
 
-        c.fillStyle = '#7FE7FF';
-        c.font = '900 32px ' + body;
-        c.fillText('А Нейро научился угадывать, где чей дом', CARD_W / 2, CARD_H - 96, CARD_W - 80);
+    const live = items.length;
+    c.fillStyle = '#B3A2D4';
+    c.font = '800 36px ' + body;
+    c.fillText('Тут ' + window.nooka.plural(live, 'живёт', 'живут', 'живут') + ' ' + live + ' ' +
+      window.nooka.plural(live, 'житель', 'жителя', 'жителей') + ' — все нарисованы от руки',
+      CARD_W / 2, CARD_H - 150, CARD_W - 80);
 
-        c.fillStyle = '#6E5F92';
-        c.font = '800 27px ' + body;
-        c.fillText('Nooka · nookagame.ru', CARD_W / 2, CARD_H - 38);
+    c.fillStyle = '#7FE7FF';
+    c.font = '900 32px ' + body;
+    c.fillText('А Нейро научился угадывать, где чей дом', CARD_W / 2, CARD_H - 96, CARD_W - 80);
 
-        resolve(cv.toDataURL('image/png'));
-      } catch (e) { reject(e); }
-    };
-    img.onerror = () => reject(new Error('scene'));
-    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    c.fillStyle = '#6E5F92';
+    c.font = '800 27px ' + body;
+    c.fillText('Nooka · nookagame.ru', CARD_W / 2, CARD_H - 38);
+
+    return cv.toDataURL('image/png');
   });
 }
 
