@@ -808,6 +808,18 @@ function World() {
     return () => clearTimeout(t);
   }, [say, ask]);
 
+  /* Мастерская засчитывается, когда в мире поселились трое: это первый
+     момент, когда Нейро уже на чём-то учится, а мир перестаёт быть пустым.
+     Отмечаем один раз — дальше missionWin сам не начислит повторно. */
+  useEffect(() => {
+    if (things.filter(t => t.zone).length < 3) return;
+    try {
+      const p = JSON.parse(localStorage.getItem('nooka_profile') || '{}');
+      if (p.missions && p.missions.world1) return;
+      if (window.nooka && window.nooka.missionWin) window.nooka.missionWin('world1', 140);
+    } catch (e) {}
+  }, [things]);
+
   const closeHelp = () => {
     setHelp(false);
     try { localStorage.setItem(SEEN, '1'); } catch (e) {}

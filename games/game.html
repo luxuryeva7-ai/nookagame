@@ -198,6 +198,11 @@ h1{font-family:var(--brand);font-weight:900;font-size:30px;line-height:1.1;
 .gal--sand b{color:#BDF0FF}
 .gal--sand span{color:#93BCCF}
 .gal--sand i{color:#7FE7FF}
+/* финальная мастерская в маршруте: без номера и другого цвета — это
+   не одиннадцатый уровень, а свободная работа после десяти */
+.st--work .st__no--work{background:rgba(127,231,255,.15);box-shadow:inset 0 0 0 1.5px rgba(127,231,255,.4)}
+.st--work .st__no--work svg{color:#7FE7FF}
+.st--work .st__tx b{color:#BDF0FF}
 .gal--bonus{background:rgba(169,139,255,.12);box-shadow:inset 0 0 0 1.5px rgba(169,139,255,.4)}
 .gal--bonus b{color:#DCCBFF}
 .gal--bonus span{color:#B4A2DC}
@@ -368,7 +373,33 @@ document.getElementById('route').innerHTML = G.levels.map(function (lv) {
       btn +
     '</div></div>' +
   '</div>';
-}).join('');
+}).join('') +
+/* Финальная мастерская: стоит последней карточкой маршрута, но номера не
+   имеет — пройти её нельзя, там нет правильного ответа. Отмечается
+   сделанной, когда ребёнок поселил в мир троих. */
+(function () {
+  var sb = G.sandbox;
+  if (!sb) return '';
+  var done = nookaLevels.isDone(sb);
+  /* доступ как у последнего уровня игры: своего номера у мастерской нет,
+     а с выдуманным большим она оказывалась запертой даже в бесплатной игре */
+  var lock = !nookaAccess.canPlay(key, G.levels.length);
+  return '<div class="st st--work' + (done ? ' st--done' : lock ? ' st--lock' : '') + '">' +
+    '<button class="st__hd">' +
+      '<span class="st__no st__no--work">' + ico('g-star') + '</span>' +
+      '<span class="st__tx"><b>' + esc(sb.t) + '</b><span>' + esc(sb.goal) + '</span></span>' +
+      '<span class="st__mk">' + (done ? ico('g-check') : lock ? ico('g-lock') : '→') + '</span>' +
+    '</button>' +
+    '<div class="st__body"><div class="st__in">' +
+      '<div class="why"><b>Зачем это</b><span>' + esc(sb.learn) + '</span></div>' +
+      '<div class="st__art">' + ico('g-star') + 'В коллекцию: ' + esc(sb.art) + '</div>' +
+      (lock
+        ? '<button class="btn btn--sun" data-pay="1">Открыть доступ</button>'
+        : '<a class="btn ' + (done ? 'btn--ok' : 'btn--pri') + '" href="' + sb.href + '">' +
+          (done ? 'Вернуться в мир' : 'Открыть мастерскую') + '</a>') +
+    '</div></div>' +
+  '</div>';
+})();
 
 /* аккордеон: открыт один уровень */
 [].forEach.call(document.querySelectorAll('.st'), function (s) {
@@ -389,6 +420,11 @@ G.levels.forEach(function (lv) {
   used[lv.idea] = (used[lv.idea] || 0) + 1;
   if (lv.art) { arts++; if (nookaLevels.isDone(lv)) artsDone++; }
 });
+/* вещь из финальной мастерской тоже попадает в коллекцию — значит и в счёт */
+if (G.sandbox && G.sandbox.art) {
+  arts++;
+  if (nookaLevels.isDone(G.sandbox)) artsDone++;
+}
 var ideaRows = Object.keys(used).sort().map(function (k) {
   return '<div class="idea"><span>' + IDEAS[k] + '</span><u></u><b>' + used[k] + '</b></div>';
 }).join('');
@@ -401,11 +437,6 @@ var others = nookaLevels.games.filter(function (g) { return g.key !== key; })
   }).join('');
 
 document.getElementById('foot').innerHTML =
-  /* Песочница — свободный режим на механике игры: без задания и без счёта.
-     Стоит выше бонусов: это не «ещё уровень», а другая работа. */
-  (G.sandbox ? '<a class="gal gal--sand" href="' + G.sandbox.href + '">' +
-    '<span><b>✦ ' + esc(G.sandbox.t) + '</b><span>' + esc(G.sandbox.s) + '</span></span>' +
-    '<i>→</i></a>' : '') +
   /* Бонус игры — открыт всем, даже без доступа: по ссылке-загадке приходит
      друг, у которого оплаты нет, и ему надо куда-то прийти. */
   (G.extras || []).map(function (x) {
