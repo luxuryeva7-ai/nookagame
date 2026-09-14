@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0E0719">
 <title>Разложи по кучкам — Nooka</title>
 <meta property="og:title" content="Разложи по кучкам — Nooka">
-<meta property="og:description" content="Курс ИИ-грамотности для детей 8–12: три игры, тридцать уровней. Первая игра — бесплатно, с телефона, без установки.">
+<meta property="og:description" content="Курс ИИ-грамотности для детей 8–12: три игры, тридцать один уровень. Первая игра — бесплатно, с телефона, без установки.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://nookagame.ru/games/cluster.html">
 <meta property="og:image" content="https://nookagame.ru/screenshots/og.jpg">
@@ -89,7 +89,7 @@
 <script src="nooka-ui.js"></script>
 <script>
 /* ============================================================
-   РАЗЛОЖИ ПО КУЧКАМ — бонус первой игры.
+   РАЗЛОЖИ ПО КУЧКАМ — одиннадцатый уровень первой игры.
 
    Все остальные уровни курса — про обучение с учителем: человек
    дал примеры и подписал их. Здесь наоборот: подписей нет вообще,
@@ -285,7 +285,7 @@ function LevelCluster({ onWin, onHome }) {
   /* ── финал ── */
   if (phase === 'done') {
     return React.createElement('div', { className: 'cl' },
-      React.createElement(TopBar, { level: '★', title: 'Разложи по кучкам', onHome }),
+      React.createElement(TopBar, { level: 11, title: 'Разложи по кучкам', onHome }),
       React.createElement('div', { className: 'clbody cldone' },
         React.createElement('div', { className: 'clzoo clgrid3', style: { width: '100%' } },
           CL_ZOO.slice(0, 6).map(b => React.createElement('div', { key: b.id, style: { textAlign: 'center' } },
@@ -306,7 +306,7 @@ function LevelCluster({ onWin, onHome }) {
   const zooOf = side => CL_ZOO.filter(b => piles[b.id] === side);
 
   return React.createElement('div', { className: 'cl' },
-    React.createElement(TopBar, { level: '★', title: 'Разложи по кучкам', onHome }),
+    React.createElement(TopBar, { level: 11, title: 'Разложи по кучкам', onHome }),
 
     phase === 'intro' && React.createElement(IntroModal, {
       emoji: NKM('hello', 88),

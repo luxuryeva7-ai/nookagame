@@ -169,7 +169,7 @@ h2{font-size:22px;margin:34px 0 16px}
 
   <div class="course-h">
     <h2>ИИ-грамотность для детей</h2>
-    <span class="tag"><i></i><span id="courseTag">3 игры · 30 уровней</span></span>
+    <span class="tag"><i></i><span id="courseTag">3 игры · 31 уровень</span></span>
   </div>
   <div class="course" id="course"></div>
 
@@ -239,7 +239,8 @@ if (xp === 0) {
   var NUM=['','Игра 1','Игра 2','Игра 3'];
   var t=nookaLevels.totals();
   document.getElementById('courseTag').textContent=
-    nookaLevels.games.length+' игры · '+t.total+' уровней'+(t.ready<t.total?' · готово '+t.ready:'');
+    nookaLevels.games.length+' игры · '+t.total+' '+
+    nooka.plural(t.total,'уровень','уровня','уровней')+(t.ready<t.total?' · готово '+t.ready:'');
   document.getElementById('course').innerHTML=nookaLevels.games.map(function(g,i){
     var s=nookaLevels.stats(g.key), pct=Math.round(s.done/s.total*100);
     return '<a class="cg" href="../games/game.html?g='+g.key+'" style="--t:'+g.tint+'">'+

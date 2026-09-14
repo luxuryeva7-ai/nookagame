@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Прототип 4 — Сезон</title>
+<link rel="icon" href="../logo.svg">
+<link href="/fonts/nooka-fonts.css" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFF3E4;--card:#FFFDFA;--ink:#2D1B45;--ink-2:#6B5A87;--ink-3:#9C8CB5;
+  --pri:#7B2FFF;--pri-s:#F0E8FF;--sun:#FFD84D;--ok:#12A66B;--ok-s:#E4F8EF;
+  --brand:'Unbounded','Nunito',system-ui,sans-serif;
+  --body:'Nunito',system-ui,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:var(--bg)}
+body{font-family:var(--body);color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased}
+
+.wrap{max-width:460px;margin:0 auto;padding:16px 16px calc(44px + env(safe-area-inset-bottom))}
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.top a{text-decoration:none;font-weight:800;font-size:13.5px;color:var(--ink-2)}
+.top .brand{font-family:var(--brand);font-weight:900;font-size:16px}
+.top .brand em{font-style:normal;color:var(--pri)}
+
+.kick{display:inline-block;padding:6px 13px;border-radius:999px;background:var(--sun);
+  font-weight:900;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:#3D2A05}
+h1{margin-top:11px;font-family:var(--brand);font-weight:900;font-size:29px;line-height:1.08;
+  letter-spacing:-.015em}
+.h-sub{margin-top:8px;font-weight:700;font-size:13.5px;line-height:1.45;color:var(--ink-2)}
+
+/* прогресс делениями — сколько серий позади видно без чтения */
+.pips{display:flex;gap:5px;margin-top:18px}
+.pips i{flex:1;height:7px;border-radius:999px;background:#EADFF5}
+.pips i.on{background:linear-gradient(90deg,#7B2FFF,#A98BFF)}
+.pips i.now{background:var(--sun)}
+.meta{display:flex;align-items:baseline;justify-content:space-between;margin-top:9px;
+  font-weight:800;font-size:12.5px;color:var(--ink-2)}
+.meta b{font-family:var(--brand);font-weight:700;font-size:14px;color:var(--ink)}
+
+.sec{margin:26px 2px 12px;font-weight:900;font-size:11.5px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink-3)}
+
+/* ── серия ── */
+.ep{display:flex;align-items:center;gap:14px;padding:14px 16px;margin-bottom:10px;
+  border-radius:24px;background:var(--card);
+  box-shadow:0 2px 0 rgba(45,27,69,.05),0 14px 30px -22px rgba(45,27,69,.5);
+  transition:transform .16s cubic-bezier(.2,.8,.3,1)}
+.ep:hover{transform:translateY(-3px)}
+.ep__no{flex-shrink:0;width:46px;text-align:center;font-family:var(--brand);font-weight:900;
+  font-size:28px;line-height:1;color:#E2D6F2;letter-spacing:-.03em}
+.ep__tx{flex:1;min-width:0}
+.ep__tx b{display:block;font-weight:900;font-size:15px;line-height:1.25}
+.ep__tx span{display:block;margin-top:4px;font-weight:700;font-size:12.5px;line-height:1.35;color:var(--ink-2)}
+.ep__ic{flex-shrink:0;width:42px;height:42px;border-radius:15px;display:flex;
+  align-items:center;justify-content:center;background:var(--pri-s)}
+.ep__ic svg{width:21px;height:21px;color:var(--pri)}
+
+.ep.done{background:transparent;box-shadow:inset 0 0 0 1.5px #E7DCF3}
+.ep.done .ep__no{color:var(--ok)}
+.ep.done .ep__ic{background:var(--ok-s)}
+.ep.done .ep__ic svg{color:var(--ok)}
+.ep.done .ep__tx b{color:var(--ink-2)}
+.ep.done .ep__tx span{display:none}
+
+/* текущая серия — крупная карточка */
+.hero{margin-bottom:12px;padding:20px;border-radius:30px;position:relative;overflow:hidden;
+  background:linear-gradient(160deg,#7B2FFF 0%,#5B1FD6 62%,#4713A8 100%);color:#fff;
+  box-shadow:0 22px 44px -26px rgba(91,31,214,.9)}
+.hero::after{content:'';position:absolute;right:-46px;top:-56px;width:190px;height:190px;
+  border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.22),transparent 70%)}
+.hero__k{position:relative;font-weight:900;font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:#E6D8FF}
+.hero__r{position:relative;display:flex;align-items:center;gap:14px;margin-top:11px}
+.hero__ic{flex-shrink:0;width:56px;height:56px;border-radius:20px;display:flex;
+  align-items:center;justify-content:center;background:rgba(255,255,255,.18)}
+.hero__ic svg{width:28px;height:28px;color:#fff}
+.hero__r b{font-family:var(--brand);font-weight:700;font-size:20px;line-height:1.15;letter-spacing:-.01em}
+.hero p{position:relative;margin-top:12px;font-weight:700;font-size:13.5px;line-height:1.45;color:#E9DFFF}
+.go{position:relative;margin-top:16px;width:100%;padding:15px;border-radius:999px;border:none;
+  cursor:pointer;font-family:var(--brand);font-weight:700;font-size:15.5px;color:#33240A;
+  background:linear-gradient(180deg,#FFF1B4,#FFD84D);box-shadow:0 4px 0 #C79412}
+.go:active{transform:translateY(2px);box-shadow:0 2px 0 #C79412}
+
+.bonus{margin-top:16px;padding:16px 17px;border-radius:26px;display:flex;align-items:center;gap:13px;
+  background:#FFF8E3;box-shadow:inset 0 0 0 1.5px #F3DFA6}
+.bonus .st{flex-shrink:0;width:44px;height:44px;border-radius:50%;display:flex;
+  align-items:center;justify-content:center;background:var(--sun)}
+.bonus .st svg{width:22px;height:22px;color:#3D2A05}
+.bonus b{display:block;font-family:var(--brand);font-weight:700;font-size:14.5px}
+.bonus span{display:block;margin-top:4px;font-weight:700;font-size:12.5px;line-height:1.35;color:var(--ink-2)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a href="#">← Моя база</a><span class="brand">Noo<em>ka</em></span></div>
+  <span class="kick">Игра 1 · 8–10 лет</span>
+  <h1>Откуда ИИ знает</h1>
+  <div class="h-sub">Десять уровней про то, откуда у ИИ берутся знания — и почему он ошибается.</div>
+
+  <div class="pips" id="pips"></div>
+  <div class="meta"><span>Пройдено <b>4 из 10</b></span><span>300 XP</span></div>
+
+  <div id="list"></div>
+</div>
+
+<script src="_proto-sprite.js"></script>
+<script src="nooka-levels.js"></script>
+<script>
+(function () {
+  var g = window.nookaLevels.games[0], DONE = 4;
+
+  document.getElementById('pips').innerHTML = g.levels.map(function (lv, i) {
+    return '<i class="' + (i < DONE ? 'on' : i === DONE ? 'now' : '') + '"></i>';
+  }).join('');
+
+  var out = '', cur = g.levels[DONE];
+
+  out += '<div class="sec">Сейчас</div>' +
+    '<div class="hero"><div class="hero__k">Уровень ' + (DONE + 1) + ' из 10</div>' +
+    '<div class="hero__r"><span class="hero__ic"><svg><use href="#g-' + cur.g + '"></use></svg></span>' +
+    '<b>' + cur.t + '</b></div>' +
+    '<p>' + (cur.goal || cur.s) + '</p>' +
+    '<button class="go">Играть</button></div>';
+
+  out += '<div class="sec">Дальше</div>';
+  g.levels.slice(DONE + 1).forEach(function (lv, k) {
+    var i = DONE + 1 + k;
+    out += '<div class="ep"><span class="ep__no">' + (i + 1) + '</span>' +
+      '<span class="ep__tx"><b>' + lv.t + '</b><span>' + (lv.goal || lv.s) + '</span></span>' +
+      '<span class="ep__ic"><svg><use href="#g-' + lv.g + '"></use></svg></span></div>';
+  });
+
+  var b = g.extras[0];
+  out += '<div class="bonus"><span class="st"><svg viewBox="0 0 24 24" fill="currentColor">' +
+    '<path d="M12 2.5l2.9 6.1 6.6.9-4.8 4.7 1.2 6.6L12 17.6l-5.9 3.2 1.2-6.6L2.5 9.5l6.6-.9z"/></svg></span>' +
+    '<span><b>' + b.t + '</b><span>' + b.goal + '</span></span></div>';
+
+  out += '<div class="sec">Пройдено</div>';
+  g.levels.slice(0, DONE).forEach(function (lv, i) {
+    out += '<div class="ep done"><span class="ep__no">' + (i + 1) + '</span>' +
+      '<span class="ep__tx"><b>' + lv.t + '</b></span>' +
+      '<span class="ep__ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5l5 5 10-11"/></svg></span></div>';
+  });
+
+  document.getElementById('list').innerHTML = out;
+})();
+</script>
+</body>
+</html>
