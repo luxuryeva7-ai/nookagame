@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0E0719">
 <title>Мой мир — Nooka</title>
 <meta property="og:title" content="Мой мир — Nooka">
-<meta property="og:description" content="Нарисуй зверя — и он побежит жить в твой мир. Нейро сам решит, где его дом, а ты поправишь.">
+<meta property="og:description" content="Рисуй кого хочешь — и он оживёт в твоём мире. Нейро учится угадывать, где чей дом, а ты его поправляешь.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://nookagame.ru/games/sandbox-world.html">
 <meta property="og:image" content="https://nookagame.ru/screenshots/og.jpg">
@@ -17,99 +17,136 @@
 <link rel="stylesheet" href="nooka-ui.css">
 <style>
 /* ============ МОЙ МИР: песочница про данные ============
-   Ребёнок не обучает модель — он заселяет мир. Обучение происходит
-   само: каждый поселённый зверь становится примером. */
+   Ребёнок не обучает модель — он населяет нарисованный мир тем,
+   что нарисовал сам. Обучение идёт само: каждая поселённая вещь
+   становится примером с меткой места. */
 .wd *,.wd *::before,.wd *::after{box-sizing:border-box;}
-.wdroot{position:fixed;inset:0;overflow:hidden;background:#090711;}
+.wdroot{position:fixed;inset:0;overflow:hidden;background:#070510;}
 .wd{position:absolute;inset:0;display:flex;flex-direction:column;}
 
-/* ── мир: три пояса ── */
+/* ── мир ── */
 .wdworld{position:relative;flex:1;overflow:hidden;}
-.wdzone{position:absolute;left:0;right:0;transition:box-shadow .2s,filter .2s;}
-.wdzone--sky{top:0;height:30%;background:linear-gradient(180deg,#241B45 0%,#1B1536 100%);}
-.wdzone--sky .wdzone__n{top:46px;}   /* под шапкой, иначе наезжает на название */
-.wdzone--land{top:30%;height:40%;background:linear-gradient(180deg,#17251E 0%,#101A16 100%);}
-.wdzone--water{top:70%;height:30%;background:linear-gradient(180deg,#122B3D 0%,#0B1B28 100%);}
-.wdzone__n{position:absolute;left:14px;top:9px;z-index:1;font-weight:900;font-size:10.5px;
-  letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.17);pointer-events:none;}
+.wdzone{position:absolute;left:0;right:0;overflow:hidden;}
+.wdzone--sky{top:0;height:30%;}
+.wdzone--sky .wdzone__n{top:auto;bottom:9px;}  /* сверху её закрывают кнопки */
+.wdzone--land{top:30%;height:40%;}
+.wdzone--water{top:70%;height:30%;}
+.wdart{position:absolute;inset:0;pointer-events:none;}
+.wdart svg{position:absolute;left:0;width:100%;display:block;}
 
-/* когда Нейро спрашивает — пояса становятся кнопками */
+.wdzone__n{position:absolute;right:13px;top:10px;z-index:3;font-weight:900;font-size:10px;
+  letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.24);pointer-events:none;}
+
+/* когда Нейро спрашивает — места становятся кнопками */
 .wdzone--ask{cursor:pointer;}
-.wdzone--ask::after{content:'';position:absolute;inset:5px;border-radius:18px;
-  box-shadow:inset 0 0 0 2px rgba(255,216,77,.5);animation:wdPulse 1.4s ease-in-out infinite;}
-.wdzone--ask:hover{filter:brightness(1.25);}
-@keyframes wdPulse{0%,100%{opacity:.45}50%{opacity:1}}
+.wdzone--ask::after{content:'';position:absolute;inset:6px;border-radius:20px;z-index:4;
+  box-shadow:inset 0 0 0 2.5px rgba(255,216,77,.55);animation:wdPulse 1.3s ease-in-out infinite;}
+.wdzone--ask:hover::after{box-shadow:inset 0 0 0 3px rgba(255,216,77,.95);}
+@keyframes wdPulse{0%,100%{opacity:.4}50%{opacity:1}}
 
-/* горизонт и вода — чтобы пояса читались как места, а не как полосы */
-.wdline{position:absolute;left:0;right:0;height:1px;background:rgba(255,255,255,.07);}
+/* ── житель мира ── */
+.wdthing{position:absolute;z-index:5;cursor:grab;touch-action:none;will-change:transform;
+  filter:drop-shadow(0 4px 9px rgba(0,0,0,.55));}
+.wdthing img{display:block;width:100%;height:100%;pointer-events:none;}
+.wdthing--drag{cursor:grabbing;z-index:30;filter:drop-shadow(0 12px 22px rgba(0,0,0,.7));}
+.wdthing--new{animation:wdPop .55s cubic-bezier(.2,1.5,.4,1) both;}
+@keyframes wdPop{0%{transform:scale(0) rotate(-22deg);opacity:0}100%{transform:scale(1);opacity:1}}
 
-/* ── зверь ── */
-.wdbeast{position:absolute;cursor:grab;touch-action:none;will-change:transform;
-  filter:drop-shadow(0 3px 7px rgba(0,0,0,.45));}
-.wdbeast img{display:block;width:100%;height:100%;pointer-events:none;}
-.wdbeast--drag{cursor:grabbing;z-index:30;filter:drop-shadow(0 10px 18px rgba(0,0,0,.6));}
-.wdbeast--new{animation:wdPop .5s cubic-bezier(.2,1.4,.4,1) both;}
-@keyframes wdPop{0%{transform:scale(0) rotate(-25deg);opacity:0}100%{transform:scale(1);opacity:1}}
-
-/* ── реплика Нейро: одна строка внизу мира ── */
-.wdsay{position:absolute;left:12px;right:12px;bottom:92px;z-index:20;
+/* ── реплика Нейро ── */
+.wdsay{position:absolute;left:12px;right:12px;bottom:14px;z-index:20;
   display:flex;align-items:center;gap:11px;padding:13px 15px;border-radius:19px;
-  background:rgba(20,14,36,.92);backdrop-filter:blur(6px);
-  box-shadow:0 8px 26px rgba(0,0,0,.45),inset 0 0 0 1px rgba(255,255,255,.11);
+  background:rgba(18,12,33,.93);backdrop-filter:blur(7px);
+  box-shadow:0 10px 30px rgba(0,0,0,.5),inset 0 0 0 1px rgba(255,255,255,.12);
   animation:wdUp .3s ease-out both;}
 .wdsay b{font-family:var(--nk-body);font-weight:800;font-size:14px;line-height:1.4;color:#F4EEFF;}
 .wdsay b em{font-style:normal;color:#FFD84D;}
 .wdsay i{flex-shrink:0;line-height:0;}
 @keyframes wdUp{from{transform:translateY(14px);opacity:0}to{transform:translateY(0);opacity:1}}
 
-/* ── низ: единственная кнопка ── */
+/* ── низ ── */
 .wdbar{position:relative;z-index:25;padding:12px 14px calc(14px + env(safe-area-inset-bottom));
-  background:linear-gradient(180deg,rgba(9,7,17,0),#090711 26%);}
+  background:linear-gradient(180deg,rgba(7,5,16,0),#070510 30%);}
 .wddraw{width:100%;border:none;cursor:pointer;border-radius:19px;padding:17px;
   font-family:var(--nk-body);font-weight:900;font-size:16px;color:#0E0719;
   background:#FFD84D;box-shadow:0 4px 0 #C9A21E;}
 .wddraw:active{transform:translateY(2px);box-shadow:0 2px 0 #C9A21E;}
+.wddraw:disabled{opacity:.55;box-shadow:none;cursor:default;}
 
-/* шапка поверх мира */
+/* шапка */
 .wdtop{position:absolute;top:0;left:0;right:0;z-index:22;display:flex;align-items:center;gap:10px;
-  padding:12px 14px;background:linear-gradient(180deg,rgba(9,7,17,.75),rgba(9,7,17,0));}
+  padding:12px 14px;background:linear-gradient(180deg,rgba(7,5,16,.82),rgba(7,5,16,0));}
 .wdtop__t{font-family:var(--nk-brand),var(--nk-body);font-weight:700;font-size:15px;color:#F4EEFF;
-  text-shadow:0 2px 8px rgba(0,0,0,.5);}
+  text-shadow:0 2px 8px rgba(0,0,0,.6);}
+.wdtop__t span{display:block;margin-top:2px;font-family:var(--nk-body);font-weight:800;
+  font-size:11px;color:#B3A2D4;text-shadow:0 1px 6px rgba(0,0,0,.8);}
 .wdtop__c{margin-left:auto;display:flex;gap:7px;}
-.wdtop__b{width:34px;height:34px;border:none;cursor:pointer;border-radius:11px;padding:0;
-  color:#CFC0EA;font-size:15px;font-weight:900;background:rgba(20,14,36,.8);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.13);}
+.wdtop__b{width:34px;height:34px;flex-shrink:0;border:none;cursor:pointer;border-radius:11px;padding:0;
+  color:#CFC0EA;font-size:15px;font-weight:900;background:rgba(18,12,33,.85);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);}
 
-/* ── доска: во весь экран, ничего лишнего ── */
+/* ── доска ── */
 .wdpad{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;
-  background:#0C0918;animation:wdFade .18s ease-out;}
+  background:#0B0817;animation:wdFade .18s ease-out;}
 @keyframes wdFade{from{opacity:0}to{opacity:1}}
-.wdpad__h{padding:16px 16px 0;text-align:center;}
-.wdpad__h b{font-family:var(--nk-brand),var(--nk-body);font-weight:700;font-size:19px;color:#F4EEFF;}
-.wdpad__h span{display:block;margin-top:4px;font-weight:700;font-size:12.5px;color:#8B7BAE;}
-.wdpad__c{flex:1;margin:14px;border-radius:24px;overflow:hidden;position:relative;
-  background:linear-gradient(180deg,#1A1430,#0D0A18);
-  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.08);}
+.wdpad__h{padding:15px 16px 0;text-align:center;}
+.wdpad__h b{font-family:var(--nk-brand),var(--nk-body);font-weight:700;font-size:18px;color:#F4EEFF;}
+.wdpad__h span{display:block;margin-top:3px;font-weight:700;font-size:12px;color:#8B7BAE;}
+.wdpad__c{flex:1;margin:12px 14px;border-radius:24px;overflow:hidden;position:relative;
+  background:radial-gradient(125% 90% at 50% 0%,#241C42 0%,#100C1F 72%);
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.09);}
 .wdpad__c canvas{width:100%;height:100%;display:block;touch-action:none;cursor:crosshair;}
 .wdpad__ghost{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  pointer-events:none;font-weight:800;font-size:14px;color:#463A63;}
-.wdpad__b{display:flex;gap:9px;padding:0 14px calc(16px + env(safe-area-inset-bottom));}
+  pointer-events:none;font-weight:800;font-size:14px;color:#4A3D69;}
+
+/* палитра */
+.wdink{display:flex;align-items:center;gap:7px;padding:0 12px;justify-content:center;}
+.wdink__c{width:33px;height:33px;border:none;cursor:pointer;border-radius:50%;padding:0;
+  position:relative;transition:transform .13s;}
+.wdink__c:active{transform:scale(.88);}
+.wdink__c.on::after{content:'';position:absolute;inset:-4px;border-radius:50%;
+  box-shadow:0 0 0 2.5px #fff;}
+.wdsize{display:flex;align-items:center;gap:7px;margin-left:5px;padding-left:10px;
+  box-shadow:inset 1px 0 0 rgba(255,255,255,.15);}
+.wdsize button{width:33px;height:33px;border:none;cursor:pointer;border-radius:12px;padding:0;
+  background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;}
+.wdsize button.on{background:rgba(255,255,255,.22);}
+.wdsize i{display:block;border-radius:50%;background:#EFE6FF;}
+
+.wdpad__b{display:flex;gap:9px;padding:12px 14px calc(14px + env(safe-area-inset-bottom));}
 .wdpad__b button{border:none;cursor:pointer;border-radius:17px;padding:16px 10px;
   font-family:var(--nk-body);font-weight:900;font-size:14.5px;}
-.wdpad__x{flex:0 0 106px;color:#B9A8D8;background:rgba(255,255,255,.07);
+.wdpad__x{flex:0 0 104px;color:#B9A8D8;background:rgba(255,255,255,.07);
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.11);}
 .wdpad__ok{flex:1;color:#0E0719;background:#7FE7FF;box-shadow:0 4px 0 #2E9EBC;}
 .wdpad__ok:disabled{opacity:.35;box-shadow:none;cursor:default;}
 
-/* пусто */
-.wdempty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  padding:0 40px;text-align:center;font-weight:800;font-size:14px;line-height:1.5;
-  color:rgba(255,255,255,.28);pointer-events:none;}
+/* ── инструкция ── */
+.wdhelp{position:fixed;inset:0;z-index:70;display:flex;align-items:center;justify-content:center;
+  padding:20px;background:rgba(7,5,16,.88);backdrop-filter:blur(5px);animation:wdFade .2s ease-out;}
+.wdhelp__c{width:100%;max-width:400px;padding:24px 22px;border-radius:28px;
+  background:linear-gradient(180deg,#1E1738,#140F26);
+  box-shadow:0 20px 60px rgba(0,0,0,.65),inset 0 0 0 1px rgba(255,255,255,.1);}
+.wdhelp__t{font-family:var(--nk-brand),var(--nk-body);font-weight:700;font-size:21px;color:#F4EEFF;
+  text-align:center;}
+.wdstep{display:flex;align-items:center;gap:14px;margin-top:16px;}
+.wdstep__i{width:52px;height:52px;flex-shrink:0;border-radius:16px;display:flex;
+  align-items:center;justify-content:center;background:rgba(255,255,255,.06);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.1);}
+.wdstep__t{font-weight:800;font-size:13.5px;line-height:1.45;color:#DDD2F2;}
+.wdstep__t b{color:#FFD84D;font-weight:900;}
+.wdhelp__go{width:100%;margin-top:22px;border:none;cursor:pointer;border-radius:17px;padding:16px;
+  font-family:var(--nk-body);font-weight:900;font-size:15.5px;color:#0E0719;
+  background:#FFD84D;box-shadow:0 4px 0 #C9A21E;}
 
-/* на компьютере мир не растягиваем во всю ширину — держим вертикальным */
+/* пусто */
+.wdempty{position:absolute;inset:0;z-index:4;display:flex;align-items:center;justify-content:center;
+  padding:0 40px;text-align:center;font-weight:800;font-size:14px;line-height:1.55;
+  color:rgba(255,255,255,.38);pointer-events:none;text-shadow:0 2px 12px rgba(0,0,0,.85);
+  white-space:pre-line;}
+
 @media(min-width:900px){
   #root>.wdroot{max-width:none;}
-  .wd{max-width:560px;margin:0 auto;box-shadow:0 0 90px rgba(0,0,0,.6);}
+  .wd{max-width:560px;margin:0 auto;box-shadow:0 0 100px rgba(0,0,0,.7);}
 }
 </style>
 </head>
@@ -123,48 +160,147 @@
 /* ============================================================
    МОЙ МИР — песочница к игре «Откуда ИИ знает».
 
-   Первая версия была доской с классами и режимами: ребёнок
-   «обучал модель», а рисунок превращался в проценты. Скучно и
-   похоже на пять уровней до этого.
+   Ребёнок рисует что хочет — любым цветом, любой толщиной — и это
+   оживает в нарисованном мире. Нейро угадывает, где этому место:
+   в небе, на земле или в воде. Ошибся — ребёнок перетаскивает, и
+   Нейро запоминает. Обучение на примерах без слова «модель».
 
-   Здесь рисунок остаётся жить. Ребёнок населяет мир, а обучение
-   идёт само: каждый поселённый зверь — пример с меткой пояса.
-   Нейро честно не знает первого и честно ошибается на похожем.
-
-   На экране одна кнопка. Всё остальное — мир.
+   Инструкция показывается сразу: без неё не видно, что Нейро
+   учится, — он выглядит просто угадывающим.
    ============================================================ */
 
-const { useState, useRef, useEffect, useCallback } = React;
+const { useState, useRef, useEffect } = React;
 const B = window.nookaBrain;
 
-const PAD = 300;              // холст доски
-const PEN = 10;
-const MAX_BEASTS = 14;
+const PAD = 320;
+const MAX_THINGS = 16;
 const KEY = 'nooka_world';
+const SEEN = 'nooka_world_seen';
+
+/* палитра: рисовать одним синим скучно — цвет тут половина дела */
+const INKS = ['#FF6B6B', '#FFA94D', '#FFD84D', '#7CE8B0', '#7FE7FF', '#A98BFF', '#FF8FD4', '#FFFFFF'];
+const SIZES = [5, 10, 18];
 
 const ZONES = [
-  { id: 'sky',   n: 'В НЕБЕ',   say: 'в небе',    top: 0.00, bot: 0.30 },
-  { id: 'land',  n: 'НА ЗЕМЛЕ', say: 'на земле',  top: 0.30, bot: 0.70 },
-  { id: 'water', n: 'В ВОДЕ',   say: 'в воде',    top: 0.70, bot: 1.00 },
+  { id: 'sky',   n: 'НЕБО',  say: 'в небе',   top: 0.00, bot: 0.30 },
+  { id: 'land',  n: 'ЗЕМЛЯ', say: 'на земле', top: 0.30, bot: 0.70 },
+  { id: 'water', n: 'ВОДА',  say: 'в воде',   top: 0.70, bot: 1.00 },
 ];
 const zoneOf = id => ZONES.find(z => z.id === id) || ZONES[1];
 
 function load() {
   try {
     const raw = JSON.parse(localStorage.getItem(KEY) || 'null');
-    return raw && Array.isArray(raw.beasts) ? raw.beasts : [];
+    return raw && Array.isArray(raw.things) ? raw.things : [];
   } catch (e) { return []; }
 }
-function store(beasts) {
+function store(things) {
   try {
     localStorage.setItem(KEY, JSON.stringify({
-      beasts: beasts.map(b => ({ img: b.img, f: b.f, zone: b.zone, w: b.w, h: b.h })),
+      things: things.map(t => ({ img: t.img, f: t.f, zone: t.zone, w: t.w, h: t.h, kind: t.kind })),
     }));
   } catch (e) {}
 }
 
-/* ── рисунок → картинка зверя: обрезаем по рамке, чтобы зверь был
-   ростом с рисунок, а не с холст ── */
+/* ── декорации мира ───────────────────────────────────────────
+   Мир должен быть нарисованным местом, а не тремя полосами: ребёнок
+   дорисовывает своё поверх готовой картинки. */
+function Sky() {
+  const stars = [];
+  /* звёзды по решётке со сдвигом: случайные пересчитывались бы
+     на каждом кадре и мигали */
+  for (let i = 0; i < 28; i++) {
+    const x = (i * 37) % 100, y = ((i * 53) % 72) + 5;
+    const r = i % 5 === 0 ? 1.6 : i % 3 === 0 ? 1.1 : 0.7;
+    stars.push(React.createElement('circle', {
+      key: i, cx: x + '%', cy: y + '%', r: r, fill: '#fff',
+      opacity: 0.16 + (i % 7) * 0.085,
+    }));
+  }
+  return React.createElement('div', { className: 'wdart' },
+    React.createElement('svg', {
+      style: { top: 0, height: '100%' }, preserveAspectRatio: 'none', viewBox: '0 0 100 100',
+    },
+      React.createElement('defs', null,
+        React.createElement('linearGradient', { id: 'wdSky', x1: '0', y1: '0', x2: '0', y2: '1' },
+          React.createElement('stop', { offset: '0', stopColor: '#2B1F55' }),
+          React.createElement('stop', { offset: '0.55', stopColor: '#201842' }),
+          React.createElement('stop', { offset: '1', stopColor: '#271D4A' }))),
+      React.createElement('rect', { width: 100, height: 100, fill: 'url(#wdSky)' })),
+    React.createElement('svg', { style: { top: 0, height: '100%' } }, stars),
+    React.createElement('svg', {
+      style: { top: '13%', left: 'auto', right: '12%', width: 58, height: 58 }, viewBox: '0 0 58 58',
+    },
+      React.createElement('circle', { cx: 29, cy: 29, r: 19, fill: '#FFE9A8', opacity: 0.12 }),
+      React.createElement('circle', { cx: 29, cy: 29, r: 13, fill: '#FFEFC4' }),
+      React.createElement('circle', { cx: 24, cy: 25, r: 2.6, fill: '#E6D3A0', opacity: 0.65 }),
+      React.createElement('circle', { cx: 33, cy: 32, r: 1.8, fill: '#E6D3A0', opacity: 0.55 })),
+    React.createElement('svg', {
+      style: { bottom: 0, height: '48%' }, preserveAspectRatio: 'none', viewBox: '0 0 100 30',
+    },
+      React.createElement('path', {
+        d: 'M-4 27 Q10 15 24 23 Q34 11 48 21 Q60 13 72 23 Q86 16 104 26 L104 34 L-4 34 Z',
+        fill: '#342659', opacity: 0.5,
+      })));
+}
+
+function Land() {
+  return React.createElement('div', { className: 'wdart' },
+    React.createElement('svg', {
+      style: { top: 0, height: '100%' }, preserveAspectRatio: 'none', viewBox: '0 0 100 100',
+    },
+      React.createElement('defs', null,
+        React.createElement('linearGradient', { id: 'wdLand', x1: '0', y1: '0', x2: '0', y2: '1' },
+          React.createElement('stop', { offset: '0', stopColor: '#1D3529' }),
+          React.createElement('stop', { offset: '1', stopColor: '#101D17' }))),
+      React.createElement('rect', { width: 100, height: 100, fill: 'url(#wdLand)' })),
+    React.createElement('svg', {
+      style: { top: 0, height: '44%' }, preserveAspectRatio: 'none', viewBox: '0 0 100 24',
+    },
+      React.createElement('path', {
+        d: 'M0 24 L0 15 Q14 4 27 13 Q40 20 52 9 Q66 -1 78 11 Q90 20 100 12 L100 24 Z',
+        fill: '#28472F', opacity: 0.85,
+      }),
+      React.createElement('path', {
+        d: 'M0 24 L0 20 Q18 12 33 19 Q48 25 62 17 Q78 9 100 19 L100 24 Z',
+        fill: '#203A28',
+      })),
+    React.createElement('svg', {
+      style: { bottom: 0, height: '13%' }, preserveAspectRatio: 'none', viewBox: '0 0 100 8',
+    },
+      React.createElement('path', {
+        d: 'M0 8 L0 5 Q6 1 12 5 Q18 1 24 5 Q30 1 36 5 Q42 1 48 5 Q54 1 60 5 Q66 1 72 5 ' +
+           'Q78 1 84 5 Q90 1 96 5 Q99 3 100 5 L100 8 Z',
+        fill: '#2A4B34', opacity: 0.9,
+      })));
+}
+
+function Water() {
+  return React.createElement('div', { className: 'wdart' },
+    React.createElement('svg', {
+      style: { top: 0, height: '100%' }, preserveAspectRatio: 'none', viewBox: '0 0 100 100',
+    },
+      React.createElement('defs', null,
+        React.createElement('linearGradient', { id: 'wdWat', x1: '0', y1: '0', x2: '0', y2: '1' },
+          React.createElement('stop', { offset: '0', stopColor: '#1A4C74' }),
+          React.createElement('stop', { offset: '1', stopColor: '#081A2D' }))),
+      React.createElement('rect', { width: 100, height: 100, fill: 'url(#wdWat)' })),
+    React.createElement('svg', {
+      style: { top: 0, height: '18%' }, preserveAspectRatio: 'none', viewBox: '0 0 100 10',
+    },
+      React.createElement('path', {
+        d: 'M0 0 L100 0 L100 5 Q88 9 76 5 Q64 1 52 5 Q40 9 28 5 Q16 1 0 5 Z',
+        fill: '#2E74A6', opacity: 0.5,
+      })),
+    React.createElement('svg', { style: { top: 0, height: '100%' } },
+      [['16%', '36%', 28], ['60%', '54%', 36], ['36%', '76%', 22], ['76%', '88%', 30]].map((p, i) =>
+        React.createElement('rect', {
+          key: i, x: p[0], y: p[1], width: p[2], height: 2.5, rx: 1.25,
+          fill: '#9EDCFF', opacity: 0.12,
+        }))));
+}
+
+/* ── рисунок → житель мира: обрезаем по рамке ── */
 function cutOut(cv) {
   const ctx = cv.getContext('2d');
   const d = ctx.getImageData(0, 0, cv.width, cv.height).data;
@@ -183,20 +319,26 @@ function cutOut(cv) {
   maxX = Math.min(cv.width - 1, maxX + pad); maxY = Math.min(cv.height - 1, maxY + pad);
   const w = maxX - minX + 1, h = maxY - minY + 1;
   const out = document.createElement('canvas');
-  /* 84, а не 150: зверь ростом с пояс закрывал полмира и лез за края */
-  const k = Math.min(1, 84 / Math.max(w, h));
+  /* 88 по большей стороне: рисунок ростом с целый пояс закрывал полмира */
+  const k = Math.min(1, 88 / Math.max(w, h));
   out.width = Math.max(8, Math.round(w * k));
   out.height = Math.max(8, Math.round(h * k));
   out.getContext('2d').drawImage(cv, minX, minY, w, h, 0, 0, out.width, out.height);
-  try { return { url: out.toDataURL('image/png'), w: out.width, h: out.height }; }
-  catch (e) { return null; }
+  try {
+    return { url: out.toDataURL('image/png'), w: out.width, h: out.height, ratio: w / h };
+  } catch (e) { return null; }
 }
 
-/* ── доска ── */
+/* ── доска с палитрой ── */
 function Pad({ onDone, onCancel }) {
   const cvRef = useRef(null);
   const [has, setHas] = useState(false);
-  const st = useRef({ drawing: false });
+  const [ink, setInk] = useState(INKS[4]);
+  const [size, setSize] = useState(SIZES[1]);
+  /* цвет и толщину держим ещё и в ref: обработчики указателя ставятся
+     один раз, замыкание на состоянии в них устареет */
+  const st = useRef({ drawing: false, ink: INKS[4], size: SIZES[1] });
+  useEffect(() => { st.current.ink = ink; st.current.size = size; }, [ink, size]);
 
   useEffect(() => {
     const cv = cvRef.current;
@@ -204,10 +346,8 @@ function Pad({ onDone, onCancel }) {
     cv.width = PAD;
     cv.height = Math.round(PAD * box.height / box.width);
     const ctx = cv.getContext('2d');
-    ctx.lineWidth = PEN;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    ctx.strokeStyle = '#8FE9FF';
 
     const pos = e => {
       const r = cv.getBoundingClientRect();
@@ -216,6 +356,8 @@ function Pad({ onDone, onCancel }) {
     const down = e => {
       try { cv.setPointerCapture(e.pointerId); } catch (_) {}
       st.current.drawing = true;
+      ctx.strokeStyle = st.current.ink;
+      ctx.lineWidth = st.current.size;
       const [x, y] = pos(e);
       ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + 0.01, y); ctx.stroke();
       setHas(true);
@@ -248,59 +390,118 @@ function Pad({ onDone, onCancel }) {
 
   return React.createElement('div', { className: 'wdpad wd' },
     React.createElement('div', { className: 'wdpad__h' },
-      React.createElement('b', null, 'Нарисуй кого хочешь'),
-      React.createElement('span', null, 'Он оживёт и останется жить в твоём мире')),
+      React.createElement('b', null, 'Рисуй что хочешь'),
+      React.createElement('span', null, 'Зверя, дерево, облако, рыбу — что угодно')),
+
     React.createElement('div', { className: 'wdpad__c' },
       React.createElement('canvas', { ref: cvRef }),
       !has && React.createElement('div', { className: 'wdpad__ghost' }, 'Рисуй пальцем')),
+
+    React.createElement('div', { className: 'wdink' },
+      INKS.map(c => React.createElement('button', {
+        key: c, className: 'wdink__c' + (ink === c ? ' on' : ''),
+        style: { background: c }, 'aria-label': 'цвет', onClick: () => setInk(c),
+      })),
+      React.createElement('div', { className: 'wdsize' },
+        SIZES.map(s => React.createElement('button', {
+          key: s, className: size === s ? 'on' : '', 'aria-label': 'толщина линии',
+          onClick: () => setSize(s),
+        }, React.createElement('i', { style: { width: s + 2, height: s + 2 } }))))),
+
     React.createElement('div', { className: 'wdpad__b' },
       React.createElement('button', {
         className: 'wdpad__x', onClick: () => (has ? wipe() : onCancel()),
       }, has ? 'Стереть' : 'Назад'),
       React.createElement('button', {
-        className: 'wdpad__ok', disabled: !has,
-        onClick: () => onDone(cvRef.current),
+        className: 'wdpad__ok', disabled: !has, onClick: () => onDone(cvRef.current),
       }, 'Оживить')));
+}
+
+/* ── инструкция: без неё не видно, что Нейро вообще учится ── */
+function Help({ onClose }) {
+  const icon = (children) => React.createElement('svg', {
+    width: 30, height: 30, viewBox: '0 0 30 30', fill: 'none',
+  }, children);
+  const step = (ic, text) => React.createElement('div', { className: 'wdstep' },
+    React.createElement('div', { className: 'wdstep__i' }, ic),
+    React.createElement('div', { className: 'wdstep__t', dangerouslySetInnerHTML: { __html: text } }));
+
+  return React.createElement('div', { className: 'wdhelp wd', onClick: onClose },
+    React.createElement('div', { className: 'wdhelp__c', onClick: e => e.stopPropagation() },
+      React.createElement('div', { className: 'wdhelp__t' }, 'Твой мир'),
+
+      step(icon([
+        React.createElement('path', {
+          key: 'a', d: 'M5 23 L19 6 L25 11 L11 26 Z', stroke: '#7FE7FF', strokeWidth: 2.2,
+          strokeLinejoin: 'round',
+        }),
+        React.createElement('path', {
+          key: 'b', d: 'M5 23 L8 26', stroke: '#7FE7FF', strokeWidth: 2.2, strokeLinecap: 'round',
+        }),
+      ]), 'Рисуй кого хочешь — <b>любым цветом</b>. Он оживёт и останется тут жить'),
+
+      step(icon([
+        React.createElement('circle', {
+          key: 'a', cx: 15, cy: 15, r: 10, stroke: '#FFD84D', strokeWidth: 2.2,
+        }),
+        React.createElement('path', {
+          key: 'b', d: 'M12 12 Q15 8.5 18 12 Q18 15 15 16 L15 17.5', stroke: '#FFD84D',
+          strokeWidth: 2.2, strokeLinecap: 'round', strokeLinejoin: 'round',
+        }),
+        React.createElement('circle', { key: 'c', cx: 15, cy: 21, r: 1.3, fill: '#FFD84D' }),
+      ]), 'Нейро угадает, где его дом: <b>в небе, на земле или в воде</b>. Кого не знает — спросит'),
+
+      step(icon([
+        React.createElement('path', {
+          key: 'a', d: 'M6 15 L22 15 M16 9 L22 15 L16 21', stroke: '#7CE8B0', strokeWidth: 2.4,
+          strokeLinecap: 'round', strokeLinejoin: 'round',
+        }),
+      ]), 'Ошибся — <b>перетащи пальцем</b>. Нейро запомнит и в следующий раз не ошибётся'),
+
+      React.createElement('button', { className: 'wdhelp__go', onClick: onClose }, 'Понятно, рисую')));
 }
 
 /* ============================================================ */
 function World() {
-  const [beasts, setBeasts] = useState(() => load().map((b, i) => ({
-    ...b, id: 'b' + i + Date.now().toString(36),
-    x: 0.1 + Math.random() * 0.7, y: 0.5,
-    vx: (Math.random() < 0.5 ? -1 : 1) * (0.018 + Math.random() * 0.02),
-    ph: Math.random() * 6.28, fresh: false,
+  const [things, setThings] = useState(() => load().map((t, i) => ({
+    ...t, id: 't' + i + Date.now().toString(36),
+    x: 0.12 + ((i * 0.17) % 0.72),
+    vx: (i % 2 ? -1 : 1) * (0.014 + (i % 4) * 0.007),
+    ph: i * 1.7,
   })));
   const [pad, setPad] = useState(false);
-  const [ask, setAsk] = useState(null);       // зверь ждёт, где ему жить
+  const [ask, setAsk] = useState(null);
   const [say, setSay] = useState('');
+  const [help, setHelp] = useState(() => {
+    try { return !localStorage.getItem(SEEN); } catch (e) { return true; }
+  });
   const worldRef = useRef(null);
   const raf = useRef(0);
   const drag = useRef(null);
   const [, force] = useState(0);
 
-  /* модель: каждый поселённый зверь — пример с меткой пояса */
-  const model = beasts.filter(b => b.f && b.zone).map(b => ({ f: b.f, label: b.zone }));
+  const model = things.filter(t => t.f && t.zone).map(t => ({ f: t.f, label: t.zone }));
 
-  useEffect(() => { store(beasts); }, [beasts]);
+  useEffect(() => { store(things); }, [things]);
+  useEffect(() => { if (!things.length) setSay(''); }, [things.length]);
 
-  useEffect(() => {
-    if (!beasts.length) setSay('');
-  }, [beasts.length]);
-
-  /* реплика — подсказка на пару секунд, а не постоянная панель:
-     висела поверх мира и закрывала зверей */
+  /* реплика — подсказка на пару секунд, а не панель поверх мира */
   useEffect(() => {
     if (!say || ask) return;
-    const t = setTimeout(() => setSay(''), 3600);
+    const t = setTimeout(() => setSay(''), 4000);
     return () => clearTimeout(t);
   }, [say, ask]);
 
-  /* ── жизнь: звери ходят сами ── */
+  const closeHelp = () => {
+    setHelp(false);
+    try { localStorage.setItem(SEEN, '1'); } catch (e) {}
+  };
+
+  /* ── жизнь ── */
   useEffect(() => {
     let last = performance.now();
     /* ширину мира держим в переменной и обновляем на resize: мерить её
-       каждому зверю каждый кадр — лишний пересчёт разметки */
+       каждому жителю каждый кадр — лишний пересчёт разметки */
     let W = worldRef.current ? worldRef.current.getBoundingClientRect().width : 360;
     const onResize = () => {
       if (worldRef.current) W = worldRef.current.getBoundingClientRect().width;
@@ -310,16 +511,18 @@ function World() {
       const dt = Math.min(50, now - last) / 1000;
       last = now;
       let moved = false;
-      beasts.forEach(b => {
-        if (drag.current && drag.current.id === b.id) return;
-        if (b === ask) return;
-        b.x += b.vx * dt;
-        /* разворот считаем от края самого зверя, а не от его центра —
-           иначе широкий зверь наполовину уезжает за границу экрана */
-        const edge = (b.w / 2 + 6) / W;
-        if (b.x < edge) { b.x = edge; b.vx = Math.abs(b.vx); }
-        if (b.x > 1 - edge) { b.x = 1 - edge; b.vx = -Math.abs(b.vx); }
-        b.ph += dt * (b.zone === 'sky' ? 2.1 : b.zone === 'water' ? 1.5 : 3.4);
+      things.forEach(t => {
+        if (drag.current && drag.current.id === t.id) return;
+        /* высокое и узкое — дерево, столб, цветок: стоит, а не бегает */
+        if (t.kind !== 'still') {
+          t.x += t.vx * dt;
+          /* разворот считаем от края рисунка, а не от центра, иначе
+             широкий житель наполовину уезжает за границу экрана */
+          const edge = (t.w / 2 + 6) / W;
+          if (t.x < edge) { t.x = edge; t.vx = Math.abs(t.vx); }
+          if (t.x > 1 - edge) { t.x = 1 - edge; t.vx = -Math.abs(t.vx); }
+        }
+        t.ph += dt * (t.zone === 'sky' ? 1.9 : t.zone === 'water' ? 1.4 : 3.2);
         moved = true;
       });
       if (moved) force(v => v + 1);
@@ -330,97 +533,92 @@ function World() {
       cancelAnimationFrame(raf.current);
       window.removeEventListener('resize', onResize);
     };
-  }, [beasts, ask]);
+  }, [things]);
 
-  /* ── куда ставить зверя внутри пояса ── */
-  const place = (b) => {
-    const z = zoneOf(b.zone);
+  const place = (t) => {
+    const z = zoneOf(t.zone);
     const box = worldRef.current ? worldRef.current.getBoundingClientRect() : { width: 360, height: 600 };
-    const wob = Math.sin(b.ph) * (b.zone === 'land' ? 0 : 7);
-    const hop = b.zone === 'land' ? Math.abs(Math.sin(b.ph)) * 6 : 0;
-    /* земля — по нижней кромке пояса, небо и вода — по середине */
-    const base = b.zone === 'land'
-      ? z.bot - 0.02 - (b.h / box.height)
-      : (z.top + z.bot) / 2 - (b.h / box.height) / 2;
-    return {
-      left: b.x * box.width - b.w / 2,
-      top: base * box.height + wob - hop,
-    };
+    const wob = t.kind === 'still'
+      ? Math.sin(t.ph) * 1.5                                  // деревце покачивается
+      : Math.sin(t.ph) * (t.zone === 'land' ? 0 : 7);
+    const hop = t.zone === 'land' && t.kind !== 'still' ? Math.abs(Math.sin(t.ph)) * 5 : 0;
+    /* на земле стоим на траве, в небе и в воде висим по центру пояса */
+    const base = t.zone === 'land'
+      ? z.bot - 0.012 - (t.h / box.height)
+      : (z.top + z.bot) / 2 - (t.h / box.height) / 2;
+    return { left: t.x * box.width - t.w / 2, top: base * box.height + wob - hop };
   };
 
-  /* ── новый зверь ── */
   const born = (cv) => {
     const cut = cutOut(cv);
     const got = B.features(cv);
     setPad(false);
-    if (!cut || !got) { setSay('Слишком мало нарисовано — попробуй ещё раз'); return; }
+    if (!cut || !got) { setSay('Тут слишком мало нарисовано — попробуй ещё раз'); return; }
 
-    const b = {
-      id: 'b' + Date.now().toString(36), img: cut.url, w: cut.w, h: cut.h, f: got.f,
-      x: 0.2 + Math.random() * 0.6, vx: (Math.random() < 0.5 ? -1 : 1) * (0.018 + Math.random() * 0.02),
-      ph: Math.random() * 6.28, zone: null, fresh: true,
+    const t = {
+      id: 't' + Date.now().toString(36), img: cut.url, w: cut.w, h: cut.h, f: got.f,
+      kind: cut.ratio < 0.62 ? 'still' : 'walk',
+      /* слева от луны: она висит справа вверху, и новый житель садился прямо на неё */
+      x: 0.16 + Math.random() * 0.48,
+      vx: (Math.random() < 0.5 ? -1 : 1) * (0.014 + Math.random() * 0.016),
+      ph: Math.random() * 6.28, zone: null,
     };
     const p = model.length ? B.predict(model, got.f) : null;
 
     if (!p || p.unsure) {
-      /* честно: такого он не видел — пусть покажет ребёнок */
-      setAsk(b);
+      setAsk(t);
       setSay(model.length
-        ? 'Такого я ещё не видел. Где он живёт?'
-        : 'Я пока никого не знаю. Покажи, где он живёт');
+        ? 'Такого я ещё не видел. Покажи, где его дом'
+        : 'Я пока никого не знаю. Покажи, где его дом');
       return;
     }
-    b.zone = p.label;
-    setBeasts(list => list.concat([b]).slice(-MAX_BEASTS));
-    setSay('Похож на тех, кто живёт <em>' + zoneOf(p.label).say + '</em>. Не туда — перетащи');
-    setTimeout(() => { b.fresh = false; }, 600);
+    t.zone = p.label;
+    setThings(list => list.concat([t]).slice(-MAX_THINGS));
+    setSay('Похоже на то, что живёт <em>' + zoneOf(p.label).say + '</em>. Не туда — перетащи');
   };
 
-  /* ребёнок показал пояс — зверь поселён, пример запомнен */
   const put = (zoneId) => {
     if (!ask) return;
-    const b = ask;
-    b.zone = zoneId;
+    const t = ask;
+    t.zone = zoneId;
     setAsk(null);
-    setBeasts(list => list.concat([b]).slice(-MAX_BEASTS));
-    setSay('Понял. Теперь буду знать');
-    setTimeout(() => { b.fresh = false; }, 600);
+    setThings(list => list.concat([t]).slice(-MAX_THINGS));
+    setSay('Запомнил: такое живёт <em>' + zoneOf(zoneId).say + '</em>');
   };
 
-  /* ── перетаскивание: это и есть исправление ошибки ── */
-  const grab = (e, b) => {
+  /* перетаскивание — это и есть исправление ошибки Нейро */
+  const grab = (e, t) => {
     if (ask) return;
     e.preventDefault();
     try { e.target.setPointerCapture(e.pointerId); } catch (_) {}
-    drag.current = { id: b.id, b: b };
+    drag.current = { id: t.id, t: t, y: 0 };
     force(v => v + 1);
   };
   const moveDrag = (e) => {
     if (!drag.current) return;
     const box = worldRef.current.getBoundingClientRect();
-    const b = drag.current.b;
-    b.x = Math.max(0.04, Math.min(0.96, (e.clientX - box.left) / box.width));
+    drag.current.t.x = Math.max(0.04, Math.min(0.96, (e.clientX - box.left) / box.width));
     drag.current.y = (e.clientY - box.top) / box.height;
     force(v => v + 1);
   };
   const drop = () => {
     if (!drag.current) return;
-    const b = drag.current.b;
-    const y = drag.current.y;
-    const z = ZONES.find(zz => y >= zz.top && y < zz.bot) || zoneOf(b.zone);
-    const changed = z.id !== b.zone;
-    b.zone = z.id;
+    const t = drag.current.t;
+    const z = ZONES.find(zz => drag.current.y >= zz.top && drag.current.y < zz.bot) || zoneOf(t.zone);
+    const changed = z.id !== t.zone;
+    t.zone = z.id;
     drag.current = null;
-    setBeasts(list => list.slice());
-    if (changed) setSay('Понял, он живёт <em>' + z.say + '</em>. Запомнил');
+    setThings(list => list.slice());
+    if (changed) setSay('Понял, такое живёт <em>' + z.say + '</em>. Запомнил');
   };
 
   const wipeAll = () => {
-    setBeasts([]); setAsk(null); setSay('');
+    setThings([]); setAsk(null); setSay('');
     try { localStorage.removeItem(KEY); } catch (e) {}
   };
 
   const box = worldRef.current ? worldRef.current.getBoundingClientRect() : null;
+  const known = model.length;
 
   return React.createElement('div', { className: 'wdroot' },
     React.createElement('div', { className: 'wd' },
@@ -433,48 +631,53 @@ function World() {
           key: z.id,
           className: 'wdzone wdzone--' + z.id + (ask ? ' wdzone--ask' : ''),
           onClick: ask ? () => put(z.id) : undefined,
-        }, React.createElement('span', { className: 'wdzone__n' }, z.n))),
-        React.createElement('div', { className: 'wdline', style: { top: '30%' } }),
-        React.createElement('div', { className: 'wdline', style: { top: '70%' } }),
+        },
+          z.id === 'sky' ? React.createElement(Sky, null)
+            : z.id === 'land' ? React.createElement(Land, null)
+              : React.createElement(Water, null),
+          React.createElement('span', { className: 'wdzone__n' }, z.n))),
 
-        /* шапка */
         React.createElement('div', { className: 'wdtop' },
-          React.createElement('div', { className: 'wdtop__t' }, 'Мой мир'),
+          React.createElement('div', { className: 'wdtop__t' }, 'Мой мир',
+            React.createElement('span', null, known
+              ? 'Нейро запомнил ' + known + ' ' +
+                window.nooka.plural(known, 'пример', 'примера', 'примеров')
+              : 'Нейро пока никого не знает')),
           React.createElement('div', { className: 'wdtop__c' },
-            beasts.length > 0 && React.createElement('button', {
-              className: 'wdtop__b', onClick: wipeAll, title: 'Начать заново',
+            React.createElement('button', {
+              className: 'wdtop__b', onClick: () => setHelp(true), 'aria-label': 'Как играть',
+            }, '?'),
+            things.length > 0 && React.createElement('button', {
+              className: 'wdtop__b', onClick: wipeAll, 'aria-label': 'Начать заново',
             }, '↺'),
             React.createElement('button', {
-              className: 'wdtop__b',
+              className: 'wdtop__b', 'aria-label': 'Закрыть',
               onClick: () => { window.location.href = 'game.html?g=data'; },
             }, '✕'))),
 
-        !beasts.length && !ask && React.createElement('div', { className: 'wdempty' },
-          'Тут пока никто не живёт.\nНарисуй кого-нибудь'),
+        !things.length && !ask && React.createElement('div', { className: 'wdempty' },
+          'Тут пока пусто.\nНарисуй кого-нибудь — и он будет тут жить'),
 
-        /* звери */
-        beasts.map(b => {
-          const p = place(b);
-          const d = drag.current && drag.current.id === b.id;
+        things.map(t => {
+          const p = place(t);
+          const d = drag.current && drag.current.id === t.id;
           return React.createElement('div', {
-            key: b.id,
-            className: 'wdbeast' + (d ? ' wdbeast--drag' : '') + (b.fresh ? ' wdbeast--new' : ''),
+            key: t.id,
+            className: 'wdthing' + (d ? ' wdthing--drag' : ''),
             style: {
-              width: b.w, height: b.h,
-              left: p.left,
-              top: d && box ? drag.current.y * box.height - b.h / 2 : p.top,
-              transform: 'scaleX(' + (b.vx < 0 ? -1 : 1) + ')',
+              width: t.w, height: t.h, left: p.left,
+              top: d && box ? drag.current.y * box.height - t.h / 2 : p.top,
+              transform: t.kind === 'still' ? 'none' : 'scaleX(' + (t.vx < 0 ? -1 : 1) + ')',
             },
-            onPointerDown: e => grab(e, b),
-          }, React.createElement('img', { src: b.img, alt: '', draggable: false }));
+            onPointerDown: e => grab(e, t),
+          }, React.createElement('img', { src: t.img, alt: '', draggable: false }));
         }),
 
-        /* зверь ждёт, пока покажут дом */
         ask && React.createElement('div', {
-          className: 'wdbeast wdbeast--new',
+          className: 'wdthing wdthing--new',
           style: {
             width: ask.w, height: ask.h,
-            left: 'calc(50% - ' + ask.w / 2 + 'px)', top: '38%', zIndex: 21,
+            left: 'calc(50% - ' + ask.w / 2 + 'px)', top: '36%', zIndex: 21,
           },
         }, React.createElement('img', { src: ask.img, alt: '', draggable: false })),
 
@@ -487,9 +690,10 @@ function World() {
         React.createElement('button', {
           className: 'wddraw', disabled: !!ask,
           onClick: () => { setPad(true); setSay(''); },
-        }, ask ? 'Сначала покажи, где он живёт' : 'Нарисовать зверя'))),
+        }, ask ? 'Покажи, где его дом' : 'Нарисовать'))),
 
-    pad && React.createElement(Pad, { onDone: born, onCancel: () => setPad(false) }));
+    pad && React.createElement(Pad, { onDone: born, onCancel: () => setPad(false) }),
+    help && React.createElement(Help, { onClose: closeHelp }));
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(World, null));
