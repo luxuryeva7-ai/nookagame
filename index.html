@@ -54,6 +54,9 @@ img{max-width:100%}
   padding:16px 28px;border-radius:999px;color:var(--nk-ink);text-decoration:none;
   transition:transform .1s cubic-bezier(.2,.8,.3,1),box-shadow .1s,filter .15s}
 .nk-btn:hover{filter:brightness(1.04);transform:translateY(-1px)}
+/* Скрытая кнопка должна исчезать: собственный display у .nk-btn сильнее,
+   чем [hidden] из браузера, и «Мой доступ» показывался бы всем подряд. */
+[hidden]{display:none!important}
 .nk-btn:focus-visible{outline:4px solid var(--nk-pri-2);outline-offset:3px}
 .nk-btn--pri{color:#fff;background:linear-gradient(180deg,#9B78FF,#7B4FF2 60%,#6E41E4);
   box-shadow:0 6px 0 var(--nk-pri-4),0 14px 26px -8px rgba(123,79,242,.5),inset 0 2px 0 rgba(255,255,255,.45)}
@@ -303,6 +306,10 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
      к своему прогрессу, ею пользуются постоянно. «Час с ИИ» нужен учителю,
      он приходит по прямой ссылке — на узком экране прячем именно его. */
   nav .hdr-hour{display:none}
+  /* у оплативших в шапке появляется третья кнопка — «Мой доступ».
+     На узком экране три кнопки в строку не помещаются: разрешаем перенос,
+     иначе «Играть» уезжает за край. У остальных шапка остаётся в одну строку. */
+  header nav{flex-wrap:wrap;justify-content:flex-end;row-gap:8px}
   nav .nk-btn--sm{padding:10px 14px;white-space:nowrap}
   nav .d-long{display:none}
   nav .d-short{display:inline}
@@ -414,6 +421,7 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
       </a>
       <nav>
         <a class="nk-btn nk-btn--soft nk-btn--sm hdr-hour" href="teacher/">Час с ИИ</a>
+        <a class="nk-btn nk-btn--soft nk-btn--sm" href="access/" id="navAccess" hidden><span class="d-long">Мой доступ</span><span class="d-short">Доступ</span></a>
         <a class="nk-btn nk-btn--soft nk-btn--sm" href="base/">Моя база</a>
         <button class="nk-btn nk-btn--cta nk-btn--sm" data-play><span class="d-long">Играть бесплатно</span><span class="d-short">Играть</span></button>
       </nav>
@@ -698,6 +706,21 @@ var toastEl = document.getElementById('toast'), _t;
 function toast(msg){ toastEl.textContent=msg; toastEl.classList.add('show'); clearTimeout(_t); _t=setTimeout(function(){ toastEl.classList.remove('show'); }, 3400); }
 
 document.querySelectorAll('[data-play]').forEach(function(b){ b.addEventListener('click', function(){ openGame('games/game.html?g=data'); }); });
+/* Кнопка «Мой доступ» в шапке — только для тех, у кого доступ открыт.
+   Там лежит код: после оплаты его нужно унести на устройство ребёнка,
+   а искать ссылку в подвале никто не станет. */
+(function () {
+  /* Ждём разбора адреса: доступ может приехать ссылкой ?k=КОД, а её
+     nooka-access разбирает после загрузки страницы — до этого state()
+     ещё ничего не знает. */
+  function show() {
+    var A = window.nookaAccess, b = document.getElementById('navAccess');
+    if (A && b && (A.state().paid || A.openAll)) b.hidden = false;
+  }
+  show();
+  document.addEventListener('DOMContentLoaded', function () { setTimeout(show, 0); });
+})();
+
 /* Куда ведёт «купить» — решает games/nooka-access.js (там же и стена внутри игр),
    чтобы ссылка оплаты правилась в одном месте на весь сайт. */
 document.querySelectorAll('[data-buy]').forEach(function(b){ b.addEventListener('click', function(){
