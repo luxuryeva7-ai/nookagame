@@ -6,23 +6,25 @@
 <meta name="theme-color" content="#0E0719">
 <title>Мой робот — Nooka</title>
 <meta property="og:title" content="Мой робот — Nooka">
-<meta property="og:description" content="Опиши словами, какого хочешь робота, — и он соберётся прямо на глазах. Каждое слово меняет его.">
+<meta property="og:description" content="Собери своего робота из сотен деталей, дай ему характер и суперсилы ИИ — и забери карточку героя.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://nookagame.ru/games/sandbox-bot.html">
 <meta property="og:image" content="https://nookagame.ru/screenshots/og.jpg">
-<meta property="og:site_name" content="Nooka">
 <meta name="twitter:card" content="summary_large_image">
 
 <link href="/fonts/nooka-fonts.css" rel="stylesheet">
 <link rel="stylesheet" href="nooka-ui.css">
 <style>
-/* ============ МОЙ РОБОТ: песочница про запрос ============
-   Слово меняет робота сразу, без кнопки «сделать»: связь между
-   тем, что написал, и тем, что получилось, должна быть мгновенной. */
+/* ============ МОЙ РОБОТ: мастерская героя ============
+   Все детали видно сразу: полки с превью, а не подсказки в строке.
+   Заказ словами собирается сам из выбранного — ребёнок видит, как его
+   нажатия превращаются в просьбу к машине. Это игра про промпты. */
 .nb *,.nb *::before,.nb *::after{box-sizing:border-box;}
 .nbroot{min-height:100vh;max-width:520px;margin:0 auto;position:relative;
   background:linear-gradient(180deg,#1C1136 0%,#120B22 58%,#0A0614 100%);}
-.nb{display:flex;flex-direction:column;min-height:100vh;padding-bottom:22px;}
+.nb{display:flex;flex-direction:column;min-height:100vh;padding-bottom:26px;}
+/* ядро держит #root во весь экран без скролла — мастерской он нужен */
+#root{height:100vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 
 .nbtop{display:flex;align-items:center;gap:10px;padding:13px 14px 0;}
 .nbtop__t{font-family:var(--nk-brand),var(--nk-body);font-weight:700;font-size:16px;color:#F4EEFF;}
@@ -33,73 +35,152 @@
   color:#CFC0EA;font-size:15px;font-weight:900;background:rgba(255,255,255,.07);
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);}
 
-/* сцена */
+/* ── сцена ── */
 .nbstage{margin:12px 14px 0;border-radius:26px;position:relative;overflow:hidden;
   background:radial-gradient(88% 60% at 50% 4%,#3E2A72 0%,#241750 44%,#150D28 100%);
   box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.1),inset 0 -40px 60px -30px rgba(0,0,0,.55);}
-.nbstage__in{position:relative;z-index:2;padding:4px 10px 0;}
-.nbstage svg{width:100%;display:block;}
-/* свет лампы сверху */
-.nbstage::before{content:'';position:absolute;left:50%;top:-62px;width:230px;height:230px;
-  transform:translateX(-50%);border-radius:50%;z-index:1;pointer-events:none;
-  background:radial-gradient(circle,rgba(255,216,77,.2) 0%,rgba(255,216,77,0) 68%);}
-.nbpop{animation:nbPop .45s cubic-bezier(.2,1.5,.4,1);}
-@keyframes nbPop{0%{transform:scale(.88);opacity:.4}100%{transform:scale(1);opacity:1}}
+.nbstage__in{position:relative;z-index:2;padding:4px 10px 0;display:flex;justify-content:center;}
+.nbstage__in svg{width:100%;max-width:236px;height:auto;display:block;}
+.nbpop{animation:nbPop .3s cubic-bezier(.2,1.5,.5,1);}
+@keyframes nbPop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+.nbname{display:flex;align-items:center;gap:8px;justify-content:center;
+  padding:0 14px 13px;position:relative;z-index:3;}
+.nbname input{width:160px;border:none;border-radius:13px;padding:9px 12px;text-align:center;
+  font-family:var(--nk-brand),var(--nk-body);font-weight:700;font-size:15px;color:#FFF6DC;
+  background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);}
+.nbname input:focus{outline:2px solid #FFD84D;outline-offset:1px;}
+.nbname button{border:none;cursor:pointer;border-radius:12px;width:38px;height:38px;font-size:16px;
+  color:#CFC0EA;background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);}
 
-/* строка-заказ */
-.nbask{margin:12px 14px 0;position:relative;}
-.nbask input{width:100%;border:none;border-radius:18px;padding:15px 16px;
-  font-family:var(--nk-body);font-weight:700;font-size:15.5px;color:#F4EEFF;
-  background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.14);}
-.nbask input:focus{outline:none;box-shadow:inset 0 0 0 2px #FFD84D;}
-.nbask input::placeholder{color:#6B5C90;font-weight:700;}
+/* ── заказ словами ── */
+.nborder{margin:12px 14px 0;border-radius:18px;padding:12px 14px;
+  background:rgba(255,216,77,.09);box-shadow:inset 0 0 0 1.5px rgba(255,216,77,.28);}
+.nborder__h{display:flex;align-items:center;gap:8px;font-weight:900;font-size:10.5px;
+  letter-spacing:.07em;text-transform:uppercase;color:#FFD84D;}
+.nborder__h button{margin-left:auto;border:none;cursor:pointer;border-radius:9px;padding:5px 9px;
+  font-family:var(--nk-body);font-weight:800;font-size:10.5px;letter-spacing:.02em;
+  text-transform:none;color:#0E0719;background:#FFD84D;}
+.nborder__t{margin-top:6px;font-weight:800;font-size:13.5px;line-height:1.45;color:#FFF6DC;}
+.nborder input{width:100%;margin-top:8px;border:none;border-radius:13px;padding:11px 12px;
+  font-family:var(--nk-body);font-weight:800;font-size:14px;color:#FFF6DC;
+  background:rgba(0,0,0,.28);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);}
+.nborder input:focus{outline:2px solid #FFD84D;outline-offset:1px;}
 
-/* подсказки */
-.nbtips{display:flex;flex-wrap:wrap;gap:6px;margin:9px 14px 0;}
-.nbtips button{border:none;cursor:pointer;border-radius:12px;padding:9px 12px;
-  font-family:var(--nk-body);font-weight:800;font-size:12.5px;color:#0E0719;
-  background:#FFD84D;box-shadow:0 2px 0 #C9A21E;}
-.nbtips--calm button{color:#BFAFE0;background:rgba(255,255,255,.07);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.11);}
-.nbtips__h{width:100%;font-weight:900;font-size:10.5px;letter-spacing:.08em;
-  text-transform:uppercase;color:#7E6EA6;margin-bottom:2px;}
+/* ── полки деталей ── */
+.nbsec{margin:16px 14px 0;}
+.nbsec__h{display:flex;align-items:baseline;gap:8px;margin-bottom:9px;}
+.nbsec__h b{font-family:var(--nk-brand),var(--nk-body);font-weight:700;font-size:14px;color:#F4EEFF;}
+.nbsec__h span{font-weight:800;font-size:11px;color:#8A7CA8;}
+.nbrow{margin-top:11px;}
+.nbrow__h{margin-bottom:6px;font-weight:900;font-size:10.5px;letter-spacing:.07em;
+  text-transform:uppercase;color:#9A8ABA;}
+.nbscroll{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.nbscroll::-webkit-scrollbar{display:none;}
+.nbpart{flex:none;width:66px;border:none;cursor:pointer;border-radius:16px;padding:4px 3px 5px;
+  background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.08);
+  transition:transform .12s,box-shadow .16s,background .16s;}
+.nbpart:active{transform:scale(.95);}
+.nbpart svg{width:100%;height:auto;display:block;}
+.nbpart b{display:block;margin-top:-2px;font-weight:800;font-size:9px;line-height:1.2;color:#9A8ABA;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.nbpart--on{background:linear-gradient(180deg,rgba(255,216,77,.22),rgba(255,216,77,.06));
+  box-shadow:inset 0 0 0 2px #FFD84D;}
+.nbpart--on b{color:#FFE9A3;}
 
-/* что понял */
-.nbgot{display:flex;flex-wrap:wrap;gap:6px;margin:11px 14px 0;}
-.nbgot span{padding:6px 10px;border-radius:10px;font-weight:800;font-size:12px;
-  color:#0E0719;background:#7CE8B0;}
-.nbgot em{font-style:normal;padding:6px 10px;border-radius:10px;font-weight:800;font-size:12px;
-  color:#9A8ABA;background:rgba(255,255,255,.06);}
+.nbcolors{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
+.nbcolors::-webkit-scrollbar{display:none;}
+.nbdot{flex:none;width:32px;height:32px;border:none;cursor:pointer;border-radius:50%;padding:0;
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.16);}
+.nbdot--on{box-shadow:inset 0 0 0 2px #FFD84D,0 0 0 3px rgba(255,216,77,.28);}
+.nbglow{flex:none;width:32px;height:32px;border:none;cursor:pointer;border-radius:50%;padding:0;
+  background:#1A1233;box-shadow:inset 0 0 0 2px rgba(255,255,255,.14);position:relative;}
+.nbglow i{position:absolute;inset:7px;border-radius:50%;}
+.nbglow--on{box-shadow:inset 0 0 0 2px #FFD84D,0 0 0 3px rgba(255,216,77,.28);}
 
-/* кнопки */
-.nbbar{display:flex;gap:8px;margin:14px 14px 0;}
-.nbbar button{flex:1;border:none;cursor:pointer;border-radius:16px;padding:15px 8px;
-  font-family:var(--nk-body);font-weight:900;font-size:14px;}
-.nbkeep{color:#0E0719;background:#7CE8B0;box-shadow:0 3px 0 #3E9E6E;}
-.nbkeep:disabled{opacity:.4;box-shadow:none;cursor:default;}
-.nbrnd{flex:0 0 58px !important;color:#B9A8D8;background:rgba(255,255,255,.07);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.11);font-size:17px !important;}
+/* ── характер ── */
+.nbtraits{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
+.nbtraits::-webkit-scrollbar{display:none;}
+.nbtrait{flex:none;border:none;cursor:pointer;border-radius:15px;padding:9px 13px;
+  font-family:var(--nk-body);font-weight:800;font-size:12.5px;color:#CFC0EA;white-space:nowrap;
+  background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.09);}
+.nbtrait--on{color:#0E0719;background:#CBB8FF;box-shadow:none;}
 
-/* полка */
-.nbshelf{margin:20px 14px 0;}
-.nbshelf__h{display:flex;align-items:baseline;gap:8px;margin-bottom:10px;}
-.nbshelf__h b{font-family:var(--nk-brand),var(--nk-body);font-weight:700;font-size:15px;color:#F4EEFF;}
-.nbshelf__h span{font-weight:800;font-size:11.5px;color:#7E6EA6;}
+/* ── суперсилы ── */
+.nbpowers{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.nbpw{display:flex;gap:9px;align-items:flex-start;text-align:left;cursor:pointer;border:none;
+  border-radius:16px;padding:10px 11px;background:rgba(255,255,255,.05);
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.08);}
+.nbpw__i{font-size:17px;line-height:1.2;flex-shrink:0;}
+.nbpw b{display:block;font-weight:900;font-size:12px;line-height:1.25;color:#EDE4FF;}
+.nbpw span{display:block;margin-top:2px;font-weight:700;font-size:10px;line-height:1.35;color:#8A7CA8;}
+.nbpw--on{background:linear-gradient(180deg,rgba(110,221,154,.22),rgba(110,221,154,.06));
+  box-shadow:inset 0 0 0 2px rgba(110,221,154,.75);}
+.nbpw--on b{color:#BFF3D8;}
+.nbpw--off{opacity:.4;}
+
+/* ── кнопки ── */
+.nbgo{margin:18px 14px 0;border:none;cursor:pointer;border-radius:19px;padding:17px;
+  font-family:var(--nk-body);font-weight:900;font-size:16px;color:#0E0719;
+  background:linear-gradient(180deg,#FFF1B4,#FFD84D);box-shadow:0 5px 0 #C9A21E;}
+.nbgo:active{transform:translateY(3px);box-shadow:0 2px 0 #C9A21E;}
+.nbgo--calm{background:rgba(255,255,255,.07);color:#DCD0F0;
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.14);}
+.nbgo--calm:active{transform:none;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.14);}
+.nbrow2{display:flex;gap:9px;margin:12px 14px 0;}
+.nbrow2>*{flex:1;margin:0;}
+
+/* ── полка ── */
+.nbshelf{margin:22px 14px 0;}
+.nbshelf__h{display:flex;align-items:baseline;gap:8px;margin-bottom:9px;}
+.nbshelf__h b{font-family:var(--nk-brand),var(--nk-body);font-weight:700;font-size:14px;color:#F4EEFF;}
+.nbshelf__h span{margin-left:auto;font-weight:800;font-size:11px;color:#8A7CA8;}
 .nbgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
-.nbcell{border-radius:18px;overflow:hidden;cursor:pointer;position:relative;
-  background:radial-gradient(85% 60% at 50% 6%,#332253,#1A1233 72%);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.09);}
-.nbcell svg{width:100%;display:block;}
-.nbcell b{display:block;padding:5px 6px 8px;font-weight:800;font-size:10px;line-height:1.3;
-  color:#BFAFE0;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.nbcell__x{position:absolute;top:5px;right:5px;width:21px;height:21px;border:none;cursor:pointer;
-  border-radius:7px;padding:0;color:#CBB;font-size:11px;font-weight:900;background:rgba(10,6,20,.78);}
-.nbempty{padding:16px;border-radius:16px;text-align:center;font-weight:700;font-size:12.5px;
-  line-height:1.5;color:#6E5F92;background:rgba(255,255,255,.04);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);}
+.nbcell{position:relative;border-radius:18px;padding:7px 6px 9px;cursor:pointer;overflow:hidden;
+  background:radial-gradient(85% 60% at 50% 8%,#3A2769,#1A1233 70%);
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.1);}
+.nbcell svg{width:100%;height:auto;display:block;}
+.nbcell b{display:block;margin-top:2px;text-align:center;font-weight:900;font-size:10.5px;color:#D6C8F0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.nbcell i{display:block;text-align:center;font-style:normal;font-weight:800;font-size:9.5px;color:#9A8ABA;}
+.nbcell__x{position:absolute;right:4px;top:4px;width:20px;height:20px;border:none;cursor:pointer;
+  border-radius:8px;padding:0;font-size:10px;color:#CFC0EA;background:rgba(0,0,0,.42);}
+.nbempty{border-radius:18px;padding:16px;text-align:center;white-space:pre-line;
+  font-weight:800;font-size:12px;line-height:1.5;color:#8A7CA8;background:rgba(255,255,255,.04);}
 
-/* инструкция */
-.nbhelp{position:fixed;inset:0;z-index:70;display:flex;align-items:center;justify-content:center;
+/* ── карточка героя ── */
+.nbcard{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;
+  padding:16px;background:rgba(8,5,16,.92);backdrop-filter:blur(6px);overflow-y:auto;}
+.nbcard__c{width:100%;max-width:400px;border-radius:30px;overflow:hidden;position:relative;
+  background:linear-gradient(180deg,#2A1B52,#140D28);
+  box-shadow:0 26px 70px rgba(0,0,0,.7),inset 0 0 0 1.5px rgba(255,255,255,.12);}
+.nbcard__x{position:absolute;right:13px;top:13px;z-index:3;width:32px;height:32px;border:none;
+  cursor:pointer;border-radius:50%;padding:0;font-size:13px;color:#CFC0EA;background:rgba(0,0,0,.4);}
+.nbcard__pic{padding:18px 18px 0;display:flex;justify-content:center;
+  background:radial-gradient(80% 60% at 50% 0%,#45307E,transparent);}
+.nbcard__pic svg{width:100%;max-width:190px;height:auto;display:block;}
+.nbcard__b{padding:4px 20px 20px;text-align:center;}
+.nbcard__n{font-family:var(--nk-brand),var(--nk-body);font-weight:700;font-size:23px;color:#FFF6DC;}
+.nbcard__tr{margin-top:3px;font-weight:800;font-size:12.5px;color:#C9B8EA;}
+.nbcard__m{margin-top:9px;font-weight:800;font-size:13px;line-height:1.45;color:#FFD84D;font-style:italic;}
+.nbcard__ps{margin-top:14px;display:flex;flex-direction:column;gap:7px;text-align:left;}
+.nbcard__p{display:flex;gap:9px;align-items:flex-start;border-radius:14px;padding:9px 11px;
+  background:rgba(255,255,255,.06);}
+.nbcard__p b{display:block;font-weight:900;font-size:12px;color:#EDE4FF;}
+.nbcard__p span{display:block;margin-top:1px;font-weight:700;font-size:10.5px;line-height:1.35;color:#9A8ABA;}
+.nbcard__nick{margin-top:14px;display:flex;align-items:center;gap:8px;}
+.nbcard__nick input{flex:1;border:none;border-radius:12px;padding:10px 12px;font-family:var(--nk-body);
+  font-weight:800;font-size:12.5px;color:#FFF6DC;background:rgba(0,0,0,.3);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);}
+.nbcard__acts{display:flex;gap:8px;margin-top:12px;}
+.nbcard__acts button{flex:1;border:none;cursor:pointer;border-radius:15px;padding:13px 10px;
+  font-family:var(--nk-body);font-weight:900;font-size:13px;color:#0E0719;background:#FFD84D;}
+.nbcard__acts .calm{color:#DCD0F0;background:rgba(255,255,255,.08);
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.14);}
+.nbcard__acts button:disabled{opacity:.5;}
+
+/* ── инструкция ── */
+.nbhelp{position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;
   padding:20px;background:rgba(10,6,20,.9);backdrop-filter:blur(5px);}
 .nbhelp__c{width:100%;max-width:400px;padding:24px 22px;border-radius:28px;
   background:linear-gradient(180deg,#241843,#150E28);
@@ -116,9 +197,7 @@
   font-family:var(--nk-body);font-weight:900;font-size:15.5px;color:#0E0719;
   background:#FFD84D;box-shadow:0 4px 0 #C9A21E;}
 
-/* ядро держит #root во весь экран без скролла — песочнице он нужен:
-   иначе на невысоком экране полка и кнопки просто недостижимы */
-#root{height:100vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+@media(prefers-reduced-motion:reduce){.nbpop{animation:none;}}
 @media(min-width:900px){#root>.nbroot{max-width:560px;} .nbroot{max-width:560px;}}
 </style>
 </head>
@@ -131,21 +210,47 @@
 <script src="nooka-access.js"></script>
 <script src="nooka-gallery.js"></script>
 <script src="nooka-bot.js"></script>
+<script src="nooka-hero.js"></script>
 <script>
 /* ============================================================
-   МОЙ РОБОТ — песочница к игре «Как управлять ИИ».
+   МОЙ РОБОТ — мастерская героя к игре «Как управлять ИИ».
 
-   Ребёнок описывает робота словами, и тот меняется прямо во время
-   набора. Слов в словаре под сотню, деталей столько же — поэтому
-   «такого не знаю» здесь не бывает: подсказки предлагают только то,
-   что машина умеет, и любое сочетание собирается в персонажа.
+   Все детали лежат на полках и видны сразу: ребёнок не гадает,
+   какие слова машина знает. Каждое нажатие дописывает заказ
+   словами — панель и промпт показывают одно и то же с двух сторон.
+
+   Сверх внешности у робота есть характер и до трёх суперсил ИИ,
+   а на выходе — карточка героя, которую можно сохранить картинкой
+   и показать.
    ============================================================ */
 
-const { useState, useEffect, useRef } = React;
+const { useState, useEffect, useMemo, useRef } = React;
 const B = window.nookaBot;
+const H = window.nookaHero;
 const KEY = 'nooka_bots';
+const NICK = 'nooka_nick';
 const SEEN = 'nooka_bot_seen';
 const MAX = 12;
+
+/* полки деталей: порядок такой же, как их замечают на роботе */
+const ROWS = [
+  { g: 'форма',    t: 'Форма' },
+  { g: 'глаза',    t: 'Глаза' },
+  { g: 'рот',      t: 'Рот' },
+  { g: 'шляпа',    t: 'Шляпа' },
+  { g: 'антенна',  t: 'Антенна' },
+  { g: 'уши',      t: 'Уши' },
+  { g: 'вещи',     t: 'Вещи' },
+  { g: 'узор',     t: 'Узор' },
+  { g: 'руки',     t: 'Руки' },
+  { g: 'низ',      t: 'Низ' },
+  { g: 'размер',   t: 'Размер' },
+];
+
+const NAMES = ['Бип', 'Тук', 'Зуми', 'Кекс', 'Плюх', 'Рики', 'Ворс', 'Нуна', 'Фокс', 'Чип',
+  'Юни', 'Маки', 'Пим', 'Ёжка', 'Лу', 'Тим', 'Гоша', 'Ням'];
+
+const pick = a => a[Math.floor(Math.random() * a.length)];
 
 function loadShelf() {
   try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) { return []; }
@@ -154,22 +259,88 @@ function storeShelf(l) {
   try { localStorage.setItem(KEY, JSON.stringify(l.slice(-MAX))); } catch (e) {}
 }
 
-/* случайный робот — на случай, когда не с чего начать */
-const RND = [
-  'большой синий робот в короне на гусеницах',
-  'маленький розовый робот со звёздными глазами и крыльями',
-  'зелёный квадратный робот в очках на ножках',
-  'жёлтый робот в колпаке с пружинкой и клешнями',
-  'фиолетовый круглый робот в наушниках летает',
-  'красный робот в полоску с локаторами и шарфом',
-  'белый высокий робот с сердечками и бабочкой',
-  'бирюзовый робот в кепке с рюкзаком на пружине',
-];
+/* сколько всего сочетаний — число, которое приятно увидеть на экране */
+const TOTAL = (function () {
+  const v = B.variants();
+  return Object.keys(v).reduce((n, g) => n * v[g].length, 1);
+})();
 
-function Bot({ spec, tag }) {
-  return React.createElement('div', {
-    className: 'nbpop', key: tag,
-    dangerouslySetInnerHTML: { __html: B.build(spec) },
+function fits(spec, patch) {
+  return Object.keys(patch).every(k => spec[k] === patch[k]);
+}
+
+function loadImg(src) {
+  return new Promise((resolve, reject) => {
+    const i = new Image();
+    i.onload = () => resolve(i);
+    i.onerror = () => reject(new Error('img'));
+    i.src = src;
+  });
+}
+
+/* ── карточка героя картинкой ──────────────────────────────
+   Робота кладём на холст отдельной картинкой, а не внутрь svg:
+   Safari отдаёт svg до того, как вложенные data-картинки успеют
+   загрузиться, и герой выходит пустым. */
+const CARD_W = 1080, CARD_H = 1350;
+
+function makeCard({ spec, name, trait, powers, nick }) {
+  const fonts = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+  return Promise.all([
+    loadImg('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(B.build(spec))),
+    fonts.catch(() => null),
+  ]).then(([bot]) => {
+    const cv = document.createElement('canvas');
+    cv.width = CARD_W; cv.height = CARD_H;
+    const c = cv.getContext('2d');
+
+    const bg = c.createLinearGradient(0, 0, 0, CARD_H);
+    bg.addColorStop(0, '#2A1B52'); bg.addColorStop(0.55, '#170F2E'); bg.addColorStop(1, '#0C0818');
+    c.fillStyle = bg; c.fillRect(0, 0, CARD_W, CARD_H);
+
+    const halo = c.createRadialGradient(CARD_W / 2, 420, 60, CARD_W / 2, 420, 460);
+    halo.addColorStop(0, 'rgba(169,139,255,.35)'); halo.addColorStop(1, 'rgba(169,139,255,0)');
+    c.fillStyle = halo; c.fillRect(0, 60, CARD_W, 760);
+
+    const bw = 560, bh = bw * bot.height / bot.width;
+    c.drawImage(bot, (CARD_W - bw) / 2, 90, bw, bh);
+
+    c.textAlign = 'center';
+    c.fillStyle = '#FFF6DC';
+    c.font = '700 84px Unbounded, Nunito, sans-serif';
+    c.fillText(name || 'Робот', CARD_W / 2, 760);
+
+    c.fillStyle = '#C9B8EA';
+    c.font = '800 34px Nunito, sans-serif';
+    c.fillText(trait ? trait.name.toUpperCase() + ' ХАРАКТЕР' : 'СОБСТВЕННЫЙ ХАРАКТЕР', CARD_W / 2, 810);
+
+    if (trait) {
+      c.fillStyle = '#FFD84D';
+      c.font = 'italic 800 38px Nunito, sans-serif';
+      c.fillText('«' + trait.line + '»', CARD_W / 2, 872);
+    }
+
+    /* три силы должны уместиться над подписью: список прижимаем к низу,
+       а не отсчитываем сверху — иначе третья плашка налезала на адрес сайта */
+    c.textAlign = 'left';
+    const step = 92, h = 80, x = 110, w = CARD_W - 220;
+    let y = CARD_H - 150 - powers.length * step;
+    powers.forEach(p => {
+      c.fillStyle = 'rgba(255,255,255,.07)';
+      if (c.roundRect) { c.beginPath(); c.roundRect(x, y, w, h, 24); c.fill(); }
+      else c.fillRect(x, y, w, h);
+      c.fillStyle = '#FFF6DC';
+      c.font = '800 38px Nunito, sans-serif';
+      c.fillText(p.ic + '  ' + p.name, x + 30, y + 52);
+      y += step;
+    });
+
+    c.textAlign = 'center';
+    c.fillStyle = '#8A7CA8';
+    c.font = '800 30px Nunito, sans-serif';
+    c.fillText((nick ? nick + ' · ' : '') + 'собрано в Nooka · nookagame.ru', CARD_W / 2, CARD_H - 60);
+
+    return cv.toDataURL('image/png');
   });
 }
 
@@ -179,94 +350,189 @@ function Help({ onClose }) {
     React.createElement('div', { className: 'nbstep__t', dangerouslySetInnerHTML: { __html: t } }));
   return React.createElement('div', { className: 'nbhelp nb', onClick: onClose },
     React.createElement('div', { className: 'nbhelp__c', onClick: e => e.stopPropagation() },
-      React.createElement('div', { className: 'nbhelp__t' }, 'Свой робот'),
-      step('⌨️', 'Опиши словами, какого хочешь робота. Он меняется <b>прямо пока пишешь</b>'),
-      step('💡', 'Не знаешь, что бывает? <b>Подсказки под строкой</b> покажут — жми и добавляй'),
-      step('🏠', 'Готового <b>оставь себе</b>. Он встанет на полку и будет ждать тебя тут'),
+      React.createElement('div', { className: 'nbhelp__t' }, 'Мастерская героя'),
+      step('🧩', 'Все детали лежат на полках — <b>выбирай и смотри</b>, как робот меняется'),
+      step('💬', 'Заказ словами <b>собирается сам</b>. Так о таком роботе попросили бы машину'),
+      step('⚡', 'Дай характер и <b>до трёх суперсил</b> — получится карточка героя'),
       React.createElement('button', { className: 'nbhelp__go', onClick: onClose }, 'Понятно, собираю')));
 }
 
+/* ── карточка героя ─────────────────────────────────────── */
+function HeroCard({ spec, name, trait, powers, nick, setNick, onClose, onKeep, kept }) {
+  const [url, setUrl] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  const save = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      const png = url || await makeCard({ spec, name, trait, powers, nick });
+      if (!url) setUrl(png);
+      const blob = await (await fetch(png)).blob();
+      const file = new File([blob], 'moy-robot.png', { type: 'image/png' });
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: name || 'Мой робот' });
+      } else {
+        const a = document.createElement('a');
+        a.href = png; a.download = 'moy-robot.png';
+        document.body.appendChild(a); a.click(); a.remove();
+      }
+    } catch (e) { /* отменили — это не ошибка */ }
+    setBusy(false);
+  };
+
+  return React.createElement('div', { className: 'nbcard nb', onClick: onClose },
+    React.createElement('div', { className: 'nbcard__c', onClick: e => e.stopPropagation() },
+      React.createElement('button', { className: 'nbcard__x', onClick: onClose, 'aria-label': 'Закрыть' }, '✕'),
+      React.createElement('div', { className: 'nbcard__pic' },
+        React.createElement('div', { dangerouslySetInnerHTML: { __html: B.build(spec) } })),
+      React.createElement('div', { className: 'nbcard__b' },
+        React.createElement('div', { className: 'nbcard__n' }, name || 'Робот'),
+        React.createElement('div', { className: 'nbcard__tr' },
+          trait ? trait.ic + ' ' + trait.name.toUpperCase() + ' ХАРАКТЕР' : 'ХАРАКТЕР НЕ ВЫБРАН'),
+        trait && React.createElement('div', { className: 'nbcard__m' }, '«' + trait.line + '»'),
+        powers.length > 0 && React.createElement('div', { className: 'nbcard__ps' },
+          powers.map(p => React.createElement('div', { className: 'nbcard__p', key: p.id },
+            React.createElement('span', { className: 'nbpw__i' }, p.ic),
+            React.createElement('span', null,
+              React.createElement('b', null, p.name),
+              React.createElement('span', null, p.what))))),
+        React.createElement('div', { className: 'nbcard__nick' },
+          React.createElement('input', {
+            value: nick, maxLength: 16, placeholder: 'твой ник',
+            'aria-label': 'Ник создателя',
+            onChange: e => setNick(e.target.value),
+          })),
+        React.createElement('div', { className: 'nbcard__acts' },
+          React.createElement('button', { onClick: save, disabled: busy },
+            busy ? 'Готовим…' : 'Сохранить картинкой'),
+          React.createElement('button', { className: 'calm', onClick: onKeep, disabled: kept },
+            kept ? 'На полке' : 'Оставить себе'))),
+    ));
+}
+
 function App() {
-  const [text, setText] = useState('');
+  const [spec, setSpec] = useState(() => Object.assign({}, B.DEF));
+  const [name, setName] = useState(() => pick(NAMES));
+  const [traitId, setTraitId] = useState('kind');
+  const [powers, setPowers] = useState([]);
+  const [nick, setNick] = useState(() => {
+    try { return localStorage.getItem(NICK) || ''; } catch (e) { return ''; }
+  });
   const [shelf, setShelf] = useState(loadShelf);
   const [kept, setKept] = useState(false);
+  const [card, setCard] = useState(false);
+  const [typing, setTyping] = useState(false);
+  const [text, setText] = useState('');
   const [help, setHelp] = useState(() => {
     try { return !localStorage.getItem(SEEN); } catch (e) { return true; }
   });
-  const inp = useRef(null);
 
-  const res = B.parse(text);
-  const spec = res.spec;
-  const has = res.got.length > 0;
+  const vs = useMemo(() => B.variants(), []);
+  const trait = H.trait(traitId);
+  const order = H.order(B.describe(spec), traitId, powers);
 
-  /* засчитываем, когда робот собран хотя бы из трёх слов: это значит,
-     что ребёнок уже уточняет заказ, а не просто пробует одно слово */
+  /* превью деталей рисуем в текущем цвете, но пересобираем только когда
+     цвет и правда сменился: иначе шесть десятков svg строятся на каждый клик */
+  const preview = useMemo(() => {
+    const out = {};
+    ROWS.forEach(r => {
+      out[r.g] = (vs[r.g] || []).map(v => ({
+        v: v,
+        svg: B.build(Object.assign({}, B.DEF, { body: spec.body, glow: spec.glow }, v.patch)),
+      }));
+    });
+    return out;
+  }, [spec.body, spec.glow, vs]);
+
+  useEffect(() => { storeShelf(shelf); }, [shelf]);
+  useEffect(() => { setKept(false); }, [spec, traitId, powers, name]);
   useEffect(() => {
-    if (res.got.length < 3) return;
+    try { localStorage.setItem(NICK, nick); } catch (e) {}
+  }, [nick]);
+
+  /* засчитываем, когда герой собран: есть характер и хотя бы одна сила —
+     тихо, без экрана победы: песочница не заканчивается */
+  useEffect(() => {
+    if (!powers.length) return;
     try {
       const p = JSON.parse(localStorage.getItem('nooka_profile') || '{}');
       if (p.missions && p.missions.mybot1) return;
-      /* тихо, без экрана победы: песочница не заканчивается */
       if (window.nooka && window.nooka.completeMission) window.nooka.completeMission('mybot1', 130);
     } catch (e) {}
-  }, [res.got.length]);
-
-  useEffect(() => { storeShelf(shelf); }, [shelf]);
-  useEffect(() => { setKept(false); }, [text]);
+  }, [powers.length]);
 
   const closeHelp = () => {
     setHelp(false);
     try { localStorage.setItem(SEEN, '1'); } catch (e) {}
   };
 
-  /* подсказки: по последнему недописанному слову, иначе — что ещё бывает */
-  const tail = text.split(' ').pop();
-  const live = tail.length >= 2 ? B.hints(tail) : [];
-  const groups = B.groups();
-  const used = {};
-  res.got.forEach(g => { used[g] = 1; });
-  const more = [];
-  ['цвет', 'форма', 'глаза', 'шляпа', 'низ', 'вещи', 'узор', 'антенна', 'руки']
-    .forEach(g => {
-      if (more.length >= 6 || !groups[g]) return;
-      const free = groups[g].filter(w => !used[w]);
-      if (free.length) more.push(free[Math.floor(Math.random() * free.length)]);
-    });
+  const put = (patch) => setSpec(s => Object.assign({}, s, patch));
 
-  const addWord = (w) => {
-    const parts = text.trim().split(' ').filter(Boolean);
-    /* если последнее слово недописано — заменяем его выбранной подсказкой */
-    if (tail.length >= 2 && live.length) parts.pop();
-    /* подсказка приносит свой предлог («в короне»), а он мог быть уже набран —
-       иначе выходит «жёлтый робот в в короне» */
-    const first = w.split(' ')[0];
-    if (parts.length && ['в', 'с', 'со', 'на'].indexOf(first) > -1 &&
-        parts[parts.length - 1] === first) parts.pop();
-    setText((parts.join(' ') + ' ' + w).trim() + ' ');
-    if (inp.current) inp.current.focus();
+  const setTrait = (t) => {
+    setTraitId(t.id);
+    put(t.patch);                                   // характер виден на лице
+  };
+
+  const togglePower = (id) => {
+    setPowers(list => list.indexOf(id) > -1 ? list.filter(x => x !== id)
+      : list.length >= H.MAX_POWERS ? list : list.concat([id]));
+  };
+
+  const shuffle = () => {
+    const next = Object.assign({}, B.DEF);
+    ROWS.forEach(r => {
+      const list = vs[r.g] || [];
+      if (list.length) Object.assign(next, pick(list).patch);
+    });
+    next.body = B.BODY[pick(Object.keys(B.BODY))];
+    next.glow = B.GLOW[pick(Object.keys(B.GLOW))];
+    setSpec(next);
+    setName(pick(NAMES));
+  };
+
+  /* слова тоже работают: это игра про промпты, и заказ можно надиктовать */
+  const applyText = (v) => {
+    setText(v);
+    const res = B.parse(v);
+    if (res.got.length) setSpec(s => Object.assign({}, s, res.spec));
   };
 
   const keep = () => {
-    if (!has || kept) return;
-    const item = { id: 'r' + Date.now().toString(36), text: text.trim(), spec: spec };
+    if (kept) return;
+    const item = {
+      id: 'r' + Date.now().toString(36), name: name, spec: spec,
+      trait: traitId, powers: powers.slice(), text: order,
+    };
     setShelf(l => l.concat([item]).slice(-MAX));
     setKept(true);
     try {
       window.nookaGallery.add({
         kind: 'pet', game: 'Мой робот',
-        title: text.trim().length > 34 ? text.trim().slice(0, 33) + '…' : text.trim(),
-        note: 'Собран словами: ' + res.got.join(', '),
+        title: name + (trait ? ' · ' + trait.name : ''),
+        note: order,
         svg: B.build(spec),
       });
     } catch (e) {}
   };
+
+  const takeOff = (it) => {
+    setSpec(Object.assign({}, B.DEF, it.spec));
+    if (it.name) setName(it.name);
+    if (it.trait) setTraitId(it.trait);
+    setPowers(it.powers ? it.powers.slice() : []);
+    setKept(false);
+    document.getElementById('root').scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const chosen = powers.map(H.power).filter(Boolean);
 
   return React.createElement('div', { className: 'nbroot' },
     React.createElement('div', { className: 'nb' },
 
       React.createElement('div', { className: 'nbtop' },
         React.createElement('div', { className: 'nbtop__t' }, 'Мой робот',
-          React.createElement('span', null, 'Опиши словами — он соберётся')),
+          React.createElement('span', null, 'Собери героя из любых деталей')),
         React.createElement('div', { className: 'nbtop__c' },
           React.createElement('button', {
             className: 'nbtop__b', onClick: () => setHelp(true), 'aria-label': 'Как играть',
@@ -278,41 +544,99 @@ function App() {
 
       React.createElement('div', { className: 'nbstage' },
         React.createElement('div', { className: 'nbstage__in' },
-          React.createElement(Bot, { spec: spec, tag: JSON.stringify(spec) }))),
+          React.createElement('div', {
+            className: 'nbpop', key: JSON.stringify(spec),
+            dangerouslySetInnerHTML: { __html: B.build(spec) },
+          })),
+        React.createElement('div', { className: 'nbname' },
+          React.createElement('input', {
+            value: name, maxLength: 14, 'aria-label': 'Имя робота',
+            onChange: e => setName(e.target.value),
+          }),
+          React.createElement('button', { onClick: shuffle, 'aria-label': 'Случайный робот' }, '🎲'))),
 
-      React.createElement('div', { className: 'nbask' },
-        React.createElement('input', {
-          ref: inp, value: text, maxLength: 140,
+      /* ── заказ словами ── */
+      React.createElement('div', { className: 'nborder' },
+        React.createElement('div', { className: 'nborder__h' }, 'Заказ словами',
+          React.createElement('button', { onClick: () => setTyping(t => !t) },
+            typing ? 'убрать строку' : 'сказать своими')),
+        React.createElement('div', { className: 'nborder__t' }, order),
+        typing && React.createElement('input', {
+          value: text, maxLength: 140, autoFocus: true,
           placeholder: 'синий робот в короне на гусеницах…',
-          onChange: e => setText(e.target.value),
+          onChange: e => applyText(e.target.value),
         })),
 
-      /* живые подсказки по набираемому слову */
-      live.length > 0 && React.createElement('div', { className: 'nbtips' },
-        live.slice(0, 6).map(w => React.createElement('button', {
-          key: w, onMouseDown: e => e.preventDefault(), onClick: () => addWord(w),
-        }, w))),
+      /* ── детали ── */
+      React.createElement('div', { className: 'nbsec' },
+        React.createElement('div', { className: 'nbsec__h' },
+          React.createElement('b', null, 'Детали'),
+          React.createElement('span', null, TOTAL.toLocaleString('ru-RU') + ' сочетаний')),
 
-      /* что ещё бывает — когда ребёнок не знает, с чего начать */
-      live.length === 0 && React.createElement('div', { className: 'nbtips nbtips--calm' },
-        React.createElement('div', { className: 'nbtips__h' },
-          has ? 'Можно добавить' : 'Попробуй так'),
-        more.map(w => React.createElement('button', {
-          key: w, onMouseDown: e => e.preventDefault(), onClick: () => addWord(w),
-        }, '+ ' + w))),
+        React.createElement('div', { className: 'nbrow' },
+          React.createElement('div', { className: 'nbrow__h' }, 'Цвет'),
+          React.createElement('div', { className: 'nbcolors' },
+            Object.keys(B.BODY).map(n => React.createElement('button', {
+              key: n, 'aria-label': n, title: n,
+              className: 'nbdot' + (spec.body === B.BODY[n] ? ' nbdot--on' : ''),
+              style: { background: B.BODY[n] },
+              onClick: () => put({ body: B.BODY[n] }),
+            })))),
 
-      has && React.createElement('div', { className: 'nbgot' },
-        res.got.map((g, i) => React.createElement('span', { key: i }, g))),
+        React.createElement('div', { className: 'nbrow' },
+          React.createElement('div', { className: 'nbrow__h' }, 'Свечение'),
+          React.createElement('div', { className: 'nbcolors' },
+            Object.keys(B.GLOW).map(n => React.createElement('button', {
+              key: n, 'aria-label': n, title: n,
+              className: 'nbglow' + (spec.glow === B.GLOW[n] ? ' nbglow--on' : ''),
+              onClick: () => put({ glow: B.GLOW[n] }),
+            }, React.createElement('i', { style: { background: B.GLOW[n] } }))))),
 
-      React.createElement('div', { className: 'nbbar' },
-        React.createElement('button', {
-          className: 'nbrnd', 'aria-label': 'Случайный робот',
-          onClick: () => setText(RND[Math.floor(Math.random() * RND.length)] + ' '),
-        }, '🎲'),
-        React.createElement('button', {
-          className: 'nbkeep', disabled: !has || kept, onClick: keep,
-        }, kept ? 'Уже на полке' : 'Оставить себе')),
+        ROWS.map(r => React.createElement('div', { className: 'nbrow', key: r.g },
+          React.createElement('div', { className: 'nbrow__h' }, r.t),
+          React.createElement('div', { className: 'nbscroll' },
+            (preview[r.g] || []).map(p => React.createElement('button', {
+              key: p.v.label,
+              className: 'nbpart' + (fits(spec, p.v.patch) ? ' nbpart--on' : ''),
+              onClick: () => put(p.v.patch),
+            },
+              React.createElement('span', { dangerouslySetInnerHTML: { __html: p.svg } }),
+              React.createElement('b', null, p.v.label))))))),
 
+      /* ── характер ── */
+      React.createElement('div', { className: 'nbsec' },
+        React.createElement('div', { className: 'nbsec__h' },
+          React.createElement('b', null, 'Характер'),
+          React.createElement('span', null, 'меняет лицо и девиз')),
+        React.createElement('div', { className: 'nbtraits' },
+          H.TRAITS.map(t => React.createElement('button', {
+            key: t.id, className: 'nbtrait' + (traitId === t.id ? ' nbtrait--on' : ''),
+            onClick: () => setTrait(t),
+          }, t.ic + ' ' + t.name)))),
+
+      /* ── суперсилы ── */
+      React.createElement('div', { className: 'nbsec' },
+        React.createElement('div', { className: 'nbsec__h' },
+          React.createElement('b', null, 'Суперсилы'),
+          React.createElement('span', null, powers.length + ' из ' + H.MAX_POWERS)),
+        React.createElement('div', { className: 'nbpowers' },
+          H.POWERS.map(p => {
+            const on = powers.indexOf(p.id) > -1;
+            const full = !on && powers.length >= H.MAX_POWERS;
+            return React.createElement('button', {
+              key: p.id, className: 'nbpw' + (on ? ' nbpw--on' : '') + (full ? ' nbpw--off' : ''),
+              onClick: () => togglePower(p.id),
+            },
+              React.createElement('span', { className: 'nbpw__i' }, p.ic),
+              React.createElement('span', null,
+                React.createElement('b', null, p.name),
+                React.createElement('span', null, p.what)));
+          }))),
+
+      React.createElement('button', { className: 'nbgo', onClick: () => setCard(true) },
+        'Карточка героя →'),
+
+      /* ── полка ── */
       React.createElement('div', { className: 'nbshelf' },
         React.createElement('div', { className: 'nbshelf__h' },
           React.createElement('b', null, 'Мои роботы'),
@@ -320,17 +644,23 @@ function App() {
         shelf.length
           ? React.createElement('div', { className: 'nbgrid' },
             shelf.slice().reverse().map(it => React.createElement('div', {
-              key: it.id, className: 'nbcell', onClick: () => setText(it.text + ' '),
+              key: it.id, className: 'nbcell', onClick: () => takeOff(it),
             },
               React.createElement('div', { dangerouslySetInnerHTML: { __html: B.build(it.spec) } }),
-              React.createElement('b', null, it.text),
+              React.createElement('b', null, it.name || 'Робот'),
+              React.createElement('i', null,
+                (it.powers && it.powers.length ? it.powers.length + ' силы' : 'без сил')),
               React.createElement('button', {
                 className: 'nbcell__x', 'aria-label': 'Убрать',
                 onClick: e => { e.stopPropagation(); setShelf(l => l.filter(x => x.id !== it.id)); },
               }, '✕'))))
           : React.createElement('div', { className: 'nbempty' },
-            'Пока пусто. Собери робота и нажми «Оставить себе» —\nон встанет сюда'))),
+            'Пока пусто. Собери героя и нажми\n«Оставить себе» на карточке'))),
 
+    card && React.createElement(HeroCard, {
+      spec: spec, name: name, trait: trait, powers: chosen, nick: nick, setNick: setNick,
+      kept: kept, onKeep: keep, onClose: () => setCard(false),
+    }),
     help && React.createElement(Help, { onClose: closeHelp }));
 }
 
