@@ -396,7 +396,7 @@ document.getElementById('route').innerHTML = G.levels.map(function (lv) {
       (lock
         ? '<button class="btn btn--sun" data-pay="1">Открыть доступ</button>'
         : '<a class="btn ' + (done ? 'btn--ok' : 'btn--pri') + '" href="' + sb.href + '">' +
-          (done ? 'Вернуться в мир' : 'Открыть мастерскую') + '</a>') +
+          (done ? (sb.back || 'Вернуться в мастерскую') : 'Открыть мастерскую') + '</a>') +
     '</div></div>' +
   '</div>';
 })();

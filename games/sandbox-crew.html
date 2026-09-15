@@ -1,0 +1,581 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="theme-color" content="#0E0719">
+<title>Мой помощник — Nooka</title>
+<meta property="og:title" content="Мой помощник — Nooka">
+<meta property="og:description" content="Собери помощника, дай ему глаза, уши и память — и отправь на работу. Что не дашь, того он знать не будет.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://nookagame.ru/games/sandbox-crew.html">
+<meta property="og:image" content="https://nookagame.ru/screenshots/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+
+<link href="/fonts/nooka-fonts.css" rel="stylesheet">
+<link rel="stylesheet" href="nooka-ui.css">
+<style>
+/* ============ МОЙ ПОМОЩНИК: песочница про устройство ИИ ============
+   Всё на одном экране: собрал — отправил на смену — увидел, где
+   помощнику не хватило чувств, — вернулся и переделал. Вкладок нет
+   намеренно: они превращают песочницу в редактор. */
+.nc *,.nc *::before,.nc *::after{box-sizing:border-box;}
+.ncroot{min-height:100vh;max-width:520px;margin:0 auto;position:relative;
+  background:linear-gradient(180deg,#1C1136 0%,#120B22 58%,#0A0614 100%);}
+.nc{display:flex;flex-direction:column;min-height:100vh;padding-bottom:26px;}
+
+.nctop{display:flex;align-items:center;gap:10px;padding:13px 14px 0;}
+.nctop__t{font-family:var(--nk-brand),var(--nk-body);font-weight:700;font-size:16px;color:#F4EEFF;}
+.nctop__t span{display:block;margin-top:2px;font-family:var(--nk-body);font-weight:800;
+  font-size:11px;color:#A794C9;}
+.nctop__c{margin-left:auto;display:flex;gap:7px;}
+.nctop__b{width:34px;height:34px;flex-shrink:0;border:none;cursor:pointer;border-radius:11px;padding:0;
+  color:#CFC0EA;font-size:15px;font-weight:900;background:rgba(255,255,255,.07);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);}
+
+/* ── сцена с помощником ── */
+.ncstage{margin:12px 14px 0;border-radius:26px;position:relative;overflow:hidden;
+  background:radial-gradient(88% 62% at 50% 6%,#3E2A72 0%,#241750 44%,#150D28 100%);
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.1),inset 0 -40px 60px -30px rgba(0,0,0,.55);}
+.ncstage__in{position:relative;z-index:2;padding:6px 10px 0;display:flex;justify-content:center;}
+.ncstage__in svg{width:100%;max-width:250px;height:auto;display:block;}
+.ncbot{animation:ncPop .32s cubic-bezier(.2,1.5,.5,1);}
+@keyframes ncPop{from{transform:scale(.88);opacity:0}to{transform:scale(1);opacity:1}}
+.ncname{display:flex;align-items:center;gap:8px;justify-content:center;
+  padding:0 14px 14px;position:relative;z-index:3;}
+.ncname input{width:150px;border:none;border-radius:13px;padding:9px 12px;text-align:center;
+  font-family:var(--nk-brand),var(--nk-body);font-weight:700;font-size:15px;color:#FFF6DC;
+  background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);}
+.ncname input:focus{outline:2px solid #FFD84D;outline-offset:1px;}
+.ncname button{border:none;cursor:pointer;border-radius:12px;width:38px;height:38px;font-size:16px;
+  color:#CFC0EA;background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);}
+
+/* ── общий блок ── */
+.ncsec{margin:16px 14px 0;}
+.ncsec__h{display:flex;align-items:baseline;gap:8px;margin-bottom:9px;}
+.ncsec__h b{font-family:var(--nk-brand),var(--nk-body);font-weight:700;font-size:14px;color:#F4EEFF;}
+.ncsec__h span{font-weight:800;font-size:11.5px;color:#9A8ABA;}
+
+/* ── умения ── */
+.ncsense{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.ncs{display:flex;align-items:center;gap:10px;text-align:left;cursor:pointer;
+  border:none;border-radius:18px;padding:11px 12px;color:#DCD0F0;
+  background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.09);
+  transition:transform .12s,box-shadow .18s,background .18s;}
+.ncs:active{transform:scale(.97);}
+.ncs__i{width:38px;height:38px;flex-shrink:0;border-radius:13px;display:flex;align-items:center;
+  justify-content:center;font-size:18px;background:rgba(255,255,255,.06);}
+.ncs__t b{display:block;font-weight:900;font-size:13.5px;color:#EDE4FF;}
+.ncs__t span{display:block;margin-top:1px;font-weight:700;font-size:11px;line-height:1.35;color:#9A8ABA;}
+.ncs--on{background:linear-gradient(180deg,rgba(255,216,77,.2),rgba(255,216,77,.07));
+  box-shadow:inset 0 0 0 1.5px rgba(255,216,77,.6);}
+.ncs--on .ncs__i{background:rgba(255,216,77,.22);}
+.ncs--on .ncs__t b{color:#FFE9A3;}
+.ncs--off{opacity:.45;}
+
+/* ── характер ── */
+.ncmood{display:flex;gap:9px;}
+.ncmood button{flex:1;border:none;cursor:pointer;border-radius:16px;padding:12px 10px;
+  font-family:var(--nk-body);font-weight:800;font-size:12.5px;line-height:1.35;color:#CFC0EA;
+  background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.09);}
+.ncmood button b{display:block;font-weight:900;font-size:13.5px;color:#EDE4FF;margin-bottom:2px;}
+.ncmood .on{background:linear-gradient(180deg,rgba(169,139,255,.28),rgba(169,139,255,.1));
+  box-shadow:inset 0 0 0 1.5px rgba(169,139,255,.7);}
+.ncmood .on b{color:#D9C8FF;}
+
+/* ── работы ── */
+.ncworks{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.ncw{position:relative;cursor:pointer;border:none;text-align:left;border-radius:18px;padding:12px;
+  color:#DCD0F0;background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.09);}
+.ncw__i{font-size:22px;}
+.ncw b{display:block;margin-top:5px;font-family:var(--nk-brand),var(--nk-body);font-weight:700;
+  font-size:14px;color:#F4EEFF;}
+.ncw span{display:block;margin-top:2px;font-weight:700;font-size:11px;line-height:1.35;color:#9A8ABA;}
+.ncw--on{background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.05));
+  box-shadow:inset 0 0 0 2px var(--t,#A98BFF);}
+.ncw--on b{color:#fff;}
+
+/* ── вид: цвет и форма ── */
+.nclook{display:flex;flex-wrap:wrap;gap:7px;}
+.nccol{width:30px;height:30px;border:none;cursor:pointer;border-radius:50%;padding:0;
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.18);}
+.nccol--on{box-shadow:inset 0 0 0 2px #FFD84D,0 0 0 3px rgba(255,216,77,.3);}
+.ncform{border:none;cursor:pointer;border-radius:13px;padding:8px 13px;font-family:var(--nk-body);
+  font-weight:800;font-size:12px;color:#CFC0EA;background:rgba(255,255,255,.06);
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.1);}
+.ncform--on{color:#0E0719;background:#FFD84D;box-shadow:none;}
+
+/* ── большая кнопка ── */
+.ncgo{margin:18px 14px 0;border:none;cursor:pointer;border-radius:19px;padding:17px;
+  font-family:var(--nk-body);font-weight:900;font-size:16px;color:#0E0719;
+  background:linear-gradient(180deg,#FFF1B4,#FFD84D);box-shadow:0 5px 0 #C9A21E;}
+.ncgo:active{transform:translateY(3px);box-shadow:0 2px 0 #C9A21E;}
+.ncgo:disabled{opacity:.45;box-shadow:0 5px 0 #6B5A2A;cursor:default;}
+.ncgo--calm{background:rgba(255,255,255,.07);color:#DCD0F0;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.14);}
+.ncgo--calm:active{transform:none;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.14);}
+
+/* ── смена ── */
+.ncshift{margin:14px 14px 0;border-radius:24px;padding:16px 15px;
+  background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.11);}
+.ncshift__n{display:flex;align-items:center;gap:8px;font-weight:900;font-size:11px;
+  letter-spacing:.06em;text-transform:uppercase;color:#FFD84D;}
+.ncshift__n i{flex:1;height:1px;background:rgba(255,255,255,.14);font-style:normal;}
+.ncsit{margin-top:10px;font-family:var(--nk-brand),var(--nk-body);font-weight:700;font-size:16.5px;
+  line-height:1.35;color:#FFF6DC;}
+.ncclues{margin-top:12px;display:flex;flex-direction:column;gap:7px;}
+.nccl{display:flex;gap:9px;align-items:flex-start;border-radius:14px;padding:9px 11px;
+  font-weight:700;font-size:12.5px;line-height:1.4;color:#DCD0F0;background:rgba(255,255,255,.05);}
+.nccl b{color:#EDE4FF;font-weight:900;}
+.nccl--blind{color:#8A7CA8;background:rgba(255,255,255,.025);}
+.nccl__i{flex-shrink:0;font-size:14px;line-height:1.3;}
+.ncsay{margin-top:12px;border-radius:16px;padding:13px 14px;
+  background:linear-gradient(180deg,rgba(169,139,255,.22),rgba(169,139,255,.07));
+  box-shadow:inset 0 0 0 1.5px rgba(169,139,255,.4);}
+.ncsay b{display:block;font-family:var(--nk-brand),var(--nk-body);font-weight:700;font-size:15px;
+  color:#EDE4FF;}
+.ncsay span{display:block;margin-top:4px;font-weight:800;font-size:12px;color:#B6A6D8;}
+.ncmark{margin-top:11px;display:flex;align-items:center;gap:9px;font-weight:900;font-size:13px;}
+.ncmark--ok{color:#8FE9BE;}
+.ncmark--no{color:#FFB2A8;}
+.ncmark em{font-style:normal;font-weight:800;font-size:12px;color:#A794C9;margin-left:2px;}
+.ncpick{margin-top:12px;display:flex;flex-direction:column;gap:8px;}
+.ncpick__h{font-weight:800;font-size:12.5px;line-height:1.4;color:#FFD84D;}
+.ncpick button{border:none;cursor:pointer;border-radius:15px;padding:13px;font-family:var(--nk-body);
+  font-weight:900;font-size:14px;color:#0E0719;background:#CBB8FF;}
+.ncnext{width:100%;margin-top:13px;border:none;cursor:pointer;border-radius:16px;padding:14px;
+  font-family:var(--nk-body);font-weight:900;font-size:14.5px;color:#0E0719;background:#FFD84D;}
+
+/* ── итог смены ── */
+.ncres{margin:14px 14px 0;border-radius:24px;padding:18px 16px;text-align:center;
+  background:radial-gradient(90% 70% at 50% 0%,#33235F,#170F2C);
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.12);}
+.ncres__s{font-family:var(--nk-brand),var(--nk-body);font-weight:700;font-size:30px;color:#FFD84D;}
+.ncres__t{margin-top:4px;font-weight:800;font-size:13px;line-height:1.45;color:#DCD0F0;}
+.ncres__m{margin-top:12px;border-radius:15px;padding:12px;font-weight:800;font-size:12.5px;
+  line-height:1.5;color:#FFE9A3;background:rgba(255,216,77,.12);
+  box-shadow:inset 0 0 0 1px rgba(255,216,77,.28);}
+.ncres__m b{color:#fff;font-weight:900;}
+.ncrow{display:flex;gap:9px;margin:12px 14px 0;}
+.ncrow>*{flex:1;margin:0;}
+
+/* ── полка ── */
+.ncshelf{margin:20px 14px 0;}
+.ncshelf__h{display:flex;align-items:baseline;gap:8px;margin-bottom:9px;}
+.ncshelf__h b{font-family:var(--nk-brand),var(--nk-body);font-weight:700;font-size:14px;color:#F4EEFF;}
+.ncshelf__h span{margin-left:auto;font-weight:800;font-size:11px;color:#8A7CA8;}
+.ncgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.nccell{position:relative;border-radius:18px;padding:7px 6px 9px;cursor:pointer;overflow:hidden;
+  background:radial-gradient(85% 60% at 50% 8%,#3A2769,#1A1233 70%);
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.1);}
+.nccell svg{width:100%;height:auto;display:block;}
+.nccell b{display:block;margin-top:2px;text-align:center;font-weight:900;font-size:10.5px;color:#D6C8F0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.nccell i{display:block;text-align:center;font-style:normal;font-weight:800;font-size:9.5px;color:#9A8ABA;}
+.nccell__x{position:absolute;right:4px;top:4px;width:20px;height:20px;border:none;cursor:pointer;
+  border-radius:8px;padding:0;font-size:10px;color:#CFC0EA;background:rgba(0,0,0,.4);}
+.ncempty{border-radius:18px;padding:16px;text-align:center;white-space:pre-line;
+  font-weight:800;font-size:12px;line-height:1.5;color:#8A7CA8;background:rgba(255,255,255,.04);}
+
+/* ── инструкция ── */
+.nchelp{position:fixed;inset:0;z-index:70;display:flex;align-items:center;justify-content:center;
+  padding:20px;background:rgba(10,6,20,.9);backdrop-filter:blur(5px);}
+.nchelp__c{width:100%;max-width:400px;padding:24px 22px;border-radius:28px;
+  background:linear-gradient(180deg,#241843,#150E28);
+  box-shadow:0 20px 60px rgba(0,0,0,.65),inset 0 0 0 1px rgba(255,255,255,.1);}
+.nchelp__t{font-family:var(--nk-brand),var(--nk-body);font-weight:700;font-size:21px;color:#F4EEFF;
+  text-align:center;}
+.ncstep{display:flex;align-items:center;gap:14px;margin-top:16px;}
+.ncstep__i{width:50px;height:50px;flex-shrink:0;border-radius:16px;display:flex;align-items:center;
+  justify-content:center;font-size:23px;background:rgba(255,255,255,.06);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.1);}
+.ncstep__t{font-weight:800;font-size:13.5px;line-height:1.45;color:#DDD2F2;}
+.ncstep__t b{color:#FFD84D;font-weight:900;}
+.nchelp__go{width:100%;margin-top:22px;border:none;cursor:pointer;border-radius:17px;padding:16px;
+  font-family:var(--nk-body);font-weight:900;font-size:15.5px;color:#0E0719;
+  background:#FFD84D;box-shadow:0 4px 0 #C9A21E;}
+
+/* ядро держит #root во весь экран без скролла — песочнице он нужен:
+   иначе на невысоком экране полка и кнопки просто недостижимы */
+#root{height:100vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+@media(prefers-reduced-motion:reduce){.ncbot{animation:none;}}
+@media(min-width:900px){#root>.ncroot{max-width:560px;} .ncroot{max-width:560px;}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="react-bundle.js"></script>
+<script src="nooka-core.js"></script>
+<script src="nooka-levels.js"></script>
+<script src="nooka-access.js"></script>
+<script src="nooka-gallery.js"></script>
+<script src="nooka-bot.js"></script>
+<script src="nooka-crew.js"></script>
+<script>
+/* ============================================================
+   МОЙ ПОМОЩНИК — песочница к игре «Что у ИИ внутри».
+
+   Ребёнок собирает помощника: даёт ему чувства (глаза, уши,
+   память, связь), выбирает работу и характер — и смотрит смену.
+   Помощник вслух объясняет каждое решение: что видел, что помнит,
+   а чего не знает, потому что этого ему не дали.
+
+   Энергии хватает на три чувства из четырёх — значит идеального
+   помощника не бывает, и к каждой работе набор свой. Ошибка здесь
+   не наказание, а ответ: вот чего ему не хватило.
+   ============================================================ */
+
+const { useState, useEffect, useRef } = React;
+const B = window.nookaBot;
+const C = window.nookaCrew;
+const KEY = 'nooka_crew';
+const SEEN = 'nooka_crew_seen';
+const MAX = 9;
+const LIMIT = 3;                                  // чувств на одного помощника
+
+const COLORS = ['#7FD8FF', '#6EDD9A', '#FFD84D', '#FF8FD4', '#A98BFF', '#FF9E7D', '#EFEAF8', '#5BE3D0'];
+const SHAPES = [
+  { id: 'soft', t: 'мягкий' }, { id: 'box', t: 'ящик' },
+  { id: 'round', t: 'круглый' }, { id: 'tall', t: 'высокий' },
+];
+
+function loadShelf() {
+  try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) { return []; }
+}
+function storeShelf(l) {
+  try { localStorage.setItem(KEY, JSON.stringify(l.slice(-MAX))); } catch (e) {}
+}
+const pick = a => a[Math.floor(Math.random() * a.length)];
+
+function Help({ onClose }) {
+  const step = (ic, t) => React.createElement('div', { className: 'ncstep' },
+    React.createElement('div', { className: 'ncstep__i' }, ic),
+    React.createElement('div', { className: 'ncstep__t', dangerouslySetInnerHTML: { __html: t } }));
+  return React.createElement('div', { className: 'nchelp nc', onClick: onClose },
+    React.createElement('div', { className: 'nchelp__c', onClick: e => e.stopPropagation() },
+      React.createElement('div', { className: 'nchelp__t' }, 'Свой помощник'),
+      step('🔧', 'Дай помощнику <b>три чувства из четырёх</b>. Больше не влезет — выбирай, что для этой работы важнее'),
+      step('🏁', 'Отправь <b>на смену</b>. Он расскажет вслух, что видит и помнит, и сам примет решение'),
+      step('🔁', 'Ошибся — <b>не беда</b>. Посмотри, чего ему не хватило, поменяй чувства и попробуй снова'),
+      React.createElement('button', { className: 'nchelp__go', onClick: onClose }, 'Понятно, собираю')));
+}
+
+/* ── одна ситуация смены ─────────────────────────────────── */
+function Situation({ work, task, no, total, res, name, onAnswer, onNext, answered }) {
+  const clue = (c, blind) => React.createElement('div', {
+    key: c.ch + c.txt, className: 'nccl' + (blind ? ' nccl--blind' : ''),
+  },
+    React.createElement('span', { className: 'nccl__i' }, C.SENSE[c.ch].ic),
+    React.createElement('span', null,
+      blind
+        ? React.createElement('span', null, c.txt, ' — ',
+          React.createElement('b', null, 'этого он не знает'))
+        : React.createElement('span', null,
+          React.createElement('b', null, C.SENSE[c.ch].say + ': '), c.txt)));
+
+  const said = res.say ? work.yes : work.no;
+
+  return React.createElement('div', { className: 'ncshift' },
+    React.createElement('div', { className: 'ncshift__n' },
+      'Случай ' + no + ' из ' + total, React.createElement('i', null), work.name),
+    React.createElement('div', { className: 'ncsit' }, task.t),
+    React.createElement('div', { className: 'ncclues' },
+      res.seen.map(c => clue(c, false)),
+      res.blind.map(c => clue(c, true))),
+
+    res.ask && !answered
+      ? React.createElement('div', { className: 'ncpick' },
+        React.createElement('div', { className: 'ncpick__h' },
+          name + ': «Примет поровну. Тут без тебя не решу — как поступим?»'),
+        React.createElement('button', { onClick: () => onAnswer(true) }, work.yes),
+        React.createElement('button', { onClick: () => onAnswer(false) }, work.no))
+      : React.createElement(React.Fragment, null,
+        React.createElement('div', { className: 'ncsay' },
+          React.createElement('b', null, said),
+          React.createElement('span', null,
+            res.ask ? 'Так решили вы — помощник был не уверен'
+              : res.sure ? 'Примет «за» оказалось больше'
+                : 'Примет поровну — выбрано то, что безопаснее')),
+        React.createElement('div', {
+          className: 'ncmark ' + (res.right ? 'ncmark--ok' : 'ncmark--no'),
+        }, res.right ? '✓ Верно' : '✕ Ошибка',
+          React.createElement('em', null,
+            res.right ? '' : 'на самом деле: ' + (task.ans ? work.yes : work.no))),
+        React.createElement('button', { className: 'ncnext', onClick: onNext },
+          no < total ? 'Дальше →' : 'Итог смены →')));
+}
+
+function App() {
+  const [has, setHas] = useState({ eye: true, ear: false, mem: true, net: true });
+  const [careful, setCareful] = useState(true);
+  const [work, setWork] = useState(C.WORKS[0]);
+  const [name, setName] = useState(() => pick(C.NAMES));
+  const [style, setStyle] = useState({ body: '#7FD8FF', shape: 'soft' });
+  const [shelf, setShelf] = useState(loadShelf);
+  const [kept, setKept] = useState(false);
+  const [help, setHelp] = useState(() => {
+    try { return !localStorage.getItem(SEEN); } catch (e) { return true; }
+  });
+
+  /* смена: null — ещё собираем; идёт — есть idx; done — показан итог */
+  const [shift, setShift] = useState(null);
+  const flow = useRef(null);
+
+  const count = C.ORDER.filter(k => has[k]).length;
+  const spec = C.look(has, style);
+
+  useEffect(() => { storeShelf(shelf); }, [shelf]);
+
+  const toggle = (k) => {
+    setHas(h => {
+      const on = C.ORDER.filter(x => h[x]).length;
+      if (!h[k] && on >= LIMIT) return h;          // энергии больше нет
+      return Object.assign({}, h, { [k]: !h[k] });
+    });
+    setShift(null);
+    setKept(false);
+  };
+
+  const start = () => {
+    setShift({ idx: 0, done: [], answer: null });
+    setKept(false);
+    setTimeout(() => { if (flow.current) flow.current.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 40);
+  };
+
+  /* результат текущей ситуации — считается заново, никаких копий состояния */
+  const task = shift && !shift.over ? work.tasks[shift.idx] : null;
+  let res = null;
+  if (task) {
+    res = C.decide(work, task, has, careful);
+    if (res.ask && shift.answer !== null) {
+      res = Object.assign({}, res, { say: shift.answer, right: shift.answer === task.ans });
+    }
+  }
+
+  const answer = (v) => setShift(s => Object.assign({}, s, { answer: v }));
+
+  const next = () => {
+    setShift(s => {
+      const done = s.done.concat([{ right: res.right, idx: s.idx, asked: !!res.ask }]);
+      if (s.idx + 1 >= work.tasks.length) return { idx: s.idx, done: done, over: true, answer: null };
+      return { idx: s.idx + 1, done: done, answer: null };
+    });
+  };
+
+  const score = shift ? shift.done.filter(d => d.right).length : 0;
+
+  /* чего не хватило: считаем по ошибкам смены */
+  let lack = [], mine = 0;
+  if (shift && shift.over) {
+    const tally = {};
+    shift.done.forEach(d => {
+      if (d.right || d.asked) return;              // спорные решали вы — чувства ни при чём
+      C.missing(work, work.tasks[d.idx], has).forEach(ch => { tally[ch] = (tally[ch] || 0) + 1; });
+    });
+    lack = Object.keys(tally).sort((a, b) => tally[b] - tally[a]);
+    mine = shift.done.filter(d => !d.right && d.asked).length;
+  }
+
+  /* засчитываем миссию после первой доведённой смены — тихо, без экрана победы */
+  useEffect(() => {
+    if (!shift || !shift.over) return;
+    try {
+      const p = JSON.parse(localStorage.getItem('nooka_profile') || '{}');
+      if (p.missions && p.missions.helper1) return;
+      if (window.nooka && window.nooka.completeMission) window.nooka.completeMission('helper1', 150);
+    } catch (e) {}
+  }, [shift && shift.over]);
+
+  const closeHelp = () => {
+    setHelp(false);
+    try { localStorage.setItem(SEEN, '1'); } catch (e) {}
+  };
+
+  const keep = () => {
+    if (kept) return;
+    const item = {
+      id: 'h' + Date.now().toString(36), name: name, work: work.id,
+      workName: work.name, spec: spec, has: has, careful: careful, score: score,
+    };
+    setShelf(l => l.concat([item]).slice(-MAX));
+    setKept(true);
+    try {
+      window.nookaGallery.add({
+        kind: 'pet', game: 'Мой помощник',
+        title: name + ' · ' + work.name,
+        note: 'Умеет: ' + C.ORDER.filter(k => has[k]).map(k => C.SENSE[k].name.toLowerCase()).join(', ') +
+          '. Смена: ' + score + ' из ' + work.tasks.length,
+        svg: B.build(spec),
+      });
+    } catch (e) {}
+  };
+
+  const takeOff = (it) => {
+    setHas(it.has); setName(it.name); setCareful(it.careful);
+    setStyle({ body: it.spec.body, shape: it.spec.shape });
+    const w = C.WORKS.filter(x => x.id === it.work)[0];
+    if (w) setWork(w);
+    setShift(null); setKept(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const shuffle = () => {
+    setName(pick(C.NAMES));
+    setStyle({ body: pick(COLORS), shape: pick(SHAPES).id });
+  };
+
+  return React.createElement('div', { className: 'ncroot' },
+    React.createElement('div', { className: 'nc' },
+
+      React.createElement('div', { className: 'nctop' },
+        React.createElement('div', { className: 'nctop__t' }, 'Мой помощник',
+          React.createElement('span', null, 'Собери — и отправь на смену')),
+        React.createElement('div', { className: 'nctop__c' },
+          React.createElement('button', {
+            className: 'nctop__b', onClick: () => setHelp(true), 'aria-label': 'Как играть',
+          }, '?'),
+          React.createElement('button', {
+            className: 'nctop__b', 'aria-label': 'Закрыть',
+            onClick: () => { window.location.href = 'game.html?g=inside'; },
+          }, '✕'))),
+
+      React.createElement('div', { className: 'ncstage' },
+        React.createElement('div', { className: 'ncstage__in' },
+          React.createElement('div', {
+            className: 'ncbot', key: JSON.stringify(spec),
+            dangerouslySetInnerHTML: { __html: B.build(spec) },
+          })),
+        React.createElement('div', { className: 'ncname' },
+          React.createElement('input', {
+            value: name, maxLength: 14, 'aria-label': 'Имя помощника',
+            onChange: e => setName(e.target.value),
+          }),
+          React.createElement('button', {
+            onClick: shuffle, 'aria-label': 'Другой вид и имя',
+          }, '🎲'))),
+
+      /* ── чувства ── */
+      React.createElement('div', { className: 'ncsec' },
+        React.createElement('div', { className: 'ncsec__h' },
+          React.createElement('b', null, 'Что ему дать'),
+          React.createElement('span', null, count + ' из ' + LIMIT + ' — больше не влезет')),
+        React.createElement('div', { className: 'ncsense' },
+          C.ORDER.map(k => {
+            const s = C.SENSE[k];
+            const full = !has[k] && count >= LIMIT;
+            return React.createElement('button', {
+              key: k, className: 'ncs' + (has[k] ? ' ncs--on' : '') + (full ? ' ncs--off' : ''),
+              onClick: () => toggle(k),
+            },
+              React.createElement('span', { className: 'ncs__i' }, s.ic),
+              React.createElement('span', { className: 'ncs__t' },
+                React.createElement('b', null, s.name),
+                React.createElement('span', null, s.what)));
+          }))),
+
+      /* ── характер ── */
+      React.createElement('div', { className: 'ncsec' },
+        React.createElement('div', { className: 'ncsec__h' },
+          React.createElement('b', null, 'Если примет поровну'),
+          React.createElement('span', null, 'когда он не уверен')),
+        React.createElement('div', { className: 'ncmood' },
+          React.createElement('button', {
+            className: careful ? 'on' : '', onClick: () => { setCareful(true); setShift(null); },
+          }, React.createElement('b', null, 'Спросит меня'), 'Покажет приметы и даст решить'),
+          React.createElement('button', {
+            className: !careful ? 'on' : '', onClick: () => { setCareful(false); setShift(null); },
+          }, React.createElement('b', null, 'Решит сам'), 'Выберет то, что безопаснее'))),
+
+      /* ── работа ── */
+      React.createElement('div', { className: 'ncsec' },
+        React.createElement('div', { className: 'ncsec__h' },
+          React.createElement('b', null, 'Куда на работу'),
+          React.createElement('span', null, work.q)),
+        React.createElement('div', { className: 'ncworks' },
+          C.WORKS.map(w => React.createElement('button', {
+            key: w.id, className: 'ncw' + (w.id === work.id ? ' ncw--on' : ''),
+            style: { '--t': w.tint },
+            onClick: () => { setWork(w); setShift(null); setKept(false); },
+          },
+            React.createElement('span', { className: 'ncw__i' }, w.ic),
+            React.createElement('b', null, w.name),
+            React.createElement('span', null, w.role))))),
+
+      /* ── вид ── */
+      React.createElement('div', { className: 'ncsec' },
+        React.createElement('div', { className: 'ncsec__h' },
+          React.createElement('b', null, 'Как выглядит')),
+        React.createElement('div', { className: 'nclook' },
+          COLORS.map(c => React.createElement('button', {
+            key: c, className: 'nccol' + (style.body === c ? ' nccol--on' : ''),
+            style: { background: c }, 'aria-label': 'Цвет',
+            onClick: () => setStyle(s => Object.assign({}, s, { body: c })),
+          })))),
+      React.createElement('div', { className: 'ncsec' },
+        React.createElement('div', { className: 'nclook' },
+          SHAPES.map(f => React.createElement('button', {
+            key: f.id, className: 'ncform' + (style.shape === f.id ? ' ncform--on' : ''),
+            onClick: () => setStyle(s => Object.assign({}, s, { shape: f.id })),
+          }, f.t)))),
+
+      /* ── смена ── */
+      React.createElement('div', { ref: flow }),
+
+      !shift && React.createElement('button', { className: 'ncgo', onClick: start },
+        'На смену ' + work.at + ' →'),
+
+      shift && !shift.over && React.createElement(Situation, {
+        work: work, task: task, no: shift.idx + 1, total: work.tasks.length,
+        res: res, name: name, answered: shift.answer !== null,
+        onAnswer: answer, onNext: next,
+      }),
+
+      shift && shift.over && React.createElement('div', { className: 'ncres' },
+        React.createElement('div', { className: 'ncres__s' }, score + ' из ' + work.tasks.length),
+        React.createElement('div', { className: 'ncres__t' },
+          score === work.tasks.length
+            ? 'Вся смена без единой ошибки. Для этой работы набор подобран точно'
+            : 'Смена окончена. Разбираем, что вышло'),
+        lack.length > 0 && React.createElement('div', { className: 'ncres__m' },
+          'Помощнику не хватило: ',
+          React.createElement('b', null, lack.map(k => C.SENSE[k].miss).join(' и ')),
+          '. Дай вместо чего-то другого — и отправь на смену снова'),
+        mine > 0 && React.createElement('div', { className: 'ncres__m' },
+          mine === 1 ? 'Один спорный случай решали вы — и не угадали. '
+            : 'Спорные случаи решали вы, и ' + mine + ' раза вышло мимо. ',
+          React.createElement('b', null, 'Приметы там были на экране'))),
+
+      shift && shift.over && React.createElement('div', { className: 'ncrow' },
+        React.createElement('button', { className: 'ncgo', onClick: start }, 'Ещё смена'),
+        React.createElement('button', {
+          className: 'ncgo ncgo--calm', onClick: keep, disabled: kept,
+        }, kept ? 'На полке' : 'Оставить себе')),
+
+      /* ── полка ── */
+      React.createElement('div', { className: 'ncshelf' },
+        React.createElement('div', { className: 'ncshelf__h' },
+          React.createElement('b', null, 'Мои помощники'),
+          React.createElement('span', null, shelf.length + ' из ' + MAX)),
+        shelf.length
+          ? React.createElement('div', { className: 'ncgrid' },
+            shelf.slice().reverse().map(it => React.createElement('div', {
+              key: it.id, className: 'nccell', onClick: () => takeOff(it),
+            },
+              React.createElement('div', { dangerouslySetInnerHTML: { __html: B.build(it.spec) } }),
+              React.createElement('b', null, it.name),
+              React.createElement('i', null, it.workName + ' · ' + it.score + '/5'),
+              React.createElement('button', {
+                className: 'nccell__x', 'aria-label': 'Убрать',
+                onClick: e => { e.stopPropagation(); setShelf(l => l.filter(x => x.id !== it.id)); },
+              }, '✕'))))
+          : React.createElement('div', { className: 'ncempty' },
+            'Пока пусто. Отправь помощника на смену\nи нажми «Оставить себе»'))),
+
+    help && React.createElement(Help, { onClose: closeHelp }));
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App, null));
+</script>
+</body>
+</html>

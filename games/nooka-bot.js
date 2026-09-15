@@ -66,11 +66,13 @@
     var p = [];
 
     /* ── за корпусом: рюкзак, крылья, антенна, уши, руки ── */
+    /* рюкзак торчит из-за корпуса заметно: при прежнем смещении его край
+       выходил на пару пикселей и деталь просто не читалась */
     if (s.gear === 'pack') p.push(
-      '<rect x="' + (cx - bw * 0.52) + '" y="' + (bcy - bh * 0.22) + '" width="' + (bw * 0.3) +
-      '" height="' + (bh * 0.5) + '" rx="14" fill="' + sh(C, -0.4) + '"/>',
-      '<rect x="' + (cx + bw * 0.22) + '" y="' + (bcy - bh * 0.22) + '" width="' + (bw * 0.3) +
-      '" height="' + (bh * 0.5) + '" rx="14" fill="' + sh(C, -0.4) + '"/>');
+      '<rect x="' + (cx - bw * 0.64) + '" y="' + (bcy - bh * 0.22) + '" width="' + (bw * 0.34) +
+      '" height="' + (bh * 0.52) + '" rx="15" fill="' + sh(C, -0.4) + '"/>',
+      '<rect x="' + (cx + bw * 0.3) + '" y="' + (bcy - bh * 0.22) + '" width="' + (bw * 0.34) +
+      '" height="' + (bh * 0.52) + '" rx="15" fill="' + sh(C, -0.4) + '"/>');
     if (s.gear === 'wings') [-1, 1].forEach(function (d) {
       p.push('<path d="M' + (cx + d * bw * 0.4) + ' ' + (bcy - 10) +
         ' q' + (d * 66) + ' -44 ' + (d * 78) + ' 10 q' + (d * -28) + ' 2 ' + (d * -50) + ' 24 Z" fill="' +
@@ -230,6 +232,11 @@
         case 'wink': return '<path d="M' + (x - 12) + ' ' + ey + ' q12 -10 24 0" fill="none" stroke="' + G +
           '" stroke-width="5.5" stroke-linecap="round"/>';
         case 'dot': return '<circle cx="' + x + '" cy="' + ey + '" r="5.5" fill="' + G + '"/>';
+        /* закрытые глаза: нужны там, где робот чего-то лишён — в мастерской
+           помощников видно сразу, что глаз ему не дали. Слова в словаре нет:
+           во второй песочнице этот вариант не выпадает. */
+        case 'shut': return '<path d="M' + (x - 12) + ' ' + ey + ' q12 11 24 0" fill="none" stroke="' + G +
+          '" stroke-width="5.5" stroke-linecap="round" opacity=".45"/>';
         case 'ring': return '<circle cx="' + x + '" cy="' + ey + '" r="10" fill="none" stroke="' + G + '" stroke-width="5"/>';
         default: return '<path d="M' + (x - 13) + ' ' + (ey + 4) + ' a13 13 0 0 1 26 0" fill="none" stroke="' +
           G + '" stroke-width="6" stroke-linecap="round"/>';

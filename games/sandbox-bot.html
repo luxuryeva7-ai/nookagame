@@ -116,6 +116,9 @@
   font-family:var(--nk-body);font-weight:900;font-size:15.5px;color:#0E0719;
   background:#FFD84D;box-shadow:0 4px 0 #C9A21E;}
 
+/* ядро держит #root во весь экран без скролла — песочнице он нужен:
+   иначе на невысоком экране полка и кнопки просто недостижимы */
+#root{height:100vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 @media(min-width:900px){#root>.nbroot{max-width:560px;} .nbroot{max-width:560px;}}
 </style>
 </head>
