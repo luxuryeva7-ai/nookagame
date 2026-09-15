@@ -1,0 +1,12 @@
+# Nooka — что можно показывать в поиске
+
+User-agent: *
+Allow: /
+
+# Служебное: инструмент выдачи кодов, страница показов и старый лендинг.
+# Открыты по адресу, но в поиске им делать нечего.
+Disallow: /tools/
+Disallow: /demo/
+Disallow: /index-classic.html
+
+Sitemap: https://nookagame.ru/sitemap.xml
