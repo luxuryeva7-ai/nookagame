@@ -35,12 +35,28 @@
   color:#CFC0EA;font-size:15px;font-weight:900;background:rgba(255,255,255,.07);
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);}
 
+/* ── шапка со сценой: прилипает к верху ──────────────────
+   Полки деталей длинные, и без этого ребёнок листает вслепую:
+   выбирает шляпу, а робота уже не видно. При прокрутке сцена
+   ужимается, чтобы не съедать пол-экрана. */
+.nbfix{position:sticky;top:0;z-index:20;padding-bottom:8px;
+  background:rgba(20,12,38,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}
+.nbfix--small .nbtop{padding-top:8px;}
+.nbfix--small .nbtop__t span{display:none;}
+.nbfix--small .nbstage{margin-top:7px;}
+.nbfix--small .nbstage__in{padding-top:0;}
+.nbfix--small .nbstage__in svg{max-width:118px;}
+.nbfix--small .nbname{padding-bottom:9px;}
+.nbfix--small .nbname input{width:134px;padding:6px 10px;font-size:13px;}
+.nbfix--small .nbname button{width:32px;height:32px;font-size:14px;}
+
 /* ── сцена ── */
 .nbstage{margin:12px 14px 0;border-radius:26px;position:relative;overflow:hidden;
   background:radial-gradient(88% 60% at 50% 4%,#3E2A72 0%,#241750 44%,#150D28 100%);
   box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.1),inset 0 -40px 60px -30px rgba(0,0,0,.55);}
 .nbstage__in{position:relative;z-index:2;padding:4px 10px 0;display:flex;justify-content:center;}
-.nbstage__in svg{width:100%;max-width:236px;height:auto;display:block;}
+.nbstage__in svg{width:100%;max-width:236px;height:auto;display:block;
+  transition:max-width .22s cubic-bezier(.2,.8,.3,1);}
 .nbpop{animation:nbPop .3s cubic-bezier(.2,1.5,.5,1);}
 @keyframes nbPop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
 .nbname{display:flex;align-items:center;gap:8px;justify-content:center;
@@ -427,6 +443,16 @@ function App() {
   const [help, setHelp] = useState(() => {
     try { return !localStorage.getItem(SEEN); } catch (e) { return true; }
   });
+  const [small, setSmall] = useState(false);
+
+  /* пока листаешь полки, робот остаётся на виду — но в половину роста */
+  useEffect(() => {
+    const root = document.getElementById('root');
+    if (!root) return;
+    const on = () => setSmall(root.scrollTop > 70);
+    root.addEventListener('scroll', on, { passive: true });
+    return () => root.removeEventListener('scroll', on);
+  }, []);
 
   const vs = useMemo(() => B.variants(), []);
   const trait = H.trait(traitId);
@@ -530,6 +556,7 @@ function App() {
   return React.createElement('div', { className: 'nbroot' },
     React.createElement('div', { className: 'nb' },
 
+      React.createElement('div', { className: 'nbfix' + (small ? ' nbfix--small' : '') },
       React.createElement('div', { className: 'nbtop' },
         React.createElement('div', { className: 'nbtop__t' }, 'Мой робот',
           React.createElement('span', null, 'Собери героя из любых деталей')),
@@ -553,7 +580,7 @@ function App() {
             value: name, maxLength: 14, 'aria-label': 'Имя робота',
             onChange: e => setName(e.target.value),
           }),
-          React.createElement('button', { onClick: shuffle, 'aria-label': 'Случайный робот' }, '🎲'))),
+          React.createElement('button', { onClick: shuffle, 'aria-label': 'Случайный робот' }, '🎲')))),
 
       /* ── заказ словами ── */
       React.createElement('div', { className: 'nborder' },
