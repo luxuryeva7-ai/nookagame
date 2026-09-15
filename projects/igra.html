@@ -25,7 +25,7 @@ body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);-w
 
 .say{display:flex;gap:9px;align-items:flex-start;margin-top:12px;animation:up .3s ease both}
 .say-av{flex:none;width:50px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:2px}
-.say-b{flex:1;background:var(--card);border-radius:16px;border-top-left-radius:5px;padding:11px 14px;box-shadow:var(--sh);font-weight:600;font-size:15px;line-height:1.45;color:var(--ink2);white-space:pre-line}
+.say-b{flex:1;background:var(--card);border-radius:16px;border-top-left-radius:5px;padding:11px 14px;box-shadow:var(--sh);font-weight:600;font-size:16.5px;line-height:1.45;color:var(--ink2);white-space:pre-line}
 .say-b b{color:var(--acc);font-weight:800}
 
 .pcard{margin-top:12px;background:var(--card);border-radius:16px;box-shadow:var(--sh);padding:13px 14px;
@@ -53,7 +53,7 @@ body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);-w
  font-weight:800;font-size:14px;color:var(--ink2);padding:4px 2px 7px;font-variant-numeric:tabular-nums}
 .hud span{display:inline-flex;align-items:center;gap:4px}
 canvas{border-radius:18px;box-shadow:var(--sh);touch-action:none;display:block;background:#E8DCC8}
-.rulebar{width:100%;max-width:360px;margin-top:7px;font-size:11.5px;font-weight:700;color:var(--ink3);text-align:center;min-height:16px}
+.rulebar{width:100%;max-width:360px;margin-top:7px;font-size:13.5px;font-weight:700;color:var(--ink3);text-align:center;min-height:16px}
 
 /* шит */
 .ovl{position:fixed;inset:0;background:rgba(43,33,24,.42);opacity:0;pointer-events:none;transition:opacity .25s;z-index:40}
@@ -78,7 +78,7 @@ canvas{border-radius:18px;box-shadow:var(--sh);touch-action:none;display:block;b
 /* конструктор если→то */
 .ifthen{display:flex;align-items:center;gap:8px;margin-top:12px}
 .plate{flex:1;background:var(--card);border-radius:16px;box-shadow:var(--sh);padding:12px 11px;cursor:pointer;min-height:92px;display:flex;flex-direction:column;justify-content:center;gap:6px}
-.plate-l{font-size:10px;font-weight:900;letter-spacing:.08em;color:var(--acc)}
+.plate-l{font-size:12px;font-weight:900;letter-spacing:.08em;color:var(--acc)}
 .plate-v{font-size:13.5px;font-weight:800;line-height:1.3;color:var(--ink)}
 .plate.todo .plate-v{color:#B8895F}
 .ifthen-ar{font-size:22px;color:var(--acc);flex:none}
@@ -149,7 +149,7 @@ canvas{border-radius:18px;box-shadow:var(--sh);touch-action:none;display:block;b
 .gst.done .gst-b{background:var(--acc);color:#fff;animation:none}
 @keyframes spin{to{transform:rotate(360deg)}}
 .live{margin-top:12px;background:var(--card);border-radius:16px;box-shadow:var(--sh);padding:10px 10px 11px}
-.live-t{font-size:10.5px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;
+.live-t{font-size:12.5px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;
  color:var(--ink3);text-align:center;margin-bottom:8px}
 .live-r{display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
 .live-r .dk{padding:7px 2px}
@@ -162,10 +162,10 @@ canvas{border-radius:18px;box-shadow:var(--sh);touch-action:none;display:block;b
 .dk:active{transform:scale(.94)}
 .dk.on{box-shadow:inset 0 0 0 2px var(--acc);background:var(--accbg)}
 .dk-ic{font-size:20px;line-height:1}
-.dk-l{font-size:9.5px;font-weight:900;letter-spacing:.03em;color:var(--ink3);text-transform:uppercase}
-.dk-v{font-size:10px;font-weight:800;color:var(--ink);line-height:1.15;max-width:100%;
+.dk-l{font-size:11.5px;font-weight:900;letter-spacing:.03em;color:var(--ink3);text-transform:uppercase}
+.dk-v{font-size:12.5px;font-weight:800;color:var(--ink);line-height:1.15;max-width:100%;
  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.dk-l{font-size:9px}
+.dk-l{font-size:11px}
 .dock-play{display:flex;gap:8px;padding:8px 12px 0}
 .dock-play .btn{min-height:46px;font-size:14.5px;border-radius:23px}
 .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:#fff;
@@ -993,14 +993,15 @@ function render(){
   if(st==='s0'){
     $('htitle').textContent='Своя игра';
     B().innerHTML=`<div class="center">
-      <div style="width:150px;height:150px;border-radius:20px;background:#D8D8D8;position:relative;margin-bottom:18px;overflow:hidden">
-        <div style="position:absolute;width:34px;height:34px;border-radius:50%;background:#9A9A9A;top:58px;left:20px;animation:drift 3.4s ease-in-out infinite alternate"></div>
+      <div style="width:150px;height:150px;border-radius:22px;background:#F2E4CC;position:relative;margin-bottom:14px;overflow:hidden">
+        <svg viewBox="0 0 150 150" style="position:absolute;inset:0;width:100%;height:100%"><g fill="none" stroke="#3A2A18" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20 h110 v110 h-110 z"/><path d="M50 20 v60 M50 80 h30 M80 50 v60 M110 50 v50 h-30 M20 110 h30"/></g><circle cx="128" cy="128" r="9" fill="#2E9E5B" stroke="#2B2118" stroke-width="3"/></svg>
+        <div style="position:absolute;width:26px;height:26px;border-radius:50%;background:#E65C00;border:3px solid #2B2118;top:22px;left:22px;animation:drift 3.4s ease-in-out infinite alternate"></div>
       </div>
       <h1 class="h1">Мастерская: своя игра</h1>
       <p class="lead">Сегодня ты не игрок.\nСегодня ты тот, кто игру <b>заказывает</b>.</p>
       <input class="field" id="nm" maxlength="16" placeholder="Как тебя зовут?" value="${S.name}">
     </div>
-    <style>@keyframes drift{from{transform:translate(0,0)}to{transform:translate(64px,-26px)}}</style>`;
+    <style>@keyframes drift{from{transform:translate(0,0)}to{transform:translate(0,58px)}}</style>`;
     F().innerHTML=`<button class="btn" onclick="S.name=($('nm').value||'Автор').trim();go('s1')">Я готов</button>`;
     return;
   }
