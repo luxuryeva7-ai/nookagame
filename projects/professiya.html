@@ -402,9 +402,10 @@ function wrapLines(ctx,text,maxW){
 function shiftVec(v,dx,dy){const n=10,o=new Uint8Array(100);for(let y=0;y<n;y++)for(let x=0;x<n;x++){const sx=x-dx,sy=y-dy;if(sx>=0&&sy>=0&&sx<n&&sy<n&&v[sy*n+sx])o[y*n+x]=1}return o}
 function noiseVec(v,k,r){const o=Uint8Array.from(v);for(let i=0;i<k;i++){const j=Math.floor(r()*100);o[j]=o[j]?0:1}return o}
 function variantOf(v,r){return noiseVec(shiftVec(v,rint(r,-1,1),rint(r,-1,1)),rint(r,3,7),r)}
-function hardDecoy(v,r){ // его же рисунок, но с половиной клеток наоборот — «похоже, но чужое»
-  let o=shiftVec(v,rint(r,-2,2),rint(r,-2,2)); const cnt=o.reduce((a,b)=>a+b,0);
-  o=noiseVec(o,Math.max(14,Math.round(cnt*0.9)),r); return o;
+function flipV(v){const o=new Uint8Array(100);for(let y=0;y<10;y++)for(let x=0;x<10;x++)o[y*10+x]=v[(9-y)*10+x];return o}
+function rot90(v){const o=new Uint8Array(100);for(let y=0;y<10;y++)for(let x=0;x<10;x++)o[x*10+(9-y)]=v[y*10+x];return o}
+function hardDecoy(v,r){ // его же рисунок, но вверх ногами или на боку: клетки похожи, вещь — другая
+  let o=r()<0.5?flipV(v):rot90(v); o=shiftVec(o,rint(r,-1,1),rint(r,-1,1)); return noiseVec(o,rint(r,2,5),r);
 }
 function decoy(kind,r){
   const o=new Uint8Array(100),n=10; const set=(x,y)=>{if(x>=0&&y>=0&&x<n&&y<n)o[y*n+x]=1};
@@ -419,11 +420,15 @@ function jaccard(a,b){let i=0,u=0;for(let k=0;k<100;k++){if(a[k]&&b[k])i++;if(a[
 function drawVec(cv,v,px,fg){const n=10,c=px/n,ctx=cv.getContext('2d');cv.width=px;cv.height=px;
   ctx.fillStyle='#FFF8EE';ctx.fillRect(0,0,px,px);ctx.fillStyle=fg||'#2B2118';
   for(let i=0;i<100;i++)if(v[i])ctx.fillRect((i%n)*c+1,Math.floor(i/n)*c+1,c-2,c-2)}
+function simShift(v,p){ // сравнение с поправкой на сдвиг в одну клетку — иначе тонкий рисунок «не узнаётся» от чиха
+  let best=0;for(let dx=-1;dx<=1;dx++)for(let dy=-1;dy<=1;dy++){const s=jaccard(shiftVec(v,dx,dy),p);if(s>best)best=s}return best;
+}
 function decScore(v){
   const pos=S.mem.pos.length?S.mem.pos:[S.thing]; let best=0;
-  pos.forEach(p=>{const s=jaccard(v,p);if(s>best)best=s});
-  let worst=0; S.mem.neg.forEach(p=>{const s=jaccard(v,p);if(s>worst)worst=s});
-  return Math.max(0,Math.min(1,best-worst*0.35+0.1));
+  pos.forEach(p=>{const s=simShift(v,p);if(s>best)best=s});
+  let worst=0; S.mem.neg.forEach(p=>{const s=simShift(v,p);if(s>worst)worst=s});
+  const raw=best-worst*0.3;
+  return Math.max(0,Math.min(1,(raw-0.05)/0.75));   // растягиваем: свои ≈ 0.55–0.95, чужие ≈ 0–0.45
 }
 /* ═══════════════ СОСТОЯНИЕ ═══════════════ */
 const S={step:'intro',child:'',age:'',seed:4821,
