@@ -236,7 +236,9 @@ h1 span{color:var(--pri-3)}
     return '<div class="op" style="--t:' + g.tint + '">' +
       '<div class="n">' + g.levels.length + ' уровней · ' + g.age + '</div>' +
       '<h4>' + g.name + '</h4><div class="s">' + g.sub + '</div>' +
-      '<ul>' + pick.map(function (l) { return '<li>' + l.t + '</li>'; }).join('') + '</ul></div>';
+      /* то же, что на главной: понятные строки, а не названия уровней */
+      '<ul>' + (g.bullets || pick.map(function (l) { return l.t; }))
+        .map(function (t) { return '<li>' + t + '</li>'; }).join('') + '</ul></div>';
   }).join('');
 
   /* ── тарифы. Кнопка ведёт туда, где реально можно заплатить: ссылка

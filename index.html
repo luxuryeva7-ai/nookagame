@@ -745,7 +745,7 @@ document.querySelectorAll('[data-buy]').forEach(function(b){ b.addEventListener(
     card.style.setProperty('--t', g.tint);
     var SHOT = { data: 'cover-data', control: 'cover-control', inside: 'cover-inside' };
     /* Бирка говорит то, чего не видно из названия игры: чем она берёт. */
-    var MARK = { data: 'Рисует пальцем', control: 'Слово в слово', inside: 'Три профессии' };
+    var MARK = { data: 'Рисует пальцем', control: 'Заказывает словами', inside: 'Три профессии' };
     var full = st.ready === st.total;
     /* Что с доступом к этой игре: бесплатна целиком, уже открыта кодом
        или закрыта. Замок вешаем только на реально закрытые — если родитель
@@ -771,7 +771,12 @@ document.querySelectorAll('[data-buy]').forEach(function(b){ b.addEventListener(
         '<div class="cc-top"><span class="cc-no">'+NO[i+1]+'</span><span class="cc-age">'+g.age+'</span></div>' +
         '<div class="cc-name">'+g.name+'</div>' +
         '<div class="cc-sub">'+g.sub+'</div>' +
-        '<ul class="cc-list">' + pick.map(function(l){ return '<li>'+l.t+'</li>'; }).join('') + '</ul>' +
+        /* Показываем, что ребёнок делает, а не как называются уровни:
+           «Чего я не видел» родителю ни о чём не говорит. */
+        '<ul class="cc-list">' +
+          (g.bullets || pick.map(function(l){ return l.t; }))
+            .map(function(t){ return '<li>'+t+'</li>'; }).join('') +
+        '</ul>' +
       '</div>' +
       '<div class="cc-foot"><b>'+st.total+' уровней</b>' +
         /* Цена нужна, только пока есть что покупать. Когда доступ уже открыт —
