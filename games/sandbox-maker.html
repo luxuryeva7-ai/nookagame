@@ -36,9 +36,18 @@
 
 /* сцена с существом */
 .mkstage{margin:12px 14px 0;border-radius:26px;position:relative;overflow:hidden;
-  background:radial-gradient(120% 80% at 50% 12%,#2B1D4E 0%,#150E28 68%);
-  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.09);}
-.mkstage svg{width:100%;display:block;}
+  background:radial-gradient(90% 62% at 50% 6%,#3A2769 0%,#231747 42%,#140D26 100%);
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.1),
+    inset 0 -40px 60px -30px rgba(0,0,0,.6);}
+.mkstage svg{width:100%;display:block;position:relative;z-index:2;}
+/* свет лампы сверху и верстак снизу: существо стоит в мастерской,
+   а не висит в пустом прямоугольнике */
+.mkstage::before{content:'';position:absolute;left:50%;top:-56px;width:210px;height:210px;
+  transform:translateX(-50%);border-radius:50%;z-index:1;pointer-events:none;
+  background:radial-gradient(circle,rgba(255,216,77,.22) 0%,rgba(255,216,77,0) 68%);}
+.mkstage::after{content:'';position:absolute;left:0;right:0;bottom:0;height:34%;z-index:1;
+  pointer-events:none;
+  background:linear-gradient(180deg,rgba(90,60,150,0) 0%,rgba(52,34,92,.55) 55%,rgba(30,19,56,.9) 100%);}
 .mkstage__empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
   padding:0 34px;text-align:center;font-weight:800;font-size:13.5px;line-height:1.5;
   color:#5B4C80;pointer-events:none;}
@@ -301,10 +310,41 @@ function parse(text) {
 /* ── рисуем существо по разбору ───────────────────────────────
    Всё из примитивов: любая комбинация слов должна дать картинку,
    а не пустое место. */
-function Creature({ spec, size }) {
+/* осветлить/затемнить цвет — для объёма: плоская заливка читается
+   как схема, а не как персонаж */
+function shade(hex, k) {
+  const n = parseInt(hex.slice(1), 16);
+  const c = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(function (v) {
+    return Math.max(0, Math.min(255, Math.round(k > 0 ? v + (255 - v) * k : v * (1 + k))));
+  });
+  return '#' + c.map(function (v) { return ('0' + v.toString(16)).slice(-2); }).join('');
+}
+
+let crSeq = 0;
+
+function Creature({ spec, size, still }) {
   const s = spec;
   const W = 300, H = 266;   // кадр плотнее: сверху было много пустоты
-  const dark = (c) => c;
+  const uid = useRef(null);
+  if (uid.current === null) uid.current = 'cr' + (++crSeq);
+  const gid = uid.current;
+
+  /* моргание: веки закрываются коротко и не по расписанию — с ровным
+     интервалом это читается как мигающая лампочка, а не как живое */
+  const [blink, setBlink] = useState(false);
+  useEffect(() => {
+    if (still) return;
+    let t1, t2;
+    const loop = () => {
+      t1 = setTimeout(() => {
+        setBlink(true);
+        t2 = setTimeout(() => { setBlink(false); loop(); }, 130);
+      }, 2200 + Math.random() * 3200);
+    };
+    loop();
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, [still]);
+
   const bodyW = s.size === 'big' ? 132 : s.size === 'small' ? 78 : 106;
   const bodyH = s.shape === 'long' ? bodyW * 1.42 : s.shape === 'square' ? bodyW : bodyW * 1.06;
   const cx = W / 2, cy = H / 2 + 12;
@@ -314,20 +354,22 @@ function Creature({ spec, size }) {
 
   /* хвост */
   if (s.tail) push(React.createElement('path', {
-    key: 'tail',
-    d: 'M' + (cx + bodyW / 2 - 8) + ' ' + (cy + 6) +
-       ' q54 -4 56 -52 q-16 4 -20 34 q-4 16 -32 22 Z',
-    fill: s.color, opacity: 0.95,
+    key: 'tail', className: 'cr-tail',
+    /* вправо и вниз: вверх он уходил ровно туда же, где крыло, и пропадал */
+    d: 'M' + (cx + bodyW / 2 - 10) + ' ' + (cy + 4) +
+       ' q58 10 62 56 q-22 -2 -30 -32 q-8 -14 -34 -12 Z',
+    /* темнее тела: тем же цветом хвост за спиной просто исчезал */
+    fill: shade(s.color, -0.28),
   }));
   /* крылья */
   if (s.wings) {
     [-1, 1].forEach(function (k) {
       push(React.createElement('path', {
-        key: 'w' + k,
+        key: 'w' + k, className: 'cr-wing',
         d: 'M' + (cx + k * (bodyW / 2 - 6)) + ' ' + (cy - 10) +
            ' q' + (k * 62) + ' -46 ' + (k * 74) + ' 6' +
            ' q' + (k * -26) + ' 4 ' + (k * -46) + ' 22 Z',
-        fill: s.color, opacity: 0.55,
+        fill: shade(s.color, -0.18), opacity: 0.78,
       }));
     });
   }
@@ -335,8 +377,13 @@ function Creature({ spec, size }) {
   for (let i = 0; i < Math.min(s.legs, 5); i++) {
     const step = s.legs > 1 ? (i - (s.legs - 1) / 2) * (bodyW / (s.legs + 0.4)) : 0;
     push(React.createElement('rect', {
-      key: 'l' + i, x: cx + step - 6, y: cy + bodyH / 2 - 10, width: 12, height: 30, rx: 6,
-      fill: s.color,
+      key: 'l' + i, x: cx + step - 8, y: cy + bodyH / 2 - 12, width: 16, height: 34, rx: 8,
+      fill: shade(s.color, -0.22),
+    }));
+    /* ступня: без неё лапа выглядит обрубком палки */
+    push(React.createElement('ellipse', {
+      key: 'lf' + i, cx: cx + step, cy: cy + bodyH / 2 + 20, rx: 11, ry: 6.5,
+      fill: shade(s.color, -0.3),
     }));
   }
   /* руки */
@@ -349,11 +396,19 @@ function Creature({ spec, size }) {
   /* тело */
   push(s.shape === 'square'
     ? React.createElement('rect', {
-      key: 'b', x: cx - bodyW / 2, y: top, width: bodyW, height: bodyH, rx: 20, fill: s.color,
+      key: 'b', className: 'cr-body', x: cx - bodyW / 2, y: top,
+      width: bodyW, height: bodyH, rx: 22, fill: 'url(#' + gid + 'g)',
     })
     : React.createElement('ellipse', {
-      key: 'b', cx: cx, cy: cy, rx: bodyW / 2, ry: bodyH / 2, fill: s.color,
+      key: 'b', className: 'cr-body', cx: cx, cy: cy,
+      rx: bodyW / 2, ry: bodyH / 2, fill: 'url(#' + gid + 'g)',
     }));
+  /* блик сверху слева — от лампы мастерской */
+  push(React.createElement('ellipse', {
+    key: 'gloss', cx: cx - bodyW * 0.17, cy: cy - bodyH * 0.27,
+    rx: bodyW * 0.2, ry: bodyH * 0.13, fill: '#fff', opacity: 0.16,
+    transform: 'rotate(-18 ' + (cx - bodyW * 0.17) + ' ' + (cy - bodyH * 0.27) + ')',
+  }));
   /* узор */
   if (s.skin === 'stripes') {
     for (let i = 0; i < 4; i++) push(React.createElement('rect', {
@@ -428,7 +483,13 @@ function Creature({ spec, size }) {
       fill: '#22183A',
     }));
     if (s.mood === 'sleepy') push(React.createElement('rect', {
-      key: 'el' + i, x: ex - r, y: ey - r, width: r * 2, height: r, rx: 2, fill: s.color,
+      key: 'el' + i, x: ex - r, y: ey - r, width: r * 2, height: r, rx: 2, fill: shade(s.color, -0.12),
+    }));
+    /* веко: при моргании накрывает глаз целиком */
+    if (!still && s.mood !== 'sleepy') push(React.createElement('rect', {
+      key: 'bl' + i, className: 'cr-lid', x: ex - r - 1, y: ey - r - 1,
+      width: r * 2 + 2, height: r * 2 + 2, rx: r, fill: shade(s.color, -0.1),
+      style: { transform: 'scaleY(' + (blink ? 1 : 0) + ')' },
     }));
     if (s.mood === 'angry') push(React.createElement('path', {
       key: 'eb' + i, d: 'M' + (ex - r) + ' ' + (ey - r - 4) + ' l' + (r * 2) + ' 7',
@@ -467,11 +528,47 @@ function Creature({ spec, size }) {
     });
   });
 
+  const defs = React.createElement('defs', { key: 'defs' },
+    React.createElement('radialGradient', { id: gid + 'g', cx: '35%', cy: '28%', r: '78%' },
+      React.createElement('stop', { offset: '0', stopColor: shade(s.color, 0.26) }),
+      React.createElement('stop', { offset: '0.58', stopColor: s.color }),
+      React.createElement('stop', { offset: '1', stopColor: shade(s.color, -0.3) })),
+    React.createElement('radialGradient', { id: gid + 's', cx: '50%', cy: '50%', r: '50%' },
+      React.createElement('stop', { offset: '0', stopColor: '#000', stopOpacity: 0.45 }),
+      React.createElement('stop', { offset: '1', stopColor: '#000', stopOpacity: 0 })));
+
+  /* тень на верстаке: без неё существо висит в воздухе */
+  const shadow = React.createElement('ellipse', {
+    key: 'sh', cx: cx, cy: cy + bodyH / 2 + 30, rx: bodyW * 0.52, ry: 11,
+    fill: 'url(#' + gid + 's)',
+  });
+
   return React.createElement('svg', {
     viewBox: '0 0 ' + W + ' ' + H, width: size || '100%',
-    style: { display: 'block' },
-  }, kids);
+    style: { display: 'block', overflow: 'visible' },
+  },
+    defs,
+    !still && React.createElement('style', { key: 'st' }, LIFE_CSS),
+    shadow,
+    React.createElement('g', { key: 'all', className: still ? '' : 'cr-all' }, kids));
 }
+
+/* Существо должно казаться живым: статичная фигура читается как схема.
+   Дыхание и покачивание — CSS, моргание — по таймеру, чтобы веки
+   закрывались не в такт и это не выглядело механикой. */
+const LIFE_CSS = `
+.cr-body{transform-box:fill-box;transform-origin:center;animation:crBreath 3.4s ease-in-out infinite}
+.cr-all{transform-box:fill-box;transform-origin:50% 90%;animation:crSway 5.2s ease-in-out infinite}
+.cr-tail{transform-box:fill-box;transform-origin:0% 50%;animation:crTail 2.6s ease-in-out infinite}
+.cr-wing{transform-box:fill-box;transform-origin:50% 90%;animation:crWing 1.9s ease-in-out infinite}
+.cr-lid{transition:transform .12s ease-out;transform-box:fill-box;transform-origin:50% 0%}
+@keyframes crBreath{0%,100%{transform:scale(1,1)}50%{transform:scale(1.025,.978)}}
+@keyframes crSway{0%,100%{transform:rotate(-1.1deg)}50%{transform:rotate(1.1deg)}}
+@keyframes crTail{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(9deg)}}
+@keyframes crWing{0%,100%{transform:rotate(-6deg) scaleY(1)}50%{transform:rotate(7deg) scaleY(.92)}}
+@media(prefers-reduced-motion:reduce){
+  .cr-body,.cr-all,.cr-tail,.cr-wing{animation:none}
+}`;
 
 /* ── хранилище полки ── */
 function loadShelf() {
@@ -610,11 +707,11 @@ function Maker() {
         React.createElement('div', { className: 'mkdiff__h' }, 'Что изменилось'),
         React.createElement('div', { className: 'mkdiff__r' },
           React.createElement('div', { className: 'mkdiff__c' },
-            React.createElement(Creature, { spec: prev.spec }),
+            React.createElement(Creature, { spec: prev.spec, still: true }),
             React.createElement('span', null, 'было')),
           React.createElement('div', { className: 'mkdiff__a' }, '→'),
           React.createElement('div', { className: 'mkdiff__c' },
-            React.createElement(Creature, { spec: cur.spec }),
+            React.createElement(Creature, { spec: cur.spec, still: true }),
             React.createElement('span', null, 'стало')))),
 
       React.createElement('div', { className: 'mkask' },
@@ -646,7 +743,7 @@ function Maker() {
             key: it.id, className: 'mkcell',
             onClick: () => { setText(it.text); setPrev(cur); setCur({ ...parse(it.text), text: it.text, at: Date.now() }); setKept(false); },
           },
-            React.createElement(Creature, { spec: it.spec }),
+            React.createElement(Creature, { spec: it.spec, still: true }),
             React.createElement('b', null, it.text),
             React.createElement('button', {
               className: 'mkcell__x', 'aria-label': 'Убрать',
