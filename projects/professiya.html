@@ -2,1259 +2,1189 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
-<meta name="theme-color" content="#FFF8EE">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Профессия будущего — Nooka</title>
 <link href="../fonts/nooka-fonts.css" rel="stylesheet">
 <style>
-:root{--bg:#FFF8EE;--card:#FFFFFF;--ink:#2B2118;--ink2:#5C4A38;--ink3:#8A7A68;
- --acc:#E65C00;--accbg:#FFF1E4;--line:rgba(180,110,40,.16);
- --sh:0 1px 2px rgba(120,72,28,.10),0 10px 26px -10px rgba(120,72,28,.20);color-scheme:light}
+:root{
+  --bg:#FFF8EE; --card:#FFFFFF; --ink:#2B2118; --ink2:#5C4A38; --ink3:#8A7A68;
+  --acc:#E65C00; --accbg:#FFF1E4; --line:rgba(180,110,40,.16);
+  --ok:#2E9E5B; --okbg:#DFF5EA; --bad:#D93030;
+  --pic:#4A90D9; --snd:#9B59C7; --num:#2E9E5B; --txt:#E0A020;
+  --sh:0 2px 14px rgba(170,100,40,.11);
+  color-scheme:light;
+}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{background:var(--bg)}
+html,body{height:100%;background:var(--bg);overflow-x:hidden}
 body{font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
-.root{min-height:100vh;min-height:100dvh;max-width:480px;margin:0 auto;display:flex;flex-direction:column;background:var(--bg)}
-.hdr{flex:none;height:52px;display:flex;align-items:center;gap:10px;padding:0 14px;background:var(--bg);position:sticky;top:0;z-index:20}
-.hdr-back{width:34px;height:34px;border:none;background:none;cursor:pointer;font-size:20px;color:var(--acc);flex:none}
-.hdr-t{flex:1;font-weight:800;font-size:14px;color:var(--ink2);text-align:center}
-.hdr-r{width:34px;flex:none}
+.root{min-height:100vh;min-height:100dvh;max-width:480px;margin:0 auto;display:flex;flex-direction:column;background:var(--bg);position:relative}
+button,.btn,.st,.chip,.tool,.chair,.f5{touch-action:manipulation;user-select:none;-webkit-user-select:none}
+
+.hdr{flex:none;height:52px;display:flex;align-items:center;gap:10px;padding:0 14px;background:var(--bg);z-index:20;position:sticky;top:0}
+.hdr-back{width:34px;height:34px;border:none;background:none;cursor:pointer;font-size:20px;color:var(--acc);display:flex;align-items:center;justify-content:center;flex:none}
+.hdr-t{flex:1;font-weight:800;font-size:16.5px;color:var(--ink2);text-align:center}
+.hdr-r{width:34px;flex:none;text-align:right;font-size:14px;font-weight:800;color:var(--ink3)}
 .prog{flex:none;height:4px;background:rgba(180,110,40,.1);position:sticky;top:52px;z-index:20}
-.prog i{display:block;height:4px;background:var(--acc);transition:width .45s cubic-bezier(.4,0,.2,1)}
+.prog i{display:block;height:4px;background:var(--acc);border-radius:0 2px 2px 0;transition:width .45s cubic-bezier(.4,0,.2,1)}
 .body{flex:1;padding:0 12px 8px}
-.foot{flex:none;position:sticky;bottom:0;z-index:25;padding:10px 12px calc(12px + env(safe-area-inset-bottom));
- background:linear-gradient(180deg,rgba(255,248,238,0),var(--bg) 38%)}
+.foot{flex:none;position:sticky;bottom:0;z-index:25;padding:10px 12px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(255,248,238,0),var(--bg) 38%)}
 
-.say{display:flex;gap:9px;align-items:flex-start;margin-top:12px;animation:up .3s ease both}
+.say{display:flex;gap:9px;align-items:flex-start;margin-top:12px;animation:up .32s ease both}
 .say-av{flex:none;width:50px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:2px}
-.say-b{flex:1;background:var(--card);border-radius:16px;border-top-left-radius:5px;padding:11px 14px;
- box-shadow:var(--sh);font-weight:600;font-size:15px;line-height:1.45;color:var(--ink2);white-space:pre-line}
+.say-b{flex:1;background:var(--card);border-radius:16px;border-top-left-radius:5px;padding:11px 14px;box-shadow:var(--sh);font-weight:600;font-size:17.5px;line-height:1.45;color:var(--ink2);white-space:pre-line}
 .say-b b{color:var(--acc);font-weight:800}
+@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
-.plate{margin-top:8px;background:var(--card);border-radius:20px;box-shadow:var(--sh);padding:10px 10px 0}
-.stage{width:100%;aspect-ratio:3/4;border-radius:12px;overflow:hidden;background:#EFE6D6;position:relative}
-.stage svg{width:100%;height:100%;display:block}
-.stage::after{content:'';position:absolute;inset:0;border-radius:12px;pointer-events:none;
- box-shadow:inset 0 0 0 1px rgba(120,72,28,.12),inset 0 2px 10px rgba(120,72,28,.10)}
-.stage.wide{aspect-ratio:3/2}
-.plate-foot{display:flex;align-items:center;justify-content:space-between;padding:9px 4px 11px;font-size:12px;font-weight:700;color:var(--ink3)}
-.reroll{border:none;background:none;color:var(--acc);font-family:inherit;font-weight:800;font-size:13px;cursor:pointer;padding:4px 6px}
-
-.pcard{margin-top:12px;background:var(--card);border-radius:16px;box-shadow:var(--sh);padding:13px 14px;
- font-weight:600;font-size:16px;line-height:2;color:var(--ink)}
-.slot{display:inline-flex;align-items:center;gap:4px;background:var(--accbg);border:1.5px solid var(--acc);
- border-radius:999px;padding:4px 11px;min-height:38px;font-weight:800;font-size:14.5px;color:var(--acc);
- cursor:pointer;vertical-align:middle;font-family:inherit;text-align:left}
-.slot.todo{border-style:dashed;color:#B8895F;background:#FFF8F0}
-.slot.pulse{animation:pulse 1.2s ease infinite}
-.slot em{font-style:normal;font-size:10px;opacity:.75}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(230,92,0,0)}50%{box-shadow:0 0 0 7px rgba(230,92,0,.15)}}
-
-.btn{width:100%;min-height:54px;border:none;border-radius:27px;font-family:'Unbounded','Nunito',sans-serif;
- font-weight:700;font-size:16px;cursor:pointer;background:var(--acc);color:#fff;display:flex;align-items:center;justify-content:center;gap:7px}
+.btn{width:100%;min-height:54px;border:none;border-radius:27px;font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:17px;cursor:pointer;background:var(--acc);color:#fff;transition:opacity .15s,transform .1s;display:flex;align-items:center;justify-content:center;gap:7px}
 .btn:active{transform:scale(.975)}
 .btn[disabled]{opacity:.28;pointer-events:none}
 .btn2{background:var(--card);color:var(--acc);box-shadow:inset 0 0 0 2px var(--line)}
-.btn-sm{min-height:46px;font-size:14.5px;border-radius:23px}
-.btnrow{display:flex;gap:9px}.btnrow .btn{flex:1}
-.txtbtn{display:block;width:100%;text-align:center;border:none;background:none;color:var(--acc);
- font-family:inherit;font-weight:800;font-size:14px;padding:11px;cursor:pointer}
-
-.ovl{position:fixed;inset:0;background:rgba(43,33,24,.42);opacity:0;pointer-events:none;transition:opacity .25s;z-index:40}
-.ovl.on{opacity:1;pointer-events:auto}
-.sheet{position:fixed;left:0;right:0;margin:0 auto;max-width:480px;bottom:0;max-height:70dvh;background:var(--bg);
- border-radius:22px 22px 0 0;z-index:41;display:none;flex-direction:column;box-shadow:0 -8px 30px rgba(90,50,10,.18)}
-.sheet.on{display:flex;animation:sheetUp .26s cubic-bezier(.3,.9,.4,1) both}
-@keyframes sheetUp{from{transform:translateY(60%);opacity:.4}to{transform:none;opacity:1}}
-.sheet-h{flex:none;padding:9px 16px 11px;text-align:center;position:relative}
-.sheet-h::before{content:'';display:block;width:36px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 11px}
-.sheet-t{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:17px}
-.sheet-x{position:absolute;right:12px;top:20px;width:32px;height:32px;border:none;background:none;font-size:19px;color:var(--ink3);cursor:pointer}
-.sheet-l{flex:1;overflow-y:auto;padding:0 12px calc(16px + env(safe-area-inset-bottom))}
-.opt{display:flex;align-items:center;gap:11px;width:100%;min-height:56px;padding:10px 13px;margin-bottom:7px;
- border:none;border-radius:15px;background:var(--card);box-shadow:var(--sh);font-family:inherit;
- font-weight:700;font-size:15px;color:var(--ink);cursor:pointer;text-align:left;line-height:1.35}
-.opt.on{box-shadow:inset 0 0 0 2px var(--acc);background:var(--accbg)}
-.opt-ic{flex:none;width:40px;height:40px;border-radius:11px;background:#F7EFE2;display:flex;align-items:center;justify-content:center;font-size:21px}
-
-/* конвейер */
-.belt{margin-top:12px;display:flex;flex-direction:column;gap:7px}
-.bay{background:var(--card);border-radius:16px;box-shadow:var(--sh);min-height:82px;padding:11px 13px;
- display:flex;align-items:center;gap:11px;position:relative;transition:box-shadow .15s,background .15s}
-.bay.empty{background:#FDF6EA;box-shadow:inset 0 0 0 2px var(--line)}
-.bay.hot{box-shadow:0 0 0 3px var(--acc);background:var(--accbg)}
-.bay.locked{background:#F4F9F2;box-shadow:inset 0 0 0 2px rgba(46,158,91,.35)}
-.bay-l{position:absolute;top:-7px;left:13px;background:var(--bg);padding:0 6px;font-size:9.5px;font-weight:900;
- letter-spacing:.09em;color:var(--ink3)}
-.bay-ic{flex:none;width:44px;height:44px;border-radius:12px;background:#F7EFE2;display:flex;align-items:center;justify-content:center;font-size:23px}
-.bay-n{flex:1;font-size:14px;font-weight:800;line-height:1.3}
-.bay-n small{display:block;font-size:11px;font-weight:700;color:var(--ink3);margin-top:3px}
-.mods{display:flex;gap:3px;flex:none}
-.mod{font-size:13px;background:#F2E9DA;border-radius:6px;padding:2px 5px}
-.joint{text-align:center;font-size:19px;line-height:1;color:var(--ink3);height:19px}
-.joint.ok{color:#2E9E5B}.joint.bad{color:#D93030}
-.tiles{display:flex;gap:8px;overflow-x:auto;padding:11px 2px 4px;scrollbar-width:none}
-.tiles::-webkit-scrollbar{display:none}
-.tile{flex:none;width:104px;background:var(--card);border-radius:15px;box-shadow:var(--sh);padding:10px 8px;
- cursor:pointer;text-align:center;position:relative;font-family:inherit}
-.tile:active{transform:scale(.95)}
-.tile.on{box-shadow:inset 0 0 0 2px var(--acc);background:var(--accbg)}
-.tile-ic{font-size:26px;line-height:1;margin-bottom:6px}
-.tile-n{font-size:11px;font-weight:800;line-height:1.25;color:var(--ink)}
-.tile-mod{position:absolute;top:5px;right:6px;font-size:11px}
-.tabs{display:flex;gap:7px;margin-top:12px}
-.tab{flex:1;padding:9px;border:none;border-radius:13px;background:var(--card);box-shadow:var(--sh);
- font-family:inherit;font-weight:800;font-size:13px;color:var(--ink3);cursor:pointer}
-.tab.on{background:var(--acc);color:#fff}
-.result{margin-top:12px;background:var(--card);border-radius:16px;box-shadow:var(--sh);padding:14px 15px;
- font-size:14.5px;font-weight:700;line-height:1.5;color:var(--ink2);animation:up .3s ease}
-.result.good{background:#F0FAF4;box-shadow:inset 0 0 0 2px rgba(46,158,91,.3)}
-.result.bad{background:#FEF3F2;box-shadow:inset 0 0 0 2px rgba(217,48,48,.25)}
-
-/* карточки дел */
-.deck{position:relative;height:170px;margin-top:14px}
-.dcard{position:absolute;inset:0;background:var(--card);border-radius:20px;box-shadow:var(--sh);
- padding:22px 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:11px;text-align:center}
-.dcard-ic{font-size:34px}
-.dcard-t{font-size:17px;font-weight:800;line-height:1.3}
-.tally{display:flex;gap:9px;margin-top:11px}
-.tal{flex:1;background:var(--card);border-radius:15px;box-shadow:var(--sh);padding:11px;text-align:center}
-.tal-n{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:22px;color:var(--acc)}
-.tal-l{font-size:11.5px;font-weight:800;color:var(--ink3);margin-top:2px}
-
-/* карусели внешности */
-.carou{display:flex;gap:8px;overflow-x:auto;padding:8px 2px;scrollbar-width:none}
-.carou::-webkit-scrollbar{display:none}
-.mini{flex:none;width:72px;height:72px;border-radius:15px;background:var(--card);box-shadow:var(--sh);
- border:3px solid transparent;cursor:pointer;overflow:hidden;padding:0}
-.mini.on{border-color:var(--acc)}
-.mini svg{width:100%;height:100%;display:block}
-.mini-w{flex:none;width:82px;text-align:center;cursor:pointer}
-.mini-w .mini{width:82px;height:82px}
-.mini-c{font-size:10.5px;font-weight:800;color:var(--ink3);margin-top:4px;line-height:1.2}
-.grp-t{font-size:10.5px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin:13px 0 0}
-
-/* сравнение */
-.cmp{margin-top:12px;position:relative;background:var(--card);border-radius:20px;box-shadow:var(--sh);padding:10px;overflow:hidden}
-.cmp-w{position:relative;aspect-ratio:3/4;border-radius:12px;overflow:hidden;background:#EFE6D6}
-.cmp-w svg{position:absolute;inset:0;width:100%;height:100%}
-.cmp-r{clip-path:inset(0 0 0 50%)}
-.cmp-h{position:absolute;top:0;bottom:0;left:50%;width:3px;background:#fff;box-shadow:0 0 0 1px rgba(120,72,28,.3);cursor:ew-resize}
-.cmp-h::after{content:'⇔';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
- width:36px;height:36px;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(90,50,10,.3);
- display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--acc)}
-.cmp-lbl{display:flex;justify-content:space-between;padding:9px 4px 2px;font-size:12px;font-weight:800;color:var(--ink3)}
-
-/* карточка энциклопедии */
-.enc{margin-top:12px;background:var(--card);border-radius:22px;box-shadow:var(--sh);overflow:hidden}
-.enc-top{position:relative;background:#EFE6D6}
-.enc-top .stage{border-radius:0;aspect-ratio:1/1}
-.enc-stamp{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.92);border-radius:9px;
- padding:5px 10px;font-size:10.5px;font-weight:900;color:var(--acc);letter-spacing:.04em;
- transform:rotate(4deg);box-shadow:0 2px 7px rgba(90,50,10,.18)}
-.enc-say{position:absolute;left:12px;bottom:12px;max-width:74%;background:#fff;border-radius:14px;
- border-bottom-left-radius:4px;padding:9px 12px;font-size:13px;font-weight:700;line-height:1.35;
- box-shadow:0 3px 12px rgba(90,50,10,.2)}
-.enc-b{padding:16px}
-.enc-name{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:20px;line-height:1.2;margin-bottom:5px}
-.enc-who{font-size:13.5px;color:var(--acc);font-weight:800;margin-bottom:13px}
-.enc-row{display:flex;gap:9px;padding:9px 0;border-top:1px solid var(--line);font-size:13.5px;line-height:1.45}
-.enc-row b{flex:none;width:96px;color:var(--ink3);font-weight:800;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;padding-top:2px}
-.enc-row span{flex:1;font-weight:600;color:var(--ink2)}
-.enc-chain{display:flex;align-items:center;gap:5px;flex-wrap:wrap;font-size:12.5px;font-weight:700;color:var(--ink2)}
-.enc-foot{padding:13px 16px;border-top:1px solid var(--line);background:#FDF8F0}
-.enc-author{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:15px;color:var(--ink)}
-.enc-note{font-size:11.5px;color:var(--ink3);font-weight:600;margin-top:6px;line-height:1.45}
-
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.chip{background:var(--card);border:2px solid var(--line);border-radius:999px;padding:9px 15px;
- font-family:inherit;font-weight:800;font-size:14px;color:var(--ink);cursor:pointer}
-.chip.on{border-color:var(--acc);background:var(--accbg);color:var(--acc)}
-.field{width:100%;background:var(--card);border:2px solid var(--line);border-radius:16px;padding:15px 16px;
- font-family:'Nunito',sans-serif;font-weight:700;font-size:17px;color:var(--ink);margin-top:12px}
+.btn-sm{min-height:46px;font-size:16px;border-radius:23px}
+.btnrow{display:flex;gap:9px}
+.btnrow .btn{flex:1}
+.txtbtn{display:block;width:100%;text-align:center;border:none;background:none;color:var(--acc);font-family:inherit;font-weight:800;font-size:16.5px;padding:11px;cursor:pointer}
+.field{width:100%;min-height:54px;margin-top:10px;border:2px solid var(--line);border-radius:16px;background:var(--card);padding:0 16px;font-family:inherit;font-size:19px;font-weight:700;color:var(--ink)}
 .field:focus{outline:none;border-color:var(--acc)}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
-.gcard{background:var(--card);border:none;border-radius:16px;box-shadow:var(--sh);padding:14px 11px;
- cursor:pointer;font-family:inherit;font-weight:700;font-size:13px;line-height:1.3;color:var(--ink);
- min-height:96px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center}
-.gcard:active{transform:scale(.96)}
-.gcard.on{box-shadow:inset 0 0 0 2px var(--acc);background:var(--accbg)}
-.gcard-ic{font-size:26px;line-height:1}
-.dgwrap{margin-top:10px;background:var(--card);border-radius:20px;box-shadow:var(--sh);
- padding:10px;display:flex;flex-direction:column;align-items:center;gap:7px}
-.dgwrap canvas{border-radius:14px;touch-action:none;display:block;background:#C9B79A}
-.dgbar{font-size:12.5px;font-weight:800;color:var(--ink3);padding:2px 0 0}
-.dghint{font-size:11.5px;font-weight:700;color:var(--ink3);opacity:.8}
-.center{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:58vh;text-align:center;padding:18px 8px}
-.h1{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:24px;line-height:1.2;margin-bottom:12px}
-.lead{font-size:16px;line-height:1.6;color:var(--ink2);font-weight:600;white-space:pre-line}
-.layers{margin-top:12px}
-.layer{display:flex;align-items:center;gap:11px;background:var(--card);border-radius:14px;box-shadow:var(--sh);
- padding:11px 14px;margin-bottom:7px;animation:slide .4s ease both}
-@keyframes slide{from{opacity:0;transform:translateX(-22px)}to{opacity:1;transform:none}}
-.layer b{flex:1;font-size:14px;font-weight:800}
-.layer span{font-size:12.5px;font-weight:800;color:var(--acc)}
-.gen{position:fixed;inset:0;background:rgba(255,248,238,.96);z-index:30;display:flex;flex-direction:column;
- align-items:center;justify-content:center;padding:22px;gap:14px}
-.gst{display:flex;align-items:center;gap:11px;padding:8px 0;font-weight:700;font-size:14.5px;color:var(--ink3);opacity:.32;transition:opacity .3s}
-.gst.on{opacity:1;color:var(--ink)}.gst.done{opacity:.68;color:var(--ink2)}
-.gst-b{flex:none;width:26px;height:26px;border-radius:50%;background:#F0E5D6;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:var(--ink3)}
-.gst.on .gst-b{background:var(--accbg);color:var(--acc);animation:spin 1s linear infinite}
-.gst.done .gst-b{background:var(--acc);color:#fff;animation:none}
-@keyframes spin{to{transform:rotate(360deg)}}
-.genchips{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:320px;min-height:30px}
-.gchip{background:var(--accbg);border:1px solid var(--line);border-radius:8px;padding:4px 10px;
- font-size:12.5px;font-weight:800;color:var(--acc);animation:up .45s ease both}
-.toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);background:var(--ink);color:#fff;
- padding:12px 20px;border-radius:999px;font-weight:800;font-size:14px;z-index:60;animation:up .25s ease}
-@keyframes up{from{opacity:0;transform:translateY(11px)}to{opacity:1;transform:none}}
-@keyframes breathe{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.022)}}
-@keyframes sway{0%,100%{transform:rotate(-1.2deg)}50%{transform:rotate(1.2deg)}}
-.br{animation:breathe 3.2s ease-in-out infinite;transform-origin:50% 78%}
-.sw{animation:sway 5s ease-in-out infinite;transform-origin:50% 92%}
-@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.chip{min-height:44px;padding:0 16px;border-radius:22px;border:2px solid var(--line);background:var(--card);font-family:inherit;font-weight:800;font-size:16.5px;color:var(--ink2);cursor:pointer}
+.chip.on{border-color:var(--acc);background:var(--accbg);color:var(--acc)}
+.h1{font-family:'Unbounded','Nunito',sans-serif;font-weight:800;font-size:27px;line-height:1.15;color:var(--ink);margin-top:18px}
+.lead{margin-top:10px;font-size:17px;font-weight:600;color:var(--ink2);line-height:1.5}
+.hintbar{text-align:center;font-size:15px;font-weight:800;color:var(--ink3);padding:14px}
+.mini{font-size:14.5px;font-weight:700;color:var(--ink3);line-height:1.45}
+.note{font-size:15.5px;font-weight:700;color:var(--ink2);text-align:center;padding:10px 6px 2px;min-height:22px;line-height:1.4}
+
+/* ── ЦЕХ ── */
+.floor{margin-top:10px;background:#EAD9BF;border-radius:18px;box-shadow:var(--sh);padding:10px 10px 12px;position:relative;overflow:hidden;
+ background-image:repeating-linear-gradient(0deg,rgba(90,60,25,.05) 0 1px,transparent 1px 22px)}
+.floor-t{font-family:'Unbounded','Nunito',sans-serif;font-weight:800;font-size:16.5px;color:#3A2A18;letter-spacing:.02em;padding:2px 4px 6px;display:flex;align-items:baseline;gap:8px}
+.floor-t span{font-family:'Nunito',sans-serif;font-size:12.5px;font-weight:800;color:#6E5233;letter-spacing:.06em;text-transform:uppercase}
+.chaincv{display:block;width:100%;border-radius:12px;background:#F6ECDA;box-shadow:inset 0 0 0 1.5px rgba(90,60,25,.25)}
+.need{margin-top:10px;background:rgba(255,248,238,.96);border-radius:14px;padding:10px 11px 11px;box-shadow:0 2px 8px rgba(90,60,25,.18)}
+.need-t{font-size:13.5px;font-weight:800;color:var(--ink3);margin-bottom:8px;text-align:center}
+.need-t b{color:var(--acc)}
+.need-r{display:flex;flex-wrap:wrap;gap:5px}
+.nd{flex:1 1 30%;min-width:96px;display:grid;grid-template-columns:auto 1fr;gap:1px 6px;background:#F2E8D8;border-radius:10px;padding:6px 8px;opacity:.55;align-items:center}
+.nd.has{opacity:1;background:var(--okbg)}
+.nd-e{width:16px;height:16px;grid-row:span 2}
+.nd-n{font-size:12.5px;font-weight:800;color:var(--ink2);line-height:1.15}
+.nd-v{font-size:12px;font-weight:800;color:var(--acc);line-height:1.2;overflow-wrap:break-word}
+.nd:not(.has) .nd-v{color:var(--ink3)}
+.stations{display:flex;flex-direction:column;gap:9px;margin-top:10px}
+.st{position:relative;border:none;border-radius:16px;cursor:pointer;font-family:inherit;text-align:left;padding:11px 14px 11px 62px;display:flex;flex-direction:column;gap:1px;
+ background:linear-gradient(165deg,#FFF8EE,#F2E4CC);box-shadow:0 1px 0 rgba(43,33,24,.28),0 10px 18px -8px rgba(43,33,24,.4);animation:float 4.2s ease-in-out infinite}
+.st:nth-child(2){animation-duration:5.1s;animation-delay:.4s}
+.st:nth-child(3){animation-duration:3.7s;animation-delay:.9s}
+.st:nth-child(4){animation-duration:4.8s;animation-delay:.2s}
+.st:nth-child(5){animation-duration:4.4s;animation-delay:.6s}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-2.5px)}}
+.st:active{transform:scale(.985)}
+.st.done{filter:saturate(.5) brightness(.97);animation:none}
+.st.next{box-shadow:0 0 0 2.5px var(--acc),0 1px 0 rgba(43,33,24,.28),0 10px 18px -8px rgba(43,33,24,.4)}
+.st-num{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;background:var(--acc);color:#fff;font-family:'Unbounded','Nunito',sans-serif;font-weight:800;font-size:17px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 0 rgba(120,50,0,.35)}
+.st.done .st-num{background:var(--ok);box-shadow:0 2px 0 rgba(20,80,40,.35)}
+.st-n{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:15px;color:#2B2118}
+.st-s{font-size:14px;font-weight:700;color:#8A7A68}
+.st-gives{font-size:13.5px;font-weight:800;color:var(--acc);margin-top:1px}
+.st.done .st-gives{color:var(--ok)}
+.st-h{position:absolute;right:13px;top:11px;font-size:12px;font-weight:800;color:var(--ok);background:var(--okbg);padding:3px 9px;border-radius:999px}
+.st-h:empty{display:none}
+.st-badge{position:absolute;right:13px;bottom:10px;font-size:12px;font-weight:900;background:var(--acc);color:#fff;padding:3px 9px;border-radius:999px}
+.st.next{padding-bottom:30px}
+
+/* ── уровень ── */
+.pzgoal{background:var(--accbg);border-radius:14px;padding:10px 12px;margin-top:10px}
+.pzgoal-t{font-size:12.5px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:var(--acc)}
+.pzgoal-r{margin-top:4px;font-size:15px;font-weight:800;color:var(--ink)}
+.pz{margin-top:10px;background:var(--card);border-radius:18px;box-shadow:var(--sh);padding:12px}
+.pz canvas{display:block;max-width:100%;touch-action:none;border-radius:12px}
+.rowlbl{font-size:12.5px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin:10px 0 6px}
+
+/* глаз */
+.pixwrap{display:grid;grid-template-columns:1fr 92px;gap:10px;align-items:start}
+.numgrid{display:grid;grid-template-columns:repeat(10,1fr);gap:1px;font-family:ui-monospace,Menlo,monospace;font-size:8.5px;line-height:1;color:var(--ink3);background:#F6EEE2;border-radius:8px;padding:5px}
+.numgrid i{font-style:normal;text-align:center;aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:2px}
+.numgrid i.on{background:#2B2118;color:#FFF8EE}
+.feat{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px}
+.feat span{background:var(--accbg);color:var(--acc);border-radius:999px;padding:5px 11px;font-size:13px;font-weight:900}
+.pixbtns{display:flex;gap:8px;margin-top:10px}
+.pixbtns .btn{flex:1}
+
+/* ухо */
+.drum{position:relative;height:190px;border-radius:16px;background:radial-gradient(circle at 50% 42%,#F7E6C8,#D9BE94 70%);box-shadow:inset 0 0 0 3px rgba(90,60,25,.25);cursor:pointer;touch-action:none;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.drum-l{font-family:'Unbounded','Nunito',sans-serif;font-weight:800;font-size:15px;color:#6E5233;pointer-events:none;text-align:center;line-height:1.3}
+.rip{position:absolute;width:40px;height:40px;border-radius:50%;border:3px solid var(--acc);transform:translate(-50%,-50%) scale(.3);opacity:.9;animation:rip .55s ease-out forwards;pointer-events:none}
+@keyframes rip{to{transform:translate(-50%,-50%) scale(4.2);opacity:0}}
+.bars{display:flex;align-items:flex-end;gap:4px;height:64px;margin-top:10px;padding:0 4px}
+.bars i{flex:1;background:var(--acc);border-radius:4px 4px 0 0;min-height:4px;opacity:.85}
+
+/* память — карточки */
+.stack{position:relative;height:250px;margin-top:4px}
+.card{position:absolute;left:50%;top:0;width:200px;margin-left:-100px;background:var(--card);border-radius:18px;box-shadow:0 6px 18px rgba(90,50,10,.22);padding:12px;touch-action:none;cursor:grab;transition:transform .18s ease,opacity .18s ease}
+.card.back{transform:scale(.94) translateY(12px);opacity:.6}
+.card.back2{transform:scale(.88) translateY(24px);opacity:.3}
+.card.fly{transition:transform .32s cubic-bezier(.3,.7,.4,1),opacity .32s}
+.card canvas{display:block;width:100%;height:auto;border-radius:10px}
+.card-n{margin-top:8px;text-align:center;font-size:13px;font-weight:800;color:var(--ink3)}
+.card-tag{position:absolute;top:14px;padding:5px 11px;border-radius:999px;font-family:'Unbounded',sans-serif;font-weight:800;font-size:13px;opacity:0;transition:opacity .12s}
+.card-tag.yes{right:12px;background:var(--okbg);color:var(--ok)}
+.card-tag.no{left:12px;background:#FDE4E4;color:var(--bad)}
+.bins{display:flex;justify-content:space-between;margin-top:8px;padding:0 4px}
+.bin{flex:1;text-align:center;border-radius:12px;padding:8px 4px;font-weight:900;font-size:14px}
+.bin.no{background:#FDE4E4;color:var(--bad);margin-right:6px}
+.bin.yes{background:var(--okbg);color:var(--ok);margin-left:6px}
+.bin b{display:block;font-family:'Unbounded',sans-serif;font-size:20px}
+
+/* решатель */
+.decwrap{display:grid;grid-template-columns:1fr;gap:8px}
+.dial{position:relative;width:176px;height:176px;margin:4px auto 0;border-radius:50%;background:radial-gradient(circle at 50% 40%,#FFF8EE,#E8D5B6);box-shadow:inset 0 0 0 4px rgba(90,60,25,.25),0 4px 12px rgba(90,50,10,.18);touch-action:none;cursor:grab}
+.dial-n{position:absolute;left:50%;top:50%;width:6px;height:78px;margin:-78px 0 0 -3px;background:var(--acc);border-radius:3px;transform-origin:50% 100%;pointer-events:none}
+.dial-c{position:absolute;left:50%;top:50%;width:22px;height:22px;margin:-11px;border-radius:50%;background:#3A2A18;pointer-events:none}
+.dial-l{position:absolute;bottom:14px;left:0;right:0;text-align:center;font-family:'Unbounded',sans-serif;font-weight:800;font-size:13px;color:#6E5233;pointer-events:none}
+.tally{display:flex;gap:6px;margin-top:6px}
+.tl{flex:1;border-radius:12px;padding:8px 6px;text-align:center;font-size:12.5px;font-weight:900;line-height:1.25}
+.tl b{display:block;font-family:'Unbounded',sans-serif;font-size:19px}
+.tl.ok{background:var(--okbg);color:var(--ok)}
+.tl.miss{background:#FFF1E4;color:#B8601A}
+.tl.fa{background:#FDE4E4;color:var(--bad)}
+
+/* рука и стул */
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.tool{width:70px;height:76px;border-radius:14px;background:#F6EEE2;box-shadow:inset 0 0 0 1.5px rgba(150,110,60,.28);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:grab;touch-action:none;font-size:12px;font-weight:800;color:var(--ink2)}
+.tool.on{box-shadow:inset 0 0 0 2.5px var(--acc);background:var(--accbg)}
+.tool.ghost{position:fixed;z-index:99;pointer-events:none;transform:translate(-50%,-50%) scale(1.15);opacity:.92}
+.tool svg{width:32px;height:32px;display:block;pointer-events:none}
+.handbox{margin-top:10px;height:92px;border-radius:14px;border:2px dashed rgba(150,110,60,.45);background:#FBF5EA;display:flex;align-items:center;justify-content:center;gap:12px;font-weight:800;color:var(--ink3);font-size:14px}
+.handbox.on{border-style:solid;border-color:var(--acc);background:var(--accbg);color:var(--ink)}
+.handbox svg{width:44px;height:44px}
+.charrow{display:flex;gap:8px;margin-top:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.charrow::-webkit-scrollbar{display:none}
+.sw{flex:none;width:44px;height:44px;border-radius:50%;border:3px solid transparent;cursor:pointer}
+.sw.on{border-color:var(--acc)}
+.charstage{display:grid;grid-template-columns:120px 1fr;gap:10px;align-items:start;margin-top:6px}
+.charpv{border-radius:14px;overflow:hidden;background:#F3EADC;aspect-ratio:3/4}
+.charpv svg{width:100%;height:100%;display:block}
+.chairs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+.chair{position:relative;border-radius:14px;background:#F6EEE2;box-shadow:inset 0 0 0 1.5px rgba(150,110,60,.28);padding:10px 4px 8px;text-align:center;font-size:12.5px;font-weight:800;color:var(--ink2);min-height:96px;display:flex;flex-direction:column;align-items:center;gap:4px;justify-content:flex-start}
+.chair svg{width:30px;height:30px;display:block}
+.chair.hot{box-shadow:inset 0 0 0 2.5px var(--acc);background:var(--accbg)}
+.chair.me{background:var(--okbg);box-shadow:inset 0 0 0 2.5px var(--ok)}
+.chair .seat{margin-top:auto;width:100%;height:22px;border-radius:6px 6px 2px 2px;background:#C9A26E;box-shadow:inset 0 -4px 0 rgba(90,50,10,.25)}
+.chair.me .seat{background:var(--ok)}
+.meDrag{position:fixed;z-index:99;pointer-events:none;width:64px;height:84px;transform:translate(-50%,-60%);filter:drop-shadow(0 6px 10px rgba(60,40,10,.35))}
+.meDrag svg{width:100%;height:100%;display:block}
+.mesrc{margin-top:10px;display:flex;align-items:center;gap:10px;background:var(--accbg);border-radius:14px;padding:8px 12px;touch-action:none;cursor:grab}
+.mesrc svg{width:48px;height:64px;display:block;flex:none}
+.mesrc span{font-weight:800;font-size:15px;color:var(--ink)}
+
+/* финал */
+.filmwrap{margin-top:10px;background:#2B2118;border-radius:18px;box-shadow:var(--sh);padding:10px;display:flex;flex-direction:column;gap:8px}
+.filmwrap canvas{width:100%;height:auto;display:block;border-radius:11px;background:#FFF8EE}
+.film-bar{width:100%;height:6px;border-radius:3px;background:rgba(255,248,238,.18);overflow:hidden}
+.film-bar i{display:block;height:6px;width:0;background:var(--acc);transition:width .12s linear}
+.film-st{font-size:13.5px;font-weight:800;color:#C4B4A2;text-align:center;min-height:16px}
+.passwrap{margin-top:10px;background:var(--card);border-radius:18px;box-shadow:var(--sh);padding:10px}
+.passwrap canvas{width:100%;height:auto;display:block;border-radius:12px}
+
+/* подсказка-рука */
+.demohand{position:absolute;left:50%;bottom:-4px;transform:translateX(-50%);z-index:40;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;transition:opacity .3s}
+.demohand.off{opacity:0}
+.dh-f{font-size:34px;filter:drop-shadow(0 4px 6px rgba(0,0,0,.3));animation:handtap 1.4s ease-in-out infinite}
+.dh-t{background:rgba(43,33,24,.9);color:#FFF8EE;font-size:13.5px;font-weight:800;padding:7px 12px;border-radius:12px;white-space:nowrap}
+@keyframes handtap{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-14px) scale(.92)}}
+.demohand.swipe .dh-f{animation:handswipe 1.6s ease-in-out infinite}
+@keyframes handswipe{0%,100%{transform:translateX(-30px)}50%{transform:translateX(30px)}}
+.demohand.turn .dh-f{animation:handturn 1.8s ease-in-out infinite}
+@keyframes handturn{0%,100%{transform:rotate(-30deg)}50%{transform:rotate(30deg)}}
+.pulse{animation:pulse 1.1s ease 2}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(230,92,0,0)}50%{box-shadow:0 0 0 7px rgba(230,92,0,.16)}}
+
+/* память — полки */
+.shelves{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.shelf{border-radius:14px;padding:8px 8px 10px;min-height:88px;background:#F6EEE2;box-shadow:inset 0 0 0 1.5px rgba(150,110,60,.28);transition:box-shadow .12s,background .12s}
+.shelf.yes{background:#EEF8F1}.shelf.no{background:#F1ECE4}
+.shelf.hot{box-shadow:inset 0 0 0 3px var(--acc);background:var(--accbg)}
+.shelf-t{display:flex;align-items:center;gap:6px;font-family:'Unbounded','Nunito',sans-serif;font-weight:800;font-size:13px;color:var(--ink2)}
+.shelf.no .shelf-t{color:var(--ink3)}
+.shelf-th canvas{display:block;border-radius:5px;border:1.5px solid var(--ink)}
+.shelf-r{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;min-height:30px}
+.shelf-r canvas{display:block;border-radius:4px;box-shadow:0 1px 0 rgba(90,50,10,.25)}
+.mini-chip{min-height:36px;padding:0 11px;font-size:13.5px}
+/* тумблер «А без тебя?» */
+.switchrow{display:flex;align-items:center;gap:10px;margin-top:10px;background:var(--card);border-radius:14px;padding:10px 12px;box-shadow:var(--sh)}
+.switch{position:relative;width:54px;height:30px;flex:none}
+.switch input{opacity:0;width:0;height:0;position:absolute}
+.switch span{position:absolute;inset:0;border-radius:15px;background:#D9BE94;transition:background .2s;cursor:pointer}
+.switch span::after{content:'';position:absolute;left:3px;top:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .2s}
+.switch input:checked+span{background:var(--bad)}
+.switch input:checked+span::after{transform:translateX(24px)}
+.switch-l{font-family:'Unbounded','Nunito',sans-serif;font-weight:800;font-size:14px;color:var(--ink)}
+.switch-c{margin-left:auto;font-size:13px;font-weight:800;color:var(--ink3);text-align:right}
 </style>
 </head>
 <body>
 <div class="root">
-  <div class="hdr">
-    <button class="hdr-back" id="back">‹</button>
-    <div class="hdr-t" id="htitle">Профессия будущего</div>
-    <div class="hdr-r"></div>
-  </div>
-  <div class="prog"><i id="pbar" style="width:0"></i></div>
+  <div class="hdr"><button class="hdr-back" id="back">‹</button><div class="hdr-t" id="htitle">Профессия будущего</div><div class="hdr-r" id="hright"></div></div>
+  <div class="prog"><i id="prog" style="width:0%"></i></div>
   <div class="body" id="body"></div>
   <div class="foot" id="foot"></div>
 </div>
-<div class="ovl" id="ovl"></div>
-<div class="sheet" id="sheet">
-  <div class="sheet-h"><div class="sheet-t" id="sheetT"></div><button class="sheet-x" id="sheetX">✕</button></div>
-  <div class="sheet-l" id="sheetL"></div>
-</div>
-
 <script>
-/* ═════════ ДАННЫЕ ═════════ */
-const PROBLEMS=[
- {id:'plastic',n:'пластика в океане больше, чем рыбы',kw:'океан',bg:'ocean'},
- {id:'air',n:'воздухом в городах трудно дышать',kw:'воздух',bg:'city'},
- {id:'fire',n:'леса горят каждое лето',kw:'лес',bg:'forest'},
- {id:'river',n:'реки стали мутными',kw:'река',bg:'river'},
- {id:'orbit',n:'вокруг Земли летает мусор',kw:'орбита',bg:'orbit'},
- {id:'food',n:'еды хватает не всем',kw:'поле',bg:'field'},
- {id:'house',n:'дома не держат тепло',kw:'дом',bg:'block'},
- {id:'animals',n:'животные уходят из своих мест',kw:'тундра',bg:'tundra'},
- {id:'talk',n:'люди перестали понимать друг друга',kw:'площадь',bg:'square'},
- {id:'dream',n:'дети разучились придумывать',kw:'школа',bg:'school'},
- {id:'trash',n:'вещи ломаются и их выбрасывают',kw:'свалка',bg:'dump'},
- {id:'late',n:'болезни замечают слишком поздно',kw:'больница',bg:'clinic'},
-];
-const ACTIONS=[
- {id:'clean',n:'чистит',inf:'чистить'},{id:'heal',n:'лечит',inf:'лечить'},
- {id:'guard',n:'охраняет',inf:'охранять'},{id:'grow',n:'выращивает',inf:'выращивать'},
- {id:'fix',n:'чинит',inf:'чинить'},{id:'find',n:'находит',inf:'находить'},
- {id:'teach',n:'учит',inf:'учить'},{id:'save',n:'спасает',inf:'спасать'},
- {id:'collect',n:'собирает',inf:'собирать'},{id:'link',n:'соединяет',inf:'соединять'},
-];
-const OBJECTS=[
- {id:'ocean',n:'океан',a:'океан',g:'океана',gok:1},{id:'air',n:'воздух',a:'воздух',g:'воздуха',gok:1},
- {id:'river',n:'река',a:'реку',g:'реки',gok:1},{id:'forest',n:'лес',a:'лес',g:'леса',gok:1},
- {id:'city',n:'город',a:'город',g:'города',gok:1},{id:'orbit',n:'орбита',a:'орбиту',g:'орбиты',gok:1},
- {id:'food',n:'еда',a:'еду',g:'еды',gok:1},{id:'house',n:'дом',a:'дом',g:'дома',gok:1},
- {id:'animals',n:'животные',a:'животных',g:'животных',gok:1},{id:'memory',n:'память',a:'память',g:'памяти',gok:0},
- {id:'weather',n:'погода',a:'погоду',g:'погоды',gok:1},{id:'ideas',n:'идеи',a:'идеи',g:'идей',gok:0},
- {id:'health',n:'здоровье',a:'здоровье',g:'здоровья',gok:0},{id:'roads',n:'дороги',a:'дороги',g:'дорог',gok:1},
-];
-/* конвейер: модальности должны сойтись на стыках */
-const INPUTS=[
- {id:'sat',n:'фото со спутников',ic:'🛰',mod:'👁',v:'просмотрела',cnt:'40 000 снимков'},
- {id:'snd',n:'записи звуков природы',ic:'🎧',mod:'👂',v:'прослушала',cnt:'8 часов записи'},
- {id:'sens',n:'показания датчиков',ic:'📟',mod:'#️⃣',v:'обработала',cnt:'12 миллионов чисел'},
- {id:'notes',n:'записи наблюдателей',ic:'📓',mod:'📄',v:'прочитала',cnt:'3 000 записей'},
- {id:'cam',n:'снимки с камер',ic:'📷',mod:'👁',v:'просмотрела',cnt:'90 000 кадров'},
- {id:'moves',n:'следы и маршруты',ic:'🐾',mod:'➡️',v:'разобрала',cnt:'700 маршрутов'},
-];
-const MODELS=[
- {id:'see',n:'узнаёт, что на картинке',ic:'🔍',takes:'👁',emits:'📄',past:'узнала',emitsName:'описание'},
- {id:'hear',n:'различает звуки',ic:'👂',takes:'👂',emits:'📄',past:'разобрала',emitsName:'описание'},
- {id:'draw',n:'придумывает новое по образцу',ic:'🎨',takes:'👁',emits:'👁',past:'нарисовала',emitsName:'картинку'},
- {id:'pred',n:'предсказывает, что будет',ic:'📈',takes:'#️⃣',emits:'📄',past:'посчитала',emitsName:'предупреждение'},
- {id:'sum',n:'коротко пересказывает',ic:'📝',takes:'📄',emits:'📄',past:'пересказала',emitsName:'пересказ'},
- {id:'route',n:'строит маршрут',ic:'🧭',takes:'➡️',emits:'➡️',past:'проложила',emitsName:'маршрут'},
-];
-const OUTPUTS=[
- {id:'map',n:'карта опасных мест',ic:'🗺',mod:'👁'},
- {id:'warn',n:'предупреждение за час до беды',ic:'⚠️',mod:'📄'},
- {id:'route',n:'маршрут для робота',ic:'🛣',mod:'➡️'},
- {id:'report',n:'короткий отчёт для людей',ic:'📋',mod:'📄'},
- {id:'pic',n:'картинка, как станет потом',ic:'🖼',mod:'👁'},
-];
-const DEEDS=[
- {ic:'🖼',t:o=>o&&o.gok?`Просмотреть 10 000 снимков ${o.g}`:'Просмотреть 10 000 снимков за одну ночь'},
- {ic:'🤔',t:()=>'Решить, что чинить первым'},
- {ic:'🌙',t:()=>'Считать всю ночь и не устать'},
- {ic:'👀',t:()=>'Заметить, что робот ошибся'},
- {ic:'🔁',t:()=>'Повторить одно и то же тысячу раз'},
- {ic:'💡',t:()=>'Придумать, зачем это вообще нужно'},
-];
-const SKIN=['#F3D3B8','#E8BC98','#C99168','#A5703F','#7B4F2C','#5A3A20'];
-const HAIR=[
- {id:'short',n:'короткие'},{id:'bob',n:'каре'},{id:'long',n:'длинные'},{id:'buns',n:'пучки'},
- {id:'curly',n:'кудри'},{id:'tail',n:'хвост'},{id:'mohawk',n:'ирокез'},{id:'bald',n:'без волос'},
-];
-const HAIRC=['#2B2118','#6B4A2F','#C4873A','#E8C33C','#B03A3A','#4A6BC4','#9A57C4','#E8E4DC'];
-const FACES=[
- {id:'calm',n:'спокойное'},{id:'smile',n:'улыбка'},{id:'serious',n:'серьёзное'},
- {id:'happy',n:'радостное'},{id:'focus',n:'сосредоточенное'},{id:'kind',n:'доброе'},
-];
-const WEAR=[
- {id:'suit',n:'гидрокостюм с лампами',c:'#2E6B8A'},{id:'coat',n:'белый халат',c:'#F2F2F5'},
- {id:'space',n:'скафандр',c:'#DCE2EC'},{id:'field',n:'полевая куртка',c:'#6B7A4A'},
- {id:'rescue',n:'спасательный жилет',c:'#E8562C'},{id:'work',n:'рабочий комбинезон',c:'#D9A32C'},
- {id:'eco',n:'куртка из переработки',c:'#4A8C6B'},{id:'warm',n:'тёплый костюм',c:'#8A5FC4'},
- {id:'light',n:'лёгкая форма',c:'#5FA8D9'},{id:'armor',n:'защитный панцирь',c:'#5C6470'},
-];
-const TOOLS=[
- {id:'net',n:'сеть-магнит',ic:'🧲'},{id:'scan',n:'сканер',ic:'📡'},{id:'seed',n:'сеялка',ic:'🌱'},
- {id:'key',n:'умный ключ',ic:'🔧'},{id:'lamp',n:'фонарь-маяк',ic:'🔦'},{id:'tab',n:'планшет',ic:'📱'},
- {id:'brush',n:'кисть-очиститель',ic:'🖌'},{id:'pump',n:'насос',ic:'⚙️'},{id:'seedbag',n:'мешок семян',ic:'🎒'},
- {id:'med',n:'аптечка',ic:'💊'},{id:'cam',n:'камера',ic:'📷'},{id:'ax',n:'резак',ic:'🪓'},
-];
-const HEADS=[
- {id:'visor',n:'визор-компас'},{id:'helm',n:'шлем'},{id:'cap',n:'кепка'},{id:'lamp',n:'налобный фонарь'},
- {id:'mask',n:'маска-фильтр'},{id:'hood',n:'капюшон'},{id:'none',n:'ничего'},{id:'band',n:'повязка'},
-];
-const PALS=[
- {id:'drone',n:'дрон-стрекоза',ic:'🚁'},{id:'bot',n:'робот-помощник',ic:'🤖'},{id:'dog',n:'пёс-разведчик',ic:'🐕'},
- {id:'bird',n:'птица-наблюдатель',ic:'🦅'},{id:'cat',n:'кот-инспектор',ic:'🐈'},{id:'fish',n:'рыба-зонд',ic:'🐟'},
- {id:'bee',n:'рой пчёл-датчиков',ic:'🐝'},{id:'turtle',n:'черепаха-платформа',ic:'🐢'},
-];
-const MORNING=[
- {ic:'🛰',n:'Смотрит, что прислали за ночь'},{ic:'☕',n:'Пьёт чай и думает'},
- {ic:'🚶',n:'Обходит участок пешком'},{ic:'📞',n:'Созванивается с командой'},
- {ic:'🔧',n:'Проверяет, всё ли цело'},{ic:'📓',n:'Читает вчерашние записи'},
-];
-const MAINDEED=[
- {ic:'🎯',n:'Находит то, что все пропустили'},{ic:'🛠',n:'Чинит то, что сломалось'},
- {ic:'🧪',n:'Пробует новый способ'},{ic:'👥',n:'Учит других, как надо'},
- {ic:'🚨',n:'Успевает раньше беды'},{ic:'🌍',n:'Делает место чуть лучше'},
-];
-const EVENING=[
- {ic:'📊',n:'Понятный отчёт для всех'},{ic:'🌱',n:'Место, где снова растёт'},
- {ic:'😌',n:'Спокойную ночь людям'},{ic:'🗺',n:'Карту, куда идти завтра'},
- {ic:'📖',n:'Историю, которую расскажут'},{ic:'🤝',n:'Одного нового помощника'},
-];
-const NAMES=['Кай','Лея','Тим','Ная','Рем','Ива','Ант','Юна','Дар','Мия','Лев','Ася',
-             'Ник','Эля','Гор','Вея','Сэм','Ния','Тэо','Ули','Ким','Ора','Ян','Ева'];
-const STARTERS=['Сегодня начнём с…','Опять эта…','Так, кто тут…','Ну что, поехали…','Мне нужен…','Никто, кроме нас…'];
-
-/* ═════════ СОСТОЯНИЕ ═════════ */
-const S={step:'s0',child:'',age:'',problem:null,action:null,object:null,
- seed:4821,hair:0,hairc:0,skin:2,face:0,wear:null,tool:null,head:null,pal:null,
- inp:null,mdl:null,out:null,goalOut:null,chainDone:0,chain:null,
- deed:0,robot:0,me:0,deeds:[],title:'',hero:'',line:'',dataGood:0,dataJunk:0,
- morning:null,main:null,evening:null,tab:'in',beltMode:'free',revealed:0};
-const STEPS=['s0','s1','met','gather','belt','goal','deeds','desk','look','gear','cmp','names','day','reveal','card','shake'];
-
-const $=id=>document.getElementById(id);
-const B=()=>$('body'), F=()=>$('foot');
+/* ═══════════════ ДАННЫЕ ═══════════════ */
 function rng(s){let x=s>>>0;return()=>{x=(x+0x6D2B79F5)>>>0;let t=x;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
 function pick(r,a){return a[Math.floor(r()*a.length)]}
 function rint(r,a,b){return a+Math.floor(r()*(b-a+1))}
 function cap(s){return s?s.charAt(0).toUpperCase()+s.slice(1):''}
-function toast(t){const e=document.createElement('div');e.className='toast';e.textContent=t;document.body.appendChild(e);setTimeout(()=>e.remove(),2100)}
+const $=id=>document.getElementById(id);
+const B=()=>$('body'), F=()=>$('foot');
+const INK='#3A2A18', W1='#F2E4CC', W2='#D9BE94', ACC1='#E08A3C', ACC2='#6E9E7A';
 
-/* ═════════ НЕЙРО ═════════ */
-function svgNeuro(size,mood,open){
-  const s=size||50,m=mood||'idle';
-  const eye={idle:'#4FD1C5',think:'#FFC94D',happy:'#7BE495',oops:'#FF9A76'}[m]||'#4FD1C5';
-  const tilt={idle:0,think:-6,happy:3,oops:-3}[m]||0;
-  const lid={idle:0,think:2.4,happy:1.6,oops:0}[m]||0;
-  return `<svg viewBox="0 0 64 64" width="${s}" height="${s}" style="display:block;overflow:visible">
-   <ellipse cx="32" cy="59" rx="15" ry="3" fill="rgba(120,72,28,.16)"/>
-   <g transform="rotate(${tilt} 32 34)">
-     <line x1="32" y1="12" x2="32" y2="19" stroke="#C9B49B" stroke-width="2.4" stroke-linecap="round"/>
-     <circle cx="32" cy="9.5" r="3.4" fill="${eye}"/><circle cx="32" cy="9.5" r="6.5" fill="${eye}" opacity=".22"/>
-     <path d="M14 30 q18 -20 36 0 z" fill="#E4DCCF"${open?' transform="rotate(-26 14 30)"':''}/>
-     <rect x="13" y="28" width="38" height="30" rx="13" fill="#F2ECE1" stroke="#D8CDBB" stroke-width="1.4"/>
-     <rect x="18" y="34" width="28" height="15" rx="7.5" fill="#2B2118"/>
-     <ellipse cx="25.5" cy="${41.5+lid}" rx="3.4" ry="${3.4-lid*.7}" fill="${eye}"/>
-     <ellipse cx="38.5" cy="${41.5+lid}" rx="3.4" ry="${3.4-lid*.7}" fill="${eye}"/>
-     <circle cx="24.3" cy="${40.3+lid}" r="1.05" fill="#fff" opacity=".9"/>
-     <circle cx="37.3" cy="${40.3+lid}" r="1.05" fill="#fff" opacity=".9"/>
-     ${m==='happy'?'<path d="M27 53 q5 4 10 0" stroke="#C9B49B" stroke-width="1.8" fill="none" stroke-linecap="round"/>':''}
-     ${m==='oops'?'<path d="M28 54 q4 -3 8 0" stroke="#C9B49B" stroke-width="1.8" fill="none" stroke-linecap="round"/>':''}
-     <rect x="8" y="38" width="5" height="12" rx="2.5" fill="#DCD2C2"/>
-     <rect x="51" y="38" width="5" height="12" rx="2.5" fill="#DCD2C2"/>
-   </g></svg>`;
-}
-function say(t,mood,open){return `<div class="say"><div class="say-av">${svgNeuro(50,mood,open)}</div><div class="say-b">${t}</div></div>`}
-
-/* ═════════ ФОН ЛОКАЦИИ ═════════ */
-const BGS={
- ocean:{sky:['#7EC8E3','#3E8CB0'],ground:'#2E6B8A',bits:'wave'},
- city:{sky:['#C4B79A','#8A7F6B'],ground:'#6B6455',bits:'tower'},
- forest:{sky:['#A8C48A','#6B8C52'],ground:'#4A5C34',bits:'tree'},
- river:{sky:['#9ECBD9','#5B93A8'],ground:'#4A7A8A',bits:'wave'},
- orbit:{sky:['#1E2444','#0C1024'],ground:'#2A3050',bits:'star'},
- field:{sky:['#F0D9A0','#D9B366'],ground:'#B08A4A',bits:'crop'},
- block:{sky:['#C8D4E0','#94A4B8'],ground:'#7A8494',bits:'tower'},
- tundra:{sky:['#D9E4EC','#A8BCCE'],ground:'#8A9AA8',bits:'rock'},
- square:{sky:['#E0CDB0','#B39A78'],ground:'#9A8468',bits:'tower'},
- school:{sky:['#E8DCC4','#C4B294'],ground:'#A89878',bits:'tower'},
- dump:{sky:['#C4B49A','#907F68'],ground:'#7A6A54',bits:'rock'},
- clinic:{sky:['#DCE8E4','#AEC4BE'],ground:'#94A8A2',bits:'tower'},
+/* смысл уровней: одна фраза до, реплики по событиям, одно «ага» после */
+const MEANING={
+ eye:    {n:1,title:'Что ИИ видит',       act:'Закрась клетки',
+          before:'Нарисуй то, что я буду искать. Я посмотрю. По-своему.',
+          dur:['Клетка закрашена — единица. Пустая — ноль. Больше я не вижу.','Для тебя — рисунок. Для меня — сто чисел. Оба правы.','Симметрично — я посчитал, а не понял. Зачем оно такое — не знаю.'],
+          aha:'Вот так и нейросеть: рисунок она не видит. Видит таблицу чисел и считает в ней признаки.'},
+ memory: {n:2,title:'На чём ИИ учится',   act:'Раскладывай по полкам',
+          before:'Я наделал кривых копий твоего рисунка и подмешал чужое. Разложи по полкам.',
+          dur:['Моё это или чужое — я не знаю. Знаю числа. Ответ — твой.','На полку кладу пару: рисунок и твой ответ. Одно без другого — мусор.','Ошибся ты — ошибусь и я. Твою ошибку я запомню как правду.','Двенадцать примеров. Мало. Большие нейросети учат на миллионах.'],
+          aha:'Вот так и нейросеть: её память — примеры с ответами. Ответы дали люди. Здесь — ты.'},
+ decider:{n:3,title:'Как ИИ решает',      act:'Крути диск',
+          before:'Едут новые. Каждую сравню с полками и скажу: моё или чужое. Где-то ошибусь.',
+          dur:['Беру рисунок. Ищу на полке самый похожий. Меряю, насколько похож.','Диск — черта. Похож сильнее черты — моё. Слабее — чужое.','Левее — пропущу чужое. Правее — не узнаю своё. Нуля нет.','Руками не переложить: тут решает черта. Где черта — решил ты.'],
+          aha:'Вот так и нейросеть: сравнивает с примерами и режет по черте. Где-то обязательно ошибётся.'},
+ hand:   {n:4,title:'Что делает рука',    act:'Покажи жест',
+          before:'Рука сделает дело. Покажи пальцем над рисунком, какое.',
+          dur:['Рука делает одно и то же. Быстро, одинаково, не устаёт. Зачем — не знает.'],
+          aha:'Вот так и нейросеть: делать умеет только то, что ей показали. Зачем — знаешь ты.'},
+ chair:  {n:5,title:'Кто решает',         act:'Посади себя в цепь',
+          before:'Собери себя. Потом сядь в цепь: спорное будет ждать тебя.',
+          dur:['Собери себя. Лицо, одежда, вещь в руке. Я так не умею.','Сел. Спорное ждёт тебя. Во мне ничего не изменилось.'],
+          aha:'Вот так и с любым ИИ: видит, помнит, считает. Решает человек. Где ему сидеть — выбрал ты.'},
+ run:    {n:6,title:'Как ИИ работает целиком', act:'Дёрни рычаг',
+          before:'Пять деталей на месте. Одна живая. Стукни темп и дёргай.',
+          dur:['Пошло. Темп — твой. Глаз считает, полки подсказывают, черта режет.','Спорная. Стоп. Тут сидишь ты. Твоё слово.','Без тебя цех тоже поедет. Только спорные некому остановить.'],
+          aha:'Вот так и нейросеть: длинная цепь тупых деталей. Ума внутри нет. Ум — там, где сидишь ты.'},
 };
+const OPENING='Это мой цех. Пока пустой: я ничего не вижу и не помню. Пять деталей — и я заработаю. Собирать будешь ты.';
+const STATIONS=[
+ {id:'eye',    n:'Глаз',     gives:'рисунок'},
+ {id:'memory', n:'Память',   gives:'примеры'},
+ {id:'decider',n:'Решатель', gives:'черту'},
+ {id:'hand',   n:'Рука',     gives:'дело'},
+ {id:'chair',  n:'Стул',     gives:'место человека'},
+];
+/* жест руки → глагол. Ребёнок может заменить своим словом */
+const GESTURES=[
+ {id:'clean', n:'чистит',   g:'brush',  how:'туда-сюда'},
+ {id:'fix',   n:'чинит',    g:'wrench', how:'тычками'},
+ {id:'find',  n:'находит',  g:'lens',   how:'обвёл кругом'},
+ {id:'carry', n:'переносит',g:'arrow',  how:'протянул далеко'},
+ {id:'heal',  n:'лечит',    g:'cross',  how:'долго держал'},
+];
+const NODEV={eye:'смотришь',memory:'запоминаешь',decider:'решаешь',hand:'делаешь'};
+const NODEN={eye:'Глаз',memory:'Память',decider:'Решатель',hand:'Рука'};
+const ROLE={eye:'Смотритель',memory:'Тренер',decider:'Диспетчер',hand:'Мастер'};
+const ASK={eye:['это оно','не оно'],memory:['помню','не помню'],decider:['моё','чужое'],hand:['делать','не делать']};
+const SKIN=['#F3D3B8','#E8BC98','#C99168','#A5703F','#7B4F2C','#5A3A20'];
+const HAIR=[{id:'short',n:'короткие'},{id:'bob',n:'каре'},{id:'long',n:'длинные'},{id:'buns',n:'пучки'},{id:'curly',n:'кудри'},{id:'tail',n:'хвост'},{id:'mohawk',n:'ирокез'},{id:'bald',n:'без волос'}];
+const HAIRC=['#2B2118','#6B4A2F','#C4873A','#E8C33C','#B03A3A','#4A6BC4','#9A57C4','#E8E4DC'];
+const FACES=[{id:'calm',n:'спокойное'},{id:'smile',n:'улыбка'},{id:'serious',n:'серьёзное'},{id:'happy',n:'радостное'},{id:'focus',n:'сосредоточенное'},{id:'kind',n:'доброе'}];
+const WEAR=[{id:'suit',n:'гидрокостюм',c:'#2E6B8A'},{id:'coat',n:'халат',c:'#F2F2F5'},{id:'space',n:'скафандр',c:'#DCE2EC'},{id:'field',n:'куртка',c:'#6B7A4A'},{id:'rescue',n:'жилет',c:'#E8562C'},{id:'work',n:'комбинезон',c:'#D9A32C'},{id:'eco',n:'эко-куртка',c:'#4A8C6B'},{id:'warm',n:'тёплый костюм',c:'#8A5FC4'}];
+const HEADS=[{id:'none',n:'ничего'},{id:'visor',n:'визор'},{id:'helm',n:'шлем'},{id:'cap',n:'кепка'},{id:'lamp',n:'фонарь'},{id:'hood',n:'капюшон'},{id:'band',n:'повязка'}];
+const NAMES=['Кай','Лея','Тим','Ная','Рем','Ива','Ант','Юна','Дар','Мия','Лев','Ася','Ник','Эля','Гор','Вея','Сэм','Ния','Тэо','Ули','Ким','Ора','Ян','Ева'];
+
+/* ═══════════════ НЕЙРО ═══════════════ */
+function svgNeuro(size,mood){
+  mood=mood||'idle';
+  const eyes={idle:'<circle cx="38" cy="46" r="4.2" fill="#2B2118"/><circle cx="62" cy="46" r="4.2" fill="#2B2118"/>',
+    think:'<circle cx="38" cy="47" r="4.2" fill="#2B2118"/><circle cx="62" cy="44" r="4.2" fill="#2B2118"/><path d="M30 36 l14 3 M70 34 l-14 5" stroke="#2B2118" stroke-width="2.2" stroke-linecap="round"/>',
+    happy:'<path d="M32 46 q6 -7 12 0" stroke="#2B2118" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M56 46 q6 -7 12 0" stroke="#2B2118" stroke-width="3" fill="none" stroke-linecap="round"/>',
+    oops:'<circle cx="38" cy="46" r="5.5" fill="#2B2118"/><circle cx="62" cy="46" r="5.5" fill="#2B2118"/><circle cx="36" cy="44" r="1.6" fill="#fff"/><circle cx="60" cy="44" r="1.6" fill="#fff"/>'}[mood];
+  const mouth={idle:'<path d="M42 62 q8 5 16 0" stroke="#2B2118" stroke-width="2.6" fill="none" stroke-linecap="round"/>',
+    think:'<path d="M43 63 h14" stroke="#2B2118" stroke-width="2.6" stroke-linecap="round"/>',
+    happy:'<path d="M40 60 q10 10 20 0" stroke="#2B2118" stroke-width="2.6" fill="none" stroke-linecap="round"/>',
+    oops:'<ellipse cx="50" cy="63" rx="5" ry="6" fill="#2B2118"/>'}[mood];
+  return `<svg viewBox="0 0 100 100" width="${size}" height="${size}"><ellipse cx="50" cy="94" rx="26" ry="4" fill="rgba(40,26,10,.14)"/><rect x="18" y="22" width="64" height="58" rx="22" fill="#F4F0E8" stroke="#2B2118" stroke-width="2.4"/><rect x="26" y="34" width="48" height="34" rx="14" fill="#2B2118"/><rect x="30" y="38" width="40" height="26" rx="11" fill="#3A3A44"/><g transform="translate(-4 -6)">${eyes}${mouth}</g><circle cx="50" cy="14" r="4" fill="${mood==='happy'?'#7FE3C0':mood==='oops'?'#E65C00':'#F2C337'}"/><path d="M50 18 v5" stroke="#2B2118" stroke-width="2.4"/><rect x="36" y="80" width="28" height="8" rx="4" fill="#2B2118"/></svg>`;
+}
+function say(t,mood){return `<div class="say"><div class="say-av">${svgNeuro(50,mood)}</div><div class="say-b">${t}</div></div>`}
+function setNote(t){const n=$('pznote'); if(n){n.textContent=t; n.animate([{opacity:0},{opacity:1}],{duration:220})}}
+
+/* ═══════════════ ПЕРСОНАЖ И ГЛИФЫ ═══════════════ */
+const BGS={forest:{sky:['#A8C48A','#6B8C52'],ground:'#4A5C34',bits:'tree'},city:{sky:['#C4B79A','#8A7F6B'],ground:'#6B6455',bits:'tower'},field:{sky:['#F0D9A0','#D9B366'],ground:'#B08A4A',bits:'crop'}};
 function svgBG(bgId,seed){
   const B1=BGS[bgId]||BGS.forest, r=rng(seed*17+3);
-  let o=`<defs><linearGradient id="sk${seed}" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0" stop-color="${B1.sky[0]}"/><stop offset="1" stop-color="${B1.sky[1]}"/></linearGradient></defs>
-    <rect width="300" height="400" fill="url(#sk${seed})"/>`;
-  if(B1.bits==='star')for(let i=0;i<40;i++)o+=`<circle cx="${rint(r,0,300)}" cy="${rint(r,0,300)}" r="${(r()*1.3+.4).toFixed(1)}" fill="#fff" opacity="${(r()*.7+.3).toFixed(2)}"/>`;
-  if(B1.bits==='tree')for(let i=0;i<7;i++){const x=rint(r,-10,300),h=rint(r,70,130),t=300-h;
-    o+=`<rect x="${x-3}" y="${t+12}" width="6" height="${h}" fill="#4A3826" opacity=".75"/>`;
-    for(let k=0;k<3;k++)o+=`<path d="M${x} ${t+k*h*.26} l${22-k*4} ${h*.3} h-${(22-k*4)*2}z" fill="${k%2?'#3E5A3A':'#4A6B42'}" opacity=".8"/>`}
-  if(B1.bits==='tower')for(let i=0;i<8;i++){const x=i*38-6,h=rint(r,60,150);
-    o+=`<rect x="${x}" y="${300-h}" width="32" height="${h}" fill="#000" opacity="${(.1+i*.02).toFixed(2)}"/>`;
-    for(let w=0;w<5;w++)if(r()>.5)o+=`<rect x="${x+5+(w%2)*14}" y="${308-h+Math.floor(w/2)*22}" width="8" height="10" fill="#FFD98C" opacity=".5"/>`}
-  if(B1.bits==='wave')for(let i=0;i<10;i++)o+=`<path d="M${rint(r,-20,280)} ${rint(r,120,290)} q18 -8 36 0" stroke="#fff" stroke-width="2" fill="none" opacity=".22"/>`;
+  let o=`<defs><linearGradient id="sk${seed}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${B1.sky[0]}"/><stop offset="1" stop-color="${B1.sky[1]}"/></linearGradient></defs><rect width="300" height="400" fill="url(#sk${seed})"/>`;
+  if(B1.bits==='tree')for(let i=0;i<7;i++){const x=rint(r,-10,300),h=rint(r,70,130),t=300-h;o+=`<rect x="${x-3}" y="${t+12}" width="6" height="${h}" fill="#4A3826" opacity=".75"/>`;for(let k=0;k<3;k++)o+=`<path d="M${x} ${t+k*h*.26} l${22-k*4} ${h*.3} h-${(22-k*4)*2}z" fill="${k%2?'#3E5A3A':'#4A6B42'}" opacity=".8"/>`}
+  if(B1.bits==='tower')for(let i=0;i<8;i++){const x=i*38-6,h=rint(r,60,150);o+=`<rect x="${x}" y="${300-h}" width="32" height="${h}" fill="#000" opacity="${(.1+i*.02).toFixed(2)}"/>`}
   if(B1.bits==='crop')for(let i=0;i<16;i++){const x=rint(r,0,300);o+=`<path d="M${x} 300 v-${rint(r,16,30)}" stroke="#8A6B34" stroke-width="2.4" opacity=".55"/>`}
-  if(B1.bits==='rock')for(let i=0;i<7;i++)o+=`<ellipse cx="${rint(r,0,300)}" cy="${rint(r,250,300)}" rx="${rint(r,16,34)}" ry="${rint(r,8,15)}" fill="#000" opacity=".13"/>`;
-  o+=`<rect y="300" width="300" height="100" fill="${B1.ground}"/>`;
-  o+=`<rect y="300" width="300" height="100" fill="#000" opacity=".07"/>`;
+  o+=`<rect y="300" width="300" height="100" fill="${B1.ground}"/><rect y="300" width="300" height="100" fill="#000" opacity=".07"/>`;
   return o;
 }
-
-/* ═════════ ПЕРСОНАЖ ═════════ */
+function toolGlyph(g,size){
+  const s=size||32;
+  const inner={
+    brush:`<rect x="17" y="6" width="6" height="16" rx="3" fill="${INK}"/><path d="M11 22 h18 l-2 10 q-7 4 -14 0z" fill="${ACC1}" stroke="${INK}" stroke-width="2"/>`,
+    cross:`<rect x="16" y="7" width="8" height="26" rx="2" fill="${ACC1}" stroke="${INK}" stroke-width="2"/><rect x="7" y="16" width="26" height="8" rx="2" fill="${ACC1}" stroke="${INK}" stroke-width="2"/>`,
+    lens:`<circle cx="17" cy="17" r="9" fill="${W1}" stroke="${INK}" stroke-width="2.6"/><path d="M24 24 l9 9" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>`,
+    wrench:`<path d="M9 31 l12 -12" stroke="${INK}" stroke-width="5" stroke-linecap="round"/><path d="M22 8 a7 7 0 1 1 10 10 l-4 -1 -5 -5z" fill="${ACC1}" stroke="${INK}" stroke-width="2"/>`,
+    arrow:`<path d="M7 20 h22" stroke="${INK}" stroke-width="4" stroke-linecap="round"/><path d="M22 11 l10 9 -10 9" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`,
+    eye:`<path d="M6 20 q14 -16 28 0 q-14 16 -28 0z" fill="${W1}" stroke="${INK}" stroke-width="2.4"/><circle cx="20" cy="20" r="5" fill="${INK}"/>`,
+    memory:`<rect x="7" y="9" width="26" height="22" rx="4" fill="${W1}" stroke="${INK}" stroke-width="2.4"/><path d="M7 20 h26 M20 9 v22" stroke="${INK}" stroke-width="2"/>`,
+    decider:`<circle cx="20" cy="22" r="13" fill="${W1}" stroke="${INK}" stroke-width="2.4"/><path d="M20 22 l7 -8" stroke="${ACC1}" stroke-width="3.5" stroke-linecap="round"/><circle cx="20" cy="22" r="2.5" fill="${INK}"/>`,
+    hand:`<path d="M12 34 v-14 q0 -4 4 -4 v-6 q0 -3 3 -3 q3 0 3 3 v6 q0 -3 3 -3 q3 0 3 3 v3 q0 -3 3 -3 q3 0 3 3 v13 q0 4 -4 4 h-14 q-4 0 -4 -4z" fill="${W1}" stroke="${INK}" stroke-width="2.2" stroke-linejoin="round"/>`,
+    chair:`<rect x="10" y="8" width="20" height="14" rx="4" fill="${W2}" stroke="${INK}" stroke-width="2.2"/><rect x="8" y="22" width="24" height="6" rx="3" fill="${ACC1}" stroke="${INK}" stroke-width="2"/><path d="M12 28 v6 M28 28 v6" stroke="${INK}" stroke-width="2.4" stroke-linecap="round"/>`,
+  }[g]||'';
+  return `<svg viewBox="0 0 40 40" width="${s}" height="${s}" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`;
+}
 function svgPerson(o){
   o=o||{};
-  const gray=o.gray;
-  const sk=gray?'#B4B4B4':SKIN[S.skin];
-  const wear=gray?null:(o.wear||S.wear);
-  const wc=gray?'#9A9A9A':(wear?wear.c:'#B9AFA0');
-  const hair=gray?null:HAIR[S.hair];
-  const hc=HAIRC[S.hairc];
-  const face=gray?null:FACES[S.face];
+  const sk=SKIN[S.skin], wear=WEAR[S.wear], wc=wear?wear.c:'#B9AFA0';
+  const hair=HAIR[S.hair], hc=HAIRC[S.hairc], face=FACES[S.face], hd=HEADS[S.head];
   let g='';
-  // ноги
-  g+=`<rect x="130" y="300" width="16" height="62" rx="7" fill="${gray?'#8A8A8A':'#3A3A44'}"/>`;
-  g+=`<rect x="154" y="300" width="16" height="62" rx="7" fill="${gray?'#8A8A8A':'#3A3A44'}"/>`;
-  g+=`<ellipse cx="138" cy="366" rx="13" ry="6" fill="${gray?'#6E6E6E':'#2B2118'}"/>`;
-  g+=`<ellipse cx="162" cy="366" rx="13" ry="6" fill="${gray?'#6E6E6E':'#2B2118'}"/>`;
-  // корпус
-  g+=`<g class="br"><path d="M150 196 q38 0 40 40 l4 70 q0 12 -44 12 q-44 0 -44 -12 l4 -70 q2 -40 40 -40z" fill="${wc}"/>`;
+  g+=`<rect x="130" y="300" width="16" height="62" rx="7" fill="#3A3A44"/><rect x="154" y="300" width="16" height="62" rx="7" fill="#3A3A44"/><ellipse cx="138" cy="366" rx="13" ry="6" fill="#2B2118"/><ellipse cx="162" cy="366" rx="13" ry="6" fill="#2B2118"/>`;
+  g+=`<path d="M150 196 q38 0 40 40 l4 70 q0 12 -44 12 q-44 0 -44 -12 l4 -70 q2 -40 40 -40z" fill="${wc}"/>`;
   if(wear&&wear.id==='suit')g+=`<circle cx="132" cy="250" r="5" fill="#FFE47A"/><circle cx="168" cy="250" r="5" fill="#FFE47A"/>`;
   if(wear&&wear.id==='rescue')g+=`<rect x="112" y="236" width="76" height="12" fill="#fff" opacity=".8"/>`;
   if(wear&&wear.id==='space')g+=`<circle cx="150" cy="248" r="18" fill="#8FA8C4" opacity=".55"/>`;
-  g+=`</g>`;
-  // руки
-  g+=`<rect x="98" y="206" width="15" height="72" rx="7.5" fill="${wc}"/>`;
-  g+=`<rect x="187" y="206" width="15" height="72" rx="7.5" fill="${wc}"/>`;
-  g+=`<circle cx="105" cy="282" r="9" fill="${sk}"/><circle cx="194" cy="282" r="9" fill="${sk}"/>`;
-  // голова
-  g+=`<rect x="142" y="176" width="16" height="24" fill="${sk}"/>`;
-  g+=`<ellipse cx="150" cy="152" rx="36" ry="40" fill="${sk}"/>`;
-  // причёска
+  g+=`<rect x="98" y="206" width="15" height="72" rx="7.5" fill="${wc}"/><rect x="187" y="206" width="15" height="72" rx="7.5" fill="${wc}"/><circle cx="105" cy="282" r="9" fill="${sk}"/><circle cx="194" cy="282" r="9" fill="${sk}"/>`;
+  g+=`<rect x="142" y="176" width="16" height="24" fill="${sk}"/><ellipse cx="150" cy="152" rx="36" ry="40" fill="${sk}"/>`;
   if(hair&&hair.id!=='bald'){
     if(hair.id==='short')g+=`<path d="M116 138 q0 -42 34 -42 q34 0 34 42 q-8 -20 -34 -20 q-26 0 -34 20z" fill="${hc}"/>`;
     if(hair.id==='bob')g+=`<path d="M114 146 q0 -48 36 -48 q36 0 36 48 q-8 -6 -13 -4 l0 -18 q-23 7 -46 0 l0 18 q-5 -2 -13 4z" fill="${hc}"/>`;
     if(hair.id==='long')g+=`<path d="M114 142 q0 -44 36 -44 q36 0 36 44 l6 72 q-13 6 -17 -4 l-4 -62 q-21 7 -42 0 l-4 62 q-4 10 -17 4z" fill="${hc}"/>`;
-    if(hair.id==='buns'){g+=`<path d="M116 138 q0 -42 34 -42 q34 0 34 42 q-8 -20 -34 -20 q-26 0 -34 20z" fill="${hc}"/>`;
-      g+=`<circle cx="114" cy="118" r="13" fill="${hc}"/><circle cx="186" cy="118" r="13" fill="${hc}"/>`}
-    if(hair.id==='curly'){g+=`<path d="M116 140 q0 -44 34 -44 q34 0 34 44z" fill="${hc}"/>`;
-      for(let i=0;i<7;i++)g+=`<circle cx="${116+i*11}" cy="${106+(i%2)*6}" r="11" fill="${hc}"/>`}
-    if(hair.id==='tail'){g+=`<path d="M116 138 q0 -42 34 -42 q34 0 34 42 q-8 -20 -34 -20 q-26 0 -34 20z" fill="${hc}"/>`;
-      g+=`<path d="M184 134 q25 10 19 50 q-4 13 -13 6 q6 -32 -12 -48z" fill="${hc}"/>`}
+    if(hair.id==='buns'){g+=`<path d="M116 138 q0 -42 34 -42 q34 0 34 42 q-8 -20 -34 -20 q-26 0 -34 20z" fill="${hc}"/><circle cx="114" cy="118" r="13" fill="${hc}"/><circle cx="186" cy="118" r="13" fill="${hc}"/>`}
+    if(hair.id==='curly'){g+=`<path d="M116 140 q0 -44 34 -44 q34 0 34 44z" fill="${hc}"/>`;for(let i=0;i<7;i++)g+=`<circle cx="${116+i*11}" cy="${106+(i%2)*6}" r="11" fill="${hc}"/>`}
+    if(hair.id==='tail'){g+=`<path d="M116 138 q0 -42 34 -42 q34 0 34 42 q-8 -20 -34 -20 q-26 0 -34 20z" fill="${hc}"/><path d="M184 134 q25 10 19 50 q-4 13 -13 6 q6 -32 -12 -48z" fill="${hc}"/>`}
     if(hair.id==='mohawk')g+=`<path d="M139 114 q11 -40 22 0 q-11 -11 -22 0z" fill="${hc}"/><path d="M116 140 q4 -28 34 -28 q30 0 34 28 q-13 -13 -34 -13 q-21 0 -34 13z" fill="${hc}"/>`;
   }
-  // лицо
-  if(face){
-    const ey=152, ex=13;
-    const closed=face.id==='happy';
-    if(closed){g+=`<path d="M${150-ex-7} ${ey} q7 -7 14 0" stroke="#2B2118" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <path d="M${150+ex-7} ${ey} q7 -7 14 0" stroke="#2B2118" stroke-width="2.6" fill="none" stroke-linecap="round"/>`}
-    else{g+=`<ellipse cx="${150-ex}" cy="${ey}" rx="5.4" ry="6" fill="#fff"/><ellipse cx="${150+ex}" cy="${ey}" rx="5.4" ry="6" fill="#fff"/>
-      <circle cx="${150-ex}" cy="${ey+1}" r="3" fill="#2B2118"/><circle cx="${150+ex}" cy="${ey+1}" r="3" fill="#2B2118"/>
-      <circle cx="${150-ex-1}" cy="${ey-1}" r="1.1" fill="#fff"/><circle cx="${150+ex-1}" cy="${ey-1}" r="1.1" fill="#fff"/>`}
-    const M={calm:'M142 172 q8 4 16 0',smile:'M140 170 q10 9 20 0',serious:'M141 173 h18',
-      happy:'M138 168 q12 12 24 0',focus:'M143 173 q7 -3 14 0',kind:'M141 170 q9 7 18 0'}[face.id];
+  if(face){const ey=152,ex=13;
+    if(face.id==='happy')g+=`<path d="M${150-ex-7} ${ey} q7 -7 14 0" stroke="#2B2118" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M${150+ex-7} ${ey} q7 -7 14 0" stroke="#2B2118" stroke-width="2.6" fill="none" stroke-linecap="round"/>`;
+    else g+=`<ellipse cx="${150-ex}" cy="${ey}" rx="5.4" ry="6" fill="#fff"/><ellipse cx="${150+ex}" cy="${ey}" rx="5.4" ry="6" fill="#fff"/><circle cx="${150-ex}" cy="${ey+1}" r="3" fill="#2B2118"/><circle cx="${150+ex}" cy="${ey+1}" r="3" fill="#2B2118"/>`;
+    const M={calm:'M142 172 q8 4 16 0',smile:'M140 170 q10 9 20 0',serious:'M141 173 h18',happy:'M138 168 q12 12 24 0',focus:'M143 173 q7 -3 14 0',kind:'M141 170 q9 7 18 0'}[face.id];
     g+=`<path d="${M}" stroke="#2B2118" stroke-width="2.6" fill="none" stroke-linecap="round"/>`;
-    if(face.id==='serious'||face.id==='focus')
-      g+=`<path d="M${150-ex-8} ${ey-11} l15 3 M${150+ex+8} ${ey-11} l-15 3" stroke="#2B2118" stroke-width="2.2" stroke-linecap="round"/>`;
+    if(face.id==='serious'||face.id==='focus')g+=`<path d="M${150-ex-8} ${ey-11} l15 3 M${150+ex+8} ${ey-11} l-15 3" stroke="#2B2118" stroke-width="2.2" stroke-linecap="round"/>`;
   }
-  // головной убор
-  const hd=gray?null:(o.head||S.head);
   if(hd&&hd.id!=='none'){
     if(hd.id==='visor')g+=`<rect x="112" y="140" width="76" height="15" rx="7" fill="#2E3A4A" opacity=".9"/><rect x="118" y="143" width="30" height="9" rx="4" fill="#7FE3C0" opacity=".8"/>`;
     if(hd.id==='helm')g+=`<path d="M110 152 q0 -48 40 -48 q40 0 40 48 z" fill="#DCE2EC"/><rect x="112" y="146" width="76" height="10" rx="5" fill="#9AA8BC"/>`;
-    if(hd.id==='cap'){g+=`<path d="M114 136 q0 -32 36 -32 q36 0 36 32z" fill="#4A6BC4"/><rect x="112" y="132" width="80" height="8" rx="4" fill="#3A559E"/>`}
-    if(hd.id==='lamp'){g+=`<rect x="114" y="132" width="72" height="11" rx="5" fill="#4A4A55"/><circle cx="150" cy="137" r="8" fill="#FFE47A"/>`}
-    if(hd.id==='mask')g+=`<rect x="130" y="166" width="40" height="19" rx="9" fill="#DCE4EC" opacity=".78"/><circle cx="150" cy="175" r="5.5" fill="#9AA8BC"/>`;
+    if(hd.id==='cap')g+=`<path d="M114 136 q0 -32 36 -32 q36 0 36 32z" fill="#4A6BC4"/><rect x="112" y="132" width="80" height="8" rx="4" fill="#3A559E"/>`;
+    if(hd.id==='lamp')g+=`<rect x="114" y="132" width="72" height="11" rx="5" fill="#4A4A55"/><circle cx="150" cy="137" r="8" fill="#FFE47A"/>`;
     if(hd.id==='hood')g+=`<path d="M110 146 q0 -52 40 -52 q40 0 40 52 q-10 -18 -40 -18 q-30 0 -40 18z" fill="#5C6470"/>`;
     if(hd.id==='band')g+=`<rect x="112" y="138" width="76" height="9" rx="4" fill="#D14545"/>`;
   }
-  // инструмент в руке
-  const tl=gray?null:(o.tool||S.tool);
-  if(tl)g+=`<g transform="translate(194 286)"><circle r="17" fill="#fff" opacity=".85"/>
-    <text x="0" y="1" text-anchor="middle" dominant-baseline="middle" font-size="21">${tl.ic}</text></g>`;
-  // спутник
-  const pl=gray?null:(o.pal||S.pal);
-  if(pl)g+=`<g transform="translate(66 300)"><circle r="20" fill="#fff" opacity=".7"/>
-    <text x="0" y="1" text-anchor="middle" dominant-baseline="middle" font-size="26">${pl.ic}</text></g>`;
-  // тень
-  return `<ellipse cx="150" cy="372" rx="52" ry="9" fill="rgba(40,26,10,.2)"/><g class="sw">${g}</g>`;
+  if(S.gest&&!o.notool)g+=`<g transform="translate(174 264)"><circle r="20" fill="#fff" opacity=".85"/><g transform="translate(-16 -16) scale(.8)">${toolGlyph(S.gest.g,40).replace(/<\/?svg[^>]*>/g,'')}</g></g>`;
+  return `<ellipse cx="150" cy="372" rx="52" ry="9" fill="rgba(40,26,10,.2)"/><g>${g}</g>`;
 }
 function personScene(opt){
   opt=opt||{};
-  const bg=opt.gray?'':svgBG(S.problem?S.problem.bg:'forest',S.seed);
-  return `<svg viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice">
-    ${opt.gray?'<rect width="300" height="400" fill="#DEDEDE"/>':bg}
-    ${svgPerson(opt)}</svg>`;
+  return `<svg viewBox="${opt.vb||'0 0 300 400'}" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">${opt.nobg?'':svgBG(S.world,S.seed)}${svgPerson(opt)}</svg>`;
 }
-
-/* ═════════ АНИМАЦИЯ СБОРКИ ═════════ */
-const STAGES=['Читаю твои слова','Ищу детали в библиотеке','Собираю слой за слоем'];
-let genBusy=false;
-function assemble(words,after){
-  if(genBusy)return; genBusy=true;
-  clearTimeout(window.__gg); window.__gg=setTimeout(()=>{genBusy=false},7000);
-  const g=document.createElement('div'); g.className='gen';
-  g.innerHTML=`<div class="genchips" id="gch"></div>
-   <div style="width:100%;max-width:300px">${STAGES.map((s,i)=>
-    `<div class="gst" id="gs${i}"><div class="gst-b">${i+1}</div>${s}</div>`).join('')}</div>`;
-  document.body.appendChild(g);
-  (words||[]).forEach((w,i)=>setTimeout(()=>{const c=$('gch');
-    if(c){const e=document.createElement('span');e.className='gchip';e.textContent=w;c.appendChild(e)}},i*110));
-  let i=0;
-  const run=()=>{
-    if(i>0)$('gs'+(i-1)).className='gst done';
-    if(i>=STAGES.length){setTimeout(()=>{g.remove();genBusy=false;clearTimeout(window.__gg);after&&after()},170);return}
-    $('gs'+i).className='gst on'; i++; setTimeout(run,730);
-  };
-  setTimeout(run,110);
-}
-
-/* ═════════ ШТОРКИ ═════════ */
-const SHEETS={
- problem:{t:'Что случилось в будущем?',list:()=>PROBLEMS.map(p=>({v:p,n:cap(p.n),emo:'🌍'})),set:v=>S.problem=v},
- action:{t:'Что он делает?',list:()=>ACTIONS.map(a=>({v:a,n:cap(a.n),emo:'✋'})),set:v=>S.action=v},
- object:{t:'С чем работает?',list:()=>OBJECTS.map(o=>({v:o,n:cap(o.n),emo:'🎯'})),set:v=>S.object=v},
-};
-let sheetKey=null;
-function openSheet(k){
-  sheetKey=k; const C=SHEETS[k];
-  $('sheetT').textContent=C.t;
-  const cur=S[k];
-  $('sheetL').innerHTML=C.list().map((o,i)=>`<button class="opt${cur&&cur.id===o.v.id?' on':''}" onclick="pickOpt(${i})">
-    <span class="opt-ic">${o.emo}</span><span>${o.n}</span></button>`).join('');
-  $('ovl').classList.add('on');
-  const sh=$('sheet'); sh.style.display='flex'; sh.classList.add('on');
-}
-function closeSheet(){$('ovl').classList.remove('on');const sh=$('sheet');sh.classList.remove('on');sh.style.display='none'}
-function pickOpt(i){const C=SHEETS[sheetKey];C.set(C.list()[i].v);closeSheet();render()}
-$('ovl').onclick=closeSheet; $('sheetX').onclick=closeSheet;
-
-/* ═════════ ЭКРАНЫ ═════════ */
-function go(s){S.step=s;render();window.scrollTo({top:0,behavior:'smooth'})}
-function pct(){return Math.round(STEPS.indexOf(S.step)/(STEPS.length-1)*100)}
-function promptWords(){
-  const w=[];
-  if(S.problem)w.push(S.problem.kw);
-  if(S.action)w.push(S.action.n);
-  if(S.object)w.push(S.object.n);
-  if(S.wear)w.push(S.wear.n.split(' ')[0]);
-  if(S.tool)w.push(S.tool.n);
-  if(S.head&&S.head.id!=='none')w.push(S.head.n);
-  if(S.pal)w.push(S.pal.n.split('-')[0]);
-  return w;
-}
-function randomGear(){
-  const r=rng(S.seed*7+13);
-  S.wear=pick(r,WEAR); S.tool=pick(r,TOOLS); S.head=pick(r,HEADS); S.pal=pick(r,PALS);
-  S.hair=rint(r,0,HAIR.length-1); S.hairc=rint(r,0,HAIRC.length-1);
-  S.skin=rint(r,0,SKIN.length-1); S.face=rint(r,0,FACES.length-1);
-}
-
-function render(){
-  $('pbar').style.width=pct()+'%';
-  $('back').style.visibility=S.step==='s0'?'hidden':'visible';
-  const st=S.step;
-
-  if(st==='s0'){
-    $('htitle').textContent='Профессия будущего';
-    B().innerHTML=`<div class="center">
-      <div style="margin-bottom:14px">${svgNeuro(96,'happy')}</div>
-      <h1 class="h1">Профессия будущего</h1>
-      <p class="lead">Через двадцать минут у тебя будет профессия,\nкоторой ещё нет ни в одном справочнике.</p>
-      <input class="field" id="nm" maxlength="12" placeholder="Как тебя зовут?" value="${S.child}" oninput="S.child=this.value">
-      <div style="font-size:12.5px;color:var(--ink3);font-weight:700;margin-top:8px">Имя попадёт на карточку</div>
-      <div class="chips" style="justify-content:center">${[8,9,10,11,12].map(a=>
-        `<button class="chip${S.age==a?' on':''}" onclick="S.age=${a};render()">${a}</button>`).join('')}</div>
-    </div>`;
-    F().innerHTML=`<button class="btn" onclick="startIt()">Поехали</button>`;
-    return;
-  }
-
-  if(st==='s1'){
-    $('htitle').textContent='Три слова';
-    const ready=S.problem&&S.action&&S.object;
-    const sl=(k,ph,val)=>`<button class="slot ${val?'':'todo pulse'}" onclick="openSheet('${k}')">${val||ph}<em>▾</em></button>`;
-    B().innerHTML=say('Профессий будущего нет ни в одном справочнике.\nПридумаем одну.')
-      +`<div class="pcard">В будущем ${sl('problem','проблема',S.problem&&S.problem.n)}.<br>
-        Нужен человек, который ${sl('action','что делает',S.action&&S.action.n)} ${sl('object','с чем',S.object&&S.object.a)}.</div>`;
-    F().innerHTML=`<button class="btn" ${ready?'':'disabled'} onclick="buildPerson()">Собрать человека</button>`;
-    return;
-  }
-
-  if(st==='met'){
-    $('htitle').textContent='Вот он';
-    B().innerHTML=`<div class="plate"><div class="stage">${personScene()}</div>
-      <div class="plate-foot"><span>Кадр #${S.seed}</span><button class="reroll" onclick="rerollGear()">↻ Ещё вариант</button></div></div>`
-      +say('Знаю про него всего три слова — оделся как попало.\nРасскажешь больше — переоденем.','oops');
-    F().innerHTML=`<button class="btn" onclick="go('gather')">Дальше →</button>`;
-    return;
-  }
-
-  if(st==='gather'){
-    $('htitle').textContent='Сбор данных';
-    B().innerHTML=say('Модели нужны данные. Собери их сам.\nНо смотри — не всё, что валяется, годится.','think')
-      +`<div class="dgwrap">
-          <div class="dgbar" id="dgbar">Собрано данных: 0</div>
-          <canvas id="dcv"></canvas>
-          <div class="dghint">🗑 мусор лучше обходить</div>
-        </div>`;
-    F().innerHTML=`<button class="btn" onclick="dgStop();go('belt')">Хватит, дальше →</button>`;
-    setTimeout(dgStart,60);
-    return;
-  }
-
-  if(st==='belt'){renderBelt(false);return}
-  if(st==='goal'){renderBelt(true);return}
-
-  if(st==='deeds'){
-    $('htitle').textContent='Кто что делает';
-    const d=DEEDS[S.deed];
-    if(!d){go('desk');return}
-    B().innerHTML=say(S.deed===0?'Один день. Шесть дел.\nРазложи: что делает робот, что делаешь ты.':'')
-      +`<div class="deck"><div class="dcard" id="dc">
-        <div class="dcard-ic">${d.ic}</div>
-        <div class="dcard-t">${d.t(S.object)}</div>
-        <div style="font-size:12px;font-weight:800;color:var(--ink3)">дело ${S.deed+1} из 6</div>
-      </div></div>
-      <div class="tally">
-        <div class="tal"><div class="tal-n">${S.robot}</div><div class="tal-l">🤖 робот</div></div>
-        <div class="tal"><div class="tal-n">${S.me}</div><div class="tal-l">🙋 я сам</div></div>
-      </div>`;
-    F().innerHTML=`<div class="btnrow">
-      <button class="btn btn2 btn-sm" onclick="assign(1)">🤖 Робот</button>
-      <button class="btn btn-sm" onclick="assign(0)">🙋 Я сам</button></div>`;
-    return;
-  }
-
-  if(st==='desk'){
-    $('htitle').textContent='Рабочее место';
-    const empty=S.me===0;
-    B().innerHTML=`<div class="plate"><div class="stage wide">${svgDesk(empty)}</div>
-      <div class="plate-foot"><span>${S.robot} у робота · ${S.me} у тебя</span><span></span></div></div>`
-      +say(empty?'Ты отдал роботу всё.\nТогда зачем тут твой стул?':'Твой стул занят.\nРобот считает — ты решаешь.',empty?'oops':'happy');
-    F().innerHTML=empty
-      ? `<div class="btnrow"><button class="btn btn2 btn-sm" onclick="giveBack()">Верну одно дело</button>
-         <button class="btn btn-sm" onclick="go('look')">Оставить так</button></div>`
-      : `<button class="btn" onclick="go('look')">Дальше →</button>`;
-    return;
-  }
-
-  if(st==='look'){
-    $('htitle').textContent='Внешность';
-    B().innerHTML=`<div class="plate"><div class="stage">${personScene()}</div><div style="height:10px"></div></div>`
-      +say('Сделай его похожим на того, кем хочешь стать.')
-      +`<div class="grp-t">Причёска</div>
-        <div class="carou">${HAIR.map((h,i)=>`<button class="mini${S.hair===i?' on':''}" onclick="S.hair=${i};render()">${miniHair(i)}</button>`).join('')}</div>
-        <div class="grp-t">Цвет волос</div>
-        <div class="carou">${HAIRC.map((c,i)=>`<button class="mini${S.hairc===i?' on':''}" onclick="S.hairc=${i};render()" style="background:${c}"></button>`).join('')}</div>
-        <div class="grp-t">Тон кожи</div>
-        <div class="carou">${SKIN.map((c,i)=>`<button class="mini${S.skin===i?' on':''}" onclick="S.skin=${i};render()" style="background:${c}"></button>`).join('')}</div>
-        <div class="grp-t">Лицо</div>
-        <div class="carou">${FACES.map((f,i)=>`<button class="mini${S.face===i?' on':''}" onclick="S.face=${i};render()">${miniFace(i)}</button>`).join('')}</div>`;
-    F().innerHTML=`<button class="btn" onclick="go('gear')">Дальше →</button>`;
-    return;
-  }
-
-  if(st==='gear'){
-    $('htitle').textContent='Снаряжение';
-    B().innerHTML=`<div class="plate"><div class="stage">${personScene()}</div><div style="height:10px"></div></div>`
-      +`<div class="pcard" style="font-size:15px;line-height:1.65">Человек, который <b>${S.action.n} ${S.object.a}</b> в мире, где <b>${S.problem.n}</b>.
-        ${S.wear?`<br>Носит <b>${S.wear.n}</b>.`:''}${S.tool?` Берёт <b>${S.tool.n}</b>.`:''}
-        ${S.head&&S.head.id!=='none'?`<br>На голове <b>${S.head.n}</b>.`:''}${S.pal?` Рядом <b>${S.pal.n}</b>.`:''}</div>`
-      +`<div class="grp-t">Одежда</div>
-        <div class="carou">${WEAR.map((w,i)=>`<div class="mini-w" onclick="S.wear=WEAR[${i}];render()">
-          <div class="mini${S.wear&&S.wear.id===w.id?' on':''}" style="background:${w.c}"></div>
-          <div class="mini-c">${w.n.split(' ')[0]}</div></div>`).join('')}</div>
-        <div class="grp-t">В руках</div>
-        <div class="carou">${TOOLS.map((t,i)=>`<div class="mini-w" onclick="S.tool=TOOLS[${i}];render()">
-          <div class="mini${S.tool&&S.tool.id===t.id?' on':''}" style="display:flex;align-items:center;justify-content:center;font-size:32px">${t.ic}</div>
-          <div class="mini-c">${t.n.split('-')[0]}</div></div>`).join('')}</div>
-        <div class="grp-t">На голове</div>
-        <div class="carou">${HEADS.map((h,i)=>`<div class="mini-w" onclick="S.head=HEADS[${i}];render()">
-          <div class="mini${S.head&&S.head.id===h.id?' on':''}">${miniHead(i)}</div>
-          <div class="mini-c">${h.n.split('-')[0]}</div></div>`).join('')}</div>
-        <div class="grp-t">Рядом</div>
-        <div class="carou">${PALS.map((p,i)=>`<div class="mini-w" onclick="S.pal=PALS[${i}];render()">
-          <div class="mini${S.pal&&S.pal.id===p.id?' on':''}" style="display:flex;align-items:center;justify-content:center;font-size:32px">${p.ic}</div>
-          <div class="mini-c">${p.n.split('-')[0]}</div></div>`).join('')}</div>`;
-    F().innerHTML=`<button class="btn" onclick="rebuild()">Пересобрать целиком</button>`;
-    return;
-  }
-
-  if(st==='cmp'){
-    $('htitle').textContent='Сравни';
-    B().innerHTML=`<div class="cmp">
-        <div class="cmp-w" id="cw">
-          <svg viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice"><rect width="300" height="400" fill="#DEDEDE"/>${svgPerson({gray:1})}</svg>
-          <svg viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice" class="cmp-r" id="cr">${svgBG(S.problem.bg,S.seed)}${svgPerson()}</svg>
-          <div class="cmp-h" id="ch"></div>
-        </div>
-        <div class="cmp-lbl"><span>Три слова</span><span>Девять слов</span></div>
-      </div>`
-      +say('Слева — всё, что я понял с трёх слов.\nСправа — с девяти. Я не поумнел.\nИзменилось то, что ты мне дал.','think');
-    F().innerHTML=`<button class="btn" onclick="go('names')">Дальше →</button>`;
-    setTimeout(initSlider,60);
-    return;
-  }
-
-  if(st==='names'){
-    $('htitle').textContent='Имя и название';
-    B().innerHTML=say('Осталось назвать. Три коротких вопроса.')
-      +`<div class="grp-t">Как называется его работа?</div>
-        <input class="field" id="ft" maxlength="28" placeholder="Название профессии" value="${S.title}" oninput="S.title=this.value">
-        <button class="txtbtn" onclick="hintTitle()">Не придумывается?</button>
-        <div class="grp-t">Как зовут человека?</div>
-        <input class="field" id="fh" maxlength="16" placeholder="Имя героя" value="${S.hero}" oninput="S.hero=this.value">
-        <button class="txtbtn" onclick="hintHero()">Дай случайное</button>
-        <div class="grp-t">Что он говорит, когда приходит на работу?</div>
-        <input class="field" id="fl" maxlength="60" placeholder="Одна фраза" value="${S.line}" oninput="S.line=this.value">
-        <div class="chips">${STARTERS.map(s=>`<button class="chip" onclick="setStart('${s}')">${s}</button>`).join('')}</div>`;
-    F().innerHTML=`<button class="btn" onclick="saveNames()">Дальше →</button>`;
-    return;
-  }
-
-  if(st==='day'){
-    $('htitle').textContent='Один день';
-    const stage=!S.morning?0:!S.main?1:2;
-    const D=[['С чего начинает утро?',MORNING,'morning'],
-             ['Главное дело дня?',MAINDEED,'main'],
-             ['Что оставляет людям вечером?',EVENING,'evening']][stage];
-    B().innerHTML=say(['Расскажи про его день.','Хорошо. А главное дело?','И последнее — что после него остаётся?'][stage])
-      +`<div class="pcard" style="line-height:1.4;font-size:16px">${D[0]}</div>
-        <div class="grid2">${D[1].map((o,i)=>`<button class="gcard${S[D[2]]&&S[D[2]].n===o.n?' on':''}" onclick="pickDay('${D[2]}',${i})">
-          <span class="gcard-ic">${o.ic}</span>${o.n}</button>`).join('')}</div>`;
-    F().innerHTML=S.evening?`<button class="btn" onclick="go('reveal')">Дальше →</button>`:'';
-    return;
-  }
-
-  if(st==='reveal'){
-    $('htitle').textContent='Как это устроено';
-    B().innerHTML=`<div class="plate"><div class="stage">${personScene()}</div><div style="height:10px"></div></div>
-      <div class="layers" id="lay"></div>`;
-    F().innerHTML='';
-    const L=[['Фон','×12'],['Тело и лицо','×6'],['Причёска','×8'],['Одежда','×10'],['Инструмент','×12'],['Спутник','×8']];
-    const box=$('lay');
-    L.forEach((l,i)=>setTimeout(()=>{
-      box.insertAdjacentHTML('beforeend',`<div class="layer"><b>${l[0]}</b><span>${l[1]}</span></div>`);
-      window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
-      if(i===L.length-1)setTimeout(()=>{
-        box.insertAdjacentHTML('beforeend',say('У меня в памяти лежат готовые детали. Я их не рисовал сейчас.\nЯ сложил твою картинку из кусочков — настоящий ИИ так же, только кусочков миллиарды.\n\n<b>Я не придумал твою профессию. Я собрал её из твоих слов.</b>','think'));
-        F().innerHTML=`<button class="btn" onclick="go('card')">Забрать карточку →</button>`;
-        window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
-      },500);
-    },i*380));
-    return;
-  }
-
-  if(st==='card'){renderCard();return}
-
-  if(st==='shake'){
-    $('htitle').textContent='';
-    B().innerHTML=`<div class="center">
-      <div style="margin-bottom:6px">${svgNeuro(120,'happy')}</div>
-      <p class="lead" style="margin-bottom:20px">Пожми, если понял:\nИИ ничего не берёт из воздуха.</p>
-      <button onclick="doShake()" style="width:170px;height:170px;border-radius:50%;border:3px dashed var(--acc);
-        background:var(--accbg);font-size:64px;cursor:pointer" id="palm">🤝</button>
-      <div id="shakeMsg" style="margin-top:18px;font-size:17px;font-weight:800;color:var(--acc);min-height:26px"></div>
-    </div>`;
-    F().innerHTML=`<div class="btnrow">
-      <button class="btn btn2 btn-sm" onclick="location.href='index.html'">← В Мастерскую</button>
-      <button class="btn btn2 btn-sm" onclick="location.reload()">Ещё профессию</button></div>`;
-    return;
-  }
-}
-
-/* ═════════ КОНВЕЙЕР ═════════ */
-function renderBelt(withGoal){
-  $('htitle').textContent=withGoal?'Заказ':'Конвейер';
-  if(withGoal&&!S.goalOut)S.goalOut=OUTPUTS[S.seed%3];
-  const out=withGoal?S.goalOut:S.out;
-  const j1=S.inp&&S.mdl?(S.inp.mod===S.mdl.takes?'ok':'bad'):'';
-  const j2=S.mdl&&out?(S.mdl.emits===out.mod?'ok':'bad'):'';
-  const ready=S.inp&&S.mdl&&out;
-  const list={in:INPUTS,mdl:MODELS,out:OUTPUTS}[S.tab];
-  B().innerHTML=say(withGoal
-      ? `Теперь заказ. Мне нужна <b>${S.goalOut.n}</b>.\nСобери цепочку, которая её выдаст.`
-      : 'Твой человек работает не один. Ему помогает модель.\nСобери её из деталей.')
-    +`<div class="belt">
-      <div class="bay ${S.inp?'':'empty'}" onclick="S.tab='in';render()"><div class="bay-l">ВХОД</div>
-        ${S.inp?`<div class="bay-ic">${S.inp.ic}</div><div class="bay-n">${S.inp.n}<small>что модель получает</small></div><div class="mods"><span class="mod">${S.inp.mod}</span></div>`
-              :'<div class="bay-n" style="color:var(--ink3);font-weight:700">Выбери, что подать на вход</div>'}</div>
-      <div class="joint ${j1}">${j1==='ok'?'✓':j1==='bad'?'✕':'↓'}</div>
-      <div class="bay ${S.mdl?'':'empty'}" onclick="S.tab='mdl';render()"><div class="bay-l">МОДЕЛЬ</div>
-        ${S.mdl?`<div class="bay-ic">${S.mdl.ic}</div><div class="bay-n">${S.mdl.n}<small>принимает ${S.mdl.takes} · выдаёт ${S.mdl.emits}</small></div>`
-              :'<div class="bay-n" style="color:var(--ink3);font-weight:700">Выбери модель</div>'}</div>
-      <div class="joint ${j2}">${j2==='ok'?'✓':j2==='bad'?'✕':'↓'}</div>
-      <div class="bay ${out?(withGoal?'locked':''):'empty'}" onclick="${withGoal?'':`S.tab='out';render()`}"><div class="bay-l">ВЫХОД${withGoal?' 🎯':''}</div>
-        ${out?`<div class="bay-ic">${out.ic}</div><div class="bay-n">${out.n}<small>${withGoal?'это заказ — менять нельзя':'что получится'}</small></div><div class="mods"><span class="mod">${out.mod}</span></div>`
-             :'<div class="bay-n" style="color:var(--ink3);font-weight:700">Выбери, что получить</div>'}</div>
-    </div>
-    <div class="tabs">
-      <button class="tab${S.tab==='in'?' on':''}" onclick="S.tab='in';render()">Вход</button>
-      <button class="tab${S.tab==='mdl'?' on':''}" onclick="S.tab='mdl';render()">Модель</button>
-      ${withGoal?'':`<button class="tab${S.tab==='out'?' on':''}" onclick="S.tab='out';render()">Выход</button>`}
-    </div>
-    <div class="tiles">${list.map((t,i)=>{
-      const sel=(S.tab==='in'&&S.inp&&S.inp.id===t.id)||(S.tab==='mdl'&&S.mdl&&S.mdl.id===t.id)||(S.tab==='out'&&S.out&&S.out.id===t.id);
-      const badge=S.tab==='mdl'?`${t.takes}→${t.emits}`:t.mod;
-      return `<button class="tile${sel?' on':''}" onclick="putTile(${i})">
-        <span class="tile-mod">${badge}</span><div class="tile-ic">${t.ic}</div><div class="tile-n">${t.n}</div></button>`}).join('')}
-    </div>
-    <div id="beltres"></div>`;
-  F().innerHTML=`<button class="btn" ${ready?'':'disabled'} onclick="runBelt(${withGoal})">Запустить</button>`;
-}
-function putTile(i){
-  const t={in:INPUTS,mdl:MODELS,out:OUTPUTS}[S.tab][i];
-  if(S.tab==='in')S.inp=t; else if(S.tab==='mdl')S.mdl=t; else S.out=t;
-  render();
-}
-function runBelt(withGoal){
-  const out=withGoal?S.goalOut:S.out;
-  const ok1=S.inp.mod===S.mdl.takes, ok2=S.mdl.emits===out.mod;
-  let txt,cls;
-  if(ok1&&ok2){
-    txt=`Модель ${S.inp.v} ${S.inp.cnt} — и выдала: <b>${out.n}</b>.`;
-    if(S.dataJunk>0)txt+=`<br><br>Правда, ты принёс <b>${S.dataJunk} ${plural(S.dataJunk,'кусок','куска','кусков')} мусора</b> — часть ответа получилась мутной.`;
-    cls='good'}
-  else if(!ok1){txt=`Модель честно ${S.mdl.past} то, что ты дал. Получилось не то.<br><br>Ты дал ей <b>${S.inp.mod}</b>, а она умеет только <b>${S.mdl.takes}</b>.`;cls='bad'}
-  else {txt=`Модель выдала <b>${S.mdl.emitsName}</b>, а ты просил <b>${out.n}</b>. Не совпало.`;cls='bad'}
-  const box=$('beltres');
-  box.innerHTML=`<div class="result ${cls}">${txt}</div>`
-    +say(ok1&&ok2?(withGoal?'Есть. Ты собрал работающую машину.':'Работает. Запомни эту цепочку.')
-        :'Мусор на входе — мусор на выходе.\nЭто правило без исключений.', ok1&&ok2?'happy':'oops');
-  if(ok1&&ok2){
-    if(withGoal){S.chainDone=1;S.chain={i:S.inp,m:S.mdl,o:out};
-      F().innerHTML=`<button class="btn" onclick="go('deeds')">Дальше →</button>`}
-    else F().innerHTML=`<button class="btn" onclick="go('goal')">Дальше — заказ →</button>`;
-  }else{
-    F().innerHTML=`<div class="btnrow"><button class="btn btn2 btn-sm" onclick="render()">Переставить</button>
-      <button class="btn btn-sm" onclick="go('${withGoal?'deeds':'goal'}')">Всё равно дальше</button></div>`;
-  }
-  window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
-}
-
-/* ═════════ РАБОЧЕЕ МЕСТО ═════════ */
-function svgDesk(empty){
-  const nm=(S.child||'ТЫ').toUpperCase();
-  return `<svg viewBox="0 0 300 200" preserveAspectRatio="xMidYMid slice">
-    <rect width="300" height="200" fill="#EFE4D2"/>
-    <rect y="150" width="300" height="50" fill="#C9B79A"/>
-    ${empty?'':'<circle cx="212" cy="52" r="34" fill="#FFE9A8" opacity=".55"/>'}
-    <rect x="24" y="96" width="104" height="10" rx="4" fill="#8A7358"/>
-    <rect x="30" y="106" width="8" height="46" fill="#8A7358"/><rect x="114" y="106" width="8" height="46" fill="#8A7358"/>
-    <rect x="44" y="60" width="64" height="38" rx="5" fill="#3A4356"/>
-    <rect x="49" y="65" width="54" height="28" rx="3" fill="#5FD0C0" opacity=".8"/>
-    <g transform="translate(76 118) scale(.62)">${svgNeuro(64,'idle')}</g>
-    <rect x="182" y="104" width="58" height="8" rx="4" fill="${empty?'#B0A08A':'#9A7F5C'}"/>
-    <rect x="186" y="112" width="7" height="40" fill="${empty?'#B0A08A':'#9A7F5C'}"/>
-    <rect x="229" y="112" width="7" height="40" fill="${empty?'#B0A08A':'#9A7F5C'}"/>
-    <rect x="184" y="66" width="54" height="40" rx="7" fill="${empty?'#C4B49C':'#A8886040'}" opacity="${empty?1:.5}"/>
-    <rect x="188" y="72" width="46" height="18" rx="4" fill="#FFF8EE"/>
-    <text x="211" y="85" text-anchor="middle" font-size="11" font-weight="900" fill="#2B2118" font-family="Nunito,sans-serif">${nm}</text>
-    ${empty?'<text x="211" y="140" text-anchor="middle" font-size="13" fill="#8A7A68" font-family="Nunito,sans-serif">пусто</text>'
-           :`<g transform="translate(150 -18) scale(.42)">${svgPerson()}</g>`}
-  </svg>`;
-}
-
-/* ═════════ МИНИАТЮРЫ ═════════ */
-function miniHair(i){const h=HAIR[i],c=HAIRC[S.hairc];
-  const save=S.hair;S.hair=i;
-  const p=`<svg viewBox="105 100 90 90"><ellipse cx="150" cy="152" rx="36" ry="40" fill="${SKIN[S.skin]}"/>`
-    +(h.id==='bald'?'':{
-      short:`<path d="M116 138 q0 -42 34 -42 q34 0 34 42 q-8 -20 -34 -20 q-26 0 -34 20z" fill="${c}"/>`,
-      bob:`<path d="M114 146 q0 -48 36 -48 q36 0 36 48 q-8 -6 -13 -4 l0 -18 q-23 7 -46 0 l0 18 q-5 -2 -13 4z" fill="${c}"/>`,
-      long:`<path d="M112 150 q0 -46 38 -46 q38 0 38 46 l6 40 q-14 6 -18 -4 l-4 -30 q-22 8 -44 0 l-4 30 q-4 10 -18 4z" fill="${c}"/>`,
-      buns:`<path d="M116 138 q0 -42 34 -42 q34 0 34 42 q-8 -20 -34 -20 q-26 0 -34 20z" fill="${c}"/><circle cx="114" cy="118" r="13" fill="${c}"/><circle cx="186" cy="118" r="13" fill="${c}"/>`,
-      curly:`<path d="M116 140 q0 -44 34 -44 q34 0 34 44z" fill="${c}"/>`+[0,1,2,3,4,5,6].map(k=>`<circle cx="${116+k*11}" cy="${106+(k%2)*6}" r="11" fill="${c}"/>`).join(''),
-      tail:`<path d="M116 138 q0 -42 34 -42 q34 0 34 42 q-8 -20 -34 -20 q-26 0 -34 20z" fill="${c}"/><path d="M186 140 q26 10 20 44 q-4 12 -14 5 q6 -28 -12 -44z" fill="${c}"/>`,
-      mohawk:`<path d="M139 114 q11 -40 22 0 q-11 -11 -22 0z" fill="${c}"/><path d="M116 140 q4 -28 34 -28 q30 0 34 28 q-13 -13 -34 -13 q-21 0 -34 13z" fill="${c}"/>`,
-    }[h.id]||'')
-    +`</svg>`;
-  S.hair=save;return p;
-}
-function miniFace(i){const f=FACES[i];
-  const M={calm:'M142 172 q8 4 16 0',smile:'M140 170 q10 9 20 0',serious:'M141 173 h18',
-    happy:'M138 168 q12 12 24 0',focus:'M143 173 q7 -3 14 0',kind:'M141 170 q9 7 18 0'}[f.id];
-  const closed=f.id==='happy';
-  return `<svg viewBox="118 128 64 64"><ellipse cx="150" cy="152" rx="34" ry="36" fill="${SKIN[S.skin]}"/>`
-   +(closed?`<path d="M130 152 q7 -7 14 0" stroke="#2B2118" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M156 152 q7 -7 14 0" stroke="#2B2118" stroke-width="2.6" fill="none" stroke-linecap="round"/>`
-     :`<ellipse cx="137" cy="152" rx="5.4" ry="6" fill="#fff"/><ellipse cx="163" cy="152" rx="5.4" ry="6" fill="#fff"/>
-       <circle cx="137" cy="153" r="3" fill="#2B2118"/><circle cx="163" cy="153" r="3" fill="#2B2118"/>`)
-   +`<path d="${M}" stroke="#2B2118" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg>`;
-}
-function miniHead(i){const h=HEADS[i];
-  const inner={visor:'<rect x="112" y="140" width="76" height="15" rx="7" fill="#2E3A4A"/><rect x="118" y="143" width="30" height="9" rx="4" fill="#7FE3C0"/>',
-    helm:'<path d="M110 152 q0 -48 40 -48 q40 0 40 48 z" fill="#DCE2EC"/><rect x="112" y="146" width="76" height="10" rx="5" fill="#9AA8BC"/>',
-    cap:'<path d="M114 136 q0 -32 36 -32 q36 0 36 32z" fill="#4A6BC4"/><rect x="112" y="132" width="80" height="8" rx="4" fill="#3A559E"/>',
-    lamp:'<rect x="114" y="132" width="72" height="11" rx="5" fill="#4A4A55"/><circle cx="150" cy="137" r="8" fill="#FFE47A"/>',
-    mask:'<rect x="130" y="166" width="40" height="19" rx="9" fill="#DCE4EC" opacity=".78"/><circle cx="150" cy="175" r="5.5" fill="#9AA8BC"/>',
-    hood:'<path d="M110 146 q0 -52 40 -52 q40 0 40 52 q-10 -18 -40 -18 q-30 0 -40 18z" fill="#5C6470"/>',
-    none:'', band:'<rect x="112" y="138" width="76" height="9" rx="4" fill="#D14545"/>'}[h.id]||'';
-  return `<svg viewBox="100 96 100 100"><ellipse cx="150" cy="152" rx="36" ry="40" fill="${SKIN[S.skin]}"/>${inner}</svg>`;
-}
-
-/* ═════════ ДЕЙСТВИЯ ═════════ */
-function startIt(){
-  const f=$('nm'); const v=(f?f.value:S.child||'').trim();
-  if(!v){toast('Впиши имя — оно попадёт на карточку');return}
-  if(!S.age){toast('Выбери, сколько тебе лет');return}
-  S.child=v; try{localStorage.setItem('nooka.child',v)}catch(e){}
-  go('s1');
-}
-function buildPerson(){
-  S.seed=1000+Math.floor(Math.random()*9000);
-  randomGear();
-  assemble([S.problem.kw,S.action.n,S.object.n],()=>{S.step='met';render()});
-}
-function rerollGear(){
-  S.seed=1000+Math.floor(Math.random()*9000);
-  randomGear();
-  const p=document.querySelector('.stage');
-  if(p){p.innerHTML=personScene();const f=document.querySelector('.plate-foot span');if(f)f.textContent='Кадр #'+S.seed}
-}
-function rebuild(){
-  S.tool=S.tool||TOOLS[0]; S.wear=S.wear||WEAR[0];
-  assemble(promptWords(),()=>go('cmp'));
-}
-function assign(toRobot){
-  const c=$('dc');
-  if(c){c.style.transition='transform .28s ease, opacity .28s ease';
-    c.style.transform='translateX('+(toRobot?-120:120)+'%) rotate('+(toRobot?-8:8)+'deg)';c.style.opacity='0'}
-  S.deeds.push(toRobot?'r':'m');
-  if(toRobot)S.robot++; else S.me++;
-  setTimeout(()=>{S.deed++;if(S.deed>=6)go('desk');else render()},280);
-}
-function giveBack(){S.deed=5;S.robot--;S.deeds.pop();go('deeds')}
-function pickDay(k,i){
-  S[k]=({morning:MORNING,main:MAINDEED,evening:EVENING})[k][i];
-  render();
-  if(S.evening)window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
-}
-function hintTitle(){
-  S.title='';
-  const r=rng(S.seed+S.title.length);
-  const v=[`${cap(S.object.n)}-${S.action.inf.slice(0,-2)}тель`,
-    `Мастер ${S.object.g}`,`${cap(S.problem.kw)}-инженер`,
-    `Хранитель ${S.object.g}`,`${cap(S.action.n)} будущего`];
-  const t=pick(r,v); $('ft').value=t; S.title=t;
-}
-function hintHero(){const r=rng(Date.now()&0xffff);const n=pick(r,NAMES);$('fh').value=n;S.hero=n}
-function setStart(s){const f=$('fl');f.value=s+' ';S.line=f.value;f.focus()}
-function saveNames(){
-  S.title=($('ft').value||('Мастер '+S.object.g)).trim();
-  S.hero=($('fh').value||NAMES[S.seed%NAMES.length]).trim();
-  S.line=$('fl').value.trim();
-  go('day');
-}
-function initSlider(){
-  const w=$('cw'),h=$('ch'),r=$('cr');
-  if(!w||!h||!r)return;
-  let drag=false;
-  const set=(x)=>{const b=w.getBoundingClientRect();
-    let p=Math.max(6,Math.min(94,(x-b.left)/b.width*100));
-    h.style.left=p+'%'; r.style.clipPath='inset(0 0 0 '+p+'%)'};
-  const down=e=>{drag=true;e.preventDefault();set((e.touches?e.touches[0]:e).clientX)};
-  const move=e=>{if(drag)set((e.touches?e.touches[0]:e).clientX)};
-  const up=()=>{drag=false};
-  w.addEventListener('pointerdown',down); w.addEventListener('pointermove',move);
-  window.addEventListener('pointerup',up);
-}
-function doShake(){
-  const p=$('palm'),m=$('shakeMsg');
-  if(!p)return;
-  p.animate([{transform:'scale(1)'},{transform:'scale(1.16) rotate(-8deg)'},{transform:'scale(1)'}],{duration:420});
-  m.textContent='До встречи, коллега.';
-  try{localStorage.setItem('nooka.m3.done','1');navigator.vibrate&&navigator.vibrate(18)}catch(e){}
-}
-
-/* ═════════ КАРТОЧКА ═════════ */
-function renderCard(){
-  $('htitle').textContent='Энциклопедия';
-  const ch=S.chain;
-  B().innerHTML=`<div class="enc">
-    <div class="enc-top">
-      <div class="stage">${personScene()}</div>
-      <div class="enc-stamp">Статья № ${S.seed}-Б</div>
-      ${S.line?`<div class="enc-say">${S.line}</div>`:''}
-    </div>
-    <div class="enc-b">
-      <div class="enc-name">${S.title}</div>
-      <div class="enc-who">${S.hero} · профессия будущего</div>
-      <div class="enc-row"><b>Зачем</b><span>В мире, где ${S.problem.n}, ${S.action.n} ${S.object.a}.</span></div>
-      ${ch?`<div class="enc-row"><b>Помощник</b><span class="enc-chain">
-        <span>${ch.i.mod} ${ch.i.n}</span><span style="color:var(--acc)">→</span>
-        <span>${ch.m.n}</span><span style="color:var(--acc)">→</span>
-        <span>${ch.o.mod} ${ch.o.n}</span></span></div>`:''}
-      <div class="enc-row"><b>Снаряжение</b><span>${[S.wear&&S.wear.n,S.tool&&S.tool.n,S.head&&S.head.id!=='none'&&S.head.n,S.pal&&S.pal.n].filter(Boolean).join(', ')}</span></div>
-      ${S.morning?`<div class="enc-row"><b>День</b><span>${S.morning.n}. ${S.main?S.main.n+'. ':''}${S.evening?'Оставляет: '+S.evening.n.toLowerCase()+'.':''}</span></div>`:''}
-      ${S.dataGood?`<div class="enc-row"><b>Данные</b><span>собрано ${S.dataGood} ${plural(S.dataGood,'порция','порции','порций')}${S.dataJunk?', мусора '+S.dataJunk:', без мусора'}</span></div>`:''}
-      <div class="enc-row"><b>Делает сам</b><span>${S.me} ${plural(S.me,'дело','дела','дел')} из шести — остальное считает робот</span></div>
-    </div>
-    <div class="enc-foot">
-      <div class="enc-author">Автор: ${S.child.toUpperCase()}, ${S.age} лет</div>
-      <div class="enc-note">До сегодняшнего дня этой профессии в энциклопедии не было.</div>
-    </div>
-  </div>`;
-  F().innerHTML=`<div class="btnrow">
-      <button class="btn btn2 btn-sm" onclick="shareCard()">Показать</button>
-      <button class="btn btn-sm" onclick="go('shake')">Дальше →</button></div>`;
-}
-function plural(n,a,b,c){const m=n%10,h=n%100;return h>=11&&h<=14?c:m===1?a:m>=2&&m<=4?b:c}
-function shareCard(){
-  const u=location.origin+location.pathname+'?t='+encodeURIComponent(S.title)+'&by='+encodeURIComponent(S.child);
-  if(navigator.share)navigator.share({title:S.title,url:u}).catch(()=>{});
-  else if(navigator.clipboard){navigator.clipboard.writeText(u);toast('Ссылка скопирована')}
-  else toast('Скопируй адрес из строки браузера');
-}
-
-/* ═════════ СБОР ДАННЫХ — игровая часть ═════════
-   Бегаешь по локации профессии и собираешь данные для модели.
-   Хорошие данные — плюс, мусор — минус. Это и есть урок
-   «мусор на входе — мусор на выходе», прожитый руками. */
-const DG={raf:0,run:0,last:0,acc:0,tick:0};
-const DG_N=16, DG_VIEW=9;
-const DATA_KINDS=[
- {mod:'👁',n:'снимок',c:'#5FA8D9'},
- {mod:'👂',n:'запись',c:'#8A6BC4'},
- {mod:'#️⃣',n:'цифры',c:'#4A8C6B'},
- {mod:'📄',n:'заметка',c:'#D9A32C'},
-];
-function dgStart(){
-  const cv=$('dcv'); if(!cv)return;
-  const size=Math.min(360,window.innerWidth-28,Math.max(240,window.innerHeight-330));
-  const dpr=Math.min(2,window.devicePixelRatio||1);
-  cv.width=size*dpr; cv.height=size*dpr; cv.style.width=size+'px'; cv.style.height=size+'px';
-  const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
-  const cell=size/DG_VIEW;
-  const r=rng(S.seed*29+11);
-
-  const g=[]; for(let y=0;y<DG_N;y++){g.push([]);for(let x=0;x<DG_N;x++)
-    g[y].push(x===0||y===0||x===DG_N-1||y===DG_N-1?1:0)}
-  for(let i=0;i<24;i++){const bx=rint(r,2,DG_N-3),by=rint(r,2,DG_N-3);
-    if(bx>3||by>3)g[by][bx]=1}
-  const dist=[];for(let y=0;y<DG_N;y++){dist.push([]);for(let x=0;x<DG_N;x++)dist[y].push(-1)}
-  dist[1][1]=0; const q=[{x:1,y:1}];
-  while(q.length){const c=q.shift();
-    [[1,0],[-1,0],[0,1],[0,-1]].forEach(([dx,dy])=>{const x=c.x+dx,y=c.y+dy;
-      if(x>=0&&y>=0&&x<DG_N&&y<DG_N&&!g[y][x]&&dist[y][x]<0){dist[y][x]=dist[c.y][c.x]+1;q.push({x,y})}})}
-  const free=[];for(let y=1;y<DG_N-1;y++)for(let x=1;x<DG_N-1;x++)
-    if(!g[y][x]&&dist[y][x]>=0&&!(x<3&&y<3))free.push({x,y});
-  for(let i=free.length-1;i>0;i--){const j=rint(r,0,i);[free[i],free[j]]=[free[j],free[i]]}
-
-  // 9 хороших порций данных и 5 кусков мусора
-  const bits=[];
-  for(let i=0;i<9;i++){const c=free[i];const k=DATA_KINDS[i%DATA_KINDS.length];
-    bits.push({x:c.x+.5,y:c.y+.5,got:0,bad:0,k,ph:r()*6.28})}
-  for(let i=0;i<5;i++){const c=free[9+i];
-    bits.push({x:c.x+.5,y:c.y+.5,got:0,bad:1,k:{mod:'🗑',n:'мусор',c:'#9A8878'},ph:r()*6.28})}
-
-  DG.st={p:{x:1.5,y:1.5},vx:0,vy:0,target:null,g,free,bits,parts:[],pops:[],trail:[],
-    good:0,junk:0,glow:0,shake:0,face:0,moving:0,done:0};
-  DG.cv=cv; DG.ctx=ctx; DG.cell=cell; DG.size=size; DG.cam={x:1.5,y:1.5};
-  DG.run=1; DG.last=performance.now(); DG.acc=0; DG.tick=0;
-
-  const pos=e=>{const b=cv.getBoundingClientRect();const t=e.touches?e.touches[0]:e;
-    return {x:(t.clientX-b.left)/cell+DG.cam.x-DG_VIEW/2,
-            y:(t.clientY-b.top)/cell+DG.cam.y-DG_VIEW/2}};
-  cv.onpointerdown=e=>{e.preventDefault();DG.st.target=pos(e)};
-  cv.onpointermove=e=>{if(DG.st.target){e.preventDefault();DG.st.target=pos(e)}};
-  cv.onpointerup=()=>{DG.st.target=null};
-  cv.onpointercancel=()=>{DG.st.target=null};
-  DG.keys={};
-  DG.kd=e=>{DG.keys[e.key.toLowerCase()]=1}; DG.ku=e=>{DG.keys[e.key.toLowerCase()]=0};
-  addEventListener('keydown',DG.kd); addEventListener('keyup',DG.ku);
-  dgDraw();
-  DG.raf=requestAnimationFrame(dgLoop);
-}
-function dgStop(){
-  if(DG.raf)cancelAnimationFrame(DG.raf);
-  DG.raf=0; DG.run=0;
-  if(DG.kd){removeEventListener('keydown',DG.kd);removeEventListener('keyup',DG.ku);DG.kd=null}
-}
-function dgLoop(t){
-  if(!DG.run)return;
-  const dt=Math.min((t-DG.last)/1000,.05); DG.last=t; DG.acc+=dt;
-  let n=0; while(DG.acc>=1/60&&n<3){dgStep(1/60);DG.acc-=1/60;DG.tick++;n++}
-  if(DG.acc>1/60)DG.acc=0;
-  dgDraw();
-  if(DG.run)DG.raf=requestAnimationFrame(dgLoop);
-}
-function dgSolid(x,y){const cx=Math.floor(x),cy=Math.floor(y);
-  if(cx<0||cy<0||cx>=DG_N||cy>=DG_N)return 1; return DG.st.g[cy][cx]}
-function dgMove(p,dx,dy){
-  const R=.34;
-  if(dx){const nx=p.x+dx;
-    if(!dgSolid(nx+Math.sign(dx)*R,p.y-R*.9)&&!dgSolid(nx+Math.sign(dx)*R,p.y+R*.9))p.x=nx}
-  if(dy){const ny=p.y+dy;
-    if(!dgSolid(p.x-R*.9,ny+Math.sign(dy)*R)&&!dgSolid(p.x+R*.9,ny+Math.sign(dy)*R))p.y=ny}
-}
-function dgStep(dt){
-  const st=DG.st; if(!st)return;
-  let dx=0,dy=0;
-  if(st.target){dx=st.target.x-st.p.x;dy=st.target.y-st.p.y;
-    const d=Math.hypot(dx,dy); if(d<.25){dx=dy=0}else{dx/=d;dy/=d}}
-  const K=DG.keys||{};
-  if(K['arrowleft']||K['a'])dx=-1; if(K['arrowright']||K['d'])dx=1;
-  if(K['arrowup']||K['w'])dy=-1; if(K['arrowdown']||K['s'])dy=1;
-  if(dx||dy){const m=Math.hypot(dx,dy)||1;dx/=m;dy/=m}
-  const sp=.062;
-  st.vx+=((dx*sp)-st.vx)*Math.min(1,13*dt);
-  st.vy+=((dy*sp)-st.vy)*Math.min(1,13*dt);
-  const spd=Math.hypot(st.vx,st.vy);
-  if(spd>.004){st.face=Math.atan2(st.vy,st.vx);st.moving=1}else st.moving=0;
-  if(spd>.03){st.trail.push({x:st.p.x,y:st.p.y,t:1});if(st.trail.length>7)st.trail.shift()}
-  st.trail.forEach(p=>p.t-=dt*3.1); st.trail=st.trail.filter(p=>p.t>0);
-  dgMove(st.p,st.vx,st.vy);
-  st.bits.forEach(b=>{
-    if(b.got)return;
-    if(Math.hypot(b.x-st.p.x,b.y-st.p.y)<.72){
-      b.got=1;
-      if(b.bad){st.junk++; st.shake=14; dgBurst(b.x,b.y,'#9A8878',10);
-        st.pops.push({x:b.x,y:b.y-.3,t:1.3,v:'мусор',bad:1});}
-      else{st.good++; st.glow=20; dgBurst(b.x,b.y,b.k.c,12);
-        st.pops.push({x:b.x,y:b.y-.3,t:1.3,v:b.k.mod+' '+b.k.n,bad:0});}
-    }});
-  (st.parts||[]).forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=dt*.5;p.t-=dt*1.7});
-  st.parts=(st.parts||[]).filter(p=>p.t>0);
-  (st.pops||[]).forEach(p=>{p.y-=dt*.8;p.t-=dt*.7});
-  st.pops=(st.pops||[]).filter(p=>p.t>0);
-  if(st.glow>0)st.glow--;
-  if(st.shake>0)st.shake--;
-  const half=DG_VIEW/2;
-  const tx=Math.max(half,Math.min(DG_N-half,st.p.x));
-  const ty=Math.max(half,Math.min(DG_N-half,st.p.y));
-  DG.cam.x+=(tx-DG.cam.x)*Math.min(1,7*dt);
-  DG.cam.y+=(ty-DG.cam.y)*Math.min(1,7*dt);
-  const bar=$('dgbar');
-  if(bar)bar.innerHTML='Собрано данных: <b style="color:var(--acc)">'+st.good+'</b>'
-    +(st.junk?' · мусора: <b style="color:#D93030">'+st.junk+'</b>':'');
-  if(st.good>=6&&!st.done){st.done=1;
-    S.dataGood=st.good; S.dataJunk=st.junk;
-    setTimeout(()=>{dgStop();go('belt')},900)}
-}
-function dgBurst(x,y,c,n){
-  const st=DG.st; st.parts=st.parts||[];
-  for(let i=0;i<n;i++){const a=Math.random()*6.283,v=.03+Math.random()*.07;
-    st.parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-.02,t:1,c,r:.06+Math.random()*.06})}
-}
-function dgDraw(){
-  const st=DG.st,ctx=DG.ctx,cell=DG.cell,size=DG.size;
-  if(!ctx||!st)return;
-  const camX=DG.cam.x-DG_VIEW/2, camY=DG.cam.y-DG_VIEW/2;
-  ctx.clearRect(0,0,size,size);
-  ctx.save();
-  if(st.shake>0)ctx.translate((Math.random()-.5)*st.shake*.4,(Math.random()-.5)*st.shake*.4);
-  ctx.save(); ctx.translate(-camX*cell,-camY*cell);
-  const W=BGS[S.problem?S.problem.bg:'forest']||BGS.forest;
-  ctx.fillStyle=W.ground; ctx.fillRect(0,0,DG_N*cell,DG_N*cell);
-  ctx.fillStyle='rgba(255,255,255,.14)'; ctx.fillRect(0,0,DG_N*cell,DG_N*cell);
-  const gx0=Math.max(0,Math.floor(camX)),gx1=Math.min(DG_N,Math.ceil(camX+DG_VIEW)+1);
-  const gy0=Math.max(0,Math.floor(camY)),gy1=Math.min(DG_N,Math.ceil(camY+DG_VIEW)+1);
-  ctx.strokeStyle='rgba(0,0,0,.05)'; ctx.lineWidth=1;
-  for(let i=gx0;i<=gx1;i++){ctx.beginPath();ctx.moveTo(i*cell,gy0*cell);ctx.lineTo(i*cell,gy1*cell);ctx.stroke()}
-  for(let i=gy0;i<=gy1;i++){ctx.beginPath();ctx.moveTo(gx0*cell,i*cell);ctx.lineTo(gx1*cell,i*cell);ctx.stroke()}
-  for(let y=gy0;y<gy1;y++)for(let x=gx0;x<gx1;x++)if(st.g[y]&&st.g[y][x]){
-    const px=x*cell,py=y*cell,rr=cell*.22;
-    ctx.fillStyle='rgba(0,0,0,.15)';
-    ctx.beginPath();ctx.ellipse(px+cell/2,py+cell*.8,cell*.34,cell*.14,0,0,7);ctx.fill();
-    ctx.fillStyle='#8A7358';
-    ctx.beginPath();ctx.moveTo(px+rr,py+cell*.16);
-    ctx.arcTo(px+cell,py+cell*.16,px+cell,py+cell*.8,rr);
-    ctx.arcTo(px+cell,py+cell*.8,px,py+cell*.8,rr);
-    ctx.arcTo(px,py+cell*.8,px,py+cell*.16,rr);
-    ctx.arcTo(px,py+cell*.16,px+cell,py+cell*.16,rr);ctx.fill();
-    ctx.fillStyle='#A08A6C';
-    ctx.fillRect(px+cell*.16,py+cell*.2,cell*.68,cell*.14);
-  }
-  st.bits.forEach(b=>{
-    if(b.got)return;
-    const ph=DG.tick*.06+b.ph, bob=Math.sin(ph)*cell*.09;
-    ctx.save(); ctx.translate(b.x*cell,b.y*cell+bob);
-    ctx.globalAlpha=.26; ctx.fillStyle=b.k.c;
-    ctx.beginPath();ctx.arc(0,0,cell*.42,0,7);ctx.fill();
-    ctx.globalAlpha=1; ctx.fillStyle='#fff';
-    ctx.beginPath();ctx.arc(0,0,cell*.28,0,7);ctx.fill();
-    ctx.strokeStyle=b.k.c; ctx.lineWidth=2.4; ctx.stroke();
-    ctx.font=Math.round(cell*.32)+'px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText(b.k.mod,0,1);
-    ctx.restore();
+function rasterize(svgStr,w,h){
+  return new Promise((res,rej)=>{
+    const withSize=svgStr.replace('<svg','<svg width="'+w+'" height="'+h+'"');
+    const img=new Image(); img.onload=()=>res(img); img.onerror=()=>rej(new Error('svg'));
+    img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(withSize);
   });
-  (st.trail||[]).forEach(p=>{ctx.save();ctx.globalAlpha=p.t*.16;
-    ctx.fillStyle='#5FA8D9';
-    ctx.beginPath();ctx.arc(p.x*cell,p.y*cell,cell*.26*p.t,0,7);ctx.fill();ctx.restore()});
-  dgHero(ctx,st.p.x*cell,st.p.y*cell,cell*.3);
-  (st.parts||[]).forEach(p=>{ctx.save();ctx.globalAlpha=Math.max(0,p.t);
-    ctx.fillStyle=p.c;ctx.beginPath();ctx.arc(p.x*cell,p.y*cell,p.r*cell*p.t,0,7);ctx.fill();ctx.restore()});
-  (st.pops||[]).forEach(p=>{ctx.save();ctx.globalAlpha=Math.max(0,Math.min(1,p.t));
-    ctx.font='800 '+Math.round(cell*.28)+'px Nunito, system-ui';ctx.textAlign='center';
-    ctx.strokeStyle='rgba(255,255,255,.9)';ctx.lineWidth=4;
-    ctx.strokeText(p.v,p.x*cell,p.y*cell);
-    ctx.fillStyle=p.bad?'#D93030':'#2B2118';ctx.fillText(p.v,p.x*cell,p.y*cell);ctx.restore()});
-  ctx.restore();
-  if(st.glow>0){ctx.fillStyle='rgba(95,168,217,'+(st.glow/110)+')';ctx.fillRect(0,0,size,size)}
-  let best=null,bd=1e9;
-  st.bits.forEach(b=>{if(b.got||b.bad)return;const d=Math.hypot(b.x-st.p.x,b.y-st.p.y);if(d<bd){bd=d;best=b}});
-  if(best&&bd>DG_VIEW*0.42){
-    const a=Math.atan2(best.y-st.p.y,best.x-st.p.x);
-    ctx.save();ctx.translate(size/2+Math.cos(a)*size*.4,size/2+Math.sin(a)*size*.4);ctx.rotate(a);
-    ctx.globalAlpha=.8;ctx.fillStyle=best.k.c;
-    ctx.beginPath();ctx.moveTo(cell*.3,0);ctx.lineTo(-cell*.18,cell*.18);ctx.lineTo(-cell*.18,-cell*.18);
-    ctx.closePath();ctx.fill();ctx.restore();
-  }
-  ctx.restore();
 }
-/* человечек-исследователь на канвасе */
-function dgHero(ctx,x,y,r){
-  ctx.save(); ctx.translate(x,y);
-  ctx.fillStyle='rgba(40,26,10,.2)';
-  ctx.beginPath();ctx.ellipse(0,r*1.05,r*.75,r*.24,0,0,7);ctx.fill();
-  const wc=S.wear?S.wear.c:'#2E6B8A';
-  ctx.fillStyle='#3A3A44';
-  ctx.fillRect(-r*.28,r*.2,r*.22,r*.8); ctx.fillRect(r*.06,r*.2,r*.22,r*.8);
-  ctx.fillStyle=wc;
-  ctx.beginPath();ctx.roundRect?ctx.roundRect(-r*.5,-r*.18,r,r*.95,r*.22):ctx.rect(-r*.5,-r*.18,r,r*.95);
-  ctx.fill();
-  ctx.fillStyle=SKIN[S.skin]||'#E8BC98';
-  ctx.beginPath();ctx.arc(0,-r*.52,r*.42,0,7);ctx.fill();
-  ctx.fillStyle=HAIRC[S.hairc]||'#2B2118';
-  ctx.beginPath();ctx.arc(0,-r*.62,r*.42,Math.PI,0);ctx.fill();
-  ctx.fillStyle='#fff';[-1,1].forEach(s=>{ctx.beginPath();ctx.arc(s*r*.15,-r*.5,r*.11,0,7);ctx.fill()});
-  ctx.fillStyle='#22201E';[-1,1].forEach(s=>{ctx.beginPath();ctx.arc(s*r*.15,-r*.49,r*.06,0,7);ctx.fill()});
-  ctx.restore();
+function fitW(el,max){
+  const par=el.parentElement; if(!par)return Math.min(max,window.innerWidth-48);
+  const cs=getComputedStyle(par);
+  const inner=par.clientWidth-parseFloat(cs.paddingLeft||0)-parseFloat(cs.paddingRight||0);
+  return Math.max(200,Math.min(max,Math.floor(inner)));
+}
+function wrapLines(ctx,text,maxW){
+  const words=String(text||'').split(/\s+/).filter(Boolean),lines=[];let line='';
+  words.forEach(wd=>{const t=line?line+' '+wd:wd;if(ctx.measureText(t).width<=maxW||!line)line=t;else{lines.push(line);line=wd}});
+  if(line)lines.push(line);return lines;
+}
+/* ── векторы 10×10: копии, чужие, сходство ── */
+function shiftVec(v,dx,dy){const n=10,o=new Uint8Array(100);for(let y=0;y<n;y++)for(let x=0;x<n;x++){const sx=x-dx,sy=y-dy;if(sx>=0&&sy>=0&&sx<n&&sy<n&&v[sy*n+sx])o[y*n+x]=1}return o}
+function noiseVec(v,k,r){const o=Uint8Array.from(v);for(let i=0;i<k;i++){const j=Math.floor(r()*100);o[j]=o[j]?0:1}return o}
+function variantOf(v,r){return noiseVec(shiftVec(v,rint(r,-1,1),rint(r,-1,1)),rint(r,3,7),r)}
+function hardDecoy(v,r){ // его же рисунок, но с половиной клеток наоборот — «похоже, но чужое»
+  let o=shiftVec(v,rint(r,-2,2),rint(r,-2,2)); const cnt=o.reduce((a,b)=>a+b,0);
+  o=noiseVec(o,Math.max(14,Math.round(cnt*0.9)),r); return o;
+}
+function decoy(kind,r){
+  const o=new Uint8Array(100),n=10; const set=(x,y)=>{if(x>=0&&y>=0&&x<n&&y<n)o[y*n+x]=1};
+  if(kind===0)for(let a=0;a<360;a+=12)set(Math.round(4.5+3.4*Math.cos(a*Math.PI/180)),Math.round(4.5+3.4*Math.sin(a*Math.PI/180)));
+  if(kind===1)for(let i=1;i<9;i++){set(i,i);set(i,9-i)}
+  if(kind===2)for(let y=1;y<9;y+=2)for(let x=1;x<9;x++)set(x,y);
+  if(kind===3)for(let y=1;y<9;y++){set(3,y);set(6,y);if(y===1||y===8)for(let x=3;x<7;x++)set(x,y)}
+  if(kind===4){for(let i=0;i<26;i++)set(rint(r,1,8),rint(r,1,8))}
+  return noiseVec(o,rint(r,0,3),r);
+}
+function jaccard(a,b){let i=0,u=0;for(let k=0;k<100;k++){if(a[k]&&b[k])i++;if(a[k]||b[k])u++}return u?i/u:0}
+function drawVec(cv,v,px,fg){const n=10,c=px/n,ctx=cv.getContext('2d');cv.width=px;cv.height=px;
+  ctx.fillStyle='#FFF8EE';ctx.fillRect(0,0,px,px);ctx.fillStyle=fg||'#2B2118';
+  for(let i=0;i<100;i++)if(v[i])ctx.fillRect((i%n)*c+1,Math.floor(i/n)*c+1,c-2,c-2)}
+function decScore(v){
+  const pos=S.mem.pos.length?S.mem.pos:[S.thing]; let best=0;
+  pos.forEach(p=>{const s=jaccard(v,p);if(s>best)best=s});
+  let worst=0; S.mem.neg.forEach(p=>{const s=jaccard(v,p);if(s>worst)worst=s});
+  return Math.max(0,Math.min(1,best-worst*0.35+0.1));
+}
+/* ═══════════════ СОСТОЯНИЕ ═══════════════ */
+const S={step:'intro',child:'',age:'',seed:4821,
+  thing:null,thingName:'',feats:null,
+  mem:{pos:[],neg:[]},memDone:0,
+  thr:0.62,tally:{ok:0,miss:0,fa:0},decDone:0,
+  gest:null,actionPhrase:'',
+  human:null,
+  hair:0,hairc:1,skin:2,face:1,wear:3,head:0,world:'forest',
+  beat:null,beatKind:'',
+  name:'',title:'',line:'',mine:'',
+  shift:null,
+  done:{eye:0,memory:0,decider:0,hand:0,chair:0}};
+let CUR=null, T={aha:null,shown:{}};
+const STEPS=['intro','floor','pz','name','run','pass','end'];
+function pct(){const i=STEPS.indexOf(S.step);return Math.max(0,Math.round(i/(STEPS.length-1)*100))}
+function go(step){S.step=step;render();window.scrollTo({top:0});save()}
+
+/* автосохранение: звонок посреди урока — норма */
+function save(){try{const o=Object.assign({},S);o.thing=S.thing?Array.from(S.thing):null;o.mem={pos:S.mem.pos.map(v=>Array.from(v)),neg:S.mem.neg.map(v=>Array.from(v))};o.shift=null;localStorage.setItem('nooka_m3',JSON.stringify(o))}catch(e){}}
+function load(){try{const o=JSON.parse(localStorage.getItem('nooka_m3')||'null');if(!o||!o.child)return false;
+  Object.assign(S,o);S.thing=o.thing?Uint8Array.from(o.thing):null;S.mem={pos:(o.mem.pos||[]).map(v=>Uint8Array.from(v)),neg:(o.mem.neg||[]).map(v=>Uint8Array.from(v))};S.step='floor';return true}catch(e){return false}}
+function wipe(){try{localStorage.removeItem('nooka_m3')}catch(e){}}
+
+function needList(){
+  return STATIONS.map(x=>{
+    let have=false,val=null;
+    if(x.id==='eye'){have=!!S.thing;val=S.thingName||null}
+    if(x.id==='memory'){have=S.memDone>0;val=have?(S.mem.pos.length+S.mem.neg.length)+' примеров':null}
+    if(x.id==='decider'){have=S.decDone>0;val=have?Math.round(S.thr*100)+'%':null}
+    if(x.id==='hand'){have=!!S.gest;val=S.actionPhrase||(S.gest&&S.gest.n)||null}
+    if(x.id==='chair'){have=!!S.human;val=have?NODEN[S.human]:null}
+    return {...x,have,val};
+  });
+}
+function needHTML(){
+  const L=needList(),got=L.filter(x=>x.have).length;
+  return `<div class="need"><div class="need-t">Для цеха нужно <b>${got} из ${L.length}</b></div>
+   <div class="need-r">${L.map(x=>`<div class="nd${x.have?' has':''}"><span class="nd-e">${toolGlyph(x.id,16)}</span><span class="nd-n">${cap(x.gives)}</span><span class="nd-v">${x.have?x.val:'—'}</span></div>`).join('')}</div></div>`;
+}
+function nextStation(){const st=STATIONS.find(x=>!S.done[x.id]);return st?st.id:null}
+function allDone(){return STATIONS.every(x=>S.done[x.id])}
+
+/* ═══════════════ РЕНДЕР ═══════════════ */
+function render(){
+  const st=S.step;
+  $('prog').style.width=pct()+'%';
+  $('back').style.visibility=st==='intro'?'hidden':'visible';
+  $('hright').textContent='';
+  $('htitle').textContent='Профессия будущего';
+  stopChain(); stopFilm(); stopRun();
+
+  if(st==='intro'){
+    B().innerHTML=`<div class="h1">Кто ты по профессии через 20 лет?</div>
+      <div class="lead">Сегодня ты соберёшь цех: цепь из деталей ИИ, которая работает сама. И решишь, где в ней место человеку.</div>
+      ${say('Я — Нейро. Внутри меня нет ума. Есть цепь тупых деталей. Сейчас соберём такую же, только твою.','idle')}
+      <input class="field" id="fn" maxlength="14" placeholder="Как тебя зовут?" value="${S.child}" oninput="S.child=this.value" autocomplete="off">
+      <div class="chips">${[8,9,10,11,12].map(a=>`<button class="chip${S.age==a?' on':''}" onclick="S.age=${a};render()">${a}</button>`).join('')}</div>`;
+    F().innerHTML=`<button class="btn" onclick="startIt()">Заступить на смену</button>`;
+    return;
+  }
+
+  if(st==='floor'){
+    $('htitle').textContent='Цех';
+    const nx=nextStation(), nxM=nx&&MEANING[nx];
+    const ah=T.aha&&MEANING[T.aha]; T.aha=null;
+    const n=Object.values(S.done).filter(Boolean).length;
+    B().innerHTML=(n===0
+      ? say(OPENING,'idle')
+      : ah ? say('<b>'+ah.aha+'</b>'+(nxM?'\nДальше — номер '+nxM.n+'.':'\nЦепь собрана. Дёргай рычаг.'),'happy')
+      : say(nxM?'Дальше — номер '+nxM.n+'. '+nxM.title+'.':'Цепь собрана. Дёргай рычаг.','think'))
+      +`<div class="floor"><div class="floor-t">ЦЕХ <span>большая цепь ИИ</span></div><canvas class="chaincv" id="chaincv"></canvas>${needHTML()}</div>
+      <div class="stations">${STATIONS.map(x=>`
+        <button class="st${S.done[x.id]?' done':''}${nx===x.id?' next':''}" id="st_${x.id}" onclick="openLevel('${x.id}')">
+          <span class="st-num">${MEANING[x.id].n}</span>
+          <span class="st-n">${MEANING[x.id].title}</span>
+          <span class="st-s">${x.n} · ${MEANING[x.id].act}</span>
+          <span class="st-gives">${S.done[x.id]?'✓ деталь на конвейере':'даст: '+x.gives}</span>
+          <span class="st-h">${S.done[x.id]?'✓ понял':''}</span>
+          ${nx===x.id?'<span class="st-badge">сейчас</span>':''}
+        </button>`).join('')}</div>`;
+    F().innerHTML=allDone()
+      ? `<button class="btn" onclick="toName()">Дёрнуть рычаг →</button>`
+      : (n>=3?`<button class="btn btn2" onclick="toName()">Хватит — что не собрал, доделаю я</button>`:`<div class="hintbar">Собери детали — начни с номера ${nxM?nxM.n:1}</div>`);
+    setTimeout(startChain,60);
+    return;
+  }
+
+  if(st==='pz'){
+    const m=MEANING[CUR], stn=STATIONS.find(x=>x.id===CUR);
+    $('htitle').textContent=stn.n;
+    B().innerHTML=`<div class="pzgoal"><div class="pzgoal-t">Уровень ${m.n} из 5 · ${m.title}</div><div class="pzgoal-r">${m.act}</div></div>
+      <div id="pzbody" style="position:relative">${levelHTML(CUR)}</div>
+      <div class="note" id="pznote"></div>`;
+    F().innerHTML=`<div class="btnrow"><button class="btn btn2 btn-sm" onclick="leaveLevel(false)">В цех</button><button class="btn btn-sm" id="doneBtn" onclick="leaveLevel(true)" disabled>Готово</button></div>`;
+    setTimeout(()=>bindLevel(CUR),60);
+    return;
+  }
+
+  if(st==='name'){renderName();return}
+  if(st==='run'){renderRun();return}
+  if(st==='pass'){renderPass();return}
+  if(st==='end'){
+    B().innerHTML=say('Внутри ИИ — не волшебство. Цепь из деталей, каждую из которых ты собрал руками.\nИ одно место, где сидит человек. Ты сам его выбрал.','happy')
+      +`<div class="lead" style="text-align:center;margin-top:24px">Мастерская Nooka · «Профессия будущего»</div>`;
+    F().innerHTML=`<div class="btnrow"><button class="btn btn2 btn-sm" onclick="go('pass')">К паспорту</button><button class="btn btn-sm" onclick="wipe();location.href='index.html'">В мастерскую</button></div>`;
+    return;
+  }
+}
+function startIt(){
+  const f=$('fn'); if(f)S.child=f.value.trim();
+  if(!S.child){const f2=$('fn');if(f2){f2.classList.add('pulse');f2.focus();setTimeout(()=>f2.classList.remove('pulse'),1200)}return}
+  if(!S.age)S.age=10;
+  S.seed=[...S.child].reduce((a,c)=>a*31+c.charCodeAt(0),7)>>>0;
+  go('floor');
+}
+function openLevel(id){CUR=id;go('pz')}
+function leaveLevel(done){
+  stopLevel(CUR);
+  if(done){S.done[CUR]=1;T.aha=CUR}
+  CUR=null; go('floor');
+}
+function enableDone(on){const b=$('doneBtn');if(b)b.disabled=!on}
+
+/* ═══════════════ КОНВЕЙЕР В ЦЕХУ — цепь растёт на глазах ═══════════════ */
+const CH={run:0,raf:0,balls:[],t:0,last:0,puddles:[],gen:0};
+function stopChain(){CH.run=0;CH.gen++;if(CH.raf)cancelAnimationFrame(CH.raf);CH.raf=0}
+function startChain(){
+  const cv=$('chaincv'); if(!cv)return;
+  const w=fitW(cv,460), h=150, dpr=Math.min(2,devicePixelRatio||1);
+  cv.width=w*dpr; cv.height=h*dpr; cv.style.width=w+'px'; cv.style.height=h+'px';
+  const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+  CH.ctx=ctx;CH.w=w;CH.h=h;CH.balls=[];CH.puddles=[];CH.t=0;CH.last=performance.now();CH.spawn=0;CH.delivered=0;
+  if(!CH.thing&&S.thing){CH.thing=document.createElement('canvas');drawVec(CH.thing,S.thing,40)}
+  CH.run=1; const my=++CH.gen;
+  const loop=(now)=>{ if(!CH.run||my!==CH.gen)return;
+    const dt=Math.min(50,now-CH.last); CH.last=now; chainStep(dt); chainDraw();
+    CH.raf=requestAnimationFrame(loop) };
+  CH.raf=requestAnimationFrame(loop);
+}
+const CHAIN_IDS=['eye','memory','decider','hand'];
+function chainSlots(){const w=CH.w,x0=30,x1=w-30;const xs=[];for(let i=0;i<4;i++)xs.push(x0+(x1-x0)*(i+1)/5);return {hatch:x0,win:x1,xs,y:72}}
+function chainStep(dt){
+  CH.t+=dt;
+  const P=chainSlots(), beat=S.beat?Math.max(700,Math.min(2200,S.beat.mean)):1400;
+  if(CH.t>CH.spawn){CH.balls.push({x:P.hatch,y:P.y,k:CH.balls.length%3,dead:0,fall:0});CH.spawn=CH.t+beat}
+  CH.balls.forEach(b=>{
+    if(b.fall){b.vy+=dt*0.004;b.y+=b.vy*dt;b.x+=b.vx*dt;if(b.y>CH.h-14){b.dead=1;if(CH.puddles.length<24)CH.puddles.push({x:b.x,y:CH.h-12,r:0,k:b.k})}return}
+    b.x+=0.05*dt;
+    for(let i=0;i<4;i++){const sx=P.xs[i]; if(b.x>=sx-2&&!b['p'+i]){b['p'+i]=1;
+      if(!S.done[CHAIN_IDS[i]]){b.fall=1;b.vy=-0.12;b.vx=0.02;return}
+      if(i===2&&b.k===2){b.fall=1;b.vy=-0.05;b.vx=0.03;return}
+    }}
+    if(b.x>P.win-6){b.dead=1;CH.delivered++}
+  });
+  CH.balls=CH.balls.filter(b=>!b.dead);
+  CH.puddles.forEach(p=>{if(p.r<9)p.r+=dt*0.02});
+}
+function chainDraw(){
+  const {ctx,w,h}=CH; if(!ctx)return; const P=chainSlots(), nx=nextStation();
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle='#F6ECDA';ctx.fillRect(0,0,w,h);
+  ctx.fillStyle='#D9BE94';ctx.fillRect(0,h-16,w,16);
+  ctx.fillStyle='#8A6D46';ctx.fillRect(P.hatch,P.y+14,P.win-P.hatch,8);
+  ctx.fillStyle='rgba(0,0,0,.08)';for(let i=0;i<18;i++)ctx.fillRect(P.hatch+((i*34+CH.t*0.05)%(P.win-P.hatch)),P.y+14,14,8);
+  ctx.fillStyle='#6E5233';ctx.fillRect(P.hatch-14,10,28,36);ctx.fillStyle='#3A2A18';ctx.fillRect(P.hatch-9,40,18,6);
+  // выход с печатью «готово»
+  ctx.fillStyle='#6E5233';ctx.fillRect(P.win-14,P.y-30,28,56);ctx.fillStyle='#FFF8EE';ctx.fillRect(P.win-10,P.y-25,20,30);
+  ctx.fillStyle='#2B2118';ctx.font='800 11px Nunito, sans-serif';ctx.textAlign='center';ctx.fillText(String(CH.delivered||0),P.win,P.y-6);
+  ctx.fillStyle='#2E9E5B';ctx.font='800 8.5px Nunito, sans-serif';ctx.fillText('готово',P.win,P.y+36);
+  const names=['глаз','память','решатель','рука'];
+  const pulse=0.5+0.5*Math.sin(CH.t/260);
+  CHAIN_IDS.forEach((id,i)=>{
+    const x=P.xs[i], on=S.done[id], isNext=nx===id;
+    if(on){ctx.fillStyle='#F2E4CC';ctx.strokeStyle='#3A2A18';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(x-22,P.y-22,44,36,8);ctx.fill();ctx.stroke();
+      if(CH.icons&&CH.icons[id])ctx.drawImage(CH.icons[id],x-13,P.y-18,26,26)}
+    else{ // заслонка; следующая — светится
+      ctx.fillStyle=isNext?`rgba(230,92,0,${0.10+pulse*0.18})`:'rgba(120,90,60,.12)';ctx.beginPath();ctx.roundRect(x-22,P.y-22,44,36,8);ctx.fill();
+      ctx.setLineDash(isNext?[]:[4,3]);ctx.strokeStyle=isNext?'#E65C00':'rgba(58,42,24,.4)';ctx.lineWidth=isNext?2.5:1.5;ctx.beginPath();ctx.roundRect(x-22,P.y-22,44,36,8);ctx.stroke();ctx.setLineDash([]);
+      if(!isNext){ctx.fillStyle='rgba(90,60,25,.35)';for(let k=0;k<3;k++)ctx.fillRect(x-16,P.y-14+k*10,32,4)}}
+    ctx.fillStyle=on?'#3A2A18':'rgba(58,42,24,.55)';ctx.font='800 10.5px Nunito, sans-serif';ctx.textAlign='center';ctx.fillText(names[i],x,P.y+30);
+    ctx.fillStyle='#E65C00';ctx.font='800 10px Unbounded, sans-serif';ctx.fillText(String(i+1),x-16,P.y-26);
+    if(S.human===id){ctx.fillStyle='#2E9E5B';ctx.fillRect(x-14,P.y+34,28,5);ctx.fillStyle='#2B2118';ctx.font='800 9.5px Nunito, sans-serif';ctx.fillText('ты',x,P.y+48)}
+  });
+  if(S.done.chair&&!S.human){}
+  CH.puddles.forEach(p=>{ctx.fillStyle=['rgba(74,144,217,.45)','rgba(224,160,32,.45)','rgba(155,89,199,.45)'][p.k];ctx.beginPath();ctx.ellipse(p.x,p.y,p.r*1.6,p.r*.6,0,0,7);ctx.fill()});
+  CH.balls.forEach(b=>{if(CH.thing&&b.k!==2){ctx.drawImage(CH.thing,b.x-8,b.y-8,16,16);ctx.strokeStyle='#2B2118';ctx.lineWidth=1.2;ctx.strokeRect(b.x-8,b.y-8,16,16)}
+    else{ctx.fillStyle=['#4A90D9','#E0A020','#9B59C7'][b.k];ctx.beginPath();ctx.arc(b.x,b.y,6.5,0,7);ctx.fill();ctx.strokeStyle='#2B2118';ctx.lineWidth=1.5;ctx.stroke()}});
+}
+(async()=>{CH.icons={};for(const id of ['eye','memory','decider','hand','chair']){try{CH.icons[id]=await rasterize(toolGlyph(id,26),52,52)}catch(e){}}})();
+/* ═══════════════ УРОВНИ ═══════════════ */
+function levelHTML(id){return {eye:eyeHTML,memory:memHTML,decider:decHTML,hand:handHTML,chair:chairHTML}[id]()}
+function bindLevel(id){
+  ({eye:eyeBind,memory:memBind,decider:decBind,hand:handBind,chair:chairBind}[id])();
+  if(!T.shown[id]){T.shown[id]=1;setTimeout(()=>demoHand(id),400)}
+}
+function stopLevel(id){if(id==='decider')decStop()}
+function demoHand(kind){
+  const box=$('pzbody'); if(!box)return;
+  const h=document.createElement('div');
+  h.className='demohand '+({eye:'',memory:'swipe',decider:'turn',hand:'swipe',chair:'swipe'}[kind]||'');
+  h.innerHTML='<div class="dh-f">☝️</div><span class="dh-t">'+{eye:'закрашивай клетки пальцем',memory:'тащи карточку на полку',decider:'крути диск',hand:'покажи пальцем над рисунком',chair:'перетащи себя на место в цепи'}[kind]+'</span>';
+  box.appendChild(h);
+  const kill=()=>{h.classList.add('off');setTimeout(()=>h.remove(),300)};
+  box.addEventListener('pointerdown',kill,{once:true}); setTimeout(kill,5200);
+}
+function thumb(px){const c=document.createElement('canvas');drawVec(c,S.thing||new Uint8Array(100),px);return c}
+
+/* ── 1. ГЛАЗ ── */
+const PIX={n:10,cells:null,down:false,mode:1};
+function eyeHTML(){
+  return say(MEANING.eye.before,'think')
+   +`<div class="pz"><div class="pixwrap"><canvas id="pixcv"></canvas>
+      <div><div class="rowlbl" style="margin-top:0">Я вижу</div><div class="numgrid" id="numgrid"></div></div></div>
+      <div class="feat" id="feat"></div>
+      <div class="pixbtns"><button class="btn btn2 btn-sm" onclick="pixMirror()">Зеркало</button><button class="btn btn2 btn-sm" onclick="pixClear()">Стереть</button></div>
+      <input class="field" id="thingname" maxlength="18" placeholder="Что это? Одним словом" value="${S.thingName}" oninput="S.thingName=this.value.trim();eyeCheck()"></div>`;
+}
+function eyeBind(){
+  const cv=$('pixcv'); if(!cv)return;
+  const n=PIX.n, dpr=Math.min(2,devicePixelRatio||1);
+  const size=Math.max(180,Math.min(240,fitW(cv,340)-104)); cv.width=size*dpr;cv.height=size*dpr;cv.style.width=size+'px';cv.style.height=size+'px';
+  const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
+  PIX.ctx=ctx;PIX.size=size;PIX.cells=S.thing?Array.from(S.thing):new Array(n*n).fill(0);
+  const cellAt=e=>{const r=cv.getBoundingClientRect();const c=Math.floor((e.clientX-r.left)/size*n),rr=Math.floor((e.clientY-r.top)/size*n);return (c<0||rr<0||c>=n||rr>=n)?-1:rr*n+c};
+  const paint=i=>{if(i<0)return;if(PIX.cells[i]!==PIX.mode){PIX.cells[i]=PIX.mode;pixDraw();eyeUpdate()}};
+  cv.onpointerdown=e=>{e.preventDefault();try{cv.setPointerCapture(e.pointerId)}catch(_){}PIX.down=true;const i=cellAt(e);PIX.mode=(i>=0&&PIX.cells[i])?0:1;paint(i)};
+  cv.onpointermove=e=>{if(!PIX.down)return;e.preventDefault();let pts=[e];if(e.getCoalescedEvents){const c=e.getCoalescedEvents();if(c&&c.length)pts=c}pts.forEach(p=>paint(cellAt(p)))};
+  const end=()=>{PIX.down=false}; cv.onpointerup=end;cv.onpointercancel=end;cv.onlostpointercapture=end;
+  pixDraw();eyeUpdate();
+}
+function pixDraw(){const {ctx,size,n,cells}=PIX;if(!ctx)return;const c=size/n;ctx.fillStyle='#F6EEE2';ctx.fillRect(0,0,size,size);
+  for(let i=0;i<n*n;i++){ctx.fillStyle=cells[i]?'#2B2118':'#FFF8EE';ctx.fillRect((i%n)*c+1,Math.floor(i/n)*c+1,c-2,c-2)}
+  ctx.strokeStyle='rgba(90,60,25,.25)';ctx.lineWidth=1;ctx.strokeRect(.5,.5,size-1,size-1)}
+function pixClear(){PIX.cells.fill(0);pixDraw();eyeUpdate()}
+function pixMirror(){const n=PIX.n;for(let y=0;y<n;y++)for(let x=0;x<n/2;x++)PIX.cells[y*n+(n-1-x)]=PIX.cells[y*n+x];pixDraw();eyeUpdate()}
+function pixFeats(cells){const n=10;let cnt=0,sym=0,top=0,bot=0,minx=n,maxx=-1,miny=n,maxy=-1;
+  for(let i=0;i<n*n;i++)if(cells[i]){cnt++;const x=i%n,y=Math.floor(i/n);if(y<n/2)top++;else bot++;if(x<minx)minx=x;if(x>maxx)maxx=x;if(y<miny)miny=y;if(y>maxy)maxy=y;if(cells[y*n+(n-1-x)])sym++}
+  return {cnt,sym:cnt?Math.round(sym/cnt*100):0,top,bot,w:cnt?maxx-minx+1:0,h:cnt?maxy-miny+1:0}}
+function eyeUpdate(){
+  const g=$('numgrid'); if(g)g.innerHTML=PIX.cells.map(v=>`<i class="${v?'on':''}">${v}</i>`).join('');
+  const f=pixFeats(PIX.cells); S.feats=f;
+  const fe=$('feat'); if(fe){fe.innerHTML=(f.cnt<6?[`закрашено ${f.cnt} из 100`]:[`закрашено ${f.cnt} из 100`,f.sym>=70?'левая половина как правая':'несимметрично',f.bot>f.top*1.4?'тяжёлый низ':f.top>f.bot*1.4?'тяжёлый верх':'ровное',`${f.w}×${f.h} клеток`]).map(t=>'<span>'+t+'</span>').join('')}
+  if(f.cnt===1&&!T.shown.eye1){T.shown.eye1=1;setNote(MEANING.eye.dur[0])}
+  if(f.cnt>=8&&f.sym>=70&&!T.shown.eyeSym){T.shown.eyeSym=1;setNote(MEANING.eye.dur[2])}
+  eyeCheck();
+}
+function eyeCheck(){
+  const f=S.feats||{cnt:0}, ok=f.cnt>=8&&(S.thingName||'').length>=2;
+  if(f.cnt>=8){S.thing=Uint8Array.from(PIX.cells);CH.thing=null}
+  enableDone(ok);
+  if(ok&&!T.shown.eyeNote){T.shown.eyeNote=1;setNote('Для тебя — '+S.thingName+'. Для меня — '+f.cnt+' единиц и '+(100-f.cnt)+' нулей. Оба правы.')}
 }
 
-/* ═════════ НАВИГАЦИЯ ═════════ */
+/* ── 2. ПАМЯТЬ — тащишь карточки на полки, полки остаются ── */
+const MEM={deck:[],i:0};
+function memHTML(){
+  if(!S.thing)return say('Сначала нарисуй что-нибудь на уровне 1 — иначе мне нечего копировать.','oops');
+  return say(MEANING.memory.before,'think')
+   +`<div class="pz"><div class="shelves"><div class="shelf yes" id="shelfyes"><div class="shelf-t"><span class="shelf-th" id="shelfth"></span>моё</div><div class="shelf-r" id="shelfry"></div></div>
+      <div class="shelf no" id="shelfno"><div class="shelf-t">чужое</div><div class="shelf-r" id="shelfrn"></div></div></div>
+      <div class="stack" id="stack"></div></div>`;
+}
+function memBind(){
+  if(!S.thing)return;
+  const r=rng(S.seed*7+11); const deck=[];
+  for(let i=0;i<7;i++)deck.push({v:variantOf(S.thing,r),truth:1});
+  for(let i=0;i<3;i++)deck.push({v:decoy(i,r),truth:0});
+  for(let i=0;i<2;i++)deck.push({v:hardDecoy(S.thing,r),truth:0});
+  for(let i=deck.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]]}
+  MEM.deck=deck;MEM.i=0;S.mem={pos:[],neg:[]};S.memDone=0;
+  const th=$('shelfth'); if(th)th.appendChild(thumb(22));
+  memRender();
+}
+function memRender(){
+  const st=$('stack'); if(!st)return; st.innerHTML='';
+  const rest=MEM.deck.slice(MEM.i,MEM.i+3);
+  if(!rest.length){st.innerHTML='<div class="hintbar" style="padding-top:70px">'+MEANING.memory.dur[3]+'</div>';return}
+  rest.slice().reverse().forEach((c,k)=>{const idx=rest.length-1-k;
+    const d=document.createElement('div');d.className='card'+(idx===1?' back':idx===2?' back2':'');
+    d.innerHTML='<canvas></canvas><div class="card-n">'+(MEM.i+idx+1)+' из '+MEM.deck.length+'</div>';
+    st.appendChild(d); drawVec(d.querySelector('canvas'),c.v,150);
+    if(idx===0)memDrag(d,c)});
+}
+function memDrag(el,c){
+  let down=false,sx=0,sy=0,dx=0,dy=0;
+  const shelfAt=(x,y)=>{for(const id of ['shelfyes','shelfno']){const s=$(id);if(!s)continue;const r=s.getBoundingClientRect();if(x>=r.left-4&&x<=r.right+4&&y>=r.top-30&&y<=r.bottom+10)return s}return null};
+  const move=e=>{if(!down)return;e.preventDefault();dx=e.clientX-sx;dy=e.clientY-sy;el.style.transition='none';el.style.transform=`translate(${dx}px,${dy}px) rotate(${dx/16}deg)`;
+    const sh=shelfAt(e.clientX,e.clientY);['shelfyes','shelfno'].forEach(id=>{const s=$(id);if(s)s.classList.toggle('hot',s===sh)})};
+  const end=e=>{if(!down)return;down=false;el.style.transition='';
+    const sh=e&&typeof e.clientX==='number'?shelfAt(e.clientX,e.clientY):null;
+    ['shelfyes','shelfno'].forEach(id=>{const s=$(id);if(s)s.classList.remove('hot')});
+    if(sh){const lab=sh.id==='shelfyes'?1:0;(lab?S.mem.pos:S.mem.neg).push(c.v);S.memDone++;
+      const row=$(lab?'shelfry':'shelfrn'); if(row){const m=document.createElement('canvas');drawVec(m,c.v,26,lab?'#2B2118':'#8A7A68');row.appendChild(m)}
+      el.classList.add('fly');const r=sh.getBoundingClientRect(),er=el.getBoundingClientRect();el.style.transform=`translate(${r.left+r.width/2-er.left-er.width/2+dx}px,${r.top-er.top+dy}px) scale(.2)`;el.style.opacity='0';
+      if(S.memDone===1)setNote(MEANING.memory.dur[0]);
+      if(S.memDone===4)setNote(MEANING.memory.dur[1]);
+      if(lab!==c.truth&&!T.shown.memWarn){T.shown.memWarn=1;setNote(MEANING.memory.dur[2])}
+      MEM.i++;setTimeout(memRender,280);
+      if(MEM.i>=MEM.deck.length){enableDone(true);setNote(MEANING.memory.dur[3])}
+    }else{el.style.transform=''}
+    dx=0;dy=0};
+  el.onpointerdown=e=>{e.preventDefault();try{el.setPointerCapture(e.pointerId)}catch(_){}down=true;sx=e.clientX;sy=e.clientY;dx=0;dy=0};
+  el.onpointermove=move;el.onpointerup=end;el.onpointercancel=end;el.onlostpointercapture=end;
+}
+
+/* ── 3. РЕШАТЕЛЬ — сравнение с полками и черта; ошибки падают в корзины ── */
+const DEC={run:0,raf:0,items:[],t:0,last:0,seen:0,gen:0,bins:{yes:[],no:[]}};
+function decHTML(){
+  if(!S.thing||!S.memDone)return say('Сначала заполни память на уровне 2 — решателю не с чем сравнивать.','oops');
+  return say(MEANING.decider.before,'think')
+   +`<div class="pz"><canvas id="deccv"></canvas>
+      <div class="dial" id="dial"><div class="dial-n" id="dialn"></div><div class="dial-c"></div><div class="dial-l" id="diall">черта 62%</div></div>
+      <div class="tally"><div class="tl ok"><b id="tok">0</b>верно</div><div class="tl miss"><b id="tmiss">0</b>не узнал своё</div><div class="tl fa"><b id="tfa">0</b>пропустил чужое</div></div></div>`;
+}
+function decMakeItems(){
+  const r=rng(S.seed*13+5), items=[];
+  for(let i=0;i<8;i++)items.push({v:variantOf(S.thing,r),truth:1});
+  for(let i=0;i<3;i++)items.push({v:decoy(i,r),truth:0});
+  for(let i=0;i<3;i++)items.push({v:hardDecoy(S.thing,r),truth:0});
+  items.forEach(it=>it.score=decScore(it.v));
+  // «нуля нет» должно быть правдой: если какая-то черта даёт 0 ошибок — подмешиваем трудную пару
+  const errsAt=t=>items.reduce((a,it)=>a+((it.score>=t)!==!!it.truth?1:0),0);
+  let guard=0; while(guard++<6){let minE=99;for(let t=0.25;t<=0.9;t+=0.02)minE=Math.min(minE,errsAt(t));if(minE>=1)break;
+    const hv=hardDecoy(S.thing,r);items.push({v:hv,truth:0,score:decScore(hv)});const sv=noiseVec(S.thing,12,r);items.push({v:sv,truth:1,score:decScore(sv)})}
+  for(let i=items.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[items[i],items[j]]=[items[j],items[i]]}
+  return items;
+}
+function decBind(){
+  if(!S.thing||!S.memDone)return;
+  const cv=$('deccv'); if(!cv)return;
+  const w=fitW(cv,460), h=150, dpr=Math.min(2,devicePixelRatio||1);
+  cv.width=w*dpr;cv.height=h*dpr;cv.style.width=w+'px';cv.style.height=h+'px';
+  const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
+  DEC.ctx=ctx;DEC.w=w;DEC.h=h;DEC.pool=decMakeItems();DEC.pi=0;DEC.items=[];DEC.t=0;DEC.spawn=600;DEC.seen=0;S.tally={ok:0,miss:0,fa:0};DEC.bins={yes:[],no:[]};DEC.start=performance.now();
+  DEC.th=thumb(28);
+  const d=$('dial'); let down=false;
+  const setThr=e=>{const r=d.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
+    let a=Math.atan2(e.clientY-cy,e.clientX-cx)*180/Math.PI+90;a=((a%360)+360)%360;if(a>180)a-=360;a=Math.max(-135,Math.min(135,a));
+    S.thr=0.25+(a+135)/270*0.65;decDial();decRejudge()};
+  d.onpointerdown=e=>{e.preventDefault();try{d.setPointerCapture(e.pointerId)}catch(_){}down=true;setThr(e)};
+  d.onpointermove=e=>{if(down){e.preventDefault();setThr(e)}};
+  const end=()=>{down=false};d.onpointerup=end;d.onpointercancel=end;d.onlostpointercapture=end;
+  decDial();
+  DEC.run=1;DEC.last=performance.now();const my=++DEC.gen;
+  const loop=now=>{if(!DEC.run||my!==DEC.gen)return;const dt=Math.min(50,now-DEC.last);DEC.last=now;decStep(dt);decDraw();DEC.raf=requestAnimationFrame(loop)};
+  DEC.raf=requestAnimationFrame(loop);
+}
+function decStop(){DEC.run=0;DEC.gen++;if(DEC.raf)cancelAnimationFrame(DEC.raf);DEC.raf=0}
+function decDial(){const a=(S.thr-0.25)/0.65*270-135;const n=$('dialn');if(n)n.style.transform='rotate('+a+'deg)';const l=$('diall');if(l)l.textContent='черта '+Math.round(S.thr*100)+'%'}
+/* крутнул диск — уже разложенные пересчитываются: корзины меняются на глазах */
+function decRejudge(){
+  const all=DEC.bins.yes.concat(DEC.bins.no); DEC.bins={yes:[],no:[]}; S.tally={ok:0,miss:0,fa:0};
+  all.forEach(it=>{it.pass=it.score>=S.thr;(it.pass?DEC.bins.yes:DEC.bins.no).push(it);decCount(it)});
+  decTally();
+}
+function decCount(it){if(it.pass===!!it.truth)S.tally.ok++;else if(it.truth)S.tally.miss++;else S.tally.fa++}
+function decStep(dt){
+  DEC.t+=dt; const w=DEC.w;
+  if(DEC.t>DEC.spawn&&DEC.pi<DEC.pool.length){const it=Object.assign({x:-20,y:0,judged:0,img:null},DEC.pool[DEC.pi++]);DEC.items.push(it);DEC.spawn=DEC.t+1400}
+  DEC.items.forEach(it=>{
+    it.x+=dt*0.07;
+    if(!it.judged&&it.x>=w*0.5){it.judged=1;it.pass=it.score>=S.thr;DEC.seen++;(it.pass?DEC.bins.yes:DEC.bins.no).push(it);decCount(it);decTally();
+      if(DEC.seen===1)setNote(MEANING.decider.dur[0]);
+      if(DEC.seen===4)setNote(MEANING.decider.dur[2]);
+      if(DEC.seen>=8){S.decDone=1;enableDone(true)}}
+    if(it.judged){it.y+=dt*0.16}
+    if(it.y>70)it.dead=1;
+  });
+  DEC.items=DEC.items.filter(i=>!i.dead);
+  if(!S.decDone&&performance.now()-DEC.start>40000){S.decDone=1;enableDone(true)}
+}
+function decTally(){const t=S.tally;['ok','miss','fa'].forEach(k=>{const e=$('t'+k);if(e)e.textContent=t[k]})}
+function decDraw(){
+  const {ctx,w,h}=DEC; if(!ctx)return;
+  ctx.clearRect(0,0,w,h);ctx.fillStyle='#F6EEE2';ctx.fillRect(0,0,w,h);
+  ctx.fillStyle='#8A6D46';ctx.fillRect(0,44,w,8);
+  // корзины
+  const by=h-46;
+  ctx.fillStyle='#DFF5EA';ctx.beginPath();ctx.roundRect(w/2-150,by,116,40,8);ctx.fill();ctx.strokeStyle='#2E9E5B';ctx.lineWidth=2;ctx.stroke();
+  ctx.fillStyle='#EDE3D2';ctx.beginPath();ctx.roundRect(w/2+34,by,116,40,8);ctx.fill();ctx.strokeStyle='#8A7A68';ctx.stroke();
+  if(DEC.th)ctx.drawImage(DEC.th,w/2-146,by+6,28,28);
+  ctx.fillStyle='#2E9E5B';ctx.font='800 12px Nunito, sans-serif';ctx.textAlign='left';ctx.fillText('моё '+DEC.bins.yes.length,w/2-112,by+25);
+  ctx.fillStyle='#8A7A68';ctx.fillText('чужое '+DEC.bins.no.length,w/2+44,by+25);
+  // содержимое корзин: неверные — рыжей рамкой
+  const dr=(list,x0)=>list.slice(-7).forEach((it,k)=>{if(!it.img){it.img=document.createElement('canvas');drawVec(it.img,it.v,40)}ctx.drawImage(it.img,x0+k*15,by-18,16,16);if(it.pass!==!!it.truth){ctx.strokeStyle='#E65C00';ctx.lineWidth=2;ctx.strokeRect(x0+k*15,by-18,16,16)}});
+  dr(DEC.bins.yes,w/2-150);dr(DEC.bins.no,w/2+34);
+  // решатель
+  ctx.fillStyle='#F2E4CC';ctx.strokeStyle='#3A2A18';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(w/2-24,8,48,44,10);ctx.fill();ctx.stroke();
+  if(CH.icons&&CH.icons.decider)ctx.drawImage(CH.icons.decider,w/2-13,12,26,26);
+  ctx.fillStyle='#2B2118';ctx.font='800 9.5px Nunito, sans-serif';ctx.textAlign='center';ctx.fillText('черта '+Math.round(S.thr*100)+'%',w/2,48);
+  DEC.items.forEach(it=>{
+    if(!it.img){it.img=document.createElement('canvas');drawVec(it.img,it.v,40)}
+    let x=it.x-14,y=16;
+    if(it.judged){const f=Math.min(1,it.y/70);x=w/2-14+(it.pass?-92:92)*f;y=16+(by-34-16)*f}
+    ctx.drawImage(it.img,x,y,28,28);
+    ctx.strokeStyle=it.judged?(it.pass?'#2E9E5B':'#8A7A68'):'#3A2A18';ctx.lineWidth=2;ctx.strokeRect(x,y,28,28);
+    if(it.judged&&it.pass!==!!it.truth){ctx.strokeStyle='#E65C00';ctx.lineWidth=2.5;ctx.strokeRect(x-2,y-2,32,32)}
+    ctx.fillStyle='#2B2118';ctx.font='800 9px Nunito, sans-serif';ctx.textAlign='center';ctx.fillText(Math.round(it.score*100)+'%',x+14,y-4);
+  });
+}
+
+/* ── 4. РУКА — жест над рисунком, машина называет измеренное ── */
+const HG={pts:[],down:false,t0:0};
+function handHTML(){
+  if(!S.thing)return say('Сначала нарисуй что-нибудь на уровне 1 — руке не с чем работать.','oops');
+  return say(MEANING.hand.before,'think')
+   +`<div class="pz"><canvas id="hgcv"></canvas>
+      <div class="feat" id="hgfeat"></div>
+      <div class="note" id="hgread" style="min-height:0"></div>
+      <div id="hgphrase" style="display:none"><div class="rowlbl">Что делает рука — твоими словами</div>
+        <input class="field" id="hgtext" maxlength="30" placeholder="например: чистит зубы" value="${S.actionPhrase}" oninput="S.actionPhrase=this.value.trim();handCheck()" style="margin-top:0"></div></div>`;
+}
+function handBind(){
+  const cv=$('hgcv'); if(!cv)return;
+  const w=fitW(cv,460), h=200, dpr=Math.min(2,devicePixelRatio||1);
+  cv.width=w*dpr;cv.height=h*dpr;cv.style.width=w+'px';cv.style.height=h+'px';
+  const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
+  HG.ctx=ctx;HG.w=w;HG.h=h;HG.pts=[];HG.th=thumb(120);
+  const pos=e=>{const r=cv.getBoundingClientRect();return {x:e.clientX-r.left,y:e.clientY-r.top,t:performance.now()}};
+  cv.onpointerdown=e=>{e.preventDefault();try{cv.setPointerCapture(e.pointerId)}catch(_){}HG.down=true;HG.pts=[pos(e)];HG.t0=performance.now();clearTimeout(HG.tm);hgDraw()};
+  cv.onpointermove=e=>{if(!HG.down)return;e.preventDefault();let pts=[e];if(e.getCoalescedEvents){const c=e.getCoalescedEvents();if(c&&c.length)pts=c}pts.forEach(p=>HG.pts.push(pos(p)));hgDraw()};
+  const end=()=>{if(!HG.down)return;HG.down=false;HG.pts.push(Object.assign({},HG.pts[HG.pts.length-1],{t:performance.now(),up:1}));HG.taps=(HG.taps||0)+1;clearTimeout(HG.tm);HG.tm=setTimeout(hgJudge,700);hgDraw()};
+  cv.onpointerup=end;cv.onpointercancel=end;cv.onlostpointercapture=end;
+  if(S.gest){$('hgphrase').style.display='';handCheck()}
+  hgDraw();
+}
+function hgDraw(){
+  const {ctx,w,h}=HG;if(!ctx)return;ctx.clearRect(0,0,w,h);ctx.fillStyle='#F6EEE2';ctx.fillRect(0,0,w,h);
+  if(HG.th)ctx.drawImage(HG.th,w/2-60,h/2-60,120,120);
+  if(HG.pts.length>1){ctx.strokeStyle='rgba(230,92,0,.7)';ctx.lineWidth=5;ctx.lineCap='round';ctx.lineJoin='round';ctx.beginPath();ctx.moveTo(HG.pts[0].x,HG.pts[0].y);
+    HG.pts.forEach(p=>{if(p.up)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y)});ctx.stroke()}
+}
+function hgJudge(){
+  const p=HG.pts; if(p.length<2)return;
+  const dur=(p[p.length-1].t-p[0].t), taps=HG.taps||1;
+  let len=0,rev=0,dir=0,minx=1e9,maxx=-1e9,miny=1e9,maxy=-1e9;
+  for(let i=1;i<p.length;i++){const a=p[i-1],b=p[i];if(a.up)continue;len+=Math.hypot(b.x-a.x,b.y-a.y);const dx=b.x-a.x;if(Math.abs(dx)>3){const nd=dx>0?1:-1;if(dir&&nd!==dir)rev++;dir=nd}}
+  p.forEach(q=>{if(q.x<minx)minx=q.x;if(q.x>maxx)maxx=q.x;if(q.y<miny)miny=q.y;if(q.y>maxy)maxy=q.y});
+  const closed=Math.hypot(p[0].x-p[p.length-1].x,p[0].y-p[p.length-1].y)<40&&len>220;
+  const feats=[];let g;
+  if(taps>=3&&len<taps*25){g='fix';feats.push(taps+' тычка',' коротко')}
+  else if(rev>=4){g='clean';feats.push('туда-сюда '+(rev+1)+' раз',len>300?'размашисто':'коротко')}
+  else if(closed){g='find';feats.push('обвёл кругом','замкнул линию')}
+  else if(len<40&&dur>700){g='heal';feats.push('держал '+Math.round(dur/100)/10+' с','почти не двигал')}
+  else{g='carry';feats.push('протянул '+Math.round(len)+' px','в одну сторону')}
+  const G=GESTURES.find(x=>x.id===g); S.gest=G;
+  const fe=$('hgfeat'); if(fe)fe.innerHTML=feats.map(t=>'<span>'+t+'</span>').join('');
+  const rd=$('hgread'); if(rd)rd.textContent='Я измерил: '+feats.join(', ')+'. Это «'+G.n+'»? Не согласен — напиши своё слово.';
+  const ph=$('hgphrase'); if(ph)ph.style.display='';
+  const tx=$('hgtext'); if(tx&&!S.actionPhrase){tx.value=G.n+' '+(S.thingName||'');S.actionPhrase=tx.value.trim()}
+  HG.taps=0; handCheck();
+}
+function handCheck(){enableDone(!!(S.gest&&(S.actionPhrase||'').length>=3));if(S.gest&&!T.shown.handNote){T.shown.handNote=1;setNote(MEANING.hand.dur[0].replace('делает одно и то же','умеет только «'+S.gest.n+'»'))}}
+
+/* ── 5. СТУЛ — собери себя, посади в цепь ── */
+function chairHTML(){
+  return say(MEANING.chair.before,'think')
+   +`<div class="pz">
+      <div class="rowlbl" style="margin-top:0">Это ты через 20 лет</div>
+      <div class="charstage"><div class="charpv" id="charpv">${personScene({vb:'70 90 160 300'})}</div>
+        <div>
+          <div class="charrow">${SKIN.map((c,i)=>`<div class="sw${S.skin===i?' on':''}" style="background:${c}" onclick="S.skin=${i};charUpd(this)"></div>`).join('')}</div>
+          <div class="charrow">${HAIRC.map((c,i)=>`<div class="sw${S.hairc===i?' on':''}" style="background:${c}" onclick="S.hairc=${i};charUpd(this)"></div>`).join('')}</div>
+          <div class="chips" style="margin-top:6px">${HAIR.map((h,i)=>`<button class="chip mini-chip${S.hair===i?' on':''}" onclick="S.hair=${i};charUpd(this)">${h.n}</button>`).join('')}</div>
+          <div class="chips" style="margin-top:6px">${FACES.map((h,i)=>`<button class="chip mini-chip${S.face===i?' on':''}" onclick="S.face=${i};charUpd(this)">${h.n}</button>`).join('')}</div>
+          <div class="chips" style="margin-top:6px">${WEAR.map((h,i)=>`<button class="chip mini-chip${S.wear===i?' on':''}" onclick="S.wear=${i};charUpd(this)">${h.n}</button>`).join('')}</div>
+          <div class="chips" style="margin-top:6px">${HEADS.map((h,i)=>`<button class="chip mini-chip${S.head===i?' on':''}" onclick="S.head=${i};charUpd(this)">${h.n}</button>`).join('')}</div>
+        </div></div>
+      <div class="rowlbl">Где в цепи место человеку — посади себя</div>
+      <div class="mesrc" id="mesrc">${personScene({vb:'90 100 120 280',nobg:1})}<span>тащи меня на место</span></div>
+      <div class="chairs">${CHAIN_IDS.map(id=>`<div class="chair${S.human===id?' me':''}" data-id="${id}">${toolGlyph(id,30)}<span>${NODEN[id]}</span><div class="seat"></div></div>`).join('')}</div>
+    </div>`;
+}
+function charUpd(el){
+  const row=el.parentElement;[...row.children].forEach(c=>c.classList.remove('on'));el.classList.add('on');
+  const pv=$('charpv');if(pv)pv.innerHTML=personScene({vb:'70 90 160 300'});
+  const ms=$('mesrc');if(ms)ms.innerHTML=personScene({vb:'90 100 120 280',nobg:1})+'<span>тащи меня на место</span>';
+  if(!T.shown.charNote){T.shown.charNote=1;setNote(MEANING.chair.dur[0])}
+}
+function chairBind(){
+  const src=$('mesrc'); if(!src)return;
+  let me=null,down=false;
+  const chairAt=(x,y)=>[...document.querySelectorAll('.chair')].find(c=>{const r=c.getBoundingClientRect();return x>=r.left-8&&x<=r.right+8&&y>=r.top-50&&y<=r.bottom+12});
+  const end=e=>{if(!down)return;down=false;document.querySelectorAll('.chair').forEach(c=>c.classList.remove('hot'));
+    const ch=e&&typeof e.clientX==='number'?chairAt(e.clientX,e.clientY):null;if(me){me.remove();me=null}
+    if(ch){S.human=ch.dataset.id;document.querySelectorAll('.chair').forEach(c=>c.classList.toggle('me',c===ch));
+      setNote(MEANING.chair.dur[1].replace('{node}',NODEN[S.human]));enableDone(true)}};
+  src.onpointerdown=e=>{e.preventDefault();try{src.setPointerCapture(e.pointerId)}catch(_){}down=true;
+    me=document.createElement('div');me.className='meDrag';me.innerHTML=personScene({vb:'90 100 120 280',nobg:1});document.body.appendChild(me);me.style.left=e.clientX+'px';me.style.top=e.clientY+'px'};
+  src.onpointermove=e=>{if(!down||!me)return;e.preventDefault();me.style.left=e.clientX+'px';me.style.top=e.clientY+'px';const ch=chairAt(e.clientX,e.clientY);document.querySelectorAll('.chair').forEach(c=>c.classList.toggle('hot',c===ch))};
+  src.onpointerup=end;src.onpointercancel=end;src.onlostpointercapture=end;
+  enableDone(!!S.human);
+}
+/* ═══════════════ ДОБОР ═══════════════ */
+function fillGaps(){
+  const r=rng(S.seed*3+1), miss=[];
+  if(!S.thing){S.thing=decoy(3,r);S.thingName=S.thingName||'ракета';miss.push('рисунок')}
+  if(!S.memDone){S.mem={pos:[variantOf(S.thing,r),variantOf(S.thing,r),variantOf(S.thing,r)],neg:[decoy(0,r),decoy(1,r),hardDecoy(S.thing,r)]};S.memDone=6;miss.push('примеры')}
+  if(!S.decDone){S.decDone=1;miss.push('черту')}
+  if(!S.gest){S.gest=pick(r,GESTURES);S.actionPhrase=S.actionPhrase||(S.gest.n+' '+S.thingName);miss.push('дело руки')}
+  if(!S.human){S.human='decider';miss.push('место человека')}
+  S.gaps=miss; return miss;
+}
+function toName(){fillGaps();go('name')}
+
+/* ═══════════════ НАЗВАНИЕ — его словами ═══════════════ */
+function titleDraft(){return ROLE[S.human]+' нейросети, которая '+(S.actionPhrase||S.gest.n)}
+function chainLine(){
+  const a=S.actionPhrase||S.gest.n;
+  if(S.human==='hand')return `Машина видит ${S.thingName}, помнит примеры и режет по черте. А ${a} — ты.`;
+  return `Машина видит ${S.thingName}, помнит примеры, режет по черте и ${a}. Одна деталь в цепи живая — ${NODEN[S.human].toLowerCase()}. Это ты.`;
+}
+function renderName(){
+  $('htitle').textContent='Как называется';
+  B().innerHTML=say(S.gaps&&S.gaps.length?'Чего не собрал — я добрал сам: '+S.gaps.join(', ')+'.\nНазвать профессию могу только с тобой.':'Цепь готова. Назвать её могу только с тобой.','think')
+    +`<div class="pz"><div class="rowlbl" style="margin-top:0">Профессия — любое слово, хоть смешное</div>
+      <input class="field" id="ptitle" maxlength="34" placeholder="Как называется?" value="${S.title}" oninput="S.title=this.value" style="margin-top:0">
+      <div class="mini" style="margin-top:6px">Черновик машины: <button class="txtbtn" style="display:inline;padding:0 4px;font-size:15px" onclick="S.title=titleDraft();$('ptitle').value=S.title">${titleDraft()}</button></div>
+      <div class="rowlbl">Что делаю я, чего машина не умеет</div>
+      <input class="field" id="pmine" maxlength="60" placeholder="Одна строка" value="${S.mine}" oninput="S.mine=this.value" style="margin-top:0">
+      <div class="rowlbl">Имя героя</div>
+      <input class="field" id="pname" maxlength="14" placeholder="Как его зовут?" value="${S.name}" oninput="S.name=this.value" style="margin-top:0">
+      <button class="txtbtn" onclick="S.name=pick(rng(performance.now()|0),NAMES);$('pname').value=S.name">Дай случайное</button>
+      <div class="rowlbl">Что он говорит, заступая на смену</div>
+      <input class="field" id="pline" maxlength="40" placeholder="Одна фраза" value="${S.line}" oninput="S.line=this.value" style="margin-top:0">
+      <div class="mini" style="margin-top:12px;text-align:center">${chainLine()}</div></div>`;
+  F().innerHTML=`<button class="btn" onclick="if(!S.title)S.title=titleDraft();if(!S.name)S.name=pick(rng(S.seed),NAMES);go('run')">К рычагу</button>`;
+}
+
+/* ═══════════════ ПУСК — смена: барабан → рычаг → спорные ждут тебя → «А без тебя?» ═══════════════ */
+const FW=720,FSH=480,BAND=76,FH=FSH+BAND;
+const RUN={on:0,raf:0,gen:0,t:0,last:0,items:[],seated:true,leave:0,waiting:null,errNo:0,errYes:0,done:0,decisions:[],taps:[],A:null,phase:'drum'};
+function stopRun(){RUN.on=0;RUN.gen++;if(RUN.raf)cancelAnimationFrame(RUN.raf);RUN.raf=0}
+async function runAssets(){
+  const A={};
+  A.person=await rasterize(personScene({vb:'60 80 180 300',nobg:1}),180,300);
+  A.icons={};for(const id of CHAIN_IDS)A.icons[id]=await rasterize(toolGlyph(id,40),80,80);
+  A.tool=await rasterize(toolGlyph(S.gest.g,40),80,80);
+  A.thing=document.createElement('canvas');drawVec(A.thing,S.thing,80);
+  return A;
+}
+function runItems(){
+  const r=rng(S.seed*5+9), items=[];
+  for(let i=0;i<16;i++){const truth=r()<0.6?1:0;const v=truth?variantOf(S.thing,r):(r()<0.5?hardDecoy(S.thing,r):decoy(rint(r,0,4),r));const c=document.createElement('canvas');drawVec(c,v,60);
+    items.push({c,truth,score:decScore(v),x:0,st:'wait',k:i})}
+  // спорные — 5 ближайших к черте
+  items.map((it,i)=>({i,d:Math.abs(it.score-S.thr)})).sort((a,b)=>a.d-b.d).slice(0,5).forEach(o=>items[o.i].border=1);
+  return items;
+}
+function renderRun(){
+  $('htitle').textContent='Цех работает';
+  RUN.phase='drum';RUN.taps=[];RUN.errNo=0;RUN.errYes=0;RUN.decisions=[];RUN.seated=true;RUN.leave=0;RUN.waiting=null;RUN.done=0;
+  B().innerHTML=say(MEANING.run.before,'happy')
+    +`<div class="pz"><div class="rowlbl" style="margin-top:0">Темп цеха — стукни 4 раза</div>
+      <div class="drum" id="drum"><div class="drum-l" id="druml">стучи здесь</div></div>
+      <div class="bars" id="bars"></div><div class="feat" id="earfeat"></div></div>`;
+  F().innerHTML=`<button class="btn" id="leverBtn" onclick="runStart()" disabled>Дёрнуть рычаг</button>`;
+  const d=$('drum');
+  d.onpointerdown=e=>{e.preventDefault();
+    const r=d.getBoundingClientRect(),rp=document.createElement('i');rp.className='rip';rp.style.left=(e.clientX-r.left)+'px';rp.style.top=(e.clientY-r.top)+'px';d.appendChild(rp);setTimeout(()=>rp.remove(),600);
+    RUN.taps.push(performance.now());const l=$('druml');if(l)l.textContent=Math.min(4,RUN.taps.length)+' / 4';
+    const iv=[];for(let i=1;i<RUN.taps.length;i++)iv.push(RUN.taps[i]-RUN.taps[i-1]);
+    const b=$('bars');if(b){const mx=Math.max(400,...iv);b.innerHTML=iv.map(v=>`<i style="height:${Math.max(6,Math.round(v/mx*60))}px"></i>`).join('')}
+    if(RUN.taps.length>=4){const mean=iv.reduce((a,b)=>a+b,0)/iv.length,sd=Math.sqrt(iv.reduce((a,b)=>a+(b-mean)*(b-mean),0)/iv.length),cv=sd/mean;
+      const tempo=mean<380?'быстро':mean>800?'медленно':'спокойно',even=cv<0.28?'ровно':'рвано';S.beat={iv,mean,cv};S.beatKind=tempo+', '+even;
+      const fe=$('earfeat');if(fe)fe.innerHTML=[`${iv.length} промежутка`,`средний ${Math.round(mean)} мс`,tempo,even].map(x=>'<span>'+x+'</span>').join('');
+      const lb=$('leverBtn');if(lb)lb.disabled=false;
+      if(RUN.taps.length===4)setNote2('Музыку я не услышал. Услышал паузы: '+tempo+', '+even+'. С таким темпом и поедем.')}
+    if(RUN.taps.length===1)setNote2('Удар. Записал не звук — тишину до следующего.');
+  };
+}
+function setNote2(t){let n=$('pznote');if(!n){n=document.createElement('div');n.className='note';n.id='pznote';B().appendChild(n)}n.textContent=t}
+function runStart(){
+  RUN.phase='prep';
+  B().innerHTML=say(MEANING.run.dur[0],'happy')+`<div class="filmwrap"><canvas id="fcv"></canvas><div class="film-bar"><i id="fbar"></i></div><div class="film-st" id="fst">Запускаю…</div></div>
+    <div class="switchrow"><label class="switch"><input type="checkbox" id="leaveSw" onchange="runLeave(this.checked)"><span></span></label><span class="switch-l">А без тебя?</span><span class="switch-c" id="errline"></span></div>
+    <div class="note" id="pznote"></div>`;
+  F().innerHTML='';
+  const cv=$('fcv');cv.width=FW;cv.height=FH;
+  runAssets().then(A=>{RUN.A=A;RUN.items=runItems();RUN.beat=Math.max(650,Math.min(1600,S.beat?S.beat.mean:1000));RUN.phase='go';runLoop()}).catch(()=>{const st=$('fst');if(st)st.textContent='Не получилось запустить. Паспорт — дальше.';F().innerHTML=`<button class="btn" onclick="go('pass')">К паспорту</button>`});
+}
+function runLeave(on){RUN.seated=!on;if(on){setNote(MEANING.run.dur[2]);RUN.leaveT=RUN.t}else setNote('Сел обратно. Спорные снова ждут тебя.');runWaitUI()}
+function runLoop(){
+  const cv=$('fcv');if(!cv)return;const ctx=cv.getContext('2d');RUN.on=1;const my=++RUN.gen;RUN.t=0;RUN.last=performance.now();
+  const loop=now=>{if(!RUN.on||my!==RUN.gen)return;const dt=Math.min(50,now-RUN.last);RUN.last=now;runStep(dt);runDraw(ctx,RUN.t/1000);
+    const b=$('fbar');if(b)b.style.width=Math.round(RUN.done/RUN.items.length*100)+'%';
+    if(RUN.done>=RUN.items.length&&!RUN.fin){RUN.fin=1;setTimeout(runFinish,1200)}
+    RUN.raf=requestAnimationFrame(loop)};RUN.raf=requestAnimationFrame(loop);
+}
+function runGeom(){const x0=70,x1=FW-70;return {x0,x1,xs:[0,1,2,3].map(i=>x0+(x1-x0)*(i+1)/5),y:250}}
+function runStep(dt){
+  RUN.t+=dt;const G=runGeom(),hx=G.xs[CHAIN_IDS.indexOf(S.human)],decX=G.xs[2];
+  RUN.items.forEach((it,k)=>{
+    if(it.st==='wait'){if(RUN.t>=k*RUN.beat+400)it.st='go',it.x=G.x0;return}
+    if(it.st==='go'){
+      // очередь: не наезжаем на стоящего впереди
+      const ahead=RUN.items[k-1];const lim=ahead&&(ahead.st==='go'||ahead.st==='hold')?ahead.x-40:1e9;
+      it.x=Math.min(it.x+dt*0.11,lim);
+      if(it.border&&!it.asked&&it.x>=hx-2&&RUN.seated){it.st='hold';it.asked=1;RUN.waiting=it;runWaitUI();setNote(MEANING.run.dur[1]);return}
+      if(it.border&&!it.asked&&it.x>=hx-2&&!RUN.seated){it.asked=1;it.pass=it.score>=S.thr;it.auto=1;if(it.pass!==!!it.truth)RUN.errNo++;runErr()}
+      if(!it.border&&!it.asked&&it.x>=decX-2){it.asked=1;it.pass=it.score>=S.thr;if(it.pass!==!!it.truth)RUN.errNo++,RUN.autoErr=1;runErr()}
+      if(it.asked&&!it.pass&&it.x>=decX){it.st='drop';it.y=0;return}
+      if(it.x>=G.x1-6){it.st='done';RUN.done++}
+    }
+    if(it.st==='drop'){it.y+=dt*0.15;if(it.y>90){it.st='done';RUN.done++}}
+  });
+  if(RUN.leave)RUN.leave=Math.min(1,RUN.leave+dt/600); else if(!RUN.seated)RUN.leave=0.001;
+  if(RUN.seated&&RUN.leave>0)RUN.leave=Math.max(0,RUN.leave-dt/600);
+}
+function runErr(){const e=$('errline');if(e)e.textContent='ошибок без тебя: '+RUN.errNo+' · с тобой: '+RUN.errYes}
+function runWaitUI(){
+  const it=RUN.waiting;
+  if(it&&it.st==='hold'&&RUN.seated){const [a,b]=ASK[S.human];F().innerHTML=`<div class="btnrow"><button class="btn btn-sm" onclick="runDecide(true)">${a}</button><button class="btn btn2 btn-sm" onclick="runDecide(false)">${b}</button></div>`}
+  else{F().innerHTML='';if(it&&it.st==='hold'&&!RUN.seated){it.st='go';it.pass=it.score>=S.thr;it.auto=1;if(it.pass!==!!it.truth)RUN.errNo++;RUN.waiting=null;runErr()}}
+}
+function runDecide(yes){const it=RUN.waiting;if(!it)return;it.pass=yes;it.st='go';it.byMe=1;RUN.decisions.push({k:it.k,yes});if(yes!==!!it.truth)RUN.errYes++;RUN.waiting=null;runErr();F().innerHTML='';
+  setNote(yes===!!it.truth?'Твоё слово. Печать.':'Твоё слово. Я бы решил иначе — но ты сидишь на стуле, не я.')}
+function runFinish(){
+  RUN.phase='fin';RUN.on=0;
+  const total=RUN.errNo+RUN.errYes;
+  setNote('Смена окончена. Ошибок без тебя: '+RUN.errNo+', с тобой: '+RUN.errYes+'. '+(RUN.errYes<=RUN.errNo?'Ум был там, где сидел ты.':'Человек тоже ошибается. Но он хотя бы знает, зачем.'));
+  F().innerHTML=`<div class="btnrow"><button class="btn btn2 btn-sm" onclick="renderRun()">Ещё смену</button>${filmCanRecord()?`<button class="btn btn2 btn-sm" onclick="filmSave()">Сохранить</button>`:''}<button class="btn btn-sm" onclick="go('pass')">Паспорт →</button></div>`;
+}
+function runDraw(ctx,t){
+  const A=RUN.A,G=runGeom(),y=G.y;
+  ctx.fillStyle='#EAD9BF';ctx.fillRect(0,0,FW,FSH);for(let i=0;i<FSH;i+=26){ctx.fillStyle='rgba(90,60,25,.06)';ctx.fillRect(0,i,FW,1)}
+  ctx.fillStyle='#D9BE94';ctx.fillRect(0,FSH-60,FW,60);
+  ctx.fillStyle='#8A6D46';ctx.fillRect(G.x0,y+22,G.x1-G.x0,14);ctx.fillStyle='rgba(0,0,0,.1)';for(let i=0;i<26;i++)ctx.fillRect(G.x0+((i*40+t*90)%(G.x1-G.x0)),y+22,20,14);
+  ctx.fillStyle='#6E5233';ctx.fillRect(G.x0-30,60,60,80);ctx.fillStyle='#3A2A18';ctx.fillRect(G.x0-18,130,36,10);
+  ctx.fillStyle='#6E5233';ctx.fillRect(G.x1-30,y-70,60,110);ctx.fillStyle='#FFF8EE';ctx.fillRect(G.x1-22,y-62,44,60);
+  const okDone=RUN.items.filter(it=>it.st==='done'&&it.pass&&it.truth).length;
+  ctx.fillStyle='#2B2118';ctx.font='800 22px Unbounded, sans-serif';ctx.textAlign='center';ctx.fillText(String(okDone),G.x1,y-22);
+  ctx.fillStyle='#FFF8EE';ctx.font='700 13px Nunito, sans-serif';ctx.fillText('готово',G.x1,y+56);
+  // куча ошибок у выхода
+  const errs=RUN.items.filter(it=>it.st==='done'&&it.asked&&it.pass!==!!it.truth);
+  errs.slice(0,12).forEach((it,i)=>{const ex=G.x1-60+(i%4)*14,ey=FSH-70-Math.floor(i/4)*14;ctx.drawImage(it.c,ex,ey,18,18);ctx.strokeStyle='#E65C00';ctx.lineWidth=2;ctx.strokeRect(ex,ey,18,18)});
+  if(errs.length){ctx.fillStyle='#E65C00';ctx.font='800 12px Nunito, sans-serif';ctx.fillText('неверных печатей: '+errs.length,G.x1-20,FSH-8)}
+  CHAIN_IDS.forEach((id,i)=>{const x=G.xs[i];
+    const active=RUN.items.some(it=>it.st==='go'&&Math.abs(it.x-x)<18);
+    ctx.fillStyle=active?'#FFF1E4':'#F2E4CC';ctx.strokeStyle='#3A2A18';ctx.lineWidth=3;ctx.beginPath();ctx.roundRect(x-42,y-52,84,70,14);ctx.fill();ctx.stroke();
+    ctx.drawImage(A.icons[id],x-22,y-46,44,44);
+    ctx.fillStyle='#3A2A18';ctx.font='800 15px Nunito, sans-serif';ctx.textAlign='center';ctx.fillText(NODEN[id],x,y+8);
+    ctx.fillStyle='#E65C00';ctx.font='800 13px Unbounded, sans-serif';ctx.fillText(String(i+1),x-34,y-58);
+    if(id==='decider'){ctx.fillStyle='#2B2118';ctx.font='700 11px Nunito, sans-serif';ctx.fillText('черта '+Math.round(S.thr*100)+'%',x,y-60)}
+    if(id==='hand')ctx.drawImage(A.tool,x+14,y-64,32,32);
+    if(id==='eye'&&active){ctx.fillStyle='rgba(43,33,24,.75)';ctx.font='700 9px ui-monospace, monospace';for(let k=0;k<4;k++)ctx.fillText('0110 1001',x,y-84+k*10)}
+    if(S.human===id){ctx.fillStyle='#C9A26E';ctx.fillRect(x-24,y+64,48,12);ctx.fillStyle='#8A6D46';ctx.fillRect(x-20,y+76,6,26);ctx.fillRect(x+14,y+76,6,26);
+      const lv=RUN.leave||0, px=x-36+lv*(FW-x+80), bob=lv>0&&lv<1?Math.abs(Math.sin(t*9))*6:0;
+      if(lv<1)ctx.drawImage(A.person,px,y+18-bob,72,120);
+      ctx.fillStyle=RUN.seated?'#2E9E5B':'#D93030';ctx.font='800 13px Nunito, sans-serif';ctx.fillText(RUN.seated?'здесь — '+(S.child||'ты'):'стул пуст',x,y+152)}
+  });
+  RUN.items.forEach(it=>{if(it.st==='wait'||it.st==='done')return;
+    let ax=it.x,ay=y-14,alpha=1;
+    if(it.st==='drop'){const f=Math.min(1,it.y/90);ay=y-14+f*90;ax=it.x+f*30;alpha=1-f}
+    ctx.save();ctx.globalAlpha=alpha;ctx.drawImage(it.c,ax-16,ay-16,32,32);
+    ctx.strokeStyle=it.st==='hold'?'#E65C00':(it.asked?(it.pass?'#2E9E5B':'#D93030'):'#3A2A18');ctx.lineWidth=it.st==='hold'?4:2;ctx.strokeRect(ax-16,ay-16,32,32);
+    if(it.border&&!it.asked){ctx.fillStyle='#E65C00';ctx.font='800 11px Nunito, sans-serif';ctx.fillText('?',ax,ay-22)}
+    if(it.st==='hold'){ctx.fillStyle='#E65C00';ctx.font='800 12px Nunito, sans-serif';ctx.fillText('спорная — твоё слово',ax,ay-28)}
+    ctx.restore()});
+  ctx.fillStyle='#FFF8EE';ctx.fillRect(0,FSH,FW,BAND);
+  ctx.fillStyle='#2B2118';ctx.font='800 22px Nunito, sans-serif';ctx.textAlign='center';
+  const line=RUN.phase==='fin'?'Ошибок без тебя: '+RUN.errNo+' · с тобой: '+RUN.errYes:(!RUN.seated?'Стул пуст. Спорные штампуются по черте — как есть.':(RUN.waiting?'Спорная ждёт: '+ASK[S.human][0]+' или '+ASK[S.human][1]+'?':(S.title||'Цех работает')));
+  wrapLines(ctx,line,FW-60).slice(0,2).forEach((l,i,arr)=>ctx.fillText(l,FW/2,FSH+BAND/2+(i-(arr.length-1)/2)*26));
+}
+/* ролик: та же смена, но проигрывается без вопросов — с твоими ответами — и пишется в mp4 */
+function filmMime(){if(typeof MediaRecorder==='undefined')return null;for(const m of ['video/mp4;codecs=avc1.42E01E','video/mp4','video/webm;codecs=vp9','video/webm']){try{if(MediaRecorder.isTypeSupported(m))return m}catch(e){}}return null}
+function filmCanRecord(){return !!(typeof MediaRecorder!=='undefined'&&HTMLCanvasElement.prototype.captureStream&&filmMime())}
+const FILM={on:0,gen:0};
+function stopFilm(){FILM.on=0;FILM.gen++}
+function filmSave(){
+  const cv=$('fcv');if(!cv||!RUN.A)return;const st=$('fst');if(st)st.textContent='Записываю ролик…';F().innerHTML='';
+  const dec={};RUN.decisions.forEach(d=>dec[d.k]=d.yes);
+  // переигрываем смену автоматически: спорные решаются твоими словами
+  const items=runItems();items.forEach(it=>{it.x=0;it.st='wait';it.asked=0});
+  const ctx=cv.getContext('2d');let rec=null;const chunks=[];
+  try{rec=new MediaRecorder(cv.captureStream(30),{mimeType:filmMime(),videoBitsPerSecond:3200000});rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};rec.start()}catch(e){rec=null}
+  const saveItems=RUN.items,saveSeated=RUN.seated,saveWait=RUN.waiting;RUN.items=items;RUN.seated=true;RUN.waiting=null;RUN.leave=0;
+  const G=runGeom(),hx=G.xs[CHAIN_IDS.indexOf(S.human)],decX=G.xs[2],beat=RUN.beat;
+  let t=0,last=performance.now(),done=0;FILM.on=1;const my=++FILM.gen;
+  const total=16*beat+5200;
+  const loop=now=>{if(!FILM.on||my!==FILM.gen)return;const dt=Math.min(50,now-last);last=now;t+=dt;
+    if(t<1800){ctx.fillStyle='#2B2118';ctx.fillRect(0,0,FW,FH);ctx.textAlign='center';ctx.fillStyle='#FFF8EE';ctx.font='800 30px Unbounded, sans-serif';let tt=S.title||'Профессия будущего';if(tt.length>24)tt=tt.slice(0,23)+'…';ctx.fillText(tt,FW/2,FH/2-10);ctx.fillStyle='#C4B4A2';ctx.font='700 20px Nunito, sans-serif';ctx.fillText((S.child||'')+(S.age?', '+S.age+' лет':''),FW/2,FH/2+30)}
+    else if(t<total){const rt=t-1800;
+      items.forEach((it,k)=>{if(it.st==='wait'){if(rt>=k*beat+400){it.st='go';it.x=G.x0}return}
+        if(it.st==='go'){it.x+=dt*0.11;
+          if(!it.asked&&it.border&&it.x>=hx-2){it.asked=1;it.pass=(k in dec)?dec[k]:(it.score>=S.thr);it.byMe=1}
+          if(!it.asked&&!it.border&&it.x>=decX-2){it.asked=1;it.pass=it.score>=S.thr}
+          if(it.asked&&!it.pass&&it.x>=decX){it.st='drop';it.y=0;return}
+          if(it.x>=G.x1-6){it.st='done';done++}}
+        if(it.st==='drop'){it.y+=dt*0.15;if(it.y>90){it.st='done';done++}}});
+      RUN.phase='film';runDraw(ctx,rt/1000)}
+    else{ctx.fillStyle='#FFF8EE';ctx.fillRect(0,0,FW,FH);ctx.textAlign='center';ctx.fillStyle='#2B2118';ctx.font='800 32px Unbounded, sans-serif';ctx.fillText('Считает машина.',FW/2,FH*0.34);ctx.fillStyle='#E65C00';ctx.fillText('Решает — '+(S.child||'человек')+'.',FW/2,FH*0.48);
+      ctx.fillStyle='#8A7A68';ctx.font='700 19px Nunito, sans-serif';ctx.fillText('Придумал профессию, собрал цепь и решал — '+(S.child||'ты'),FW/2,FH*0.63);ctx.fillText('Считал, штамповал и крутил конвейер — Нейро',FW/2,FH*0.69);
+      ctx.fillStyle='#C4B4A2';ctx.font='700 16px Nunito, sans-serif';ctx.fillText('Мастерская Nooka · nookagame.ru',FW/2,FH*0.87)}
+    const b=$('fbar');if(b)b.style.width=Math.round(t/(total+3200)*100)+'%';
+    if(t>=total+3200){FILM.on=0;RUN.items=saveItems;RUN.seated=saveSeated;RUN.waiting=saveWait;RUN.phase='fin';
+      const fin=blob=>{if(blob&&blob.size)filmDeliver(blob).then(how=>{if(st)st.textContent=how==='share'?'Отправил — выбери «Сохранить видео».':how==='download'?'Ролик скачан.':'Сохранить не вышло.';runFinish()});else{if(st)st.textContent='';runFinish()}};
+      if(rec&&rec.state!=='inactive'){rec.onstop=()=>fin(new Blob(chunks,{type:filmMime()}));rec.stop()}else fin(null);return}
+    requestAnimationFrame(loop)};
+  requestAnimationFrame(loop);
+}
+async function filmDeliver(blob){
+  const ext=(blob.type||'').indexOf('mp4')>=0?'mp4':'webm',fname=((S.title||'moy-ceh').replace(/[^\wа-яА-ЯёЁ -]/g,'').trim()||'ceh')+'.'+ext;
+  try{if(navigator.canShare&&window.File){const f=new File([blob],fname,{type:blob.type||'video/mp4'});if(navigator.canShare({files:[f]})){await navigator.share({files:[f],title:S.title});return 'share'}}}catch(e){}
+  try{const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=fname;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(u);a.remove()},2000);return 'download'}catch(e){return 'fail'}
+}
+
+/* ═══════════════ ПАСПОРТ ═══════════════ */
+async function passDraw(cv){
+  const W=1080,H=1350;cv.width=W;cv.height=H;const ctx=cv.getContext('2d');
+  ctx.fillStyle='#FFF8EE';ctx.fillRect(0,0,W,H);ctx.fillStyle='#E65C00';ctx.fillRect(0,0,W,14);
+  ctx.textAlign='left';ctx.fillStyle='#8A7A68';ctx.font='800 22px Nunito, sans-serif';ctx.fillText('ПАСПОРТ ПРОФЕССИИ БУДУЩЕГО · МАСТЕРСКАЯ NOOKA',60,70);
+  ctx.fillStyle='#2B2118';ctx.font='800 54px Unbounded, sans-serif';
+  wrapLines(ctx,S.title||'Профессия будущего',W-430).slice(0,2).forEach((l,i)=>ctx.fillText(l,60,146+i*62));
+  ctx.fillStyle='#5C4A38';ctx.font='700 30px Nunito, sans-serif';ctx.fillText((S.name||'')+' · '+(S.child||'')+(S.age?', '+S.age+' лет':''),60,290);
+  try{const im=await rasterize(personScene({vb:'40 80 220 300'}),330,450);ctx.drawImage(im,W-390,60,330,450)}catch(e){}
+  ctx.fillStyle='#8A7A68';ctx.font='800 20px Nunito, sans-serif';ctx.fillText('С ЧЕМ РАБОТАЕТ',60,370);
+  const th=document.createElement('canvas');drawVec(th,S.thing,200);ctx.drawImage(th,60,386,200,200);ctx.strokeStyle='#2B2118';ctx.lineWidth=3;ctx.strokeRect(60,386,200,200);
+  ctx.fillStyle='#2B2118';ctx.font='800 34px Nunito, sans-serif';ctx.fillText(cap(S.thingName||''),290,430);
+  ctx.fillStyle='#8A7A68';ctx.font='700 22px Nunito, sans-serif';const f=pixFeats(Array.from(S.thing));
+  ['глаз видит: '+f.cnt+' единиц из 100','память: '+(S.mem.pos.length+S.mem.neg.length)+' примеров, ответы — '+(S.child||'мои'),'черта решателя: '+Math.round(S.thr*100)+'%','рука: '+(S.actionPhrase||S.gest.n),'темп цеха: '+(S.beatKind||'—')].forEach((l,i)=>ctx.fillText(l,290,470+i*34));
+  ctx.fillStyle='#8A7A68';ctx.font='800 20px Nunito, sans-serif';ctx.fillText('ЦЕПЬ',60,660);
+  const xs=[0,1,2,3].map(i=>110+i*270);ctx.fillStyle='#8A6D46';ctx.fillRect(100,740,W-200,10);
+  for(const [i,id] of CHAIN_IDS.entries()){const x=xs[i],me=S.human===id;
+    ctx.fillStyle=me?'#DFF5EA':'#F2E4CC';ctx.strokeStyle=me?'#2E9E5B':'#3A2A18';ctx.lineWidth=4;ctx.beginPath();ctx.roundRect(x-70,690,200,110,18);ctx.fill();ctx.stroke();
+    try{const im=await rasterize(toolGlyph(id,40),80,80);ctx.drawImage(im,x-50,705,60,60)}catch(e){}
+    ctx.fillStyle='#2B2118';ctx.font='800 24px Nunito, sans-serif';ctx.fillText(NODEN[id],x+20,740);
+    ctx.fillStyle='#E65C00';ctx.font='800 18px Unbounded, sans-serif';ctx.fillText(String(i+1),x-62,678);
+    ctx.fillStyle=me?'#2E9E5B':'#8A7A68';ctx.font='700 19px Nunito, sans-serif';ctx.fillText(me?'здесь — '+(S.child||'человек'):'машина',x+20,772)}
+  ctx.fillStyle='#2B2118';ctx.font='700 25px Nunito, sans-serif';let yy=850;
+  wrapLines(ctx,chainLine(),W-120).forEach(l=>{ctx.fillText(l,60,yy);yy+=34});
+  if(S.mine){ctx.fillStyle='#8A7A68';ctx.font='800 18px Nunito, sans-serif';ctx.fillText('ЧТО ДЕЛАЮ Я, ЧЕГО МАШИНА НЕ УМЕЕТ',60,yy+22);ctx.fillStyle='#2B2118';ctx.font='800 28px Nunito, sans-serif';wrapLines(ctx,S.mine,W-120).slice(0,2).forEach((l,i)=>ctx.fillText(l,60,yy+62+i*36));yy+=100}
+  if(S.line){ctx.fillStyle='#E65C00';ctx.font='800 28px Nunito, sans-serif';ctx.fillText('«'+S.line+'»',60,yy+40)}
+  if(S.shiftErr){ctx.fillStyle='#8A7A68';ctx.font='700 20px Nunito, sans-serif';ctx.fillText('смена: ошибок без тебя '+S.shiftErr.no+', с тобой '+S.shiftErr.yes,60,1090)}
+  ctx.fillStyle='#2B2118';ctx.font='800 38px Unbounded, sans-serif';ctx.textAlign='center';ctx.fillText('Считает машина. Решает — '+(S.child||'человек')+'.',W/2,1150);
+  ctx.fillStyle='#8A7A68';ctx.font='700 22px Nunito, sans-serif';ctx.fillText('До сегодняшнего дня этой профессии не было. Придумал — '+(S.child||'ты')+'.',W/2,1205);
+  ctx.fillStyle='#C4B4A2';ctx.font='700 20px Nunito, sans-serif';ctx.fillText('Мастерская Nooka · nookagame.ru',W/2,1290);
+}
+function renderPass(){
+  $('htitle').textContent='Паспорт';
+  if(RUN.errNo||RUN.errYes)S.shiftErr={no:RUN.errNo,yes:RUN.errYes};
+  B().innerHTML=say('Вот твой паспорт. Здесь всё, что ты собрал руками — и место, которое оставил себе.','happy')+`<div class="passwrap"><canvas id="pcv"></canvas></div>`;
+  F().innerHTML=`<div class="btnrow"><button class="btn btn2 btn-sm" onclick="savePass()">Картинка</button><button class="btn btn-sm" onclick="go('end')">Дальше</button></div>`;
+  passDraw($('pcv'));
+}
+function savePass(){const cv=$('pcv');if(!cv)return;cv.toBlob(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=(S.title||'passport').replace(/[^\wа-яА-ЯёЁ -]/g,'')+'.png';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500)},'image/png')}
+
+/* ═══════════════ НАВИГАЦИЯ И СТАРТ ═══════════════ */
 $('back').onclick=()=>{
-  if(typeof dgStop==='function')dgStop();
-  const map={s1:'s0',met:'s1',gather:'met',belt:'gather',goal:'belt',deeds:'goal',desk:'deeds',look:'desk',
-    gear:'look',cmp:'gear',names:'cmp',day:'names',reveal:'day',card:'reveal',shake:'card'};
-  S.step=map[S.step]||'s0'; render();
+  stopChain();stopFilm();stopRun();if(CUR)stopLevel(CUR);
+  if(S.step==='pz'){CUR=null;go('floor');return}
+  if(S.step==='run'||S.step==='name'){go('floor');return}
+  const i=STEPS.indexOf(S.step);
+  if(i<=0){location.href='index.html';return}
+  S.step=STEPS[Math.max(0,i-1)];if(S.step==='pz')S.step='floor';render();
 };
-try{const c=localStorage.getItem('nooka.child'); if(c)S.child=c}catch(e){}
-render();
+if(!CanvasRenderingContext2D.prototype.roundRect){CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r){this.moveTo(x+r,y);this.arcTo(x+w,y,x+w,y+h,r);this.arcTo(x+w,y+h,x,y+h,r);this.arcTo(x,y+h,x,y,r);this.arcTo(x,y,x+w,y,r);this.closePath();return this}}
+if(load()){S.step='intro';render();const f=$('fn');if(f){f.value=S.child}
+  F().innerHTML=`<div class="btnrow"><button class="btn btn2 btn-sm" onclick="wipe();S.done={eye:0,memory:0,decider:0,hand:0,chair:0};S.thing=null;S.memDone=0;S.decDone=0;S.gest=null;S.human=null;go('floor')">Заново</button><button class="btn btn-sm" onclick="go('floor')">Продолжить смену</button></div>`}
+else render();
 </script>
 </body>
 </html>
