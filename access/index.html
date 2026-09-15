@@ -106,6 +106,10 @@ h1{font-family:var(--brand);font-weight:700;font-size:27px;line-height:1.18;marg
 .code button{margin-left:auto;flex:none;padding:10px 16px;border:none;border-radius:999px;cursor:pointer;
   font-family:var(--brand);font-weight:700;font-size:13px;color:var(--pri-4);background:var(--pri-1)}
 .code button:active{transform:translateY(2px)}
+/* Кнопка внутри текста: выглядит ссылкой, работает как копирование. */
+.lnk{padding:0;border:none;background:none;cursor:pointer;font:inherit;color:var(--pri-3);
+  text-decoration:underline;text-underline-offset:2px}
+.lnk:active{opacity:.6}
 .state--bad{background:linear-gradient(180deg,#FFEFEA,#FFE2DA);
   box-shadow:var(--shadow),inset 0 0 0 2px rgba(217,74,52,.35)}
 .state--bad .badge{background:rgba(217,74,52,.14);color:#A8341F}
@@ -164,6 +168,21 @@ setTimeout(function () {
            String(d.getMonth() + 1).padStart(2, '0') + '.' + d.getFullYear();
   }
 
+  /* Ссылка с кодом: её проще переслать в мессенджер, чем диктовать код. */
+  function linkFor() {
+    return location.origin + location.pathname.replace(/[^/]*$/, '') + '?k=' + (A.state().code || '');
+  }
+  function wireCopy(id, get, label) {
+    var b = document.getElementById(id);
+    if (!b) return;
+    b.onclick = function () {
+      var t = get();
+      if (navigator.clipboard) navigator.clipboard.writeText(t);
+      b.textContent = 'Скопировано';
+      setTimeout(function () { b.textContent = label; }, 1600);
+    };
+  }
+
   function render() {
     var st = A.state();
     var open = st.paid || A.openAll;
@@ -184,11 +203,20 @@ setTimeout(function () {
         '<p>Так бывает, если по дороге закрылась вкладка. Напишите нам — найдём ваш ' +
         'платёж и откроем доступ вручную в тот же день. Платить ещё раз не нужно.</p>';
     } else if (pay && pay.ok) {
+      /* Код показываем прямо здесь, а не только в карточке внизу: человек
+         после оплаты видит «готово» и уходит играть, а код нужен, чтобы
+         открыть игры на устройстве ребёнка. Ниже по странице он его не ищет. */
       box.className = 'state state--on';
       box.innerHTML = '<span class="badge">Оплата прошла</span>' +
         '<h2>Готово — все три игры открыты</h2>' +
-        '<p>Доступ включён на этом устройстве, вводить ничего не нужно. ' +
-        'Чек банк пришлёт на почту, которую вы указали при оплате.</p>';
+        '<p>На этом устройстве вводить ничего не нужно. Сохраните код — им доступ ' +
+        'открывается на телефоне ребёнка и возвращается, если очистить браузер.</p>' +
+        (st.code
+          ? '<div class="code"><b id="payCode">' + st.code + '</b>' +
+            '<button id="copyPay">Скопировать</button></div>' +
+            '<p class="hint">Или отправьте ссылку — она открывает доступ одним нажатием: ' +
+            '<button class="lnk" id="copyPayLink">скопировать ссылку</button></p>'
+          : '');
     } else if (st.paid) {
       /* Считаем целые сутки вниз: код печатается с запасом вверх, и годовой
          доступ иначе показывался бы как «367 дней» против обещанных 366. */
@@ -220,6 +248,9 @@ setTimeout(function () {
         '<h2>Пока открыта первая игра курса</h2>' +
         '<p>Одиннадцать уровней бесплатно и без регистрации. Вторая и третья игры открываются кодом.</p>';
     }
+
+    wireCopy('copyPay', function () { return st.code; }, 'Скопировать');
+    wireCopy('copyPayLink', linkFor, 'скопировать ссылку');
 
     /* ── ввод кода: не показываем тем, у кого уже открыто ──── */
     var un = document.getElementById('unlock');
@@ -277,26 +308,24 @@ setTimeout(function () {
     /* ── помощь: разная до и после оплаты ──────────────────── */
     var help = document.getElementById('help');
     if (open) {
+      var shown = !!(pay && pay.ok && st.code);   // код уже стоит в блоке выше
       help.innerHTML =
         '<div class="card">' +
-          '<h3>' + (st.code ? 'Сохраните код доступа' : 'Доступ открыт') + '</h3>' +
+          '<h3>' + (st.code && !shown ? 'Сохраните код доступа' : 'Доступ открыт') + '</h3>' +
           '<p>Доступ записан в память браузера этого устройства. Чтобы открыть игры ' +
-          'на другом телефоне или планшете — введите там этот код. Он же вернёт доступ, ' +
-          'если очистить данные браузера.</p>' +
-          (st.code
+          'на другом телефоне или планшете — введите там ' + (shown ? 'код, который выше' : 'этот код') +
+          '. Он же вернёт доступ, если очистить данные браузера.</p>' +
+          (st.code && !shown
             ? '<div class="code"><b id="myCode">' + st.code + '</b>' +
-              '<button id="copyCode">Скопировать</button></div>'
+              '<button id="copyCode">Скопировать</button></div>' +
+              '<p class="hint">Или отправьте ссылку — она открывает доступ одним нажатием: ' +
+              '<button class="lnk" id="copyLink">скопировать ссылку</button></p>'
             : '') +
           '<a class="btn btn--cta btn--wide" style="margin-top:14px" ' +
             'href="../games/game.html?g=data">Открыть игры →</a>' +
         '</div>';
-      var cp = document.getElementById('copyCode');
-      if (cp) cp.onclick = function () {
-        var t = document.getElementById('myCode').textContent;
-        if (navigator.clipboard) navigator.clipboard.writeText(t);
-        cp.textContent = 'Скопировано';
-        setTimeout(function () { cp.textContent = 'Скопировать'; }, 1600);
-      };
+      wireCopy('copyCode', function () { return st.code; }, 'Скопировать');
+      wireCopy('copyLink', linkFor, 'скопировать ссылку');
     } else if (pay && pay.failed) {
       help.innerHTML =
         '<div class="card">' +
