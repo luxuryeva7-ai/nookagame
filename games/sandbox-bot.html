@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="theme-color" content="#0E0719">
+<title>Мой робот — Nooka</title>
+<meta property="og:title" content="Мой робот — Nooka">
+<meta property="og:description" content="Опиши словами, какого хочешь робота, — и он соберётся прямо на глазах. Каждое слово меняет его.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://nookagame.ru/games/sandbox-bot.html">
+<meta property="og:image" content="https://nookagame.ru/screenshots/og.jpg">
+<meta property="og:site_name" content="Nooka">
+<meta name="twitter:card" content="summary_large_image">
+
+<link href="/fonts/nooka-fonts.css" rel="stylesheet">
+<link rel="stylesheet" href="nooka-ui.css">
+<style>
+/* ============ МОЙ РОБОТ: песочница про запрос ============
+   Слово меняет робота сразу, без кнопки «сделать»: связь между
+   тем, что написал, и тем, что получилось, должна быть мгновенной. */
+.nb *,.nb *::before,.nb *::after{box-sizing:border-box;}
+.nbroot{min-height:100vh;max-width:520px;margin:0 auto;position:relative;
+  background:linear-gradient(180deg,#1C1136 0%,#120B22 58%,#0A0614 100%);}
+.nb{display:flex;flex-direction:column;min-height:100vh;padding-bottom:22px;}
+
+.nbtop{display:flex;align-items:center;gap:10px;padding:13px 14px 0;}
+.nbtop__t{font-family:var(--nk-brand),var(--nk-body);font-weight:700;font-size:16px;color:#F4EEFF;}
+.nbtop__t span{display:block;margin-top:2px;font-family:var(--nk-body);font-weight:800;
+  font-size:11px;color:#A794C9;}
+.nbtop__c{margin-left:auto;display:flex;gap:7px;}
+.nbtop__b{width:34px;height:34px;flex-shrink:0;border:none;cursor:pointer;border-radius:11px;padding:0;
+  color:#CFC0EA;font-size:15px;font-weight:900;background:rgba(255,255,255,.07);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);}
+
+/* сцена */
+.nbstage{margin:12px 14px 0;border-radius:26px;position:relative;overflow:hidden;
+  background:radial-gradient(88% 60% at 50% 4%,#3E2A72 0%,#241750 44%,#150D28 100%);
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.1),inset 0 -40px 60px -30px rgba(0,0,0,.55);}
+.nbstage__in{position:relative;z-index:2;padding:4px 10px 0;}
+.nbstage svg{width:100%;display:block;}
+/* свет лампы сверху */
+.nbstage::before{content:'';position:absolute;left:50%;top:-62px;width:230px;height:230px;
+  transform:translateX(-50%);border-radius:50%;z-index:1;pointer-events:none;
+  background:radial-gradient(circle,rgba(255,216,77,.2) 0%,rgba(255,216,77,0) 68%);}
+.nbpop{animation:nbPop .45s cubic-bezier(.2,1.5,.4,1);}
+@keyframes nbPop{0%{transform:scale(.88);opacity:.4}100%{transform:scale(1);opacity:1}}
+
+/* строка-заказ */
+.nbask{margin:12px 14px 0;position:relative;}
+.nbask input{width:100%;border:none;border-radius:18px;padding:15px 16px;
+  font-family:var(--nk-body);font-weight:700;font-size:15.5px;color:#F4EEFF;
+  background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.14);}
+.nbask input:focus{outline:none;box-shadow:inset 0 0 0 2px #FFD84D;}
+.nbask input::placeholder{color:#6B5C90;font-weight:700;}
+
+/* подсказки */
+.nbtips{display:flex;flex-wrap:wrap;gap:6px;margin:9px 14px 0;}
+.nbtips button{border:none;cursor:pointer;border-radius:12px;padding:9px 12px;
+  font-family:var(--nk-body);font-weight:800;font-size:12.5px;color:#0E0719;
+  background:#FFD84D;box-shadow:0 2px 0 #C9A21E;}
+.nbtips--calm button{color:#BFAFE0;background:rgba(255,255,255,.07);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.11);}
+.nbtips__h{width:100%;font-weight:900;font-size:10.5px;letter-spacing:.08em;
+  text-transform:uppercase;color:#7E6EA6;margin-bottom:2px;}
+
+/* что понял */
+.nbgot{display:flex;flex-wrap:wrap;gap:6px;margin:11px 14px 0;}
+.nbgot span{padding:6px 10px;border-radius:10px;font-weight:800;font-size:12px;
+  color:#0E0719;background:#7CE8B0;}
+.nbgot em{font-style:normal;padding:6px 10px;border-radius:10px;font-weight:800;font-size:12px;
+  color:#9A8ABA;background:rgba(255,255,255,.06);}
+
+/* кнопки */
+.nbbar{display:flex;gap:8px;margin:14px 14px 0;}
+.nbbar button{flex:1;border:none;cursor:pointer;border-radius:16px;padding:15px 8px;
+  font-family:var(--nk-body);font-weight:900;font-size:14px;}
+.nbkeep{color:#0E0719;background:#7CE8B0;box-shadow:0 3px 0 #3E9E6E;}
+.nbkeep:disabled{opacity:.4;box-shadow:none;cursor:default;}
+.nbrnd{flex:0 0 58px !important;color:#B9A8D8;background:rgba(255,255,255,.07);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.11);font-size:17px !important;}
+
+/* полка */
+.nbshelf{margin:20px 14px 0;}
+.nbshelf__h{display:flex;align-items:baseline;gap:8px;margin-bottom:10px;}
+.nbshelf__h b{font-family:var(--nk-brand),var(--nk-body);font-weight:700;font-size:15px;color:#F4EEFF;}
+.nbshelf__h span{font-weight:800;font-size:11.5px;color:#7E6EA6;}
+.nbgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.nbcell{border-radius:18px;overflow:hidden;cursor:pointer;position:relative;
+  background:radial-gradient(85% 60% at 50% 6%,#332253,#1A1233 72%);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.09);}
+.nbcell svg{width:100%;display:block;}
+.nbcell b{display:block;padding:5px 6px 8px;font-weight:800;font-size:10px;line-height:1.3;
+  color:#BFAFE0;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.nbcell__x{position:absolute;top:5px;right:5px;width:21px;height:21px;border:none;cursor:pointer;
+  border-radius:7px;padding:0;color:#CBB;font-size:11px;font-weight:900;background:rgba(10,6,20,.78);}
+.nbempty{padding:16px;border-radius:16px;text-align:center;font-weight:700;font-size:12.5px;
+  line-height:1.5;color:#6E5F92;background:rgba(255,255,255,.04);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);}
+
+/* инструкция */
+.nbhelp{position:fixed;inset:0;z-index:70;display:flex;align-items:center;justify-content:center;
+  padding:20px;background:rgba(10,6,20,.9);backdrop-filter:blur(5px);}
+.nbhelp__c{width:100%;max-width:400px;padding:24px 22px;border-radius:28px;
+  background:linear-gradient(180deg,#241843,#150E28);
+  box-shadow:0 20px 60px rgba(0,0,0,.65),inset 0 0 0 1px rgba(255,255,255,.1);}
+.nbhelp__t{font-family:var(--nk-brand),var(--nk-body);font-weight:700;font-size:21px;color:#F4EEFF;
+  text-align:center;}
+.nbstep{display:flex;align-items:center;gap:14px;margin-top:16px;}
+.nbstep__i{width:50px;height:50px;flex-shrink:0;border-radius:16px;display:flex;
+  align-items:center;justify-content:center;font-size:23px;background:rgba(255,255,255,.06);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.1);}
+.nbstep__t{font-weight:800;font-size:13.5px;line-height:1.45;color:#DDD2F2;}
+.nbstep__t b{color:#FFD84D;font-weight:900;}
+.nbhelp__go{width:100%;margin-top:22px;border:none;cursor:pointer;border-radius:17px;padding:16px;
+  font-family:var(--nk-body);font-weight:900;font-size:15.5px;color:#0E0719;
+  background:#FFD84D;box-shadow:0 4px 0 #C9A21E;}
+
+@media(min-width:900px){#root>.nbroot{max-width:560px;} .nbroot{max-width:560px;}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="react-bundle.js"></script>
+<script src="nooka-core.js"></script>
+<script src="nooka-levels.js"></script>
+<script src="nooka-access.js"></script>
+<script src="nooka-gallery.js"></script>
+<script src="nooka-bot.js"></script>
+<script>
+/* ============================================================
+   МОЙ РОБОТ — песочница к игре «Как управлять ИИ».
+
+   Ребёнок описывает робота словами, и тот меняется прямо во время
+   набора. Слов в словаре под сотню, деталей столько же — поэтому
+   «такого не знаю» здесь не бывает: подсказки предлагают только то,
+   что машина умеет, и любое сочетание собирается в персонажа.
+   ============================================================ */
+
+const { useState, useEffect, useRef } = React;
+const B = window.nookaBot;
+const KEY = 'nooka_bots';
+const SEEN = 'nooka_bot_seen';
+const MAX = 12;
+
+function loadShelf() {
+  try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) { return []; }
+}
+function storeShelf(l) {
+  try { localStorage.setItem(KEY, JSON.stringify(l.slice(-MAX))); } catch (e) {}
+}
+
+/* случайный робот — на случай, когда не с чего начать */
+const RND = [
+  'большой синий робот в короне на гусеницах',
+  'маленький розовый робот со звёздными глазами и крыльями',
+  'зелёный квадратный робот в очках на ножках',
+  'жёлтый робот в колпаке с пружинкой и клешнями',
+  'фиолетовый круглый робот в наушниках летает',
+  'красный робот в полоску с локаторами и шарфом',
+  'белый высокий робот с сердечками и бабочкой',
+  'бирюзовый робот в кепке с рюкзаком на пружине',
+];
+
+function Bot({ spec, tag }) {
+  return React.createElement('div', {
+    className: 'nbpop', key: tag,
+    dangerouslySetInnerHTML: { __html: B.build(spec) },
+  });
+}
+
+function Help({ onClose }) {
+  const step = (ic, t) => React.createElement('div', { className: 'nbstep' },
+    React.createElement('div', { className: 'nbstep__i' }, ic),
+    React.createElement('div', { className: 'nbstep__t', dangerouslySetInnerHTML: { __html: t } }));
+  return React.createElement('div', { className: 'nbhelp nb', onClick: onClose },
+    React.createElement('div', { className: 'nbhelp__c', onClick: e => e.stopPropagation() },
+      React.createElement('div', { className: 'nbhelp__t' }, 'Свой робот'),
+      step('⌨️', 'Опиши словами, какого хочешь робота. Он меняется <b>прямо пока пишешь</b>'),
+      step('💡', 'Не знаешь, что бывает? <b>Подсказки под строкой</b> покажут — жми и добавляй'),
+      step('🏠', 'Готового <b>оставь себе</b>. Он встанет на полку и будет ждать тебя тут'),
+      React.createElement('button', { className: 'nbhelp__go', onClick: onClose }, 'Понятно, собираю')));
+}
+
+function App() {
+  const [text, setText] = useState('');
+  const [shelf, setShelf] = useState(loadShelf);
+  const [kept, setKept] = useState(false);
+  const [help, setHelp] = useState(() => {
+    try { return !localStorage.getItem(SEEN); } catch (e) { return true; }
+  });
+  const inp = useRef(null);
+
+  const res = B.parse(text);
+  const spec = res.spec;
+  const has = res.got.length > 0;
+
+  /* засчитываем, когда робот собран хотя бы из трёх слов: это значит,
+     что ребёнок уже уточняет заказ, а не просто пробует одно слово */
+  useEffect(() => {
+    if (res.got.length < 3) return;
+    try {
+      const p = JSON.parse(localStorage.getItem('nooka_profile') || '{}');
+      if (p.missions && p.missions.mybot1) return;
+      /* тихо, без экрана победы: песочница не заканчивается */
+      if (window.nooka && window.nooka.completeMission) window.nooka.completeMission('mybot1', 130);
+    } catch (e) {}
+  }, [res.got.length]);
+
+  useEffect(() => { storeShelf(shelf); }, [shelf]);
+  useEffect(() => { setKept(false); }, [text]);
+
+  const closeHelp = () => {
+    setHelp(false);
+    try { localStorage.setItem(SEEN, '1'); } catch (e) {}
+  };
+
+  /* подсказки: по последнему недописанному слову, иначе — что ещё бывает */
+  const tail = text.split(' ').pop();
+  const live = tail.length >= 2 ? B.hints(tail) : [];
+  const groups = B.groups();
+  const used = {};
+  res.got.forEach(g => { used[g] = 1; });
+  const more = [];
+  ['цвет', 'форма', 'глаза', 'шляпа', 'низ', 'вещи', 'узор', 'антенна', 'руки']
+    .forEach(g => {
+      if (more.length >= 6 || !groups[g]) return;
+      const free = groups[g].filter(w => !used[w]);
+      if (free.length) more.push(free[Math.floor(Math.random() * free.length)]);
+    });
+
+  const addWord = (w) => {
+    const parts = text.trim().split(' ').filter(Boolean);
+    /* если последнее слово недописано — заменяем его выбранной подсказкой */
+    if (tail.length >= 2 && live.length) parts.pop();
+    /* подсказка приносит свой предлог («в короне»), а он мог быть уже набран —
+       иначе выходит «жёлтый робот в в короне» */
+    const first = w.split(' ')[0];
+    if (parts.length && ['в', 'с', 'со', 'на'].indexOf(first) > -1 &&
+        parts[parts.length - 1] === first) parts.pop();
+    setText((parts.join(' ') + ' ' + w).trim() + ' ');
+    if (inp.current) inp.current.focus();
+  };
+
+  const keep = () => {
+    if (!has || kept) return;
+    const item = { id: 'r' + Date.now().toString(36), text: text.trim(), spec: spec };
+    setShelf(l => l.concat([item]).slice(-MAX));
+    setKept(true);
+    try {
+      window.nookaGallery.add({
+        kind: 'pet', game: 'Мой робот',
+        title: text.trim().length > 34 ? text.trim().slice(0, 33) + '…' : text.trim(),
+        note: 'Собран словами: ' + res.got.join(', '),
+        svg: B.build(spec),
+      });
+    } catch (e) {}
+  };
+
+  return React.createElement('div', { className: 'nbroot' },
+    React.createElement('div', { className: 'nb' },
+
+      React.createElement('div', { className: 'nbtop' },
+        React.createElement('div', { className: 'nbtop__t' }, 'Мой робот',
+          React.createElement('span', null, 'Опиши словами — он соберётся')),
+        React.createElement('div', { className: 'nbtop__c' },
+          React.createElement('button', {
+            className: 'nbtop__b', onClick: () => setHelp(true), 'aria-label': 'Как играть',
+          }, '?'),
+          React.createElement('button', {
+            className: 'nbtop__b', 'aria-label': 'Закрыть',
+            onClick: () => { window.location.href = 'game.html?g=control'; },
+          }, '✕'))),
+
+      React.createElement('div', { className: 'nbstage' },
+        React.createElement('div', { className: 'nbstage__in' },
+          React.createElement(Bot, { spec: spec, tag: JSON.stringify(spec) }))),
+
+      React.createElement('div', { className: 'nbask' },
+        React.createElement('input', {
+          ref: inp, value: text, maxLength: 140,
+          placeholder: 'синий робот в короне на гусеницах…',
+          onChange: e => setText(e.target.value),
+        })),
+
+      /* живые подсказки по набираемому слову */
+      live.length > 0 && React.createElement('div', { className: 'nbtips' },
+        live.slice(0, 6).map(w => React.createElement('button', {
+          key: w, onMouseDown: e => e.preventDefault(), onClick: () => addWord(w),
+        }, w))),
+
+      /* что ещё бывает — когда ребёнок не знает, с чего начать */
+      live.length === 0 && React.createElement('div', { className: 'nbtips nbtips--calm' },
+        React.createElement('div', { className: 'nbtips__h' },
+          has ? 'Можно добавить' : 'Попробуй так'),
+        more.map(w => React.createElement('button', {
+          key: w, onMouseDown: e => e.preventDefault(), onClick: () => addWord(w),
+        }, '+ ' + w))),
+
+      has && React.createElement('div', { className: 'nbgot' },
+        res.got.map((g, i) => React.createElement('span', { key: i }, g))),
+
+      React.createElement('div', { className: 'nbbar' },
+        React.createElement('button', {
+          className: 'nbrnd', 'aria-label': 'Случайный робот',
+          onClick: () => setText(RND[Math.floor(Math.random() * RND.length)] + ' '),
+        }, '🎲'),
+        React.createElement('button', {
+          className: 'nbkeep', disabled: !has || kept, onClick: keep,
+        }, kept ? 'Уже на полке' : 'Оставить себе')),
+
+      React.createElement('div', { className: 'nbshelf' },
+        React.createElement('div', { className: 'nbshelf__h' },
+          React.createElement('b', null, 'Мои роботы'),
+          React.createElement('span', null, shelf.length + ' из ' + MAX)),
+        shelf.length
+          ? React.createElement('div', { className: 'nbgrid' },
+            shelf.slice().reverse().map(it => React.createElement('div', {
+              key: it.id, className: 'nbcell', onClick: () => setText(it.text + ' '),
+            },
+              React.createElement('div', { dangerouslySetInnerHTML: { __html: B.build(it.spec) } }),
+              React.createElement('b', null, it.text),
+              React.createElement('button', {
+                className: 'nbcell__x', 'aria-label': 'Убрать',
+                onClick: e => { e.stopPropagation(); setShelf(l => l.filter(x => x.id !== it.id)); },
+              }, '✕'))))
+          : React.createElement('div', { className: 'nbempty' },
+            'Пока пусто. Собери робота и нажми «Оставить себе» —\nон встанет сюда'))),
+
+    help && React.createElement(Help, { onClose: closeHelp }));
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App, null));
+</script>
+</body>
+</html>
