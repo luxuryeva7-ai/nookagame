@@ -451,6 +451,36 @@ html,body{overflow-x:hidden}
 .hmark{background:var(--acc)!important;width:4px!important;height:18px!important;border-radius:2px!important;opacity:1!important}
 .patch.ok .pmark,.hole.filled .hmark{background:#2E9E5B!important}
 .pok{font-size:12.5px!important}
+
+/* ═══ единый детский скин: как в лабиринте — одна карточка, воздух, крупно ═══ */
+.table{background:var(--card);box-shadow:var(--sh);padding:12px;min-height:0;border-radius:20px}
+.table::before{display:none}
+.lampglow,.lamp,.clutter,.junk{display:none!important}
+.tbl-head{min-height:60px}
+.tbl-title{font-size:17px;color:var(--ink);text-shadow:none;letter-spacing:0}
+.tbl-title span{color:var(--ink3);font-size:13px;text-transform:none;letter-spacing:0}
+.rail-lbl{color:var(--ink2)}
+.filmwrap{background:#F6EEE2;box-shadow:none;margin:8px 0 10px}
+.film-t{color:var(--ink3);letter-spacing:.04em}
+.sl{background:#E8DCC6;box-shadow:inset 0 0 0 1.5px rgba(90,60,25,.18)}
+.sl::after{color:var(--ink3)}
+.sl.on::after{color:#FFF8EE;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.need{display:none}
+.progline{margin-top:8px;text-align:center;font-size:15.5px;font-weight:800;color:var(--ink2)}
+.progline b{color:var(--acc)}
+.stations{gap:10px;margin-top:12px}
+.st{border-radius:18px;padding:14px 60px 14px 72px;min-height:76px;justify-content:center;background:var(--card);box-shadow:var(--sh);animation:none!important;gap:3px}
+.st.done{background:#F3FAF5;filter:none}
+.st.next{box-shadow:0 0 0 3px var(--acc),var(--sh);padding-bottom:14px}
+.st-num{width:44px;height:44px;font-size:19px;box-shadow:none;left:14px}
+.st.done .st-num{box-shadow:none}
+.st-n{font-size:16px;line-height:1.25}
+.st-s{font-size:14.5px}
+.st-gives,.st-h{display:none}
+.st-badge{right:14px;top:50%;bottom:auto;transform:translateY(-50%);font-size:12.5px;padding:6px 11px}
+.st.done::after{content:'✓';position:absolute;right:20px;top:50%;transform:translateY(-50%);color:var(--ok);font-weight:900;font-size:22px}
+.pzgoal{background:var(--card);box-shadow:var(--sh);border-radius:16px;padding:12px 14px}
+.pzgoal-t{font-size:12.5px;color:var(--ink3)}
 </style>
 </head>
 <body>
@@ -1179,15 +1209,14 @@ function render(){
     const ah=T.aha&&MEANING[T.aha]; T.aha=null;
     const nx=nextStation(), nxM=nx&&MEANING[nx];
     B().innerHTML=(n===0
-        ? say('Я прочитал тыщу книжек. Целиком не помню ни одной — я их разобрал.\nИди по номерам, от 1 до 5 — каждый покажет, как я устроен.','idle')
+        ? say('Я разобрал тысячу книжек на детали. Собери из них свою — по номерам, от 1 до 5.','idle')
         : ah ? say('<b>'+ah.aha+'</b>'+(nxM?'\nДальше — номер '+nxM.n+'.':'\nВсё собрано. Складываем книжку.'),'happy')
         : say(nxM?'Дальше — номер '+nxM.n+'. '+nxM.title+'.':'Всё собрано. Складываем книжку.', 'think'))
       +tableHTML();
     F().innerHTML=(n>=2)
       ? `<button class="btn" onclick="toBook()">Сложить книжку →</button>`
       : `<div class="hintbar">Собери что-нибудь — начни с любого</div>`;
-    setTimeout(()=>{initLamp();initClutter();initRail();syncStrip();
-      if(dropJunkQueued){dropJunk(dropJunkQueued);dropJunkQueued=null}},60);
+    setTimeout(()=>{initRail();syncStrip();dropJunkQueued=null},60);
     return;
   }
 
@@ -1576,8 +1605,9 @@ function needList(){
   });
 }
 function needHTML(){
-  const L=needList(), got=L.filter(x=>x.have).length;
-  return `<div class="need">
+  const L=needList(), got=L.filter(x=>x.have).length, nx=nextStation();
+  const nxN=nx?(STATIONS.find(s=>s.id===nx)||{}).n:null;
+  return `<div class="progline">Для книжки собрано <b>${got} из ${L.length}</b>${nxN?' · дальше: '+nxN.toLowerCase():' · всё есть'}</div><div class="need">
     <div class="need-t">Для книжки нужно собрать <b>${got} из ${L.length}</b></div>
     <div class="need-r">${L.map(x=>`
       <div class="nd${x.have?' has':''}">
@@ -1602,8 +1632,7 @@ function tableHTML(){
     <div class="lampglow" id="lampglow"></div>
     <div class="tbl-head">
       <div class="tbl-neuro" id="tblneuro">${svgNeuro(62,tblMood())}</div>
-      <div class="tbl-title">СТОЛ НЕЙРО<span>как ИИ понимает и создаёт</span></div>
-      <div class="lamp" id="lamp" style="left:${T.lamp}px">💡</div>
+      <div class="tbl-title">Стол Нейро<span>как ИИ понимает и создаёт</span></div>
     </div>
     <div class="rail" id="rail">
       <div class="rail-arc"></div>
@@ -1625,10 +1654,7 @@ function tableHTML(){
         <span class="st-h">${T.done[st.id]?'✓ понял':''}</span>
         ${nextStation()===st.id?'<span class="st-badge">сейчас</span>':''}
       </button>`).join('')}</div>
-    <div class="clutter" id="clutter">${CLUTTER.filter((c,i)=>i%2===0).map(c=>
-      // мелочи вдвое меньше («много деталей»), и ни одна не торчит за край стола
-      `<span class="cl" data-id="${c.id}" style="left:${Math.min(c.x,Math.min(window.innerWidth,480)-62)}px;top:${c.y}px;font-size:${c.s}px">${c.e}</span>`).join('')}</div>
-    <div class="junk" id="junk"></div>
+
   </div>`;
 }
 /* какой пазл подсветить как следующий — первый, который ещё что-то даёт */
