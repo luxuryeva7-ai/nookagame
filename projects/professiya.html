@@ -382,7 +382,8 @@ function personScene(opt){
 }
 function rasterize(svgStr,w,h){
   return new Promise((res,rej)=>{
-    const withSize=svgStr.replace('<svg','<svg width="'+w+'" height="'+h+'"');
+    // снимаем старые width/height с корня: дубль атрибута = битый XML = картинка не грузится (Safari даст 300×150 без явных размеров)
+    const withSize=svgStr.replace(/^(\s*<svg\b)([^>]*)>/,(m,head,attrs)=>head+attrs.replace(/\s(?:width|height)="[^"]*"/g,'')+(/xmlns=/.test(attrs)?'':' xmlns="http://www.w3.org/2000/svg"')+' width="'+w+'" height="'+h+'">');
     const img=new Image(); img.onload=()=>res(img); img.onerror=()=>rej(new Error('svg'));
     img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(withSize);
   });
