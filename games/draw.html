@@ -324,7 +324,7 @@
 <script src="nooka-ui.js"></script>
 <script>
 /* ============================================================
-   ДОСКА — сквозная механика игры «Откуда ИИ знает».
+   ДОСКА — сквозная механика игры «Откуда ИИ берёт ответы».
    Ребёнок рисует пальцем, а Нейро действительно учится на его
    рисунках: классификатор считает признаки по растру и сравнивает
    с примерами. Никакой имитации — если примеров мало или они
@@ -1456,7 +1456,7 @@ function LevelDraw({ n, onWin, onHome }) {
     }[kind];
     const svg = document.querySelector(sel);
     if (svg && window.nookaGallery) {
-      window.nookaGallery.add({ kind: kind, game: 'Откуда ИИ знает',
+      window.nookaGallery.add({ kind: kind, game: 'Откуда ИИ берёт ответы',
         title: meta.title, note: meta.note, svg: svg.outerHTML });
     }
     setSaved(true);
