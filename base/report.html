@@ -140,7 +140,7 @@ h1{font-family:var(--body);font-weight:900;font-size:clamp(26px,4.4vw,36px);line
   html +=
     '<div class="card">' +
       '<h2>Четыре умения</h2>' +
-      '<div class="sub">Из них и состоит ИИ-грамотность. Курс собран вокруг них</div>' +
+      '<div class="sub">Вокруг них собран весь курс — по ним и видно, чему ребёнок научился</div>' +
       r.verbs.map(function (x) {
         var p = x.total ? Math.round(x.done / x.total * 100) : 0;
         return '<div class="idea">' +
@@ -157,7 +157,7 @@ h1{font-family:var(--body);font-weight:900;font-size:clamp(26px,4.4vw,36px);line
   html +=
     '<div class="card">' +
       '<h2>Методическая основа</h2>' +
-      '<div class="sub">Пять больших идей — международная рамка, по которой выстроен курс</div>' +
+      '<div class="sub">Курс собран по международной программе «Пять больших идей об ИИ» — той же, по которой учат детей в других странах</div>' +
       сИдеями.map(function (x) {
         var p = Math.round(x.done / x.total * 100);
         return '<div class="idea">' +
@@ -173,7 +173,7 @@ h1{font-family:var(--body);font-weight:900;font-size:clamp(26px,4.4vw,36px);line
   html +=
     '<div class="card">' +
       '<h2>Что он теперь знает</h2>' +
-      '<div class="sub">По одному выводу с каждого пройденного уровня</div>' +
+      '<div class="sub">С каждого пройденного уровня — по одной мысли, которую ребёнок унёс</div>' +
       '<ul class="learn">' +
         r.done.map(function (d) {
           return '<li><b>' + d.game + ' · уровень ' + d.n + '</b>' + d.learn + '</li>';
@@ -186,7 +186,7 @@ h1{font-family:var(--body);font-weight:900;font-size:clamp(26px,4.4vw,36px);line
     html +=
       '<div class="card">' +
         '<h2>О чём спросить за ужином</h2>' +
-        '<div class="sub">Вопросы по последнему пройденному. Он сможет ответить своими словами</div>' +
+        '<div class="sub">Вопросы по последним уровням. Ребёнок ответит на них своими словами — спросите за ужином</div>' +
         '<ul class="asks">' +
           r.asks.map(function (a) {
             return '<li>' + a.ask + '<span>уровень «' + a.t + '»</span></li>';
