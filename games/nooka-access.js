@@ -383,6 +383,16 @@
         var f = String(lv.href || '').split(/[?#]/)[0].toLowerCase();
         if (f === file) out.push({ game: g, level: lv });
       });
+      /* Финальные мастерские живут не в levels, но доступ у них общий с игрой:
+         без этой строки платная мастерская открывалась прямой ссылкой мимо
+         пейволла. Номер берём как у последнего уровня — он и решает доступ. */
+      if (g.sandbox && g.sandbox.href) {
+        var sf = String(g.sandbox.href).split(/[?#]/)[0].toLowerCase();
+        if (sf === file) {
+          var last = g.levels.length;
+          out.push({ game: g, level: { n: last, t: g.sandbox.t, href: g.sandbox.href, mid: g.sandbox.mid } });
+        }
+      }
     });
     return out;
   }

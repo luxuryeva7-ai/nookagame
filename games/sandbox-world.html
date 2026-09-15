@@ -210,6 +210,8 @@
 
 <script src="react-bundle.js"></script>
 <script src="nooka-core.js"></script>
+<script src="nooka-levels.js"></script>
+<script src="nooka-access.js"></script>
 <script src="nooka-brain.js"></script>
 <script src="nooka-gallery.js"></script>
 <script>
@@ -816,7 +818,10 @@ function World() {
     try {
       const p = JSON.parse(localStorage.getItem('nooka_profile') || '{}');
       if (p.missions && p.missions.world1) return;
-      if (window.nooka && window.nooka.missionWin) window.nooka.missionWin('world1', 140);
+      /* именно completeMission, а не missionWin: последний показывает экран
+         победы с кнопкой «К уровням», а песочница не заканчивается —
+         ребёнок продолжает населять мир */
+      if (window.nooka && window.nooka.completeMission) window.nooka.completeMission('world1', 140);
     } catch (e) {}
   }, [things]);
 
