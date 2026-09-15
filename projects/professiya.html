@@ -220,6 +220,58 @@ button,.btn,.st,.chip,.tool,.chair,.f5{touch-action:manipulation;user-select:non
 .switch input:checked+span::after{transform:translateX(24px)}
 .switch-l{font-family:'Unbounded','Nunito',sans-serif;font-weight:800;font-size:14px;color:var(--ink)}
 .switch-c{margin-left:auto;font-size:13px;font-weight:800;color:var(--ink3);text-align:right}
+
+/* ═══ единый детский скин: как в лабиринте — одна карточка, воздух, крупно ═══ */
+.floor{margin-top:12px;background:var(--card);border-radius:20px;box-shadow:var(--sh);padding:12px;position:relative;overflow:hidden;background-image:none}
+.floor-t{font-family:'Unbounded','Nunito',sans-serif;font-weight:800;font-size:17px;color:var(--ink);padding:2px 4px 8px;display:flex;align-items:baseline;gap:8px;letter-spacing:0}
+.floor-t span{font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;color:var(--ink3);letter-spacing:0;text-transform:none}
+.chaincv{display:block;width:100%;border-radius:14px;background:#F6ECDA;box-shadow:none}
+.progline{margin-top:10px;text-align:center;font-size:15.5px;font-weight:800;color:var(--ink2)}
+.progline b{color:var(--acc)}
+.stations{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.st{position:relative;border:none;border-radius:18px;cursor:pointer;font-family:inherit;text-align:left;padding:14px 60px 14px 72px;display:flex;flex-direction:column;gap:3px;min-height:76px;justify-content:center;background:var(--card);box-shadow:var(--sh);animation:none}
+.st:nth-child(n){animation:none}
+.st:active{transform:scale(.985)}
+.st.done{background:#F3FAF5;filter:none}
+.st.next{box-shadow:0 0 0 3px var(--acc),var(--sh);padding-bottom:14px}
+.st-num{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:var(--acc);color:#fff;font-family:'Unbounded','Nunito',sans-serif;font-weight:800;font-size:19px;display:flex;align-items:center;justify-content:center;box-shadow:none}
+.st.done .st-num{background:var(--ok);box-shadow:none}
+.st-n{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:16px;color:var(--ink);line-height:1.25}
+.st-s{font-size:14.5px;font-weight:700;color:var(--ink3)}
+.st-gives,.st-h{display:none}
+.st-badge{position:absolute;right:14px;top:50%;bottom:auto;transform:translateY(-50%);font-size:12.5px;font-weight:900;background:var(--acc);color:#fff;padding:6px 11px;border-radius:999px}
+.st.done::after{content:'✓';position:absolute;right:20px;top:50%;transform:translateY(-50%);color:var(--ok);font-weight:900;font-size:22px}
+.pzgoal{background:var(--card);box-shadow:var(--sh);border-radius:16px;padding:12px 14px}
+.pzgoal-t{font-size:12.5px;color:var(--ink3)}
+.pzgoal-r{font-family:'Unbounded','Nunito',sans-serif;font-size:17px;font-weight:700;margin-top:4px}
+.explbtn{display:inline-flex;align-items:center;gap:6px;margin-top:10px;border:none;background:var(--accbg);color:var(--acc);font-family:inherit;font-weight:800;font-size:14.5px;padding:9px 14px;border-radius:999px;cursor:pointer;touch-action:manipulation}
+.explain{display:none;margin-top:10px;background:var(--card);border-radius:16px;box-shadow:var(--sh);padding:13px 15px;font-size:16.5px;line-height:1.5;color:var(--ink2);font-weight:600;white-space:pre-line}
+.explain.on{display:block}
+.pz{border-radius:20px}
+.pixwrap{display:block}
+.pixcenter{display:flex;justify-content:center}
+.numgrid{grid-template-columns:repeat(10,1fr);gap:2px;font-size:11px;padding:6px;margin-top:8px;border-radius:12px}
+.numgrid i{border-radius:3px}
+.rowlbl{font-size:13px}
+.sw{width:48px;height:48px}
+.charrow{gap:9px}
+.mini-chip{min-height:40px;font-size:14.5px;padding:0 13px}
+.feat span{font-size:14px;padding:6px 12px}
+.tl{font-size:13.5px}
+.dial{width:196px;height:196px}
+.dial-n{height:88px;margin-top:-88px}
+.dial-w{position:absolute;top:22px;left:0;right:0;display:flex;justify-content:space-between;padding:0 22px;font-size:12.5px;font-weight:900;color:var(--ink3);pointer-events:none}
+.demohand .dh-f{font-size:40px}
+.demohand .dh-t{font-size:15px;padding:9px 14px}
+.h1{font-size:25px;line-height:1.2;text-align:center}
+.lead{text-align:center;white-space:pre-line}
+.center{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:16px 8px 8px}
+.ill{width:150px;height:150px;border-radius:22px;overflow:hidden;background:#F2E4CC;margin:8px 0 10px}
+.ill svg{width:100%;height:100%;display:block}
+.stack{height:230px}
+.card{width:190px;margin-left:-95px}
+.shelf{min-height:96px}
+.shelf-r canvas{width:32px;height:32px}
 </style>
 </head>
 <body>
@@ -454,6 +506,27 @@ function load(){try{const o=JSON.parse(localStorage.getItem('nooka_m3')||'null')
   Object.assign(S,o);S.thing=o.thing?Uint8Array.from(o.thing):null;S.mem={pos:(o.mem.pos||[]).map(v=>Uint8Array.from(v)),neg:(o.mem.neg||[]).map(v=>Uint8Array.from(v))};S.step='floor';return true}catch(e){return false}}
 function wipe(){try{localStorage.removeItem('nooka_m3')}catch(e){}}
 
+/* картинка на входе: цех в три детали */
+function illCeh(){return `<svg viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg"><rect width="150" height="150" fill="#F2E4CC"/><rect x="12" y="92" width="126" height="12" rx="6" fill="#8A6D46"/>
+ <rect x="10" y="22" width="26" height="60" rx="5" fill="#6E5233"/><rect x="42" y="56" width="30" height="30" rx="8" fill="#FFF8EE" stroke="#3A2A18" stroke-width="3"/><rect x="82" y="56" width="30" height="30" rx="8" fill="#FFF8EE" stroke="#3A2A18" stroke-width="3"/>
+ <circle cx="57" cy="71" r="6" fill="#3A2A18"/><path d="M90 71 h14 M97 64 v14" stroke="#3A2A18" stroke-width="3"/><rect x="120" y="44" width="20" height="42" rx="4" fill="#6E5233"/><rect x="124" y="50" width="12" height="20" fill="#FFF8EE"/>
+ <circle cx="28" cy="98" r="7" fill="#E65C00" stroke="#2B2118" stroke-width="2"/><circle cx="66" cy="98" r="7" fill="#4A90D9" stroke="#2B2118" stroke-width="2"/><circle cx="104" cy="98" r="7" fill="#2E9E5B" stroke="#2B2118" stroke-width="2"/>
+ <rect x="52" y="112" width="46" height="8" rx="4" fill="#C9A26E"/><rect x="56" y="120" width="5" height="16" fill="#8A6D46"/><rect x="89" y="120" width="5" height="16" fill="#8A6D46"/></svg>`}
+/* тонкая строка прогресса вместо чек-листа */
+function progHTML(){
+  const n=Object.values(S.done).filter(Boolean).length, nx=nextStation();
+  return `<div class="progline">Собрано <b>${n} из 5</b>${nx?' · дальше: '+STATIONS.find(x=>x.id===nx).n.toLowerCase():' · всё на месте'}</div>`;
+}
+/* «Что это значит?» — три строки простыми словами, по запросу */
+const EXPLAIN={
+ eye:'Я не вижу картинку. Я вижу клетки: закрашена — единица, пустая — ноль.\nИз этих чисел я и считаю, что нарисовано.\nНарисуй то, с чем будет работать твоя профессия.',
+ memory:'Чтобы узнавать твой рисунок, мне нужны примеры с ответами.\nПримеры я сделал сам — кривые копии и чужое. Ответы даёшь ты: тащи на полку «моё» или «чужое».\nЧто ты сказал — то я и запомню.',
+ decider:'Каждую новую картинку я сравниваю с полками: на «моё» похожа или на «чужое».\nДиск — черта. Похожа сильнее черты — моё, слабее — чужое.\nГде бы ни стояла черта, где-то я ошибусь. Покрути и посмотри.',
+ hand:'Рука умеет одно дело — то, которое ты ей показал.\nПокажи пальцем над рисунком: туда-сюда, тычки, обведи.\nЗачем это дело нужно, рука не знает. Это знаешь ты.',
+ chair:'В цепи из деталей одно место остаётся человеку.\nСпорные картинки — те, где я не уверен — будут ждать твоего слова.\nСобери себя и посади на любую деталь.',
+ run:'Стукни четыре раза — это темп цеха. Дёрни рычаг — поедет.\nСпорные картинки остановятся у тебя: скажи «моё» или «чужое».\nПотом щёлкни «А без тебя?» — увидишь, что будет без человека.',
+};
+function toggleExplain(){const e=$('explain');if(e)e.classList.toggle('on')}
 function needList(){
   return STATIONS.map(x=>{
     let have=false,val=null;
@@ -483,11 +556,12 @@ function render(){
   stopChain(); stopFilm(); stopRun();
 
   if(st==='intro'){
-    B().innerHTML=`<div class="h1">Кто ты по профессии через 20 лет?</div>
-      <div class="lead">Сегодня ты соберёшь цех: цепь из деталей ИИ, которая работает сама. И решишь, где в ней место человеку.</div>
-      ${say('Я — Нейро. Внутри меня нет ума. Есть цепь тупых деталей. Сейчас соберём такую же, только твою.','idle')}
+    B().innerHTML=`<div class="center">
+      <div class="ill">${illCeh()}</div>
+      <h1 class="h1">Профессия будущего</h1>
+      <p class="lead">Соберём цех — цепь из деталей ИИ.\nОна работает сама. А ты решишь, где в ней место человеку.</p>
       <input class="field" id="fn" maxlength="14" placeholder="Как тебя зовут?" value="${S.child}" oninput="S.child=this.value" autocomplete="off">
-      <div class="chips">${[8,9,10,11,12].map(a=>`<button class="chip${S.age==a?' on':''}" onclick="S.age=${a};render()">${a}</button>`).join('')}</div>`;
+      <div class="chips" style="justify-content:center">${[8,9,10,11,12].map(a=>`<button class="chip${S.age==a?' on':''}" onclick="S.age=${a};render()">${a}</button>`).join('')}</div></div>`;
     F().innerHTML=`<button class="btn" onclick="startIt()">Заступить на смену</button>`;
     return;
   }
@@ -498,17 +572,15 @@ function render(){
     const ah=T.aha&&MEANING[T.aha]; T.aha=null;
     const n=Object.values(S.done).filter(Boolean).length;
     B().innerHTML=(n===0
-      ? say(OPENING,'idle')
+      ? say('Цех пустой. Собери пять деталей — по номерам, от 1 до 5. Я заработаю.','idle')
       : ah ? say('<b>'+ah.aha+'</b>'+(nxM?'\nДальше — номер '+nxM.n+'.':'\nЦепь собрана. Дёргай рычаг.'),'happy')
       : say(nxM?'Дальше — номер '+nxM.n+'. '+nxM.title+'.':'Цепь собрана. Дёргай рычаг.','think'))
-      +`<div class="floor"><div class="floor-t">ЦЕХ <span>большая цепь ИИ</span></div><canvas class="chaincv" id="chaincv"></canvas>${needHTML()}</div>
+      +`<div class="floor"><div class="floor-t">Цех <span>большая цепь ИИ</span></div><canvas class="chaincv" id="chaincv"></canvas>${progHTML()}</div>
       <div class="stations">${STATIONS.map(x=>`
         <button class="st${S.done[x.id]?' done':''}${nx===x.id?' next':''}" id="st_${x.id}" onclick="openLevel('${x.id}')">
           <span class="st-num">${MEANING[x.id].n}</span>
           <span class="st-n">${MEANING[x.id].title}</span>
           <span class="st-s">${x.n} · ${MEANING[x.id].act}</span>
-          <span class="st-gives">${S.done[x.id]?'✓ деталь на конвейере':'даст: '+x.gives}</span>
-          <span class="st-h">${S.done[x.id]?'✓ понял':''}</span>
           ${nx===x.id?'<span class="st-badge">сейчас</span>':''}
         </button>`).join('')}</div>`;
     F().innerHTML=allDone()
@@ -521,7 +593,8 @@ function render(){
   if(st==='pz'){
     const m=MEANING[CUR], stn=STATIONS.find(x=>x.id===CUR);
     $('htitle').textContent=stn.n;
-    B().innerHTML=`<div class="pzgoal"><div class="pzgoal-t">Уровень ${m.n} из 5 · ${m.title}</div><div class="pzgoal-r">${m.act}</div></div>
+    B().innerHTML=`<div class="pzgoal"><div class="pzgoal-t">Уровень ${m.n} из 5</div><div class="pzgoal-r">${m.title}</div>
+        <button class="explbtn" onclick="toggleExplain()">Что это значит?</button><div class="explain" id="explain">${EXPLAIN[CUR]}</div></div>
       <div id="pzbody" style="position:relative">${levelHTML(CUR)}</div>
       <div class="note" id="pznote"></div>`;
     F().innerHTML=`<div class="btnrow"><button class="btn btn2 btn-sm" onclick="leaveLevel(false)">В цех</button><button class="btn btn-sm" id="doneBtn" onclick="leaveLevel(true)" disabled>Готово</button></div>`;
@@ -559,7 +632,7 @@ const CH={run:0,raf:0,balls:[],t:0,last:0,puddles:[],gen:0};
 function stopChain(){CH.run=0;CH.gen++;if(CH.raf)cancelAnimationFrame(CH.raf);CH.raf=0}
 function startChain(){
   const cv=$('chaincv'); if(!cv)return;
-  const w=fitW(cv,460), h=150, dpr=Math.min(2,devicePixelRatio||1);
+  const w=fitW(cv,460), h=Math.round(w*0.6), dpr=Math.min(2,devicePixelRatio||1);
   cv.width=w*dpr; cv.height=h*dpr; cv.style.width=w+'px'; cv.style.height=h+'px';
   const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
   CH.ctx=ctx;CH.w=w;CH.h=h;CH.balls=[];CH.puddles=[];CH.t=0;CH.last=performance.now();CH.spawn=0;CH.delivered=0;
@@ -571,7 +644,7 @@ function startChain(){
   CH.raf=requestAnimationFrame(loop);
 }
 const CHAIN_IDS=['eye','memory','decider','hand'];
-function chainSlots(){const w=CH.w,x0=30,x1=w-30;const xs=[];for(let i=0;i<4;i++)xs.push(x0+(x1-x0)*(i+1)/5);return {hatch:x0,win:x1,xs,y:72}}
+function chainSlots(){const w=CH.w,x0=34,x1=w-34;const xs=[];for(let i=0;i<4;i++)xs.push(x0+(x1-x0)*(i+1)/5);return {hatch:x0,win:x1,xs,y:Math.round(CH.h*0.46)}}
 function chainStep(dt){
   CH.t+=dt;
   const P=chainSlots(), beat=S.beat?Math.max(700,Math.min(2200,S.beat.mean)):1400;
@@ -580,7 +653,7 @@ function chainStep(dt){
     if(b.fall){b.vy+=dt*0.004;b.y+=b.vy*dt;b.x+=b.vx*dt;if(b.y>CH.h-14){b.dead=1;if(CH.puddles.length<24)CH.puddles.push({x:b.x,y:CH.h-12,r:0,k:b.k})}return}
     b.x+=0.05*dt;
     for(let i=0;i<4;i++){const sx=P.xs[i]; if(b.x>=sx-2&&!b['p'+i]){b['p'+i]=1;
-      if(!S.done[CHAIN_IDS[i]]){b.fall=1;b.vy=-0.12;b.vx=0.02;return}
+      if(!S.done[CHAIN_IDS[i]]){b.fall=1;b.vy=-0.14;b.vx=0.02;return}
       if(i===2&&b.k===2){b.fall=1;b.vy=-0.05;b.vx=0.03;return}
     }}
     if(b.x>P.win-6){b.dead=1;CH.delivered++}
@@ -593,31 +666,34 @@ function chainDraw(){
   ctx.clearRect(0,0,w,h);
   ctx.fillStyle='#F6ECDA';ctx.fillRect(0,0,w,h);
   ctx.fillStyle='#D9BE94';ctx.fillRect(0,h-16,w,16);
-  ctx.fillStyle='#8A6D46';ctx.fillRect(P.hatch,P.y+14,P.win-P.hatch,8);
-  ctx.fillStyle='rgba(0,0,0,.08)';for(let i=0;i<18;i++)ctx.fillRect(P.hatch+((i*34+CH.t*0.05)%(P.win-P.hatch)),P.y+14,14,8);
-  ctx.fillStyle='#6E5233';ctx.fillRect(P.hatch-14,10,28,36);ctx.fillStyle='#3A2A18';ctx.fillRect(P.hatch-9,40,18,6);
+  ctx.fillStyle='#8A6D46';ctx.fillRect(P.hatch,P.y+14,P.win-P.hatch,12);
+  ctx.fillStyle='rgba(0,0,0,.09)';for(let i=0;i<18;i++)ctx.fillRect(P.hatch+((i*34+CH.t*0.05)%(P.win-P.hatch)),P.y+14,16,12);
+  ctx.fillStyle='#6E5233';ctx.fillRect(P.hatch-18,10,36,P.y-10);ctx.fillStyle='#3A2A18';ctx.fillRect(P.hatch-12,P.y-8,24,7);
+  ctx.fillStyle='#FFF8EE';ctx.font='800 12px Nunito, sans-serif';ctx.textAlign='center';ctx.fillText('люк',P.hatch,26);
   // выход с печатью «готово»
-  ctx.fillStyle='#6E5233';ctx.fillRect(P.win-14,P.y-30,28,56);ctx.fillStyle='#FFF8EE';ctx.fillRect(P.win-10,P.y-25,20,30);
-  ctx.fillStyle='#2B2118';ctx.font='800 11px Nunito, sans-serif';ctx.textAlign='center';ctx.fillText(String(CH.delivered||0),P.win,P.y-6);
-  ctx.fillStyle='#2E9E5B';ctx.font='800 8.5px Nunito, sans-serif';ctx.fillText('готово',P.win,P.y+36);
+  ctx.fillStyle='#6E5233';ctx.fillRect(P.win-20,P.y-42,40,72);ctx.fillStyle='#FFF8EE';ctx.fillRect(P.win-14,P.y-36,28,40);
+  ctx.fillStyle='#2B2118';ctx.font='800 16px Unbounded, sans-serif';ctx.textAlign='center';ctx.fillText(String(CH.delivered||0),P.win,P.y-10);
+  ctx.fillStyle='#2E9E5B';ctx.font='800 11px Nunito, sans-serif';ctx.fillText('готово',P.win,P.y+44);
   const names=['глаз','память','решатель','рука'];
   const pulse=0.5+0.5*Math.sin(CH.t/260);
   CHAIN_IDS.forEach((id,i)=>{
     const x=P.xs[i], on=S.done[id], isNext=nx===id;
-    if(on){ctx.fillStyle='#F2E4CC';ctx.strokeStyle='#3A2A18';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(x-22,P.y-22,44,36,8);ctx.fill();ctx.stroke();
-      if(CH.icons&&CH.icons[id])ctx.drawImage(CH.icons[id],x-13,P.y-18,26,26)}
+    const bw=56,bh=48;
+    if(on){ctx.fillStyle='#F2E4CC';ctx.strokeStyle='#3A2A18';ctx.lineWidth=2.5;ctx.beginPath();ctx.roundRect(x-bw/2,P.y-bh+12,bw,bh,12);ctx.fill();ctx.stroke();
+      if(CH.icons&&CH.icons[id])ctx.drawImage(CH.icons[id],x-17,P.y-bh+18,34,34)}
     else{ // заслонка; следующая — светится
-      ctx.fillStyle=isNext?`rgba(230,92,0,${0.10+pulse*0.18})`:'rgba(120,90,60,.12)';ctx.beginPath();ctx.roundRect(x-22,P.y-22,44,36,8);ctx.fill();
-      ctx.setLineDash(isNext?[]:[4,3]);ctx.strokeStyle=isNext?'#E65C00':'rgba(58,42,24,.4)';ctx.lineWidth=isNext?2.5:1.5;ctx.beginPath();ctx.roundRect(x-22,P.y-22,44,36,8);ctx.stroke();ctx.setLineDash([]);
-      if(!isNext){ctx.fillStyle='rgba(90,60,25,.35)';for(let k=0;k<3;k++)ctx.fillRect(x-16,P.y-14+k*10,32,4)}}
-    ctx.fillStyle=on?'#3A2A18':'rgba(58,42,24,.55)';ctx.font='800 10.5px Nunito, sans-serif';ctx.textAlign='center';ctx.fillText(names[i],x,P.y+30);
-    ctx.fillStyle='#E65C00';ctx.font='800 10px Unbounded, sans-serif';ctx.fillText(String(i+1),x-16,P.y-26);
-    if(S.human===id){ctx.fillStyle='#2E9E5B';ctx.fillRect(x-14,P.y+34,28,5);ctx.fillStyle='#2B2118';ctx.font='800 9.5px Nunito, sans-serif';ctx.fillText('ты',x,P.y+48)}
+      ctx.fillStyle=isNext?`rgba(230,92,0,${0.10+pulse*0.18})`:'rgba(120,90,60,.12)';ctx.beginPath();ctx.roundRect(x-bw/2,P.y-bh+12,bw,bh,12);ctx.fill();
+      ctx.setLineDash(isNext?[]:[5,4]);ctx.strokeStyle=isNext?'#E65C00':'rgba(58,42,24,.4)';ctx.lineWidth=isNext?3:1.5;ctx.beginPath();ctx.roundRect(x-bw/2,P.y-bh+12,bw,bh,12);ctx.stroke();ctx.setLineDash([]);
+      if(!isNext){ctx.fillStyle='rgba(90,60,25,.35)';for(let k=0;k<3;k++)ctx.fillRect(x-20,P.y-bh+22+k*11,40,5)}}
+    ctx.fillStyle=on?'#3A2A18':'rgba(58,42,24,.55)';ctx.font='800 13px Nunito, sans-serif';ctx.textAlign='center';ctx.fillText(names[i],x,P.y+34);
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(x-bw/2+2,P.y-bh+12,11,0,7);ctx.fill();ctx.fillStyle='#E65C00';ctx.beginPath();ctx.arc(x-bw/2+2,P.y-bh+12,9.5,0,7);ctx.fill();
+    ctx.fillStyle='#fff';ctx.font='800 11px Unbounded, sans-serif';ctx.fillText(String(i+1),x-bw/2+2,P.y-bh+16);
+    if(S.human===id){ctx.fillStyle='#2E9E5B';ctx.fillRect(x-16,P.y+40,32,6);ctx.fillStyle='#2B2118';ctx.font='800 12px Nunito, sans-serif';ctx.fillText('ты',x,P.y+58)}
   });
   if(S.done.chair&&!S.human){}
   CH.puddles.forEach(p=>{ctx.fillStyle=['rgba(74,144,217,.45)','rgba(224,160,32,.45)','rgba(155,89,199,.45)'][p.k];ctx.beginPath();ctx.ellipse(p.x,p.y,p.r*1.6,p.r*.6,0,0,7);ctx.fill()});
-  CH.balls.forEach(b=>{if(CH.thing&&b.k!==2){ctx.drawImage(CH.thing,b.x-8,b.y-8,16,16);ctx.strokeStyle='#2B2118';ctx.lineWidth=1.2;ctx.strokeRect(b.x-8,b.y-8,16,16)}
-    else{ctx.fillStyle=['#4A90D9','#E0A020','#9B59C7'][b.k];ctx.beginPath();ctx.arc(b.x,b.y,6.5,0,7);ctx.fill();ctx.strokeStyle='#2B2118';ctx.lineWidth=1.5;ctx.stroke()}});
+  CH.balls.forEach(b=>{if(CH.thing&&b.k!==2){ctx.drawImage(CH.thing,b.x-11,b.y-11,22,22);ctx.strokeStyle='#2B2118';ctx.lineWidth=1.5;ctx.strokeRect(b.x-11,b.y-11,22,22)}
+    else{ctx.fillStyle=['#4A90D9','#E0A020','#9B59C7'][b.k];ctx.beginPath();ctx.arc(b.x,b.y,9,0,7);ctx.fill();ctx.strokeStyle='#2B2118';ctx.lineWidth=1.8;ctx.stroke()}});
 }
 (async()=>{CH.icons={};for(const id of ['eye','memory','decider','hand','chair']){try{CH.icons[id]=await rasterize(toolGlyph(id,26),52,52)}catch(e){}}})();
 /* ═══════════════ УРОВНИ ═══════════════ */
@@ -634,7 +710,7 @@ function demoHand(kind){
   h.innerHTML='<div class="dh-f">☝️</div><span class="dh-t">'+{eye:'закрашивай клетки пальцем',memory:'тащи карточку на полку',decider:'крути диск',hand:'покажи пальцем над рисунком',chair:'перетащи себя на место в цепи'}[kind]+'</span>';
   box.appendChild(h);
   const kill=()=>{h.classList.add('off');setTimeout(()=>h.remove(),300)};
-  box.addEventListener('pointerdown',kill,{once:true}); setTimeout(kill,5200);
+  box.addEventListener('pointerdown',kill,{once:true}); setTimeout(kill,7500);
 }
 function thumb(px){const c=document.createElement('canvas');drawVec(c,S.thing||new Uint8Array(100),px);return c}
 
@@ -642,16 +718,16 @@ function thumb(px){const c=document.createElement('canvas');drawVec(c,S.thing||n
 const PIX={n:10,cells:null,down:false,mode:1};
 function eyeHTML(){
   return say(MEANING.eye.before,'think')
-   +`<div class="pz"><div class="pixwrap"><canvas id="pixcv"></canvas>
-      <div><div class="rowlbl" style="margin-top:0">Я вижу</div><div class="numgrid" id="numgrid"></div></div></div>
+   +`<div class="pz"><div class="pixcenter"><canvas id="pixcv"></canvas></div>
       <div class="feat" id="feat"></div>
+      <div class="rowlbl">Что вижу я — сто чисел</div><div class="numgrid" id="numgrid"></div>
       <div class="pixbtns"><button class="btn btn2 btn-sm" onclick="pixMirror()">Зеркало</button><button class="btn btn2 btn-sm" onclick="pixClear()">Стереть</button></div>
       <input class="field" id="thingname" maxlength="18" placeholder="Что это? Одним словом" value="${S.thingName}" oninput="S.thingName=this.value.trim();eyeCheck()"></div>`;
 }
 function eyeBind(){
   const cv=$('pixcv'); if(!cv)return;
   const n=PIX.n, dpr=Math.min(2,devicePixelRatio||1);
-  const size=Math.max(180,Math.min(240,fitW(cv,340)-104)); cv.width=size*dpr;cv.height=size*dpr;cv.style.width=size+'px';cv.style.height=size+'px';
+  const size=Math.max(200,Math.min(300,fitW(cv,340))); cv.width=size*dpr;cv.height=size*dpr;cv.style.width=size+'px';cv.style.height=size+'px';
   const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
   PIX.ctx=ctx;PIX.size=size;PIX.cells=S.thing?Array.from(S.thing):new Array(n*n).fill(0);
   const cellAt=e=>{const r=cv.getBoundingClientRect();const c=Math.floor((e.clientX-r.left)/size*n),rr=Math.floor((e.clientY-r.top)/size*n);return (c<0||rr<0||c>=n||rr>=n)?-1:rr*n+c};
@@ -672,7 +748,7 @@ function pixFeats(cells){const n=10;let cnt=0,sym=0,top=0,bot=0,minx=n,maxx=-1,m
 function eyeUpdate(){
   const g=$('numgrid'); if(g)g.innerHTML=PIX.cells.map(v=>`<i class="${v?'on':''}">${v}</i>`).join('');
   const f=pixFeats(PIX.cells); S.feats=f;
-  const fe=$('feat'); if(fe){fe.innerHTML=(f.cnt<6?[`закрашено ${f.cnt} из 100`]:[`закрашено ${f.cnt} из 100`,f.sym>=70?'левая половина как правая':'несимметрично',f.bot>f.top*1.4?'тяжёлый низ':f.top>f.bot*1.4?'тяжёлый верх':'ровное',`${f.w}×${f.h} клеток`]).map(t=>'<span>'+t+'</span>').join('')}
+  const fe=$('feat'); if(fe){fe.innerHTML=(f.cnt<6?[`закрашено ${f.cnt} из 100`]:[`закрашено ${f.cnt} из 100`,f.sym>=70?'левая половина как правая':'несимметрично',f.bot>f.top*1.4?'тяжёлый низ':f.top>f.bot*1.4?'тяжёлый верх':'ровное']).map(t=>'<span>'+t+'</span>').join('')}
   if(f.cnt===1&&!T.shown.eye1){T.shown.eye1=1;setNote(MEANING.eye.dur[0])}
   if(f.cnt>=8&&f.sym>=70&&!T.shown.eyeSym){T.shown.eyeSym=1;setNote(MEANING.eye.dur[2])}
   eyeCheck();
@@ -696,9 +772,9 @@ function memHTML(){
 function memBind(){
   if(!S.thing)return;
   const r=rng(S.seed*7+11); const deck=[];
-  for(let i=0;i<7;i++)deck.push({v:variantOf(S.thing,r),truth:1});
-  for(let i=0;i<3;i++)deck.push({v:decoy(i,r),truth:0});
-  for(let i=0;i<2;i++)deck.push({v:hardDecoy(S.thing,r),truth:0});
+  for(let i=0;i<5;i++)deck.push({v:variantOf(S.thing,r),truth:1});
+  for(let i=0;i<2;i++)deck.push({v:decoy(i,r),truth:0});
+  deck.push({v:hardDecoy(S.thing,r),truth:0});
   for(let i=deck.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]]}
   MEM.deck=deck;MEM.i=0;S.mem={pos:[],neg:[]};S.memDone=0;
   const th=$('shelfth'); if(th)th.appendChild(thumb(22));
@@ -723,13 +799,13 @@ function memDrag(el,c){
     const sh=e&&typeof e.clientX==='number'?shelfAt(e.clientX,e.clientY):null;
     ['shelfyes','shelfno'].forEach(id=>{const s=$(id);if(s)s.classList.remove('hot')});
     if(sh){const lab=sh.id==='shelfyes'?1:0;(lab?S.mem.pos:S.mem.neg).push(c.v);S.memDone++;
-      const row=$(lab?'shelfry':'shelfrn'); if(row){const m=document.createElement('canvas');drawVec(m,c.v,26,lab?'#2B2118':'#8A7A68');row.appendChild(m)}
+      const row=$(lab?'shelfry':'shelfrn'); if(row){const m=document.createElement('canvas');drawVec(m,c.v,32,lab?'#2B2118':'#8A7A68');row.appendChild(m)}
       el.classList.add('fly');const r=sh.getBoundingClientRect(),er=el.getBoundingClientRect();el.style.transform=`translate(${r.left+r.width/2-er.left-er.width/2+dx}px,${r.top-er.top+dy}px) scale(.2)`;el.style.opacity='0';
       if(S.memDone===1)setNote(MEANING.memory.dur[0]);
       if(S.memDone===4)setNote(MEANING.memory.dur[1]);
       if(lab!==c.truth&&!T.shown.memWarn){T.shown.memWarn=1;setNote(MEANING.memory.dur[2])}
       MEM.i++;setTimeout(memRender,280);
-      if(MEM.i>=MEM.deck.length){enableDone(true);setNote(MEANING.memory.dur[3])}
+      if(MEM.i>=MEM.deck.length){enableDone(true);setNote('Восемь примеров. Мало. Большие нейросети учат на миллионах.')}
     }else{el.style.transform=''}
     dx=0;dy=0};
   el.onpointerdown=e=>{e.preventDefault();try{el.setPointerCapture(e.pointerId)}catch(_){}down=true;sx=e.clientX;sy=e.clientY;dx=0;dy=0};
@@ -742,8 +818,8 @@ function decHTML(){
   if(!S.thing||!S.memDone)return say('Сначала заполни память на уровне 2 — решателю не с чем сравнивать.','oops');
   return say(MEANING.decider.before,'think')
    +`<div class="pz"><canvas id="deccv"></canvas>
-      <div class="dial" id="dial"><div class="dial-n" id="dialn"></div><div class="dial-c"></div><div class="dial-l" id="diall">черта 62%</div></div>
-      <div class="tally"><div class="tl ok"><b id="tok">0</b>верно</div><div class="tl miss"><b id="tmiss">0</b>не узнал своё</div><div class="tl fa"><b id="tfa">0</b>пропустил чужое</div></div></div>`;
+      <div class="dial" id="dial"><div class="dial-w"><span>мягче</span><span>строже</span></div><div class="dial-n" id="dialn"></div><div class="dial-c"></div><div class="dial-l" id="diall">черта</div></div>
+      <div class="tally"><div class="tl ok"><b id="tok">0</b>угадал</div><div class="tl miss"><b id="tmiss">0</b>не узнал своё</div><div class="tl fa"><b id="tfa">0</b>пустил чужое</div></div></div>`;
 }
 function decMakeItems(){
   const r=rng(S.seed*13+5), items=[];
@@ -779,7 +855,7 @@ function decBind(){
   DEC.raf=requestAnimationFrame(loop);
 }
 function decStop(){DEC.run=0;DEC.gen++;if(DEC.raf)cancelAnimationFrame(DEC.raf);DEC.raf=0}
-function decDial(){const a=(S.thr-0.25)/0.65*270-135;const n=$('dialn');if(n)n.style.transform='rotate('+a+'deg)';const l=$('diall');if(l)l.textContent='черта '+Math.round(S.thr*100)+'%'}
+function decDial(){const a=(S.thr-0.25)/0.65*270-135;const n=$('dialn');if(n)n.style.transform='rotate('+a+'deg)';const l=$('diall');if(l)l.textContent=S.thr<0.45?'мягко':S.thr>0.72?'строго':'посередине'}
 /* крутнул диск — уже разложенные пересчитываются: корзины меняются на глазах */
 function decRejudge(){
   const all=DEC.bins.yes.concat(DEC.bins.no); DEC.bins={yes:[],no:[]}; S.tally={ok:0,miss:0,fa:0};
@@ -820,7 +896,7 @@ function decDraw(){
   // решатель
   ctx.fillStyle='#F2E4CC';ctx.strokeStyle='#3A2A18';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(w/2-24,8,48,44,10);ctx.fill();ctx.stroke();
   if(CH.icons&&CH.icons.decider)ctx.drawImage(CH.icons.decider,w/2-13,12,26,26);
-  ctx.fillStyle='#2B2118';ctx.font='800 9.5px Nunito, sans-serif';ctx.textAlign='center';ctx.fillText('черта '+Math.round(S.thr*100)+'%',w/2,48);
+  ctx.fillStyle='#2B2118';ctx.font='800 11px Nunito, sans-serif';ctx.textAlign='center';ctx.fillText('черта',w/2,48);
   DEC.items.forEach(it=>{
     if(!it.img){it.img=document.createElement('canvas');drawVec(it.img,it.v,40)}
     let x=it.x-14,y=16;
@@ -828,7 +904,6 @@ function decDraw(){
     ctx.drawImage(it.img,x,y,28,28);
     ctx.strokeStyle=it.judged?(it.pass?'#2E9E5B':'#8A7A68'):'#3A2A18';ctx.lineWidth=2;ctx.strokeRect(x,y,28,28);
     if(it.judged&&it.pass!==!!it.truth){ctx.strokeStyle='#E65C00';ctx.lineWidth=2.5;ctx.strokeRect(x-2,y-2,32,32)}
-    ctx.fillStyle='#2B2118';ctx.font='800 9px Nunito, sans-serif';ctx.textAlign='center';ctx.fillText(Math.round(it.score*100)+'%',x+14,y-4);
   });
 }
 
@@ -878,7 +953,7 @@ function hgJudge(){
   else{g='carry';feats.push('протянул '+Math.round(len)+' px','в одну сторону')}
   const G=GESTURES.find(x=>x.id===g); S.gest=G;
   const fe=$('hgfeat'); if(fe)fe.innerHTML=feats.map(t=>'<span>'+t+'</span>').join('');
-  const rd=$('hgread'); if(rd)rd.textContent='Я измерил: '+feats.join(', ')+'. Это «'+G.n+'»? Не согласен — напиши своё слово.';
+  const rd=$('hgread'); if(rd)rd.textContent='Я измерил: '+feats.join(', ')+'. Похоже, рука «'+G.n+'». Не так — напиши своё слово ниже.';
   const ph=$('hgphrase'); if(ph)ph.style.display='';
   const tx=$('hgtext'); if(tx&&!S.actionPhrase){tx.value=G.n+' '+(S.thingName||'');S.actionPhrase=tx.value.trim()}
   HG.taps=0; handCheck();
@@ -897,7 +972,7 @@ function chairHTML(){
           <div class="chips" style="margin-top:6px">${HAIR.map((h,i)=>`<button class="chip mini-chip${S.hair===i?' on':''}" onclick="S.hair=${i};charUpd(this)">${h.n}</button>`).join('')}</div>
           <div class="chips" style="margin-top:6px">${FACES.map((h,i)=>`<button class="chip mini-chip${S.face===i?' on':''}" onclick="S.face=${i};charUpd(this)">${h.n}</button>`).join('')}</div>
           <div class="chips" style="margin-top:6px">${WEAR.map((h,i)=>`<button class="chip mini-chip${S.wear===i?' on':''}" onclick="S.wear=${i};charUpd(this)">${h.n}</button>`).join('')}</div>
-          <div class="chips" style="margin-top:6px">${HEADS.map((h,i)=>`<button class="chip mini-chip${S.head===i?' on':''}" onclick="S.head=${i};charUpd(this)">${h.n}</button>`).join('')}</div>
+
         </div></div>
       <div class="rowlbl">Где в цепи место человеку — посади себя</div>
       <div class="mesrc" id="mesrc">${personScene({vb:'90 100 120 280',nobg:1})}<span>тащи меня на место</span></div>
@@ -984,7 +1059,8 @@ function renderRun(){
   $('htitle').textContent='Цех работает';
   RUN.phase='drum';RUN.taps=[];RUN.errNo=0;RUN.errYes=0;RUN.decisions=[];RUN.seated=true;RUN.leave=0;RUN.waiting=null;RUN.done=0;RUN.fin=0;RUN.items=[];
   B().innerHTML=say(MEANING.run.before,'happy')
-    +`<div class="pz"><div class="rowlbl" style="margin-top:0">Темп цеха — стукни 4 раза</div>
+    +`<div class="pzgoal"><div class="pzgoal-t">Запуск</div><div class="pzgoal-r">Как ИИ работает целиком</div><button class="explbtn" onclick="toggleExplain()">Что это значит?</button><div class="explain" id="explain">${EXPLAIN.run}</div></div>
+    <div class="pz"><div class="rowlbl" style="margin-top:0">Темп цеха — стукни 4 раза</div>
       <div class="drum" id="drum"><div class="drum-l" id="druml">стучи здесь</div></div>
       <div class="bars" id="bars"></div><div class="feat" id="earfeat"></div></div>`;
   F().innerHTML=`<button class="btn" id="leverBtn" onclick="runStart()" disabled>Дёрнуть рычаг</button>`;
