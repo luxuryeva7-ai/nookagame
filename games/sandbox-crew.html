@@ -33,12 +33,27 @@
   color:#CFC0EA;font-size:15px;font-weight:900;background:rgba(255,255,255,.07);
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);}
 
+/* ── шапка со сценой: прилипает к верху ──────────────────
+   Список чувств, работ и смена длинные — без этого помощник
+   уезжает за экран, и непонятно, кого ты вообще собираешь. */
+.ncfix{position:sticky;top:0;z-index:20;padding-bottom:8px;
+  background:rgba(20,12,38,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}
+.ncfix--small .nctop{padding-top:8px;}
+.ncfix--small .nctop__t span{display:none;}
+.ncfix--small .ncstage{margin-top:7px;}
+.ncfix--small .ncstage__in{padding-top:0;}
+.ncfix--small .ncstage__in svg{max-width:120px;}
+.ncfix--small .ncname{padding-bottom:9px;}
+.ncfix--small .ncname input{width:132px;padding:6px 10px;font-size:13px;}
+.ncfix--small .ncname button{width:32px;height:32px;font-size:14px;}
+
 /* ── сцена с помощником ── */
 .ncstage{margin:12px 14px 0;border-radius:26px;position:relative;overflow:hidden;
   background:radial-gradient(88% 62% at 50% 6%,#3E2A72 0%,#241750 44%,#150D28 100%);
   box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.1),inset 0 -40px 60px -30px rgba(0,0,0,.55);}
 .ncstage__in{position:relative;z-index:2;padding:6px 10px 0;display:flex;justify-content:center;}
-.ncstage__in svg{width:100%;max-width:250px;height:auto;display:block;}
+.ncstage__in svg{width:100%;max-width:250px;height:auto;display:block;
+  transition:max-width .22s cubic-bezier(.2,.8,.3,1);}
 .ncbot{animation:ncPop .32s cubic-bezier(.2,1.5,.5,1);}
 @keyframes ncPop{from{transform:scale(.88);opacity:0}to{transform:scale(1);opacity:1}}
 .ncname{display:flex;align-items:center;gap:8px;justify-content:center;
@@ -317,6 +332,16 @@ function App() {
   const [help, setHelp] = useState(() => {
     try { return !localStorage.getItem(SEEN); } catch (e) { return true; }
   });
+  const [small, setSmall] = useState(false);
+
+  /* пока листаешь чувства и смену, помощник остаётся на виду */
+  useEffect(() => {
+    const root = document.getElementById('root');
+    if (!root) return;
+    const on = () => setSmall(root.scrollTop > 70);
+    root.addEventListener('scroll', on, { passive: true });
+    return () => root.removeEventListener('scroll', on);
+  }, []);
 
   /* смена: null — ещё собираем; идёт — есть idx; done — показан итог */
   const [shift, setShift] = useState(null);
@@ -428,6 +453,7 @@ function App() {
   return React.createElement('div', { className: 'ncroot' },
     React.createElement('div', { className: 'nc' },
 
+      React.createElement('div', { className: 'ncfix' + (small ? ' ncfix--small' : '') },
       React.createElement('div', { className: 'nctop' },
         React.createElement('div', { className: 'nctop__t' }, 'Мой помощник',
           React.createElement('span', null, 'Собери — и отправь на смену')),
@@ -453,7 +479,7 @@ function App() {
           }),
           React.createElement('button', {
             onClick: shuffle, 'aria-label': 'Другой вид и имя',
-          }, '🎲'))),
+          }, '🎲')))),
 
       /* ── чувства ── */
       React.createElement('div', { className: 'ncsec' },
