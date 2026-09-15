@@ -272,6 +272,20 @@ button,.btn,.st,.chip,.tool,.chair,.f5{touch-action:manipulation;user-select:non
 .card{width:190px;margin-left:-95px}
 .shelf{min-height:96px}
 .shelf-r canvas{width:32px;height:32px}
+
+/* стул: одна колонка — превью сверху, ряды цветов на всю ширину (грид 120px+1fr раздувал страницу до 601px) */
+.charstage{display:block}
+.charpv{width:116px;margin:0 auto 6px}
+.charrow{gap:8px;overflow-x:auto;padding:2px 0 6px}
+.sw{width:42px;height:42px}
+/* пуск: строка ошибок под переключателем, а не в нём */
+.switchrow{flex-wrap:wrap;row-gap:6px}
+.switch-l{white-space:nowrap}
+.switch-c{width:100%;text-align:center;margin:0}
+
+.sumrow{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid rgba(90,60,25,.12);font-size:15px}
+.sumrow:last-of-type{border-bottom:0}.sumk{font-weight:800;color:var(--ink3)}.sumv{font-weight:800;color:var(--ink);text-align:right}
+.sumttl{margin-top:10px;text-align:center;font-family:'Unbounded','Nunito',sans-serif;font-weight:800;font-size:16px;color:var(--acc)}
 </style>
 </head>
 <body>
@@ -299,7 +313,7 @@ const MEANING={
           aha:'Вот так и нейросеть: рисунок она не видит. Видит таблицу чисел и считает в ней признаки.'},
  memory: {n:2,title:'На чём ИИ учится',   act:'Раскладывай по полкам',
           before:'Я наделал кривых копий твоего рисунка и подмешал чужое. Разложи по полкам.',
-          dur:['Моё это или чужое — я не знаю. Знаю числа. Ответ — твой.','На полку кладу пару: рисунок и твой ответ. Одно без другого — мусор.','Ошибся ты — ошибусь и я. Твою ошибку я запомню как правду.','Двенадцать примеров. Мало. Большие нейросети учат на миллионах.'],
+          dur:['Моё это или чужое — я не знаю. Знаю числа. Ответ — твой.','На полку кладу пару: рисунок и твой ответ. Одно без другого — мусор.','Ошибся ты — ошибусь и я. Твою ошибку я запомню как правду.','Полки полные. Это и есть моя память — то, что разложил ты.'],
           aha:'Вот так и нейросеть: её память — примеры с ответами. Ответы дали люди. Здесь — ты.'},
  decider:{n:3,title:'Как ИИ решает',      act:'Крути диск',
           before:'Едут новые. Каждую сравню с полками и скажу: моё или чужое. Где-то ошибусь.',
@@ -348,16 +362,27 @@ const NAMES=['Кай','Лея','Тим','Ная','Рем','Ива','Ант','Ю�
 
 /* ═══════════════ НЕЙРО ═══════════════ */
 function svgNeuro(size,mood){
-  mood=mood||'idle';
-  const eyes={idle:'<circle cx="38" cy="46" r="4.2" fill="#2B2118"/><circle cx="62" cy="46" r="4.2" fill="#2B2118"/>',
-    think:'<circle cx="38" cy="47" r="4.2" fill="#2B2118"/><circle cx="62" cy="44" r="4.2" fill="#2B2118"/><path d="M30 36 l14 3 M70 34 l-14 5" stroke="#2B2118" stroke-width="2.2" stroke-linecap="round"/>',
-    happy:'<path d="M32 46 q6 -7 12 0" stroke="#2B2118" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M56 46 q6 -7 12 0" stroke="#2B2118" stroke-width="3" fill="none" stroke-linecap="round"/>',
-    oops:'<circle cx="38" cy="46" r="5.5" fill="#2B2118"/><circle cx="62" cy="46" r="5.5" fill="#2B2118"/><circle cx="36" cy="44" r="1.6" fill="#fff"/><circle cx="60" cy="44" r="1.6" fill="#fff"/>'}[mood];
-  const mouth={idle:'<path d="M42 62 q8 5 16 0" stroke="#2B2118" stroke-width="2.6" fill="none" stroke-linecap="round"/>',
-    think:'<path d="M43 63 h14" stroke="#2B2118" stroke-width="2.6" stroke-linecap="round"/>',
-    happy:'<path d="M40 60 q10 10 20 0" stroke="#2B2118" stroke-width="2.6" fill="none" stroke-linecap="round"/>',
-    oops:'<ellipse cx="50" cy="63" rx="5" ry="6" fill="#2B2118"/>'}[mood];
-  return `<svg viewBox="0 0 100 100" width="${size}" height="${size}"><ellipse cx="50" cy="94" rx="26" ry="4" fill="rgba(40,26,10,.14)"/><rect x="18" y="22" width="64" height="58" rx="22" fill="#F4F0E8" stroke="#2B2118" stroke-width="2.4"/><rect x="26" y="34" width="48" height="34" rx="14" fill="#2B2118"/><rect x="30" y="38" width="40" height="26" rx="11" fill="#3A3A44"/><g transform="translate(-4 -6)">${eyes}${mouth}</g><circle cx="50" cy="14" r="4" fill="${mood==='happy'?'#7FE3C0':mood==='oops'?'#E65C00':'#F2C337'}"/><path d="M50 18 v5" stroke="#2B2118" stroke-width="2.4"/><rect x="36" y="80" width="28" height="8" rx="4" fill="#2B2118"/></svg>`;
+  const sz=size||50,m=mood||'idle';
+  const eye={idle:'#4FD1C5',think:'#FFC94D',happy:'#7BE495',oops:'#FF9A76'}[m]||'#4FD1C5';
+  const tilt={idle:0,think:-6,happy:3,oops:-3}[m]||0;
+  const lid={idle:0,think:2.4,happy:1.6,oops:0}[m]||0;
+  return `<svg viewBox="0 0 64 64" width="${sz}" height="${sz}" style="display:block;overflow:visible">
+   <ellipse cx="32" cy="59" rx="15" ry="3" fill="rgba(120,72,28,.16)"/>
+   <g transform="rotate(${tilt} 32 34)">
+     <line x1="32" y1="12" x2="32" y2="19" stroke="#C9B49B" stroke-width="2.4" stroke-linecap="round"/>
+     <circle cx="32" cy="9.5" r="3.4" fill="${eye}"/><circle cx="32" cy="9.5" r="6.5" fill="${eye}" opacity=".22"/>
+     <path d="M14 30 q18 -20 36 0 z" fill="#E4DCCF"/>
+     <rect x="13" y="28" width="38" height="30" rx="13" fill="#F2ECE1" stroke="#D8CDBB" stroke-width="1.4"/>
+     <rect x="18" y="34" width="28" height="15" rx="7.5" fill="#2B2118"/>
+     <ellipse cx="25.5" cy="${41.5+lid}" rx="3.4" ry="${3.4-lid*.7}" fill="${eye}"/>
+     <ellipse cx="38.5" cy="${41.5+lid}" rx="3.4" ry="${3.4-lid*.7}" fill="${eye}"/>
+     <circle cx="24.3" cy="${40.3+lid}" r="1.05" fill="#fff" opacity=".9"/>
+     <circle cx="37.3" cy="${40.3+lid}" r="1.05" fill="#fff" opacity=".9"/>
+     ${m==='happy'?'<path d="M27 53 q5 4 10 0" stroke="#C9B49B" stroke-width="1.8" fill="none" stroke-linecap="round"/>':''}
+     ${m==='oops'?'<path d="M28 54 q4 -3 8 0" stroke="#C9B49B" stroke-width="1.8" fill="none" stroke-linecap="round"/>':''}
+     <rect x="8" y="38" width="5" height="12" rx="2.5" fill="#DCD2C2"/>
+     <rect x="51" y="38" width="5" height="12" rx="2.5" fill="#DCD2C2"/>
+   </g></svg>`;
 }
 function say(t,mood){return `<div class="say"><div class="say-av">${svgNeuro(50,mood)}</div><div class="say-b">${t}</div></div>`}
 function setNote(t){const n=$('pznote'); if(n){n.textContent=t; n.animate([{opacity:0},{opacity:1}],{duration:220})}}
@@ -472,7 +497,7 @@ function decoy(kind,r){
 function jaccard(a,b){let i=0,u=0;for(let k=0;k<100;k++){if(a[k]&&b[k])i++;if(a[k]||b[k])u++}return u?i/u:0}
 function drawVec(cv,v,px,fg){const n=10,c=px/n,ctx=cv.getContext('2d');cv.width=px;cv.height=px;
   ctx.fillStyle='#FFF8EE';ctx.fillRect(0,0,px,px);ctx.fillStyle=fg||'#2B2118';
-  for(let i=0;i<100;i++)if(v[i])ctx.fillRect((i%n)*c+1,Math.floor(i/n)*c+1,c-2,c-2)}
+  const g=c>=6?1:0;for(let i=0;i<100;i++)if(v[i])ctx.fillRect((i%n)*c+g,Math.floor(i/n)*c+g,c-2*g,c-2*g)}
 function simShift(v,p){ // сравнение с поправкой на сдвиг в одну клетку — иначе тонкий рисунок «не узнаётся» от чиха
   let best=0;for(let dx=-1;dx<=1;dx++)for(let dy=-1;dy<=1;dy++){const s=jaccard(shiftVec(v,dx,dy),p);if(s>best)best=s}return best;
 }
@@ -607,7 +632,8 @@ function render(){
   if(st==='pass'){renderPass();return}
   if(st==='end'){
     B().innerHTML=say('Внутри ИИ — не волшебство. Цепь из деталей, каждую из которых ты собрал руками.\nИ одно место, где сидит человек. Ты сам его выбрал.','happy')
-      +`<div class="lead" style="text-align:center;margin-top:24px">Мастерская Nooka · «Профессия будущего»</div>`;
+      +`<div class="pz"><div class="rowlbl" style="margin-top:0">Что ты собрал</div>${[['Глаз',S.thingName||'—'],['Память',(S.mem.pos.length+S.mem.neg.length)+' примеров'],['Решатель','черта — '+(S.thr<0.45?'мягко':S.thr>0.72?'строго':'посередине')],['Рука',S.actionPhrase||(S.gest&&S.gest.n)||'—'],['Стул',S.human?NODEN[S.human].toLowerCase():'—']].map(([k,v])=>`<div class="sumrow"><span class="sumk">${k}</span><span class="sumv">${v}</span></div>`).join('')}${S.title?`<div class="sumttl">«${S.title}»${S.name?' · '+S.name:''}</div>`:''}</div>
+      <div class="lead" style="text-align:center;margin-top:18px">Мастерская Nooka · «Профессия будущего»</div>`;
     F().innerHTML=`<div class="btnrow"><button class="btn btn2 btn-sm" onclick="go('pass')">К паспорту</button><button class="btn btn-sm" onclick="wipe();location.href='index.html'">В мастерскую</button></div>`;
     return;
   }
@@ -955,7 +981,7 @@ function hgJudge(){
   const fe=$('hgfeat'); if(fe)fe.innerHTML=feats.map(t=>'<span>'+t+'</span>').join('');
   const rd=$('hgread'); if(rd)rd.textContent='Я измерил: '+feats.join(', ')+'. Похоже, рука «'+G.n+'». Не так — напиши своё слово ниже.';
   const ph=$('hgphrase'); if(ph)ph.style.display='';
-  const tx=$('hgtext'); if(tx&&!S.actionPhrase){tx.value=G.n+' '+(S.thingName||'');S.actionPhrase=tx.value.trim()}
+  const tx=$('hgtext'); if(tx&&!S.actionPhrase){tx.value=G.n;S.actionPhrase=G.n}
   HG.taps=0; handCheck();
 }
 function handCheck(){enableDone(!!(S.gest&&(S.actionPhrase||'').length>=3));if(S.gest&&!T.shown.handNote){T.shown.handNote=1;setNote(MEANING.hand.dur[0].replace('делает одно и то же','умеет только «'+S.gest.n+'»'))}}
@@ -1005,7 +1031,7 @@ function fillGaps(){
   if(!S.thing){S.thing=decoy(3,r);S.thingName=S.thingName||'ракета';miss.push('рисунок')}
   if(!S.memDone){S.mem={pos:[variantOf(S.thing,r),variantOf(S.thing,r),variantOf(S.thing,r)],neg:[decoy(0,r),decoy(1,r),hardDecoy(S.thing,r)]};S.memDone=6;miss.push('примеры')}
   if(!S.decDone){S.decDone=1;miss.push('черту')}
-  if(!S.gest){S.gest=pick(r,GESTURES);S.actionPhrase=S.actionPhrase||(S.gest.n+' '+S.thingName);miss.push('дело руки')}
+  if(!S.gest){S.gest=pick(r,GESTURES);S.actionPhrase=S.actionPhrase||S.gest.n;miss.push('дело руки')}
   if(!S.human){S.human='decider';miss.push('место человека')}
   S.gaps=miss; return miss;
 }
@@ -1092,7 +1118,7 @@ function runLeave(on){RUN.seated=!on;if(RUN.phase==='fin')return;if(on)setNote(M
 function runLoop(){
   const cv=$('fcv');if(!cv)return;const ctx=cv.getContext('2d');RUN.on=1;const my=++RUN.gen;RUN.t=0;RUN.last=performance.now();
   const loop=now=>{if(!RUN.on||my!==RUN.gen)return;const dt=Math.min(50,now-RUN.last);RUN.last=now;runStep(dt);runDraw(ctx,RUN.t/1000);
-    const b=$('fbar');if(b)b.style.width=Math.round(RUN.done/RUN.items.length*100)+'%';
+    const b=$('fbar');if(b)b.style.width=Math.round(RUN.done/RUN.items.length*100)+'%';const st=$('fst');if(st)st.textContent=RUN.fin?'Смена окончена':'Смена идёт · '+RUN.done+' из '+RUN.items.length;
     if(RUN.done>=RUN.items.length&&!RUN.fin){RUN.fin=1;setTimeout(runFinish,1200)}
     RUN.raf=requestAnimationFrame(loop)};RUN.raf=requestAnimationFrame(loop);
 }
@@ -1130,7 +1156,7 @@ function runFinish(){
   RUN.phase='fin';RUN.on=0;
   const total=RUN.errNo+RUN.errYes;
   setNote('Смена окончена. Ошибок без тебя: '+RUN.errNo+', с тобой: '+RUN.errYes+'. '+(RUN.errYes<=RUN.errNo?'Ум был там, где сидел ты.':'Человек тоже ошибается. Но он хотя бы знает, зачем.'));
-  F().innerHTML=`<div class="btnrow"><button class="btn btn2 btn-sm" onclick="renderRun()">Ещё смену</button>${filmCanRecord()?`<button class="btn btn2 btn-sm" onclick="filmSave()">Сохранить</button>`:''}<button class="btn btn-sm" onclick="go('pass')">Паспорт →</button></div>`;
+  F().innerHTML=`<div class="btnrow" style="margin-bottom:8px"><button class="btn btn2 btn-sm" onclick="renderRun()">Ещё смену</button>${filmCanRecord()?`<button class="btn btn2 btn-sm" onclick="filmSave()">Сохранить видео</button>`:''}</div><button class="btn" onclick="go('pass')">Паспорт →</button>`;
 }
 function runDraw(ctx,t){
   const A=RUN.A,G=runGeom(),y=G.y;
@@ -1267,7 +1293,7 @@ $('back').onclick=()=>{
 };
 if(!CanvasRenderingContext2D.prototype.roundRect){CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r){this.moveTo(x+r,y);this.arcTo(x+w,y,x+w,y+h,r);this.arcTo(x+w,y+h,x,y+h,r);this.arcTo(x,y+h,x,y,r);this.arcTo(x,y,x+w,y,r);this.closePath();return this}}
 if(load()){S.step='intro';render();const f=$('fn');if(f){f.value=S.child}
-  F().innerHTML=`<div class="btnrow"><button class="btn btn2 btn-sm" onclick="wipe();S.done={eye:0,memory:0,decider:0,hand:0,chair:0};S.thing=null;S.memDone=0;S.decDone=0;S.gest=null;S.human=null;go('floor')">Заново</button><button class="btn btn-sm" onclick="go('floor')">Продолжить смену</button></div>`}
+  F().innerHTML=`<div class="btnrow"><button class="btn btn2 btn-sm" onclick="wipe();location.reload()">Заново</button><button class="btn btn-sm" onclick="go('floor')">Продолжить смену</button></div>`}
 else render();
 </script>
 </body>
