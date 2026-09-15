@@ -982,7 +982,7 @@ function runItems(){
 }
 function renderRun(){
   $('htitle').textContent='Цех работает';
-  RUN.phase='drum';RUN.taps=[];RUN.errNo=0;RUN.errYes=0;RUN.decisions=[];RUN.seated=true;RUN.leave=0;RUN.waiting=null;RUN.done=0;
+  RUN.phase='drum';RUN.taps=[];RUN.errNo=0;RUN.errYes=0;RUN.decisions=[];RUN.seated=true;RUN.leave=0;RUN.waiting=null;RUN.done=0;RUN.fin=0;RUN.items=[];
   B().innerHTML=say(MEANING.run.before,'happy')
     +`<div class="pz"><div class="rowlbl" style="margin-top:0">Темп цеха — стукни 4 раза</div>
       <div class="drum" id="drum"><div class="drum-l" id="druml">стучи здесь</div></div>
@@ -1012,7 +1012,7 @@ function runStart(){
   const cv=$('fcv');cv.width=FW;cv.height=FH;
   runAssets().then(A=>{RUN.A=A;RUN.items=runItems();RUN.beat=Math.max(650,Math.min(1600,S.beat?S.beat.mean:1000));RUN.phase='go';runLoop()}).catch(()=>{const st=$('fst');if(st)st.textContent='Не получилось запустить. Паспорт — дальше.';F().innerHTML=`<button class="btn" onclick="go('pass')">К паспорту</button>`});
 }
-function runLeave(on){RUN.seated=!on;if(on){setNote(MEANING.run.dur[2]);RUN.leaveT=RUN.t}else setNote('Сел обратно. Спорные снова ждут тебя.');runWaitUI()}
+function runLeave(on){RUN.seated=!on;if(RUN.phase==='fin')return;if(on)setNote(MEANING.run.dur[2]);else setNote('Сел обратно. Спорные снова ждут тебя.');runWaitUI()}
 function runLoop(){
   const cv=$('fcv');if(!cv)return;const ctx=cv.getContext('2d');RUN.on=1;const my=++RUN.gen;RUN.t=0;RUN.last=performance.now();
   const loop=now=>{if(!RUN.on||my!==RUN.gen)return;const dt=Math.min(50,now-RUN.last);RUN.last=now;runStep(dt);runDraw(ctx,RUN.t/1000);
@@ -1037,11 +1037,13 @@ function runStep(dt){
     }
     if(it.st==='drop'){it.y+=dt*0.15;if(it.y>90){it.st='done';RUN.done++}}
   });
-  if(RUN.leave)RUN.leave=Math.min(1,RUN.leave+dt/600); else if(!RUN.seated)RUN.leave=0.001;
-  if(RUN.seated&&RUN.leave>0)RUN.leave=Math.max(0,RUN.leave-dt/600);
+  // персонаж идёт к цели: встал — уходит к 1, сел — возвращается к 0 (раньше плюс и минус гасили друг друга, и он застревал на полпути)
+  const tgt=RUN.seated?0:1, lv=RUN.leave||0;
+  RUN.leave=lv<tgt?Math.min(tgt,lv+dt/600):Math.max(tgt,lv-dt/600);
 }
 function runErr(){const e=$('errline');if(e)e.textContent='ошибок без тебя: '+RUN.errNo+' · с тобой: '+RUN.errYes}
 function runWaitUI(){
+  if(RUN.phase==='fin')return;   // после финала кнопки итога не трогаем
   const it=RUN.waiting;
   if(it&&it.st==='hold'&&RUN.seated){const [a,b]=ASK[S.human];F().innerHTML=`<div class="btnrow"><button class="btn btn-sm" onclick="runDecide(true)">${a}</button><button class="btn btn2 btn-sm" onclick="runDecide(false)">${b}</button></div>`}
   else{F().innerHTML='';if(it&&it.st==='hold'&&!RUN.seated){it.st='go';it.pass=it.score>=S.thr;it.auto=1;if(it.pass!==!!it.truth)RUN.errNo++;RUN.waiting=null;runErr()}}
