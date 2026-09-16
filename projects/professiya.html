@@ -296,6 +296,26 @@ button,.btn,.st,.chip,.tool,.chair,.f5{touch-action:manipulation;user-select:non
 .dialrow{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:8px;font-weight:800;font-size:14px;color:var(--ink2)}
 .dialrow .txtbtn{font-size:15px}
 .ask-sub{font-size:13px;color:var(--ink3);text-align:center;margin:-2px 0 8px}
+
+/* рождение напарника */
+.bstage{position:relative;width:300px;height:340px;margin:0 auto}
+.bstage svg{width:100%;height:100%;display:block}
+.bsil{position:absolute;inset:0;opacity:.16}
+.bpart{position:absolute;width:44px;height:44px;transform:translate(var(--dx),var(--dy));animation:bfly .6s cubic-bezier(.2,.8,.3,1.15) forwards;transition:opacity .4s;filter:drop-shadow(0 4px 6px rgba(60,40,10,.25))}
+.bpart svg{width:44px;height:44px}
+.bpart.gone{opacity:0}
+@keyframes bfly{to{transform:translate(0,0)}}
+.bbot{position:absolute;inset:0;opacity:0;transform:scale(.9);transition:opacity .5s,transform .5s}
+.bbot.on{opacity:1;transform:scale(1)}
+.botsay{margin-top:10px;background:var(--card);border-radius:16px;padding:12px 14px;box-shadow:var(--sh);font-weight:700;font-size:17px;line-height:1.5;color:var(--ink2);white-space:pre-line}
+.botsay:empty{display:none}
+/* три правила */
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{min-height:50px;border-radius:16px;border:2px solid var(--line);background:var(--card);font-family:inherit;font-weight:800;font-size:16px;color:var(--ink2);padding:10px 14px;text-align:left;cursor:pointer}
+.opt.on{border-color:var(--acc);background:var(--accbg);color:var(--acc)}
+.rulerow{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(90,60,25,.12);font-weight:700;font-size:15.5px;color:var(--ink);line-height:1.35}
+.rulerow:last-of-type{border-bottom:0}
+.rulen{flex:none;width:26px;height:26px;border-radius:50%;background:var(--acc);color:#fff;font-weight:900;font-size:14px;display:flex;align-items:center;justify-content:center}
 </style>
 </head>
 <body>
@@ -566,10 +586,11 @@ const S={step:'intro',child:'',age:'',seed:4821,
   hair:0,hairc:1,skin:2,face:1,wear:3,head:0,world:'forest',
   beat:null,beatKind:'',
   name:'',title:'',line:'',mine:'',
+  botName:'',born:0,rules:[],
   shift:null,
   done:{eye:0,memory:0,decider:0,hand:0,chair:0}};
 let CUR=null, T={aha:null,shown:{}};
-const STEPS=['intro','floor','pz','name','run','pass','end'];
+const STEPS=['intro','floor','birth','pz','name','run','rules','pass','end'];
 function pct(){const i=STEPS.indexOf(S.step);return Math.max(0,Math.round(i/(STEPS.length-1)*100))}
 function go(step){S.step=step;render();window.scrollTo({top:0});save()}
 
@@ -616,6 +637,7 @@ function needHTML(){
   return `<div class="need"><div class="need-t">Для цеха нужно <b>${got} из ${L.length}</b></div>
    <div class="need-r">${L.map(x=>`<div class="nd${x.have?' has':''}"><span class="nd-e">${toolGlyph(x.id,16)}</span><span class="nd-n">${cap(x.gives)}</span><span class="nd-v">${x.have?x.val:'—'}</span></div>`).join('')}</div></div>`;
 }
+function floorDoneLine(){return S.born?(botName()+' собран и ждёт. Дёргай рычаг.'):'Все пять деталей на месте. Теперь собери из них напарника.'}
 function nextStation(){const st=STATIONS.find(x=>!S.done[x.id]);return st?st.id:null}
 function allDone(){return STATIONS.every(x=>S.done[x.id])}
 
@@ -646,8 +668,8 @@ function render(){
     const n=Object.values(S.done).filter(Boolean).length;
     B().innerHTML=(n===0
       ? say('Цех пустой. Собери пять деталей — по номерам, от 1 до 5. Я заработаю.','idle')
-      : ah ? say('<b>'+ah.aha+'</b>'+(nxM?'\nДальше — номер '+nxM.n+'.':'\nЦепь собрана. Дёргай рычаг.'),'happy')
-      : say(nxM?'Дальше — номер '+nxM.n+'. '+nxM.title+'.':'Цепь собрана. Дёргай рычаг.','think'))
+      : ah ? say('<b>'+ah.aha+'</b>'+(nxM?'\nДальше — номер '+nxM.n+'.':'\n'+floorDoneLine()),'happy')
+      : say(nxM?'Дальше — номер '+nxM.n+'. '+nxM.title+'.':floorDoneLine(),'think'))
       +`<div class="floor"><div class="floor-t">Цех <span>большая цепь ИИ</span></div><canvas class="chaincv" id="chaincv"></canvas>${progHTML()}</div>
       <div class="stations">${STATIONS.map(x=>`
         <button class="st${S.done[x.id]?' done':''}${nx===x.id?' next':''}" id="st_${x.id}" onclick="openLevel('${x.id}')">
@@ -657,7 +679,7 @@ function render(){
           ${nx===x.id?'<span class="st-badge">сейчас</span>':''}
         </button>`).join('')}</div>`;
     F().innerHTML=allDone()
-      ? `<button class="btn" onclick="toName()">Дёрнуть рычаг →</button>`
+      ? (S.born?`<button class="btn" onclick="toName()">Дёрнуть рычаг →</button>`:`<button class="btn" onclick="go('birth')">Собрать напарника →</button>`)
       : (n>=3?`<button class="btn btn2" onclick="toName()">Хватит — что не собрал, доделаю я</button>`:`<div class="hintbar">Собери детали — начни с номера ${nxM?nxM.n:1}</div>`);
     setTimeout(startChain,60);
     return;
@@ -675,12 +697,14 @@ function render(){
     return;
   }
 
+  if(st==='birth'){renderBirth();return}
+  if(st==='rules'){renderRules();return}
   if(st==='name'){renderName();return}
   if(st==='run'){renderRun();return}
   if(st==='pass'){renderPass();return}
   if(st==='end'){
     B().innerHTML=say('Внутри ИИ — не волшебство. Цепь из деталей, каждую из которых ты собрал руками.\nИ одно место, где сидит человек. Ты сам его выбрал.','happy')
-      +`<div class="pz"><div class="rowlbl" style="margin-top:0">Что ты собрал</div>${[['Глаз',S.thingName||'—'],['Память',(S.mem.pos.length+S.mem.neg.length)+' примеров'],['Решатель','черта — '+(S.thr<0.45?'мягко':S.thr>0.72?'строго':'посередине')],['Рука',S.actionPhrase||(S.gest&&S.gest.n)||'—'],['Стул',S.human?NODEN[S.human].toLowerCase():'—'],['Роль',S.human?ROLE[S.human]:'—'],['Мир',WORLDS[worldOf()].n]].map(([k,v])=>`<div class="sumrow"><span class="sumk">${k}</span><span class="sumv">${v}</span></div>`).join('')}${S.title?`<div class="sumttl">«${S.title}»${S.name?' · '+S.name:''}</div>`:''}</div>
+      +`<div class="pz"><div class="rowlbl" style="margin-top:0">Что ты собрал</div>${[['Глаз',S.thingName||'—'],['Память',(S.mem.pos.length+S.mem.neg.length)+' примеров'],['Решатель','черта — '+(S.thr<0.45?'мягко':S.thr>0.72?'строго':'посередине')],['Рука',S.actionPhrase||(S.gest&&S.gest.n)||'—'],['Стул',S.human?NODEN[S.human].toLowerCase():'—'],['Роль',S.human?ROLE[S.human]:'—'],['Мир',WORLDS[worldOf()].n],['Напарник',S.botName||'—']].map(([k,v])=>`<div class="sumrow"><span class="sumk">${k}</span><span class="sumv">${v}</span></div>`).join('')}${rulesHTML()}${S.title?`<div class="sumttl">«${S.title}»${S.name?' · '+S.name:''}</div>`:''}</div>
       <div class="lead" style="text-align:center;margin-top:18px">Мастерская Nooka · «Профессия будущего»</div><div style="text-align:center;margin-top:6px"><button class="txtbtn" onclick="location.href='index.html'">В мастерскую</button></div>`;
     F().innerHTML=`<div class="btnrow" style="margin-bottom:8px"><button class="btn btn2 btn-sm" onclick="go('pass')">К паспорту</button><button class="btn btn2 btn-sm" onclick="wipe();location.reload()">Собрать заново</button></div><button class="btn" onclick="go('run')">Дёрнуть рычаг снова</button>`;
     return;
@@ -1094,7 +1118,7 @@ function chainLine(){
 }
 function renderName(){
   $('htitle').textContent='Как называется';
-  B().innerHTML=say(S.gaps&&S.gaps.length?'Чего не собрал — я добрал сам: '+S.gaps.join(', ')+'.\nНазвать профессию могу только с тобой.':'Цепь готова. Назвать её могу только с тобой.','think')
+  B().innerHTML=say(S.gaps&&S.gaps.length?'Чего не собрал — я добрал сам: '+S.gaps.join(', ')+'.\nНазвать профессию могу только с тобой.':(S.botName?S.botName+' готов. ':'Цепь готова. ')+'Назвать профессию могу только с тобой.','think')
     +`<div class="pz"><div class="rowlbl" style="margin-top:0">Профессия — любое слово, хоть смешное</div>
       <input class="field" id="ptitle" maxlength="34" placeholder="Как называется?" value="${S.title}" oninput="S.title=this.value" style="margin-top:0">
       <div class="mini" style="margin-top:6px">Черновик машины: <button class="txtbtn" style="display:inline;padding:0 4px;font-size:15px" onclick="S.title=titleDraft();$('ptitle').value=S.title">${titleDraft()}</button></div>
@@ -1309,7 +1333,7 @@ function runFinish(){
   RUN.phase='fin';RUN.on=0;
   const total=RUN.errNo+RUN.errYes;
   setNote('Смена окончена. Ошибок без тебя: '+RUN.errNo+', с тобой: '+RUN.errYes+'. '+(RUN.errYes<=RUN.errNo?'Ум был там, где сидел ты.':'Человек тоже ошибается. Но он хотя бы знает, зачем.'));
-  F().innerHTML=`<div class="btnrow" style="margin-bottom:8px"><button class="btn btn2 btn-sm" onclick="renderRun()">Ещё смену</button>${filmCanRecord()?`<button class="btn btn2 btn-sm" onclick="filmSave()">Сохранить видео</button>`:''}</div><button class="btn" onclick="go('pass')">Паспорт →</button>`;
+  F().innerHTML=`<div class="btnrow" style="margin-bottom:8px"><button class="btn btn2 btn-sm" onclick="renderRun()">Ещё смену</button>${filmCanRecord()?`<button class="btn btn2 btn-sm" onclick="filmSave()">Сохранить видео</button>`:''}</div><button class="btn" onclick="go(S.rules&&S.rules.length>=3?'pass':'rules')">Дальше →</button>`;
 }
 function runDraw(ctx,t){
   const A=RUN.A,G=runGeom(),y=G.y;
@@ -1413,9 +1437,94 @@ async function filmDeliver(blob){
   try{const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=fname;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(u);a.remove()},2000);return 'download'}catch(e){return 'fail'}
 }
 
+/* ═══ НАПАРНИК: рождение робота из деталей и три правила ═══ */
+const BOTNAMES=['Тыр-Тыр','Бип','Кубик','Зум','Пиксель','Шурум','Тик','Болт','Искра','Чип','Гайка','Луч'];
+function botMood(){return S.thr<0.45?'добрый':S.thr>0.72?'строгий':'спокойный'}
+function botName(){return S.botName||'напарник'}
+/* робот собран из того, что сделал ребёнок: глаз — его рисунок, грудь — полки, живот — черта, рука — инструмент, слева — стул человека */
+function svgBot(o){
+  o=o||{};const K=INK,ln=`stroke="${K}" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"`,cid='botEye'+(o.id||'');
+  const v=S.thing||new Uint8Array(100);let eye='';
+  for(let i=0;i<100;i++)if(v[i]){const x=128+(i%10)*4.4,y=88+Math.floor(i/10)*4.4;eye+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="4" height="4" fill="${K}"/>`}
+  const a=(S.thr-0.25)/0.65*270-135;
+  const tool=S.gest?toolGlyph(S.gest.g,40).replace(/<\/?svg[^>]*>/g,''):'';
+  const kid=o.nokid?'':`<g transform="translate(17 104) scale(0.2)">${svgPerson({notool:1})}</g>`;
+  return `<svg viewBox="0 0 300 340" xmlns="http://www.w3.org/2000/svg" ${o.attrs||''}>
+   <defs><clipPath id="${cid}"><circle cx="150" cy="110" r="27"/></clipPath></defs>
+   <ellipse cx="150" cy="326" rx="86" ry="8" fill="rgba(40,26,10,.18)"/>
+   <rect x="66" y="288" width="168" height="34" rx="17" fill="${K}"/><circle cx="90" cy="305" r="9" fill="#D9BE94"/><circle cx="150" cy="305" r="9" fill="#D9BE94"/><circle cx="210" cy="305" r="9" fill="#D9BE94"/>
+   <rect x="16" y="150" width="8" height="34" rx="4" fill="#C9A26E" ${ln}/><rect x="14" y="178" width="62" height="12" rx="6" fill="#C9A26E" ${ln}/><rect x="22" y="190" width="8" height="30" fill="#8A6D46"/><rect x="60" y="190" width="8" height="30" fill="#8A6D46"/>
+   ${kid}
+   <path d="M222 190 L262 226" stroke="${K}" stroke-width="30" stroke-linecap="round"/><path d="M222 190 L262 226" stroke="#F2E4CC" stroke-width="22" stroke-linecap="round"/>
+   <rect x="80" y="152" width="140" height="140" rx="26" fill="#F2E4CC" ${ln}/>
+   <rect x="100" y="168" width="100" height="48" rx="9" fill="#FFF8EE" ${ln}/>
+   <rect x="108" y="176" width="84" height="13" rx="4" fill="#DFF5EA" stroke="${K}" stroke-width="2"/><rect x="108" y="195" width="84" height="13" rx="4" fill="#EDE3D2" stroke="${K}" stroke-width="2"/>
+   <text x="150" y="186.5" text-anchor="middle" font-family="Nunito, sans-serif" font-weight="800" font-size="9.5" fill="${K}">моё ${S.mem.pos.length}</text><text x="150" y="205.5" text-anchor="middle" font-family="Nunito, sans-serif" font-weight="800" font-size="9.5" fill="${K}">чужое ${S.mem.neg.length}</text>
+   <circle cx="150" cy="254" r="25" fill="#F6EEE2" ${ln}/><g transform="rotate(${a.toFixed(1)} 150 254)"><path d="M150 254 v-18" stroke="#E65C00" stroke-width="4" stroke-linecap="round"/></g><circle cx="150" cy="254" r="4" fill="${K}"/>
+   <line x1="150" y1="44" x2="150" y2="66" stroke="${K}" stroke-width="4"/><circle cx="150" cy="40" r="7" fill="#E65C00" ${ln}/>
+   <rect x="94" y="66" width="112" height="86" rx="24" fill="#F2E4CC" ${ln}/>
+   <circle cx="150" cy="110" r="30" fill="#FFF8EE" ${ln}/><g clip-path="url(#${cid})">${eye}</g>
+   <path d="M136 141 q14 8 28 0" stroke="${K}" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+   <circle cx="268" cy="232" r="22" fill="#fff" ${ln}/><g transform="translate(252 216) scale(.8)">${tool}</g>
+  </svg>`;
+}
+function sayBot(t){return `<div class="say"><div class="say-av">${svgBot({nokid:1,id:'a',attrs:'width="50" height="56"'})}</div><div class="say-b">${t}</div></div>`}
+/* ── рождение: детали слетаются в робота, он говорит первые слова из выборов ребёнка ── */
+const BSLOT={eye:[128,88],memory:[128,170],decider:[128,232],hand:[246,210],chair:[23,160]};
+function renderBirth(){
+  $('htitle').textContent='Рождение';
+  const ids=['eye','memory','decider','hand','chair'],startX=[30,90,150,210,270];
+  B().innerHTML=say('Пять деталей есть. Смотри, что из них выходит.','happy')+`<div class="pz birth"><div class="bstage" id="bstage">
+      <div class="bsil">${svgBot({nokid:1,id:'s'})}</div>
+      ${ids.map((id,i)=>{const [l,t]=BSLOT[id];return `<div class="bpart" style="left:${l}px;top:${t}px;--dx:${startX[i]-22-l}px;--dy:${308-t}px;animation-delay:${(.25+i*.4).toFixed(2)}s">${toolGlyph(id,44)}</div>`}).join('')}
+      <div class="bbot" id="bbot">${svgBot({id:'b'})}</div></div>
+    <div class="botsay" id="botsay"></div>
+    <div id="bname" style="display:none"><div class="rowlbl">Как его зовут?</div><input class="field" id="botname" maxlength="14" placeholder="Имя напарника" value="${S.botName||''}" oninput="S.botName=this.value.trim();botNameCheck()" style="margin-top:0" autocomplete="off"><button class="txtbtn" onclick="S.botName=pick(rng(performance.now()|0),BOTNAMES);$('botname').value=S.botName;botNameCheck()">Дай случайное</button></div></div>
+    <div class="note" id="pznote"></div>`;
+  F().innerHTML=`<button class="btn" id="birthBtn" onclick="birthDone()" disabled>Познакомились →</button>`;
+  setTimeout(()=>{const b=$('bbot');if(!b)return;b.classList.add('on');[...document.querySelectorAll('.bpart')].forEach(p=>p.classList.add('gone'));botSpeak()},2600);
+}
+function botSpeak(){
+  const lines=['Я вижу: '+(S.thingName||'что-то')+'.','Помню '+(S.mem.pos.length+S.mem.neg.length)+' примеров.','Я '+botMood()+'.','Умею: '+(S.gest?S.gest.n:'делать')+'.','Зачем — не знаю.','Это знаешь ты.'];
+  const el=$('botsay');if(!el)return;let i=0;
+  const tick=()=>{if(!$('botsay'))return;el.textContent=lines.slice(0,i+1).join('\n');i++;if(i<lines.length)setTimeout(tick,650);else{const n=$('bname');if(n)n.style.display='';botNameCheck();setNote('Дай ему имя — и он твой.')}};
+  tick();
+}
+function botNameCheck(){const b=$('birthBtn');if(b)b.disabled=!(S.botName&&S.botName.length>=2)}
+function birthDone(){if(!(S.botName&&S.botName.length>=2))return;S.born=1;save();go('name')}
+/* ── три правила: робот спрашивает «зачем», ответы ребёнка становятся его правилами ── */
+const RQ=[
+ {q:'Приехало то, чего я никогда не видел. Что мне делать?',opts:['Остановись и спроси меня','Отложи в сторону — разберём вместе','Штампуй по черте, как умеешь']},
+ {q:'Чужое, но очень похоже на моё. Как быть?',opts:['Сомневаешься — зови меня','Лучше лишний раз не пустить','Похоже — значит моё, пропускай']},
+ {q:'Что важнее: быстро или точно?',opts:['Точно. Пусть медленно','Быстро, но спорное — мне','Быстро. Ошибки поправим']},
+];
+const RULE={i:0,pick:''};
+function renderRules(){
+  $('htitle').textContent='Три правила';
+  if(!S.rules)S.rules=[];
+  RULE.i=S.rules.length;if(RULE.i>=3){renderRulesDone();return}
+  const q=RQ[RULE.i];RULE.pick='';
+  B().innerHTML=sayBot((RULE.i===0?'Смена кончилась. У меня остались вопросы — без тебя на них не ответить.\n':'')+q.q)
+    +`<div class="pz"><div class="rowlbl" style="margin-top:0">Правило ${RULE.i+1} из 3</div>
+      <div class="opts">${q.opts.map((o,k)=>`<button class="opt" onclick="rulePick(this,${k})">${o}</button>`).join('')}</div>
+      <input class="field" id="ruleown" maxlength="60" placeholder="Или своими словами" oninput="ruleOwn(this.value)" autocomplete="off"></div>
+    <div class="note" id="pznote">Это твои правила. У машины своих нет.</div>`;
+  F().innerHTML=`<button class="btn" id="ruleBtn" onclick="ruleSave()" disabled>Так и запиши</button>`;
+}
+function rulePick(el,k){[...document.querySelectorAll('.opt')].forEach(o=>o.classList.remove('on'));el.classList.add('on');RULE.pick=RQ[RULE.i].opts[k];const f=$('ruleown');if(f)f.value='';const b=$('ruleBtn');if(b)b.disabled=false}
+function ruleOwn(v){v=v.trim();const b=$('ruleBtn');if(v.length>=3){[...document.querySelectorAll('.opt')].forEach(o=>o.classList.remove('on'));RULE.pick=v;if(b)b.disabled=false}else if(!document.querySelector('.opt.on')){RULE.pick='';if(b)b.disabled=true}}
+function ruleSave(){if(!RULE.pick)return;S.rules[RULE.i]=RULE.pick;save();renderRules()}
+function rulesHTML(){return (S.rules&&S.rules.length)?`<div class="rowlbl">Правила для ${botName()}</div>${S.rules.map((r,i)=>`<div class="rulerow"><span class="rulen">${i+1}</span><span>${r}</span></div>`).join('')}`:''}
+function renderRulesDone(){
+  B().innerHTML=sayBot('Запомнил. Теперь у меня есть то, чего не было: зачем.')
+    +`<div class="pz">${rulesHTML()}<button class="txtbtn" onclick="S.rules=[];save();renderRules()">Переписать</button></div>
+    <div class="note">Ты написал правила для ИИ. Это и есть профессия будущего.</div>`;
+  F().innerHTML=`<button class="btn" onclick="go('pass')">К паспорту →</button>`;
+}
+
 /* ═══════════════ ПАСПОРТ ═══════════════ */
 async function passDraw(cv){
-  const W=1080,H=1350;cv.width=W;cv.height=H;const ctx=cv.getContext('2d');
+  const W=1080,H=1520;cv.width=W;cv.height=H;const ctx=cv.getContext('2d');
   ctx.fillStyle='#FFF8EE';ctx.fillRect(0,0,W,H);ctx.fillStyle='#E65C00';ctx.fillRect(0,0,W,14);
   ctx.textAlign='left';ctx.fillStyle='#8A7A68';ctx.font='800 22px Nunito, sans-serif';ctx.fillText('ПАСПОРТ ПРОФЕССИИ БУДУЩЕГО · МАСТЕРСКАЯ NOOKA',60,70);
   ctx.fillStyle='#2B2118';ctx.font='800 54px Unbounded, sans-serif';
@@ -1438,11 +1547,15 @@ async function passDraw(cv){
   ctx.fillStyle='#2B2118';ctx.font='700 25px Nunito, sans-serif';let yy=850;
   wrapLines(ctx,chainLine(),W-120).forEach(l=>{ctx.fillText(l,60,yy);yy+=34});
   if(S.mine){ctx.fillStyle='#8A7A68';ctx.font='800 18px Nunito, sans-serif';ctx.fillText('ЧТО ДЕЛАЮ Я, ЧЕГО МАШИНА НЕ УМЕЕТ',60,yy+22);ctx.fillStyle='#2B2118';ctx.font='800 28px Nunito, sans-serif';wrapLines(ctx,S.mine,W-120).slice(0,2).forEach((l,i)=>ctx.fillText(l,60,yy+62+i*36));yy+=100}
-  if(S.line){ctx.fillStyle='#E65C00';ctx.font='800 28px Nunito, sans-serif';ctx.fillText('«'+S.line+'»',60,yy+40)}
-  if(S.shiftErr){ctx.fillStyle='#8A7A68';ctx.font='700 20px Nunito, sans-serif';ctx.fillText('смена: ошибок без тебя '+S.shiftErr.no+', с тобой '+S.shiftErr.yes,60,1090)}
-  ctx.fillStyle='#2B2118';ctx.font='800 38px Unbounded, sans-serif';ctx.textAlign='center';ctx.fillText('Считает машина. Решает — '+(S.child||'человек')+'.',W/2,1150);
-  ctx.fillStyle='#8A7A68';ctx.font='700 22px Nunito, sans-serif';ctx.fillText('До сегодняшнего дня этой профессии не было. Придумал — '+(S.child||'ты')+'.',W/2,1205);
-  ctx.fillStyle='#C4B4A2';ctx.font='700 20px Nunito, sans-serif';ctx.fillText('Мастерская Nooka · nookagame.ru',W/2,1290);
+  if(S.line){ctx.fillStyle='#E65C00';ctx.font='800 28px Nunito, sans-serif';ctx.fillText('«'+S.line+'»',60,yy+40);yy+=60}
+  if(S.shiftErr){ctx.fillStyle='#8A7A68';ctx.font='700 20px Nunito, sans-serif';ctx.fillText('смена: ошибок без тебя '+S.shiftErr.no+', с тобой '+S.shiftErr.yes,60,yy+24);yy+=36}
+  // правила, которые ребёнок дал своему ИИ — и сам напарник рядом
+  if(S.rules&&S.rules.length){yy+=34;const y0=yy;ctx.fillStyle='#8A7A68';ctx.font='800 20px Nunito, sans-serif';ctx.textAlign='left';ctx.fillText('ПРАВИЛА, КОТОРЫЕ Я ДАЛ '+(S.botName?S.botName.toUpperCase():'СВОЕМУ ИИ'),60,yy);yy+=44;
+    S.rules.forEach((r,i)=>{ctx.fillStyle='#E65C00';ctx.beginPath();ctx.arc(76,yy-9,14,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.font='800 17px Nunito, sans-serif';ctx.textAlign='center';ctx.fillText(String(i+1),76,yy-3);ctx.textAlign='left';ctx.fillStyle='#2B2118';ctx.font='700 26px Nunito, sans-serif';const ls=wrapLines(ctx,r,600).slice(0,2);ls.forEach((l,j)=>ctx.fillText(l,104,yy+j*30));yy+=40+(ls.length>1?30:0)});
+    try{const bim=await rasterize(svgBot({id:'p'}),240,272);ctx.drawImage(bim,W-320,y0-50,240,272)}catch(e){}}
+  ctx.fillStyle='#2B2118';ctx.font='800 38px Unbounded, sans-serif';ctx.textAlign='center';ctx.fillText('Считает машина. Решает — '+(S.child||'человек')+'.',W/2,1372);
+  ctx.fillStyle='#8A7A68';ctx.font='700 22px Nunito, sans-serif';ctx.fillText('До сегодняшнего дня этой профессии не было. Придумал — '+(S.child||'ты')+'.',W/2,1424);
+  ctx.fillStyle='#C4B4A2';ctx.font='700 20px Nunito, sans-serif';ctx.fillText('Мастерская Nooka · nookagame.ru',W/2,1482);
 }
 function renderPass(){
   $('htitle').textContent='Паспорт';
