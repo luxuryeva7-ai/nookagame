@@ -15,7 +15,10 @@
      data-nk-logout  — по клику выход и переход на главную
      (оба элемента можно держать hidden — покажутся после входа)
 
-   Пользуются: login/, base/index.html, base/report.html
+   Прогресс ребёнка возит nooka-sync.js — на закрытых страницах его
+   подключают сразу после этого файла.
+
+   Пользуются: login/, base/index.html, base/report.html, nooka-core.js
    ============================================================ */
 (function () {
 
@@ -30,9 +33,10 @@
 
   var LOGIN_URL = '/login/';
 
-  /* Ответ всегда один формат: { ok, status, data }. Нет сети — status 0. */
-  function call(method, path, body) {
-    var opts = { method: method, credentials: 'include', headers: {} };
+  /* Ответ всегда один формат: { ok, status, data }. Нет сети — status 0.
+     keepalive — запрос доедет, даже если страницу уже закрывают. */
+  function call(method, path, body, keepalive) {
+    var opts = { method: method, credentials: 'include', headers: {}, keepalive: !!keepalive };
     if (body) {
       opts.headers['Content-Type'] = 'application/json';
       opts.body = JSON.stringify(body);
@@ -73,8 +77,17 @@
     location.replace(LOGIN_URL + '?next=' + encodeURIComponent(here));
   }
 
+  /* Выход. Сначала прогресс уходит на сервер и только потом стирается
+     с устройства (nooka-sync.js). Не дошёл — выход не состоится:
+     промис отклоняется с ошибкой 'not_saved'. */
   function logout() {
-    return call('POST', '/auth/logout', {}).then(function () { mePromise = null; });
+    var S = window.nookaSync;
+    return (S ? S.beforeLogout() : Promise.resolve()).then(function () {
+      return call('POST', '/auth/logout', {});
+    }).then(function () {
+      if (S) S.wipe();
+      mePromise = null;
+    });
   }
 
   function fillPage(user) {
@@ -86,7 +99,10 @@
       el.hidden = false;
       el.addEventListener('click', function (e) {
         e.preventDefault();
-        logout().then(function () { location.href = '/'; });
+        logout().then(function () { location.href = '/'; }, function () {
+          alert('Не получилось сохранить прогресс перед выходом — нет связи с сервером. ' +
+            'Попробуйте ещё раз, когда появится интернет.');
+        });
       });
     });
   }
@@ -118,8 +134,12 @@
     root.style.visibility = 'hidden';   // ни кадра чужого прогресса до ответа сервера
     return me().then(function (user) {
       if (!user) { goLogin(); return null; }
-      whenBody(function () { fillPage(user); root.style.visibility = ''; });
-      return user;
+      /* свежий прогресс из аккаунта — до того, как страница покажется */
+      var S = window.nookaSync;
+      return (S ? S.onPage(user) : Promise.resolve()).then(function () {
+        whenBody(function () { fillPage(user); root.style.visibility = ''; });
+        return user;
+      });
     }, function () {
       whenBody(showOffline);
       return null;
@@ -131,6 +151,7 @@
 
   window.nookaAccount = {
     api: API,
+    call: call,
     me: me,
     ready: ready,
     safeNext: safeNext,

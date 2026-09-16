@@ -11,6 +11,10 @@
   function load() {
     try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) { return []; }
   }
+  function sync(fn, arg) {
+    if (window.nookaSync) window.nookaSync[fn](arg);
+  }
+
   /* ── безопасный показ ─────────────────────────────────────
      Работа пришла с сервера — значит, это уже не наша строка, а данные.
      Разбираем её в «неживом» документе (скрипты там не запускаются,
@@ -77,6 +81,7 @@
       list.push(item);
       while (list.length > LIMIT) list.shift();
       save(list);
+      sync('changed');
       return item.id;
     },
 
@@ -89,6 +94,7 @@
     },
     remove: function (id) {
       save(load().filter(function (x) { return x.id !== id; }));
+      sync('removed', id);
     },
 
     safeHtml: safeHtml,

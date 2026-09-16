@@ -10,9 +10,26 @@
     p.xp = p.xp || 0;
     p.missions = p.missions || {};
     p.days = p.days || [];
+    /* xpBy — опыт за каждую миссию. Нужен, чтобы прогресс с двух устройств
+       сложился без двойного счёта (nooka-sync.js). В старых профилях его
+       нет: делим накопленный опыт поровну между пройденными миссиями —
+       сумма сходится, а сервер делит так же. */
+    if (!p.xpBy) {
+      p.xpBy = {};
+      var ids = Object.keys(p.missions);
+      if (ids.length) {
+        var each = Math.floor(p.xp / ids.length);
+        ids.forEach(function (id, i) { p.xpBy[id] = each + (i === 0 ? p.xp - each * ids.length : 0); });
+      } else if (p.xp) {
+        p.xpBy._extra = p.xp;
+      }
+    }
     return p;
   }
-  function save(p) { try { localStorage.setItem(KEY, JSON.stringify(p)); } catch (e) {} }
+  function save(p) {
+    try { localStorage.setItem(KEY, JSON.stringify(p)); } catch (e) {}
+    if (window.nookaSync) window.nookaSync.changed();
+  }
   function dstr(d) {
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
   }
@@ -179,7 +196,13 @@
       return list.slice().sort(function (a, b) { return key(a) - key(b); });
     },
 
-    addXP: function (n) { var p = load(); p.xp += n; save(p); return p.xp; },
+    addXP: function (n) {
+      var p = load();
+      p.xp += n;
+      p.xpBy._extra = (p.xpBy._extra || 0) + n;
+      save(p);
+      return p.xp;
+    },
 
     // Отметить миссию пройденной. XP начисляется один раз, день идёт в стрик всегда.
     completeMission: function (id, xp) {
@@ -187,7 +210,7 @@
       var t = dstr(new Date());
       if (p.days.indexOf(t) < 0) p.days.push(t);
       var isNew = !p.missions[id];
-      if (isNew) { p.missions[id] = Date.now(); p.xp += (xp || 60); }
+      if (isNew) { p.missions[id] = Date.now(); p.xp += (xp || 60); p.xpBy[id] = xp || 60; }
       save(p);
       return isNew;
     },
@@ -474,4 +497,20 @@
       }, 700 * (i + 1));
     });
   } catch (e) {}
+})();
+
+/* Прогресс в аккаунте родителя: модули лежат рядом с этим файлом.
+   Подключаем отсюда, чтобы не вписывать их в каждую игру. */
+(function () {
+  if (window.nookaSync) return;
+  var me = document.currentScript;
+  if (!me || !me.src) return;
+  var dir = me.src.replace(/[^\/]*$/, '');
+  var files = window.nookaAccount ? ['nooka-sync.js'] : ['nooka-account.js', 'nooka-sync.js'];
+  files.forEach(function (f) {
+    var s = document.createElement('script');
+    s.src = dir + f;
+    s.async = false;   // по порядку: sync опирается на account
+    document.head.appendChild(s);
+  });
 })();

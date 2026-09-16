@@ -4,7 +4,7 @@
    Пароля нет намеренно: родителю не нужно его придумывать,
    забывать и восстанавливать. Почта сама подтверждает, что это он.
 
-   Требует nooka-account.js. Пользуется: login/index.html
+   Требует nooka-account.js и nooka-sync.js. Пользуется: login/index.html
    ============================================================ */
 (function () {
   var A = window.nookaAccount;
@@ -111,7 +111,13 @@
     A.verifyCode(email, code).then(function (r) {
       if (r.ok) {
         say('codeMsg', 'Готово, входим…', true);
-        location.replace(next);
+        /* Прогресс с этого устройства — в аккаунт, из аккаунта — сюда.
+           Долго не ждём: база всё равно сверится ещё раз. */
+        var go = function () { location.replace(next); };
+        var S = window.nookaSync;
+        if (!S) return go();
+        Promise.race([S.pull(r.data.user), new Promise(function (ok) { setTimeout(ok, 8000); })])
+          .then(go, go);
         return;
       }
       busy(btn, false);
