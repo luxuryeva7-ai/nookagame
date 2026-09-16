@@ -1029,7 +1029,7 @@ function chairHTML(){
   return say(MEANING.chair.before,'think')
    +`<div class="pz">
       <div class="rowlbl" style="margin-top:0">Это ты через 20 лет</div>
-      <div class="charstage"><div class="charpv" id="charpv">${personScene({vb:'70 90 160 300'})}</div>
+      <div class="charstage"><div class="charpv" id="charpv">${personScene({vb:'30 50 240 320'})}</div>
         <div>
           <div class="charrow">${SKIN.map((c,i)=>`<div class="sw${S.skin===i?' on':''}" style="background:${c}" onclick="S.skin=${i};charUpd(this)"></div>`).join('')}</div>
           <div class="charrow">${HAIRC.map((c,i)=>`<div class="sw${S.hairc===i?' on':''}" style="background:${c}" onclick="S.hairc=${i};charUpd(this)"></div>`).join('')}</div>
@@ -1039,14 +1039,14 @@ function chairHTML(){
 
         </div></div>
       <div class="rowlbl">Где в цепи место человеку — посади себя</div>
-      <div class="mesrc" id="mesrc">${personScene({vb:'90 100 120 280',nobg:1})}<span>тащи меня на место</span></div>
+      <div class="mesrc" id="mesrc">${personScene({vb:'60 50 180 240',nobg:1})}<span>тащи меня на место</span></div>
       <div class="chairs">${CHAIN_IDS.map(id=>`<div class="chair${S.human===id?' me':''}" data-id="${id}">${toolGlyph(id,30)}<span>${NODEN[id]}</span><div class="seat"></div></div>`).join('')}</div>
     </div>`;
 }
 function charUpd(el){
   const row=el.parentElement;[...row.children].forEach(c=>c.classList.remove('on'));el.classList.add('on');
-  const pv=$('charpv');if(pv)pv.innerHTML=personScene({vb:'70 90 160 300'});
-  const ms=$('mesrc');if(ms)ms.innerHTML=personScene({vb:'90 100 120 280',nobg:1})+'<span>тащи меня на место</span>';
+  const pv=$('charpv');if(pv)pv.innerHTML=personScene({vb:'30 50 240 320'});
+  const ms=$('mesrc');if(ms)ms.innerHTML=personScene({vb:'60 50 180 240',nobg:1})+'<span>тащи меня на место</span>';
   if(!T.shown.charNote){T.shown.charNote=1;setNote(MEANING.chair.dur[0])}
 }
 function chairBind(){
@@ -1058,7 +1058,7 @@ function chairBind(){
     if(ch){S.human=ch.dataset.id;document.querySelectorAll('.chair').forEach(c=>c.classList.toggle('me',c===ch));
       setNote(MEANING.chair.dur[1].replace('{node}',NODEN[S.human]));enableDone(true)}};
   src.onpointerdown=e=>{e.preventDefault();try{src.setPointerCapture(e.pointerId)}catch(_){}down=true;
-    me=document.createElement('div');me.className='meDrag';me.innerHTML=personScene({vb:'90 100 120 280',nobg:1});document.body.appendChild(me);me.style.left=e.clientX+'px';me.style.top=e.clientY+'px'};
+    me=document.createElement('div');me.className='meDrag';me.innerHTML=personScene({vb:'60 50 180 240',nobg:1});document.body.appendChild(me);me.style.left=e.clientX+'px';me.style.top=e.clientY+'px'};
   src.onpointermove=e=>{if(!down||!me)return;e.preventDefault();me.style.left=e.clientX+'px';me.style.top=e.clientY+'px';const ch=chairAt(e.clientX,e.clientY);document.querySelectorAll('.chair').forEach(c=>c.classList.toggle('hot',c===ch))};
   src.onpointerup=end;src.onpointercancel=end;src.onlostpointercapture=end;
   enableDone(!!S.human);
@@ -1105,7 +1105,7 @@ const RUN={on:0,raf:0,gen:0,t:0,last:0,items:[],seated:true,leave:0,waiting:null
 function stopRun(){RUN.on=0;RUN.gen++;if(RUN.raf)cancelAnimationFrame(RUN.raf);RUN.raf=0}
 async function runAssets(){
   const A={};
-  A.person=await rasterize(personScene({vb:'60 80 180 300',nobg:1}),180,300);
+  A.person=await rasterize(personScene({vb:'50 56 190 316',nobg:1}),180,300);
   A.icons={};for(const id of CHAIN_IDS)A.icons[id]=await rasterize(toolGlyph(id,40),80,80);
   A.tool=await rasterize(toolGlyph(S.gest.g,40),80,80);
   A.thing=document.createElement('canvas');drawVec(A.thing,S.thing,80);
@@ -1288,7 +1288,7 @@ async function passDraw(cv){
   ctx.fillStyle='#2B2118';ctx.font='800 54px Unbounded, sans-serif';
   wrapLines(ctx,S.title||'Профессия будущего',W-430).slice(0,2).forEach((l,i)=>ctx.fillText(l,60,146+i*62));
   ctx.fillStyle='#5C4A38';ctx.font='700 30px Nunito, sans-serif';ctx.fillText((S.name||'')+' · '+(S.child||'')+(S.age?', '+S.age+' лет':''),60,290);
-  try{const im=await rasterize(personScene({vb:'40 80 220 300'}),330,450);ctx.drawImage(im,W-390,60,330,450)}catch(e){}
+  try{const im=await rasterize(personScene({vb:'36 58 228 311'}),330,450);ctx.drawImage(im,W-390,60,330,450)}catch(e){}
   ctx.fillStyle='#8A7A68';ctx.font='800 20px Nunito, sans-serif';ctx.fillText('С ЧЕМ РАБОТАЕТ',60,370);
   const th=document.createElement('canvas');drawVec(th,S.thing,200);ctx.drawImage(th,60,386,200,200);ctx.strokeStyle='#2B2118';ctx.lineWidth=3;ctx.strokeRect(60,386,200,200);
   ctx.fillStyle='#2B2118';ctx.font='800 34px Nunito, sans-serif';ctx.fillText(cap(S.thingName||''),290,430);
