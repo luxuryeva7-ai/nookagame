@@ -318,7 +318,7 @@ function drawGallery(){
   }
   w.innerHTML='<div class="gal">'+items.map(function(a){
     return '<div class="gcard" data-id="'+a.id+'">'+
-      '<div class="gcard__pic">'+a.svg+'</div>'+
+      '<div class="gcard__pic">'+window.nookaGallery.safeHtml(a)+'</div>'+
       '<div class="gcard__t">'+esc(a.title)+'</div>'+
       '<div class="gcard__n">'+esc(a.note)+'</div></div>';
   }).join('')+'</div>';
@@ -331,7 +331,7 @@ function drawGallery(){
 function openArtifact(id){
   var a=window.nookaGallery.get(id); if(!a) return;
   var v=document.createElement('div'); v.className='gview';
-  v.innerHTML=a.svg+
+  v.innerHTML=window.nookaGallery.safeHtml(a)+
     '<div class="gview__t">'+esc(a.title)+'</div>'+
     '<div class="gview__n">'+esc(a.note)+(a.game?' · '+esc(a.game):'')+'</div>'+
     '<div class="gview__b"><button class="x">Закрыть</button><button class="d">Удалить</button></div>';
