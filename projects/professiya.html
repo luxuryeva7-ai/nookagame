@@ -286,6 +286,11 @@ button,.btn,.st,.chip,.tool,.chair,.f5{touch-action:manipulation;user-select:non
 .sumrow{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid rgba(90,60,25,.12);font-size:15px}
 .sumrow:last-of-type{border-bottom:0}.sumk{font-weight:800;color:var(--ink3)}.sumv{font-weight:800;color:var(--ink);text-align:right}
 .sumttl{margin-top:10px;text-align:center;font-family:'Unbounded','Nunito',sans-serif;font-weight:800;font-size:16px;color:var(--acc)}
+
+/* пуск: кнопки решения под плёнкой, пульсируют, пока ждут ребёнка */
+.askrow{margin-top:8px}.askrow:empty{display:none}
+.ask-t{font-weight:800;font-size:14px;color:var(--acc);text-align:center;margin-bottom:6px}
+.ask-pulse{animation:askp 1.1s ease-in-out infinite}@keyframes askp{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
 </style>
 </head>
 <body>
@@ -671,8 +676,8 @@ function render(){
   if(st==='end'){
     B().innerHTML=say('Внутри ИИ — не волшебство. Цепь из деталей, каждую из которых ты собрал руками.\nИ одно место, где сидит человек. Ты сам его выбрал.','happy')
       +`<div class="pz"><div class="rowlbl" style="margin-top:0">Что ты собрал</div>${[['Глаз',S.thingName||'—'],['Память',(S.mem.pos.length+S.mem.neg.length)+' примеров'],['Решатель','черта — '+(S.thr<0.45?'мягко':S.thr>0.72?'строго':'посередине')],['Рука',S.actionPhrase||(S.gest&&S.gest.n)||'—'],['Стул',S.human?NODEN[S.human].toLowerCase():'—']].map(([k,v])=>`<div class="sumrow"><span class="sumk">${k}</span><span class="sumv">${v}</span></div>`).join('')}${S.title?`<div class="sumttl">«${S.title}»${S.name?' · '+S.name:''}</div>`:''}</div>
-      <div class="lead" style="text-align:center;margin-top:18px">Мастерская Nooka · «Профессия будущего»</div>`;
-    F().innerHTML=`<div class="btnrow"><button class="btn btn2 btn-sm" onclick="go('pass')">К паспорту</button><button class="btn btn-sm" onclick="wipe();location.href='index.html'">В мастерскую</button></div>`;
+      <div class="lead" style="text-align:center;margin-top:18px">Мастерская Nooka · «Профессия будущего»</div><div style="text-align:center;margin-top:6px"><button class="txtbtn" onclick="location.href='index.html'">В мастерскую</button></div>`;
+    F().innerHTML=`<div class="btnrow" style="margin-bottom:8px"><button class="btn btn2 btn-sm" onclick="go('pass')">К паспорту</button><button class="btn btn2 btn-sm" onclick="wipe();location.reload()">Собрать заново</button></div><button class="btn" onclick="go('run')">Дёрнуть рычаг снова</button>`;
     return;
   }
 }
@@ -1101,7 +1106,7 @@ function renderName(){
 
 /* ═══════════════ ПУСК — смена: барабан → рычаг → спорные ждут тебя → «А без тебя?» ═══════════════ */
 const FW=720,FSH=480,BAND=76,FH=FSH+BAND;
-const RUN={on:0,raf:0,gen:0,t:0,last:0,items:[],seated:true,leave:0,waiting:null,errNo:0,errYes:0,done:0,decisions:[],taps:[],A:null,phase:'drum'};
+const RUN={on:0,raf:0,gen:0,t:0,last:0,items:[],seated:true,leave:0,waiting:null,errNo:0,errYes:0,done:0,decisions:[],taps:[],A:null,phase:'drum',fx:[],belt:0,waitT:0,nudged:0};
 function stopRun(){RUN.on=0;RUN.gen++;if(RUN.raf)cancelAnimationFrame(RUN.raf);RUN.raf=0}
 async function runAssets(){
   const A={};
@@ -1121,7 +1126,7 @@ function runItems(){
 }
 function renderRun(){
   $('htitle').textContent='Цех работает';
-  RUN.phase='drum';RUN.taps=[];RUN.errNo=0;RUN.errYes=0;RUN.decisions=[];RUN.seated=true;RUN.leave=0;RUN.waiting=null;RUN.done=0;RUN.fin=0;RUN.items=[];
+  RUN.phase='drum';RUN.taps=[];RUN.errNo=0;RUN.errYes=0;RUN.decisions=[];RUN.seated=true;RUN.leave=0;RUN.waiting=null;RUN.done=0;RUN.fin=0;RUN.items=[];RUN.fx=[];RUN.belt=0;RUN.waitT=0;RUN.nudged=0;
   B().innerHTML=say(MEANING.run.before,'happy')
     +`<div class="pzgoal"><div class="pzgoal-t">Запуск</div><div class="pzgoal-r">Как ИИ работает целиком</div><button class="explbtn" onclick="toggleExplain()">Что это значит?</button><div class="explain" id="explain">${EXPLAIN.run}</div></div>
     <div class="pz"><div class="rowlbl" style="margin-top:0">Темп цеха — стукни 4 раза</div>
@@ -1145,7 +1150,7 @@ function renderRun(){
 function setNote2(t){let n=$('pznote');if(!n){n=document.createElement('div');n.className='note';n.id='pznote';B().appendChild(n)}n.textContent=t}
 function runStart(){
   RUN.phase='prep';
-  B().innerHTML=say(MEANING.run.dur[0],'happy')+`<div class="filmwrap"><canvas id="fcv"></canvas><div class="film-bar"><i id="fbar"></i></div><div class="film-st" id="fst">Запускаю…</div></div>
+  B().innerHTML=say(MEANING.run.dur[0],'happy')+`<div class="filmwrap"><canvas id="fcv"></canvas><div class="film-bar"><i id="fbar"></i></div><div class="film-st" id="fst">Запускаю…</div></div><div class="askrow" id="askrow"></div>
     <div class="switchrow"><label class="switch"><input type="checkbox" id="leaveSw" onchange="runLeave(this.checked)"><span></span></label><span class="switch-l">А без тебя?</span><span class="switch-c" id="errline"></span></div>
     <div class="note" id="pznote"></div>`;
   F().innerHTML='';
@@ -1163,6 +1168,11 @@ function runLoop(){
 function runGeom(){const x0=70,x1=FW-70;return {x0,x1,xs:[0,1,2,3].map(i=>x0+(x1-x0)*(i+1)/5),y:250}}
 function runStep(dt){
   RUN.t+=dt;const G=runGeom(),hx=G.xs[CHAIN_IDS.indexOf(S.human)],decX=G.xs[2];
+  if(!RUN.waiting)RUN.belt+=dt;
+  if(RUN.waiting&&RUN.seated){RUN.waitT+=dt;
+    if(RUN.waitT>8000&&!RUN.nudged){RUN.nudged=1;setNote('Я жду тебя: '+ASK[S.human][0]+' или '+ASK[S.human][1]+'? Кнопки под плёнкой.')}
+    if(RUN.waitT>20000){const w=RUN.waiting;w.pass=w.score>=S.thr;w.st='go';w.auto=1;if(w.pass!==!!w.truth)RUN.errNo++;RUN.waiting=null;RUN.waitT=0;RUN.nudged=0;RUN.fx.push({k:'flash',x:hx,t0:RUN.t,ok:w.pass===!!w.truth});runErr();const ar=$('askrow');if(ar)ar.innerHTML='';setNote('Ты молчал — решила черта, как без человека. Так и бывает, когда стул пуст.')}
+  }else RUN.waitT=0;
   RUN.items.forEach((it,k)=>{
     if(it.st==='wait'){if(RUN.t>=k*RUN.beat+400)it.st='go',it.x=G.x0;return}
     if(it.st==='go'){
@@ -1170,8 +1180,8 @@ function runStep(dt){
       const ahead=RUN.items[k-1];const lim=ahead&&(ahead.st==='go'||ahead.st==='hold')?ahead.x-40:1e9;
       it.x=Math.min(it.x+dt*0.11,lim);
       if(it.border&&!it.asked&&it.x>=hx-2&&RUN.seated){it.st='hold';it.asked=1;RUN.waiting=it;runWaitUI();setNote(MEANING.run.dur[1]);return}
-      if(it.border&&!it.asked&&it.x>=hx-2&&!RUN.seated){it.asked=1;it.pass=it.score>=S.thr;it.auto=1;if(it.pass!==!!it.truth)RUN.errNo++;runErr()}
-      if(!it.border&&!it.asked&&it.x>=decX-2){it.asked=1;it.pass=it.score>=S.thr;if(it.pass!==!!it.truth)RUN.errNo++,RUN.autoErr=1;runErr()}
+      if(it.border&&!it.asked&&it.x>=hx-2&&!RUN.seated){it.asked=1;it.pass=it.score>=S.thr;it.auto=1;if(it.pass!==!!it.truth)RUN.errNo++;RUN.fx.push({k:'flash',x:hx,t0:RUN.t,ok:it.pass===!!it.truth});runErr()}
+      if(!it.border&&!it.asked&&it.x>=decX-2){it.asked=1;it.pass=it.score>=S.thr;if(it.pass!==!!it.truth)RUN.errNo++,RUN.autoErr=1;RUN.fx.push({k:'flash',x:decX,t0:RUN.t,ok:it.pass===!!it.truth});runErr()}
       if(it.asked&&!it.pass&&it.x>=decX){it.st='drop';it.y=0;return}
       if(it.x>=G.x1-6){it.st='done';RUN.done++}
     }
@@ -1184,11 +1194,11 @@ function runStep(dt){
 function runErr(){const e=$('errline');if(e)e.textContent='ошибок без тебя: '+RUN.errNo+' · с тобой: '+RUN.errYes}
 function runWaitUI(){
   if(RUN.phase==='fin')return;   // после финала кнопки итога не трогаем
-  const it=RUN.waiting;
-  if(it&&it.st==='hold'&&RUN.seated){const [a,b]=ASK[S.human];F().innerHTML=`<div class="btnrow"><button class="btn btn-sm" onclick="runDecide(true)">${a}</button><button class="btn btn2 btn-sm" onclick="runDecide(false)">${b}</button></div>`}
-  else{F().innerHTML='';if(it&&it.st==='hold'&&!RUN.seated){it.st='go';it.pass=it.score>=S.thr;it.auto=1;if(it.pass!==!!it.truth)RUN.errNo++;RUN.waiting=null;runErr()}}
+  const it=RUN.waiting, ar=$('askrow');
+  if(it&&it.st==='hold'&&RUN.seated){const [a,b]=ASK[S.human];if(ar)ar.innerHTML=`<div class="ask-t">Спорная остановилась у тебя — твоё слово</div><div class="btnrow"><button class="btn btn-sm ask-pulse" onclick="runDecide(true)">${a}</button><button class="btn btn2 btn-sm ask-pulse" onclick="runDecide(false)">${b}</button></div>`}
+  else{if(ar)ar.innerHTML='';if(it&&it.st==='hold'&&!RUN.seated){it.st='go';it.pass=it.score>=S.thr;it.auto=1;if(it.pass!==!!it.truth)RUN.errNo++;RUN.waiting=null;runErr()}}
 }
-function runDecide(yes){const it=RUN.waiting;if(!it)return;it.pass=yes;it.st='go';it.byMe=1;RUN.decisions.push({k:it.k,yes});if(yes!==!!it.truth)RUN.errYes++;RUN.waiting=null;runErr();F().innerHTML='';
+function runDecide(yes){const it=RUN.waiting;if(!it)return;const G=runGeom();it.pass=yes;it.st='go';it.byMe=1;RUN.decisions.push({k:it.k,yes});if(yes!==!!it.truth)RUN.errYes++;RUN.waiting=null;RUN.waitT=0;RUN.nudged=0;RUN.fx.push({k:yes?'stamp':'toss',x:it.x,y:G.y-14,t0:RUN.t,ok:yes===!!it.truth});runErr();const ar=$('askrow');if(ar)ar.innerHTML='';
   setNote(yes===!!it.truth?'Твоё слово. Печать.':'Твоё слово. Я бы решил иначе — но ты сидишь на стуле, не я.')}
 function runFinish(){
   RUN.phase='fin';RUN.on=0;
@@ -1200,7 +1210,7 @@ function runDraw(ctx,t){
   const A=RUN.A,G=runGeom(),y=G.y;
   ctx.fillStyle='#EAD9BF';ctx.fillRect(0,0,FW,FSH);for(let i=0;i<FSH;i+=26){ctx.fillStyle='rgba(90,60,25,.06)';ctx.fillRect(0,i,FW,1)}
   ctx.fillStyle='#D9BE94';ctx.fillRect(0,FSH-60,FW,60);
-  ctx.fillStyle='#8A6D46';ctx.fillRect(G.x0,y+22,G.x1-G.x0,14);ctx.fillStyle='rgba(0,0,0,.1)';for(let i=0;i<26;i++)ctx.fillRect(G.x0+((i*40+t*90)%(G.x1-G.x0)),y+22,20,14);
+  ctx.fillStyle='#8A6D46';ctx.fillRect(G.x0,y+22,G.x1-G.x0,14);ctx.fillStyle='rgba(0,0,0,.1)';for(let i=0;i<26;i++)ctx.fillRect(G.x0+((i*40+RUN.belt*0.09)%(G.x1-G.x0)),y+22,20,14);
   ctx.fillStyle='#6E5233';ctx.fillRect(G.x0-30,60,60,80);ctx.fillStyle='#3A2A18';ctx.fillRect(G.x0-18,130,36,10);
   ctx.fillStyle='#6E5233';ctx.fillRect(G.x1-30,y-70,60,110);ctx.fillStyle='#FFF8EE';ctx.fillRect(G.x1-22,y-62,44,60);
   const okDone=RUN.items.filter(it=>it.st==='done'&&it.pass&&it.truth).length;
@@ -1216,13 +1226,20 @@ function runDraw(ctx,t){
     ctx.drawImage(A.icons[id],x-22,y-46,44,44);
     ctx.fillStyle='#3A2A18';ctx.font='800 15px Nunito, sans-serif';ctx.textAlign='center';ctx.fillText(NODEN[id],x,y+8);
     ctx.fillStyle='#E65C00';ctx.font='800 13px Unbounded, sans-serif';ctx.fillText(String(i+1),x-34,y-58);
-    if(id==='decider'){ctx.fillStyle='#2B2118';ctx.font='700 11px Nunito, sans-serif';ctx.fillText('черта '+Math.round(S.thr*100)+'%',x,y-60)}
+    if(id==='decider'){ctx.fillStyle='#2B2118';ctx.font='700 11px Nunito, sans-serif';ctx.fillText('черта: '+(S.thr<0.45?'мягко':S.thr>0.72?'строго':'посередине'),x,y-60)}
     if(id==='hand')ctx.drawImage(A.tool,x+14,y-64,32,32);
     if(id==='eye'&&active){ctx.fillStyle='rgba(43,33,24,.75)';ctx.font='700 9px ui-monospace, monospace';for(let k=0;k<4;k++)ctx.fillText('0110 1001',x,y-84+k*10)}
     if(S.human===id){ctx.fillStyle='#C9A26E';ctx.fillRect(x-24,y+64,48,12);ctx.fillStyle='#8A6D46';ctx.fillRect(x-20,y+76,6,26);ctx.fillRect(x+14,y+76,6,26);
-      const lv=RUN.leave||0, px=x-36+lv*(FW-x+80), bob=lv>0&&lv<1?Math.abs(Math.sin(t*9))*6:0;
-      if(lv<1)ctx.drawImage(A.person,px,y+18-bob,72,120);
-      ctx.fillStyle=RUN.seated?'#2E9E5B':'#D93030';ctx.font='800 13px Nunito, sans-serif';ctx.fillText(RUN.seated?'здесь — '+(S.child||'ты'):'стул пуст',x,y+152)}
+      const lv=RUN.leave||0, px=x-36+lv*(FW-x+80), walking=lv>0&&lv<1, fin=RUN.phase==='fin', waiting=!!RUN.waiting&&RUN.seated;
+      // персонаж живой: идёт — покачивается, ждёт спорную — наклоняется к ленте с «?», финал — прыгает с галочкой
+      const bob=walking?Math.abs(Math.sin(t*9))*6:(fin&&RUN.seated?Math.abs(Math.sin(t*7))*10:0), lean=waiting?Math.sin(t*5)*0.07:0;
+      if(lv<1){ctx.save();ctx.translate(px+36,y+138);ctx.rotate(lean);ctx.drawImage(A.person,-36,-120-bob,72,120);ctx.restore()}
+      const st=RUN.fx.find(f=>f.k==='stamp'&&RUN.t-f.t0<420);
+      if(st&&lv<1){const f=(RUN.t-st.t0)/420;ctx.drawImage(A.tool,st.x-16,st.y-16-(1-f)*46,32,32)}
+      if((waiting||(fin&&RUN.seated))&&lv<1){const bx=px+72,by=y+6;ctx.fillStyle='#FFF8EE';ctx.strokeStyle='#3A2A18';ctx.lineWidth=3;ctx.beginPath();ctx.roundRect(bx-21,by-22,42,34,10);ctx.fill();ctx.stroke();
+        if(waiting){ctx.fillStyle='#E65C00';ctx.font='800 24px Unbounded, sans-serif';ctx.textAlign='center';ctx.fillText('?',bx,by+4)}
+        else{ctx.strokeStyle='#2E9E5B';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(bx-9,by-3);ctx.lineTo(bx-3,by+4);ctx.lineTo(bx+9,by-9);ctx.stroke()}}
+      ctx.fillStyle=RUN.seated?'#2E9E5B':'#D93030';ctx.font='800 13px Nunito, sans-serif';ctx.textAlign='center';ctx.fillText(RUN.seated?'здесь — '+(S.child||'ты'):'стул пуст',x,y+152)}
   });
   RUN.items.forEach(it=>{if(it.st==='wait'||it.st==='done')return;
     let ax=it.x,ay=y-14,alpha=1;
@@ -1231,6 +1248,12 @@ function runDraw(ctx,t){
     ctx.strokeStyle=it.st==='hold'?'#E65C00':(it.asked?(it.pass?'#2E9E5B':'#D93030'):'#3A2A18');ctx.lineWidth=it.st==='hold'?4:2;ctx.strokeRect(ax-16,ay-16,32,32);
     if(it.border&&!it.asked){ctx.fillStyle='#E65C00';ctx.font='800 11px Nunito, sans-serif';ctx.fillText('?',ax,ay-22)}
     if(it.st==='hold'){ctx.fillStyle='#E65C00';ctx.font='800 12px Nunito, sans-serif';ctx.fillText('спорная — твоё слово',ax,ay-28)}
+    ctx.restore()});
+  // эффекты: печать/крест на решении человека, кольцо на автоматическом
+  RUN.fx=RUN.fx.filter(f=>RUN.t-f.t0<700);
+  RUN.fx.forEach(f=>{const a=(RUN.t-f.t0)/700;ctx.save();ctx.globalAlpha=1-a;
+    if(f.k==='flash'){ctx.strokeStyle=f.ok?'#2E9E5B':'#E65C00';ctx.lineWidth=3;ctx.beginPath();ctx.arc(f.x,y-14,18+a*22,0,Math.PI*2);ctx.stroke()}
+    else{const s=1+(1-Math.min(1,a*3))*0.8;ctx.translate(f.x,f.y);ctx.scale(s,s);ctx.fillStyle=f.k==='stamp'?'#2E9E5B':'#D93030';ctx.beginPath();ctx.arc(0,0,14,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#FFF8EE';ctx.lineWidth=3.5;ctx.beginPath();if(f.k==='stamp'){ctx.moveTo(-7,0);ctx.lineTo(-2,5);ctx.lineTo(7,-6)}else{ctx.moveTo(-6,-6);ctx.lineTo(6,6);ctx.moveTo(6,-6);ctx.lineTo(-6,6)}ctx.stroke()}
     ctx.restore()});
   ctx.fillStyle='#FFF8EE';ctx.fillRect(0,FSH,FW,BAND);
   ctx.fillStyle='#2B2118';ctx.font='800 22px Nunito, sans-serif';ctx.textAlign='center';
