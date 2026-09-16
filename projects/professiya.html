@@ -706,7 +706,7 @@ function render(){
     B().innerHTML=say('Внутри ИИ — не волшебство. Цепь из деталей, каждую из которых ты собрал руками.\nИ одно место, где сидит человек. Ты сам его выбрал.','happy')
       +`<div class="pz"><div class="rowlbl" style="margin-top:0">Что ты собрал</div>${[['Глаз',S.thingName||'—'],['Память',(S.mem.pos.length+S.mem.neg.length)+' примеров'],['Решатель','черта — '+(S.thr<0.45?'мягко':S.thr>0.72?'строго':'посередине')],['Рука',S.actionPhrase||(S.gest&&S.gest.n)||'—'],['Стул',S.human?NODEN[S.human].toLowerCase():'—'],['Роль',S.human?ROLE[S.human]:'—'],['Мир',WORLDS[worldOf()].n],['Напарник',S.botName||'—']].map(([k,v])=>`<div class="sumrow"><span class="sumk">${k}</span><span class="sumv">${v}</span></div>`).join('')}${rulesHTML()}${S.title?`<div class="sumttl">«${S.title}»${S.name?' · '+S.name:''}</div>`:''}</div>
       <div class="lead" style="text-align:center;margin-top:18px">Мастерская Nooka · «Профессия будущего»</div><div style="text-align:center;margin-top:6px"><button class="txtbtn" onclick="location.href='index.html'">В мастерскую</button></div>`;
-    F().innerHTML=`<div class="btnrow" style="margin-bottom:8px"><button class="btn btn2 btn-sm" onclick="go('pass')">К паспорту</button><button class="btn btn2 btn-sm" onclick="wipe();location.reload()">Собрать заново</button></div><button class="btn" onclick="go('run')">Дёрнуть рычаг снова</button>`;
+    F().innerHTML=`<div class="btnrow" style="margin-bottom:8px"><button class="btn btn2 btn-sm" onclick="go('pass')">К паспорту</button><button class="btn btn2 btn-sm" onclick="wipe();location.reload()">Всё заново</button></div><button class="btn" onclick="go('run')">Дёрнуть рычаг снова</button>`;
     return;
   }
 }
