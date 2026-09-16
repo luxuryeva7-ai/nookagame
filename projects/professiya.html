@@ -1514,7 +1514,7 @@ function renderRules(){
 function rulePick(el,k){[...document.querySelectorAll('.opt')].forEach(o=>o.classList.remove('on'));el.classList.add('on');RULE.pick=RQ[RULE.i].opts[k];const f=$('ruleown');if(f)f.value='';const b=$('ruleBtn');if(b)b.disabled=false}
 function ruleOwn(v){v=v.trim();const b=$('ruleBtn');if(v.length>=3){[...document.querySelectorAll('.opt')].forEach(o=>o.classList.remove('on'));RULE.pick=v;if(b)b.disabled=false}else if(!document.querySelector('.opt.on')){RULE.pick='';if(b)b.disabled=true}}
 function ruleSave(){if(!RULE.pick)return;S.rules[RULE.i]=RULE.pick;save();renderRules()}
-function rulesHTML(){return (S.rules&&S.rules.length)?`<div class="rowlbl">Правила для ${botName()}</div>${S.rules.map((r,i)=>`<div class="rulerow"><span class="rulen">${i+1}</span><span>${r}</span></div>`).join('')}`:''}
+function rulesHTML(){return (S.rules&&S.rules.length)?`<div class="rowlbl">Правила для напарника${S.botName?' · '+S.botName:''}</div>${S.rules.map((r,i)=>`<div class="rulerow"><span class="rulen">${i+1}</span><span>${r}</span></div>`).join('')}`:''}
 function renderRulesDone(){
   B().innerHTML=sayBot('Запомнил. Теперь у меня есть то, чего не было: зачем.')
     +`<div class="pz">${rulesHTML()}<button class="txtbtn" onclick="S.rules=[];save();renderRules()">Переписать</button></div>
@@ -1550,7 +1550,7 @@ async function passDraw(cv){
   if(S.line){ctx.fillStyle='#E65C00';ctx.font='800 28px Nunito, sans-serif';ctx.fillText('«'+S.line+'»',60,yy+40);yy+=60}
   if(S.shiftErr){ctx.fillStyle='#8A7A68';ctx.font='700 20px Nunito, sans-serif';ctx.fillText('смена: ошибок без тебя '+S.shiftErr.no+', с тобой '+S.shiftErr.yes,60,yy+24);yy+=36}
   // правила, которые ребёнок дал своему ИИ — и сам напарник рядом
-  if(S.rules&&S.rules.length){yy+=34;const y0=yy;ctx.fillStyle='#8A7A68';ctx.font='800 20px Nunito, sans-serif';ctx.textAlign='left';ctx.fillText('ПРАВИЛА, КОТОРЫЕ Я ДАЛ '+(S.botName?S.botName.toUpperCase():'СВОЕМУ ИИ'),60,yy);yy+=44;
+  if(S.rules&&S.rules.length){yy+=34;const y0=yy;ctx.fillStyle='#8A7A68';ctx.font='800 20px Nunito, sans-serif';ctx.textAlign='left';ctx.fillText('ПРАВИЛА, КОТОРЫЕ Я ДАЛ НАПАРНИКУ'+(S.botName?' · '+S.botName.toUpperCase():''),60,yy);yy+=44;
     S.rules.forEach((r,i)=>{ctx.fillStyle='#E65C00';ctx.beginPath();ctx.arc(76,yy-9,14,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.font='800 17px Nunito, sans-serif';ctx.textAlign='center';ctx.fillText(String(i+1),76,yy-3);ctx.textAlign='left';ctx.fillStyle='#2B2118';ctx.font='700 26px Nunito, sans-serif';const ls=wrapLines(ctx,r,600).slice(0,2);ls.forEach((l,j)=>ctx.fillText(l,104,yy+j*30));yy+=40+(ls.length>1?30:0)});
     try{const bim=await rasterize(svgBot({id:'p'}),240,272);ctx.drawImage(bim,W-320,y0-50,240,272)}catch(e){}}
   ctx.fillStyle='#2B2118';ctx.font='800 38px Unbounded, sans-serif';ctx.textAlign='center';ctx.fillText('Считает машина. Решает — '+(S.child||'человек')+'.',W/2,1372);
