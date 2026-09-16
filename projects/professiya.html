@@ -1269,7 +1269,7 @@ function runStep(dt){
   if(!RUN.waiting)RUN.belt+=dt;
   if(RUN.waiting&&RUN.seated){RUN.waitT+=dt;
     if(RUN.waitT>8000&&!RUN.nudged){RUN.nudged=1;setNote(nudgeLine());runWaitUI()}
-    if(RUN.waitT>20000){const w=RUN.waiting;w.pass=w.score>=S.thr;w.st='go';w.auto=1;if(w.pass!==!!w.truth)RUN.errNo++;RUN.waiting=null;RUN.waitT=0;RUN.nudged=0;RUN.fx.push({k:'flash',x:hx,t0:RUN.t,ok:w.pass===!!w.truth});runErr();const ar=$('askrow');if(ar)ar.innerHTML='';setNote('Ты молчал — решила черта, как без человека. Так и бывает, когда стул пуст.')}
+    if(RUN.waitT>((S.human==='eye'||S.human==='hand')?30000:20000)){const w=RUN.waiting;w.pass=w.score>=S.thr;w.st='go';w.auto=1;if(w.pass!==!!w.truth)RUN.errNo++;RUN.waiting=null;RUN.waitT=0;RUN.nudged=0;RUN.fx.push({k:'flash',x:hx,t0:RUN.t,ok:w.pass===!!w.truth});runErr();const ar=$('askrow');if(ar)ar.innerHTML='';setNote('Ты молчал — решила черта, как без человека. Так и бывает, когда стул пуст.')}
   }else RUN.waitT=0;
   RUN.items.forEach((it,k)=>{
     if(it.st==='wait'){if(RUN.t>=k*RUN.beat+400)it.st='go',it.x=G.x0;return}
