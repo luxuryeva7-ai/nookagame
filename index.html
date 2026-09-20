@@ -563,8 +563,8 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
 
   <section class="wrap section pricing" id="plans">
     <div class="nk-chip sec-head-chip">Доступ</div>
-    <h2 class="nk-t-h1 sec-h">Первая игра бесплатно, <span>дальше по коду</span></h2>
-    <p class="nk-t-body sec-sub" style="margin-left:auto;margin-right:auto">Не подписка: код действует свой срок и заканчивается сам. Карта не привязывается, автоматически ничего не спишется.</p>
+    <h2 class="nk-t-h1 sec-h">Первая игра бесплатно, <span>дальше по доступу</span></h2>
+    <p class="nk-t-body sec-sub" style="margin-left:auto;margin-right:auto">Не подписка: доступ действует свой срок и заканчивается сам. Карта не привязывается, автоматически ничего не спишется.</p>
     <div class="price-grid">
       <div class="nk-clay price-box">
         <div class="nk-t-caption price-tier">Бесплатно</div>
@@ -585,7 +585,7 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
         <div class="price-why">163 ₽ в месяц — дешевле одного занятия с репетитором</div>
         <div class="pf">
           <div><span class="ok">✓</span> <span class="pt"><b>Ещё <span id="pfPaid">22 уровня и две мастерские</span></b>: вторая и третья игры</span></div>
-          <div><span class="ok">✓</span> <span class="pt">Один код на <b>всю семью</b>, а не на одного ребёнка</span></div>
+          <div><span class="ok">✓</span> <span class="pt">Один доступ на <b>всю семью</b>, а не на одного ребёнка</span></div>
           <div><span class="ok">✓</span> <span class="pt">Отчёт родителю: что ребёнок освоил и о чём его спросить</span></div>
           <div><span class="ok">✓</span> <span class="pt">Карта не привязывается, <b>списывать нечего</b></span></div>
         </div>
@@ -606,8 +606,8 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
         <button class="nk-btn nk-btn--cta" style="width:100%" data-buy="year">Взять на год</button>
       </div>
     </div>
-    <div class="price-hint">После оплаты приходит код доступа — он открывает игры на любом устройстве семьи.
-      Аккаунт создавать не нужно. <a href="/access/">Код уже есть →</a></div>
+    <div class="price-hint">Оплата в личном кабинете: доступ открывается сразу и работает на любом
+      устройстве семьи, где выполнен вход. <a href="/login/">Уже оплачено — войти →</a></div>
   </section>
 
   <section class="wrap final">
@@ -648,6 +648,7 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
 <div class="nk-chip toast" id="toast"></div>
 
 <script src="games/nooka-levels.js"></script>
+<script src="games/nooka-account.js"></script>
 <script src="games/nooka-access.js"></script>
 <script src="legal/requisites.js"></script>
 <script>
@@ -709,19 +710,16 @@ var toastEl = document.getElementById('toast'), _t;
 function toast(msg){ toastEl.textContent=msg; toastEl.classList.add('show'); clearTimeout(_t); _t=setTimeout(function(){ toastEl.classList.remove('show'); }, 3400); }
 
 document.querySelectorAll('[data-play]').forEach(function(b){ b.addEventListener('click', function(){ openGame('games/game.html?g=data'); }); });
-/* Кнопка «Мой доступ» в шапке — только для тех, у кого доступ открыт.
-   Там лежит код: после оплаты его нужно унести на устройство ребёнка,
-   а искать ссылку в подвале никто не станет. */
+/* Кнопка «Мой доступ» в шапке — только для тех, у кого он открыт.
+   Ответ о доступе приходит с сервера, поэтому ждём ready: до него
+   про оплату ничего не известно. */
 (function () {
-  /* Ждём разбора адреса: доступ может приехать ссылкой ?k=КОД, а её
-     nooka-access разбирает после загрузки страницы — до этого state()
-     ещё ничего не знает. */
-  function show() {
-    var A = window.nookaAccess, b = document.getElementById('navAccess');
-    if (A && b && (A.state().paid || A.openAll)) b.hidden = false;
-  }
-  show();
-  document.addEventListener('DOMContentLoaded', function () { setTimeout(show, 0); });
+  var A = window.nookaAccess;
+  if (!A) return;
+  A.ready.then(function (s) {
+    var b = document.getElementById('navAccess');
+    if (b && (s.paid || A.openAll)) b.hidden = false;
+  });
 })();
 
 /* Куда ведёт «купить» — решает games/nooka-access.js (там же и стена внутри игр),
@@ -761,7 +759,7 @@ document.querySelectorAll('[data-buy]').forEach(function(b){ b.addEventListener(
       'stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/>' +
       '<path d="M8 10.5V7a4 4 0 018 0v3.5"/></svg>';
     var status = freeGame ? '<span class="cc-st cc-st--free">Бесплатно</span>'
-      : locked ? '<span class="cc-st cc-st--lock">' + LOCK_SVG + 'По коду</span>'
+      : locked ? '<span class="cc-st cc-st--lock">' + LOCK_SVG + 'По доступу</span>'
       : '<span class="cc-st cc-st--free">Открыто</span>';
     card.innerHTML =
       '<div class="cc-shot' + (locked ? ' cc-shot--lock' : '') + '">' +
@@ -795,7 +793,7 @@ document.querySelectorAll('[data-buy]').forEach(function(b){ b.addEventListener(
       /* Подпись есть у каждой карточки — иначе кнопки встают на разной
          высоте и ряд разъезжается */
       '<div class="cc-hint">' +
-        (locked ? 'Один код открывает обе платные игры'
+        (locked ? 'Один доступ открывает обе платные игры'
                 : freeGame ? 'Без регистрации и без карты'
                 : 'Доступ открыт — можно играть') + '</div>';
 
