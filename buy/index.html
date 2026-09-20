@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Открыть весь курс — Nooka</title>
-<meta name="description" content="Вторая и третья игры курса Nooka: 20 уровней про то, как управлять ИИ и что у него внутри. 490 ₽ на три месяца или 1450 ₽ на год. Без подписки и привязки карты.">
+<meta name="description" content="Вторая и третья игры курса Nooka: 22 уровня и две мастерские про то, как управлять ИИ и где он работает. 490 ₽ на три месяца или 1450 ₽ на год. Без подписки и привязки карты.">
 <meta property="og:title" content="Nooka — открыть весь курс">
-<meta property="og:description" content="Ещё 20 уровней про ИИ для ребёнка 8–12. Разовая оплата, без автосписаний, возврат 14 дней.">
+<meta property="og:description" content="Ещё 22 уровня и две мастерские про ИИ для ребёнка 8–12. Разовая оплата, без автосписаний, возврат 14 дней.">
 <meta property="og:image" content="https://nookagame.ru/screenshots/og.jpg">
 <link rel="icon" type="image/svg+xml" href="../logo.svg">
 <link href="/fonts/nooka-fonts.css" rel="stylesheet">
@@ -148,7 +148,7 @@ h1 span{color:var(--pri-3)}
   <div class="head">
     <span class="chip"><span class="dot"></span>Первая игра остаётся бесплатной</span>
     <h1>Открыть <span>весь курс</span></h1>
-    <p class="lede">Ещё двадцать уровней: как заставить ИИ понять тебя с первого раза
+    <p class="lede">Ещё <span id="buyVol">двадцать два уровня и две мастерские</span>: как заставить ИИ понять тебя с первого раза
     и что у него внутри. Разовая оплата — не подписка.</p>
   </div>
 
@@ -234,7 +234,7 @@ h1 span{color:var(--pri-3)}
     var pick = g.levels.filter(function (l) { return l.href; }).slice(0, 3);
     if (pick.length < 3) pick = g.levels.slice(0, 3);
     return '<div class="op" style="--t:' + g.tint + '">' +
-      '<div class="n">' + g.levels.length + ' уровней · ' + g.age + '</div>' +
+      '<div class="n">' + nookaLevels.volume(g.key).text + ' · ' + g.age + '</div>' +
       '<h4>' + g.name + '</h4><div class="s">' + g.sub + '</div>' +
       /* то же, что на главной: понятные строки, а не названия уровней */
       '<ul>' + (g.bullets || pick.map(function (l) { return l.t; }))
@@ -246,14 +246,14 @@ h1 span{color:var(--pri-3)}
   var PLAN_VIEW = {
     quarter: {
       per: '163 ₽ в месяц', why: 'Дешевле одного занятия с репетитором',
-      f: ['Вторая и третья игры — <b>ещё 20 уровней</b>',
+      f: ['Вторая и третья игры — <b>ещё ' + nookaLevels.volume('paid').text + '</b>',
           'Один код на <b>всю семью</b>, а не на одного ребёнка',
           'Отчёт родителю: что ребёнок освоил и о чём его спросить',
           'Карта не привязывается, <b>списывать нечего</b>']
     },
     year: {
       per: '121 ₽ в месяц вместо 163', why: 'Год выходит как три квартала — четвёртый в подарок',
-      f: ['Те же 20 уровней, но <b>на 12 месяцев</b>',
+      f: ['Те же ' + nookaLevels.volume('paid').short + ', но <b>на 12 месяцев</b>',
           'Плюс <b>каждая новая игра</b>, которая выйдет за год',
           'В планах науки и технологии, <b>доплачивать не нужно</b>',
           'Не подошло — <b>вернём деньги</b> за 14 дней']
@@ -335,6 +335,10 @@ h1 span{color:var(--pri-3)}
   document.getElementById('faq').innerHTML = FAQ.map(function (q) {
     return '<details class="fq"><summary>' + q[0] + '</summary><p>' + q[1] + '</p></details>';
   }).join('');
+
+  /* Объём во вступлении — из реестра, чтобы не разъезжался с курсом */
+  var vol = document.getElementById('buyVol');
+  if (vol) vol.textContent = nookaLevels.volume('paid').text;
 
   document.getElementById('req').innerHTML =
     R.seller + ' · ИНН ' + R.inn + ' · ОГРНИП ' + R.ogrnip + '<br>' +

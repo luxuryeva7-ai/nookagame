@@ -66,8 +66,9 @@ body{margin:0;font-family:var(--ak-body);color:var(--ak-ink);}
 .ak-tap:active{transform:translateY(0);}
 .ak ::-webkit-scrollbar{display:none;}
 .ak{scrollbar-width:none;}
-input[type=range]{-webkit-appearance:none;width:100%;height:18px;border-radius:999px;outline:none;cursor:pointer;background:transparent;}
-input[type=range]::-webkit-slider-runnable-track{height:18px;border-radius:999px;}
+input[type=range]{-webkit-appearance:none;width:100%;height:18px;border-radius:999px;outline:none;cursor:pointer;background:transparent;margin:10px 0;}
+input[type=range]::-webkit-slider-runnable-track{height:18px;border-radius:999px;background:linear-gradient(180deg,#EFE6FF,#DFD2F7);box-shadow:inset 0 2px 4px rgba(45,27,69,.16);}
+input[type=range]::-moz-range-track{height:18px;border-radius:999px;background:linear-gradient(180deg,#EFE6FF,#DFD2F7);box-shadow:inset 0 2px 4px rgba(45,27,69,.16);}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:36px;height:36px;border-radius:50%;background:linear-gradient(180deg,#fff 0%,#FFF7E8 100%);box-shadow:0 4px 0 rgba(45,27,69,.15),0 8px 18px -6px rgba(45,27,69,.2),inset 0 2px 0 rgba(255,255,255,.95);margin-top:-9px;cursor:pointer;transition:transform .1s;}
 input[type=range]::-webkit-slider-thumb:active{transform:scale(1.18);}
 </style>
@@ -704,14 +705,22 @@ function AKCylinder({
   }, /*#__PURE__*/React.createElement("circle", {
     cx: width / 2,
     cy: obj.cy,
-    r: 10,
+    r: 14,
+    fill: "#fff",
+    opacity: ".92"
+  }), /*#__PURE__*/React.createElement("circle", {
+    cx: width / 2,
+    cy: obj.cy,
+    r: 14,
     fill: obj.color,
-    opacity: ".85"
+    opacity: ".35",
+    stroke: obj.color,
+    strokeWidth: "2"
   }), /*#__PURE__*/React.createElement("text", {
     x: width / 2,
-    y: obj.cy + 5,
+    y: obj.cy + 7,
     textAnchor: "middle",
-    fontSize: "11"
+    fontSize: "19"
   }, obj.emoji)))), /*#__PURE__*/React.createElement("ellipse", {
     cx: width / 2,
     cy: top - 10,
@@ -1728,8 +1737,8 @@ const AK_LIQUIDS = {
 const AK_ORDER = ['honey', 'water', 'oil', 'alcohol'];
 
 // Cylinder geometry constants (must match AKCylinder props width=160 height=360 capacity=4)
-const CYL_HEIGHT = 360,
-  CYL_WIDTH = 160,
+const CYL_HEIGHT = 320,
+  CYL_WIDTH = 140,
   CYL_CAP = 4;
 const CYL_LAYER_H = (CYL_HEIGHT - 70) / CYL_CAP;
 const CYL_BOTTOM = CYL_HEIGHT - 30;
@@ -1759,23 +1768,18 @@ const PHASE2_OBJECTS = [{
   color: '#A8D8FF',
   fact: 'Лёд чуть легче воды — плавает между маслом и водой.'
 }];
+const OBJ_R = 14; // радиус кружка предмета в цилиндре (совпадает с AKCylinder)
+/* Предмет останавливается НА ГРАНИЦЕ слоёв: тонет в том, что легче его,
+   и ложится на тот слой, который тяжелее. Слои снизу: мёд 1,4 · вода 1,0 ·
+   масло 0,9 · спирт 0,8. Считаем от реальных размеров цилиндра, иначе
+   предмет уезжает за дно и его срезает обводкой. */
 function getObjectCy(density) {
-  // Layers from bottom: honey(1.4), water(1.0), oil(0.9), alcohol(0.8)
-  const layerDensities = [1.4, 1.0, 0.9, 0.8]; // index 0 = bottom layer
-  if (density > 1.4) {
-    return CYL_BOTTOM - 12; // below honey, at very bottom
-  }
-  if (density > 1.0) {
-    return CYL_BOTTOM - CYL_LAYER_H * 1 + CYL_LAYER_H * 0.5; // between honey and water
-  }
-  if (density > 0.9) {
-    return CYL_BOTTOM - CYL_LAYER_H * 2 + CYL_LAYER_H * 0.5; // between water and oil
-  }
-  if (density > 0.8) {
-    return CYL_BOTTOM - CYL_LAYER_H * 3 + CYL_LAYER_H * 0.5; // between oil and alcohol
-  }
-  // lighter than alcohol → floats on top
-  return CYL_BOTTOM - CYL_LAYER_H * 4 + 10;
+  const boundary = i => CYL_BOTTOM - CYL_LAYER_H * i; // граница над i-м слоем снизу
+  if (density > 1.4) return CYL_BOTTOM - OBJ_R - 2;   // тяжелее всех — на дно
+  if (density >= 1.0) return boundary(1);             // лежит на мёде
+  if (density >= 0.9) return boundary(2);             // лежит на воде
+  if (density >= 0.8) return boundary(3);             // лежит на масле
+  return boundary(4) + OBJ_R;                          // всплывает на поверхность
 }
 function Level2Density({
   onDone
@@ -2251,17 +2255,23 @@ const L3_EXPERIMENTS = [{
 }];
 function BubbleEffect() {
   const bubbles = Array.from({
-    length: 12
+    length: 14
   }, (_, i) => ({
-    left: 20 + Math.random() * 60,
-    size: 6 + Math.random() * 10,
-    delay: i * 0.1,
-    dur: 0.8 + Math.random() * 0.5
+    left: 12 + Math.random() * 72,
+    size: 9 + Math.random() * 14,
+    delay: i * 0.09,
+    dur: 0.9 + Math.random() * 0.6
   }));
+  /* Фон и контраст: на белой карточке бледные пузырьки не читались —
+     ребёнок видел пустой прямоугольник вместо кипящей реакции. */
   return /*#__PURE__*/React.createElement("div", {
     style: {
       position: 'relative',
+      width: 80,
       height: 80,
+      borderRadius: 16,
+      background: 'linear-gradient(180deg,#EAFBF2,#CDEFDF)',
+      border: '2px solid rgba(60,168,118,.28)',
       overflow: 'hidden'
     }
   }, bubbles.map((b, i) => /*#__PURE__*/React.createElement("div", {
@@ -2273,9 +2283,11 @@ function BubbleEffect() {
       width: b.size,
       height: b.size,
       borderRadius: '50%',
-      background: 'rgba(200,240,220,0.85)',
-      border: '1.5px solid rgba(60,168,118,.4)',
-      animation: `ak-rise ${b.dur}s ease-out ${b.delay}s forwards`
+      background: 'rgba(255,255,255,.95)',
+      border: '2px solid rgba(45,150,105,.75)',
+      /* бесконечно: иначе пузырьки улетают и карточка стоит пустой,
+         пока ребёнок думает над вопросом */
+      animation: `ak-rise ${b.dur}s ease-out ${b.delay}s infinite`
     }
   })));
 }
@@ -2819,7 +2831,7 @@ const L4_LIQUIDS = [{
   base: '#F0F0EA'
 }, {
   id: 'secret',
-  name: 'Загадка Nooka',
+  name: 'Загадка Нейро',
   emoji: '❓',
   ph: 5,
   base: '#E9E2F2'
@@ -2923,7 +2935,7 @@ function Level4Potion({
       lineHeight: 1.55,
       marginBottom: 18
     }
-  }, "У Nooka есть волшебный сок фиолетовой капусты — он раскрывает тайну любой жидкости. Капни его и смотри, какой цвет вспыхнет!"), /*#__PURE__*/React.createElement("button", {
+  }, "У Нейро есть волшебный сок фиолетовой капусты — он раскрывает тайну любой жидкости. Капни его и смотри, какой цвет вспыхнет!"), /*#__PURE__*/React.createElement("button", {
     className: "ak-btn ak-btn--ok",
     style: {
       width: '100%'
@@ -3265,7 +3277,7 @@ function Level5Crystal({
       lineHeight: 1.55,
       marginBottom: 18
     }
-  }, "Nooka уронил сахар в чай — и он исчез! Куда? И можно ли вернуть его обратно… в виде кристалла-самоцвета?"), /*#__PURE__*/React.createElement("button", {
+  }, "Нейро уронил сахар в чай — и он исчез! Куда? И можно ли вернуть его обратно… в виде кристалла-самоцвета?"), /*#__PURE__*/React.createElement("button", {
     className: "ak-btn ak-btn--ok",
     style: {
       width: '100%'
@@ -3319,8 +3331,14 @@ function Level5Crystal({
       right: 8,
       height: Math.min(26, sediment / 3 + 6),
       borderRadius: '0 0 22px 22px',
-      background: '#fff',
-      opacity: .95
+      /* крупинки, иначе белый осадок сливался с фоном стакана
+         и текст «на дне осадок» расходился с картинкой */
+      background: 'radial-gradient(circle at 18% 62%, rgba(45,27,69,.35) 1.6px, transparent 2.2px),' +
+        'radial-gradient(circle at 42% 38%, rgba(45,27,69,.3) 1.6px, transparent 2.2px),' +
+        'radial-gradient(circle at 63% 70%, rgba(45,27,69,.33) 1.6px, transparent 2.2px),' +
+        'radial-gradient(circle at 84% 45%, rgba(45,27,69,.28) 1.6px, transparent 2.2px), #fff',
+      borderTop: '2px solid rgba(45,27,69,.16)',
+      opacity: .98
     }
   }), phase === 'result' && crystal === 'big' && /*#__PURE__*/React.createElement("div", {
     style: {
@@ -3402,9 +3420,13 @@ function Level5Crystal({
       minHeight: 40
     }
   }, sediment > 0 ? 'Соль больше не растворяется — на дне осадок. Раствор насыщен!' : saturated ? 'Ровно на грани: раствор насыщен!' : temp > 55 ? 'Горячая вода — жадная: растворяет больше!' : 'Пока всё растворяется. Добавь ещё или нагрей.'), readyToGrow && /*#__PURE__*/React.createElement("div", {
+    /* на телефоне две кнопки в строку не помещались и уезжали за экран */
     style: {
       display: 'flex',
-      gap: 10
+      gap: 10,
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+      maxWidth: '100%'
     }
   }, /*#__PURE__*/React.createElement("button", {
     className: "ak-btn",
@@ -3591,7 +3613,7 @@ function Level6Candle({
       lineHeight: 1.55,
       marginBottom: 18
     }
-  }, "У Nooka день рождения! Он накрыл одну свечку банкой. Спорим, не угадаешь, что случится через 5 секунд?"), /*#__PURE__*/React.createElement("button", {
+  }, "У Нейро день рождения! Одну свечку он накрыл банкой. Спорим, не угадаешь, что случится через 5 секунд?"), /*#__PURE__*/React.createElement("button", {
     className: "ak-btn ak-btn--ok",
     style: {
       width: '100%'
