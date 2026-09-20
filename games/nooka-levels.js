@@ -301,6 +301,42 @@
     };
   }
 
+  /* Объём игры словами. Одно место на весь сайт: страницы больше не
+     вписывают числа руками и не разъезжаются с курсом. */
+  function plural(n, one, few, many) {
+    var a = Math.abs(n) % 100, b = a % 10;
+    if (a > 10 && a < 20) return many;
+    if (b > 1 && b < 5) return few;
+    if (b === 1) return one;
+    return many;
+  }
+  function levelsWord(n) { return n + ' ' + plural(n, 'уровень', 'уровня', 'уровней'); }
+  var SHOPS = ['', 'мастерская', 'две мастерские', 'три мастерские', 'четыре мастерских'];
+  function shopsWord(n) { return n ? (SHOPS[n] || n + ' мастерских') : ''; }
+
+  /* Сколько всего в одной игре или в наборе игр: уровни, бонусы, мастерские.
+     keys — ключ игры, список ключей или 'free' / 'paid'. */
+  function volume(keys) {
+    var list;
+    if (keys === 'all') list = GAMES.slice();
+    else if (keys === 'free') list = GAMES.filter(function (g) { return (g.free || 0) >= g.levels.length; });
+    else if (keys === 'paid') list = GAMES.filter(function (g) { return (g.free || 0) < g.levels.length; });
+    else if (typeof keys === 'string') list = [game(keys)].filter(Boolean);
+    else list = keys.map(game).filter(Boolean);
+
+    var lv = 0, shops = 0;
+    list.forEach(function (g) {
+      lv += g.levels.length + ((g.extras || []).length);
+      if (g.sandbox) shops++;
+    });
+    return {
+      levels: lv,
+      shops: shops,
+      text: levelsWord(lv) + (shops ? ' и ' + shopsWord(shops) : ''),
+      short: levelsWord(lv)
+    };
+  }
+
   window.nookaLevels = {
     games: GAMES,
     ideas: IDEAS,
@@ -309,6 +345,8 @@
     isDone: isDone,
     stats: stats,
     totals: totals,
+    volume: volume,
+    levelsWord: levelsWord,
     nextLevel: nextLevel,
     report: report,
     hub: function (key) { return 'game.html?g=' + key; }
