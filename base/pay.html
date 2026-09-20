@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Оплата доступа — Nooka</title>
+<meta name="description" content="Оплата доступа к играм Nooka: разовая оплата на три месяца или на год, без подписки.">
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="../logo.svg">
+<link href="/fonts/nooka-fonts.css" rel="stylesheet">
+<link href="/account/account.css" rel="stylesheet">
+<script src="/metrika.js" defer></script>
+<!-- Страница за входом: платит аккаунт, а не устройство. Без входа
+     nooka-account.js сам уведёт на /login/ и вернёт сюда после кода. -->
+<script src="../games/nooka-account.js" data-require-login></script>
+<script src="../games/nooka-access.js"></script>
+</head>
+<body>
+<div class="wrap wrap--wide">
+
+  <div class="top">
+    <a href="../"><img src="../logo.svg" alt="Nooka"></a>
+    <a class="back" href="./">← В кабинет</a>
+  </div>
+
+  <h1 id="h1">Открыть весь курс</h1>
+  <p class="lede" id="lede">Вторая и третья игры курса: ещё 20 уровней и две мастерские.
+  Разовая оплата — не подписка.</p>
+
+  <div class="state" id="state" hidden>
+    <span class="state__dot"></span>
+    <div><b id="stateH"></b><span id="stateS"></span></div>
+  </div>
+
+  <div class="plans" id="plans"></div>
+
+  <div class="msg" id="msg" role="alert"></div>
+
+  <p class="fine">
+    Оплата идёт на защищённой странице банка — реквизиты карты к нам не попадают.
+    Чек придёт на почту аккаунта. Не подошло — вернём деньги в течение 14 дней,
+    достаточно написать в <a href="https://t.me/NookaGame" target="_blank" rel="noopener">Telegram</a>.<br>
+    Оплачивая, вы соглашаетесь с <a href="../legal/oferta.html">офертой</a>
+    и <a href="../legal/privacy.html">политикой обработки персональных данных</a>.
+    <span id="oldCode">Остался код от прежней покупки? <a href="../access/">Привяжите его к аккаунту</a>.</span>
+  </p>
+
+</div>
+<script>
+(function () {
+  var A = window.nookaAccess, ACC = window.nookaAccount;
+  var msg = document.getElementById('msg');
+
+  function say(text, bad) {
+    msg.textContent = text || '';
+    msg.className = 'msg' + (text ? (bad ? ' msg--bad' : ' msg--ok') : '');
+  }
+
+  /* ── возврат из платёжки ───────────────────────────────
+     PayKeeper дописывает к адресу ?payment_id=…&clientid=…&result=success.
+     Успех в адресе ничего не открывает: доступ выдаёт уведомление, которое
+     платёжка шлёт серверу отдельно. Поэтому спрашиваем сервер — и адрес
+     сразу чистим: в clientid лежит почта, ей не место ни в адресной
+     строке, ни в чужом скриншоте. */
+  var back = null;
+  try {
+    var q = new URLSearchParams(location.search);
+    if (q.get('result') || q.get('payment_id')) {
+      back = q.get('result') === 'fail' ? 'fail' : 'wait';
+      history.replaceState(null, '', location.pathname);
+    }
+  } catch (e) {}
+
+  /* Уведомление идёт своей дорогой и может опоздать на несколько секунд —
+     поэтому переспрашиваем, а не выносим приговор с первого ответа. */
+  function waitForAccess(left) {
+    return A.refresh().then(function (s) {
+      if (s.paid) return s;
+      if (left <= 0) return null;
+      return new Promise(function (ok) { setTimeout(ok, 2000); }).then(function () {
+        return waitForAccess(left - 1);
+      });
+    });
+  }
+
+  function dstr(iso) {
+    /* без «г.» на конце: дата стоит в предложении, и точка уже есть у фразы */
+    return new Date(iso).toLocaleDateString('ru-RU',
+      { day: 'numeric', month: 'long', year: 'numeric' }).replace(' г.', '');
+  }
+  function plural(n, a, b, c) {
+    var m = n % 100; if (m > 10 && m < 20) return c;
+    m = n % 10; return m === 1 ? a : (m >= 2 && m <= 4 ? b : c);
+  }
+
+  function showState(s) {
+    var box = document.getElementById('state');
+    if (!s.paid) { box.hidden = true; return; }
+    box.hidden = false;
+    box.className = 'state state--on';
+    document.getElementById('stateH').textContent = 'Доступ открыт до ' + dstr(s.until);
+    document.getElementById('stateS').textContent =
+      'Осталось ' + s.days + ' ' + plural(s.days, 'день', 'дня', 'дней') +
+      '. Оплата ниже добавит время к этому сроку — ничего не сгорит.';
+    document.getElementById('h1').textContent = 'Продлить доступ';
+    document.getElementById('lede').textContent =
+      'Доступ уже открыт. Новый срок прибавится к нынешнему.';
+  }
+
+  /* ── тарифы ───────────────────────────────────────────── */
+  var VIEW = {
+    quarter: { per: '163 ₽ в месяц', days: '92 дня' },
+    year:    { per: '121 ₽ в месяц', days: '366 дней' }
+  };
+  document.getElementById('plans').innerHTML = ['quarter', 'year'].map(function (k) {
+    var p = A.plans[k], best = k === 'year';
+    return '<div class="plan' + (best ? ' plan--best' : '') + '" id="' + k + '">' +
+      (best ? '<span class="plan__flag">ВЫГОДНЕЕ</span>' : '') +
+      '<div class="plan__tier">' + p.title + ' · ' + VIEW[k].days + '</div>' +
+      '<div class="plan__amt">' + p.price + '</div>' +
+      '<p class="plan__note">' + VIEW[k].per + ', без автопродления. ' + p.note + '</p>' +
+      '<button class="btn btn--pri" data-plan="' + k + '">Оплатить ' + p.price + '</button>' +
+      '</div>';
+  }).join('');
+
+  /* Сумму и номер заказа выдаёт сервер: то, что назовёт браузер, платёжка
+     принимать не должна. Здесь только отправка формы. */
+  function pay(btn, plan) {
+    var was = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Открываем оплату…';
+    say('');
+    ACC.call('POST', '/pay/start', { plan: plan }).then(function (r) {
+      if (!r.ok) {
+        btn.disabled = false; btn.textContent = was;
+        if (r.status === 401) return location.href = '/login/?next=' + encodeURIComponent('/base/pay.html');
+        if (r.data && r.data.error === 'pay_off') {
+          return say('Оплата картой сейчас недоступна. Напишите нам в Telegram — откроем доступ вручную.', true);
+        }
+        return say('Не получилось начать оплату. Попробуйте ещё раз или напишите нам в Telegram.', true);
+      }
+      var f = document.createElement('form');
+      f.method = 'POST';
+      f.action = r.data.url;
+      f.acceptCharset = 'utf-8';
+      f.style.display = 'none';
+      Object.keys(r.data.fields).forEach(function (k) {
+        var i = document.createElement('input');
+        i.type = 'hidden'; i.name = k; i.value = r.data.fields[k];
+        f.appendChild(i);
+      });
+      if (window.nkGoal) nkGoal('pay_click');   // ушёл на страницу банка
+      document.body.appendChild(f);
+      f.submit();
+      /* если форма почему-то не ушла — вернуть кнопку в рабочий вид */
+      setTimeout(function () { btn.disabled = false; btn.textContent = was; }, 8000);
+    });
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('[data-plan]'), function (b) {
+    b.addEventListener('click', function () { pay(b, b.getAttribute('data-plan')); });
+  });
+
+  /* Тариф из адреса: из игры сюда приходят ссылкой pay.html#year */
+  var want = (location.hash || '').replace('#', '');
+  if (want && document.getElementById(want)) {
+    setTimeout(function () {
+      document.getElementById(want).scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 60);
+  }
+
+  /* ── что показать на этой загрузке ────────────────────── */
+  if (back === 'fail') {
+    say('Оплата не прошла — деньги остались у вас. Можно попробовать ещё раз.', true);
+    A.ready.then(showState);
+  } else if (back === 'wait') {
+    say('Проверяем оплату…');
+    waitForAccess(6).then(function (s) {
+      if (s) {
+        if (window.nkGoal) nkGoal('paid');      // доступ открылся после оплаты
+        say('Готово: доступ открыт до ' + dstr(s.until) + '. Можно играть на любом устройстве, где выполнен вход.');
+        showState(s);
+      } else {
+        say('Банк подтвердил оплату, но до нас она ещё не дошла. Обновите страницу через минуту — ' +
+          'а если ничего не изменится, напишите в Telegram, откроем вручную.', true);
+      }
+    });
+  } else {
+    A.ready.then(showState);
+  }
+
+  /* Ссылка на привязку старого кода нужна не всем: тем, кто пришёл уже
+     после перехода на аккаунты, она только мешает. Показываем её, пока
+     у человека нет доступа. */
+  A.ready.then(function (s) {
+    document.getElementById('oldCode').hidden = s.paid;
+  });
+})();
+</script>
+</body>
+</html>

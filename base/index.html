@@ -208,16 +208,17 @@ function doneCount(key){
   return nooka.getCompleted(key).length;
 }
 
-/* «Мой доступ» показываем только тем, у кого он есть: там лежит код,
-   которым игры открываются на втором устройстве. */
+/* «Мой доступ» показываем всем вошедшим: у кого доступ есть — там срок,
+   у кого нет — оплата. Ответ приходит с сервера, поэтому ждём ready. */
 (function(){
-  /* Доступ может приехать ссылкой ?k=КОД — её разбирают после загрузки. */
-  function show(){
-    var A=window.nookaAccess, b=document.getElementById('myAccess');
-    if(A && b && (A.state().paid || A.openAll)) b.hidden=false;
-  }
-  show();
-  document.addEventListener('DOMContentLoaded', function(){ setTimeout(show, 0); });
+  var A=window.nookaAccess;
+  if(!A) return;
+  A.ready.then(function(s){
+    var b=document.getElementById('myAccess');
+    if(!b) return;
+    b.hidden=false;
+    if(!s.paid && !A.openAll){ b.textContent='Открыть доступ'; b.href=A.payUrl; }
+  });
 })();
 
 var xp=nooka.totalXP(), r=nooka.getRank(xp), st=nooka.streak();
