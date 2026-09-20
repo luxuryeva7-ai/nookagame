@@ -14,6 +14,8 @@
 
 <link rel="icon" href="../logo.svg">
 <link href="/fonts/nooka-fonts.css" rel="stylesheet">
+<script src="../games/nooka-account.js" data-require-login></script>
+<script src="../games/nooka-sync.js"></script>
 <style>
 :root{--purple:#7B2FFF;--yellow:#FFE141;--black:#111118;--muted:#6B7280;--bg:#F4F1FA}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -152,6 +154,7 @@ h2{font-size:22px;margin:34px 0 16px}
       <a class="back" href="../access/" id="myAccess" hidden>Мой доступ</a>
       <a class="back" href="report.html">Родителям: что освоил →</a>
       <a class="back" href="../">← на главную</a>
+      <a class="back" href="#" data-nk-logout hidden>Выйти</a>
     </div>
   </div>
 
@@ -316,7 +319,7 @@ function drawGallery(){
   }
   w.innerHTML='<div class="gal">'+items.map(function(a){
     return '<div class="gcard" data-id="'+a.id+'">'+
-      '<div class="gcard__pic">'+a.svg+'</div>'+
+      '<div class="gcard__pic">'+window.nookaGallery.safeHtml(a)+'</div>'+
       '<div class="gcard__t">'+esc(a.title)+'</div>'+
       '<div class="gcard__n">'+esc(a.note)+'</div></div>';
   }).join('')+'</div>';
@@ -329,7 +332,7 @@ function drawGallery(){
 function openArtifact(id){
   var a=window.nookaGallery.get(id); if(!a) return;
   var v=document.createElement('div'); v.className='gview';
-  v.innerHTML=a.svg+
+  v.innerHTML=window.nookaGallery.safeHtml(a)+
     '<div class="gview__t">'+esc(a.title)+'</div>'+
     '<div class="gview__n">'+esc(a.note)+(a.game?' · '+esc(a.game):'')+'</div>'+
     '<div class="gview__b"><button class="x">Закрыть</button><button class="d">Удалить</button></div>';
