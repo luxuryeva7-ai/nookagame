@@ -4,365 +4,156 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Мой доступ — Nooka</title>
-<meta name="description" content="Ввести код доступа Nooka и открыть все три игры курса. Проверить, до какой даты действует доступ.">
+<meta name="description" content="Что открыто в аккаунте Nooka и до какого числа. Здесь же привязывается код доступа от прежней покупки.">
 <meta name="robots" content="noindex">
 <link rel="icon" type="image/svg+xml" href="../logo.svg">
 <link href="/fonts/nooka-fonts.css" rel="stylesheet">
-<style>
-:root{
-  --bg:#FFF4E4; --surface:#FFFDF8; --ink:#2D1B45; --ink-2:#6B5680; --ink-3:#A797B8;
-  --pri-1:#E4D9FF; --pri-2:#A98BFF; --pri-3:#7B4FF2; --pri-4:#5836BD;
-  --sun-1:#FFF1B4; --sun-2:#FFD84D; --sun-3:#E8AE1F;
-  --ok-1:#C9F4DE; --ok-2:#4ED99B; --ok-3:#1FA76E;
-  --warn-1:#FFD6CC; --warn-3:#D94A34;
-  --line:rgba(45,27,69,.1);
-  --brand:'Unbounded','Nunito',system-ui,sans-serif;
-  --shadow:0 10px 22px -8px rgba(45,27,69,.18),0 4px 10px -4px rgba(45,27,69,.08);
-}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;padding:0 0 56px;background:var(--bg);color:var(--ink);
-  font-family:'Nunito',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-.wrap{max-width:620px;margin:0 auto;padding:0 20px}
-a{color:var(--pri-3);font-weight:800;text-decoration:none}
-a:hover{color:var(--pri-4)}
-img{max-width:100%}
-
-.top{padding:20px 0 16px}
-.top .row{display:flex;align-items:center;justify-content:space-between;gap:14px}
-.top img{height:30px;display:block}
-.top .back{font-weight:800;font-size:14px;color:var(--ink-2)}
-
-h1{font-family:var(--brand);font-weight:700;font-size:27px;line-height:1.18;margin:10px 0 8px;letter-spacing:-.015em}
-.lede{font-weight:700;font-size:15px;line-height:1.5;color:var(--ink-2);margin:0 0 22px}
-
-/* ── главная плашка состояния: с неё родитель начинает читать ── */
-.state{border-radius:24px;padding:20px 22px;margin-bottom:18px;box-shadow:var(--shadow)}
-.state--on{background:linear-gradient(180deg,#E8FBF2,#D6F6E8);box-shadow:var(--shadow),inset 0 0 0 2px rgba(78,217,155,.5)}
-.state--off{background:var(--surface)}
-.state--warn{background:linear-gradient(180deg,#FFF6E4,#FFEFD2);box-shadow:var(--shadow),inset 0 0 0 2px rgba(255,216,77,.6)}
-.state .badge{display:inline-flex;align-items:center;gap:7px;padding:6px 13px;border-radius:999px;
-  font-weight:800;font-size:12px;margin-bottom:10px}
-.state--on .badge{background:rgba(31,167,110,.14);color:#136E48}
-.state--off .badge{background:var(--pri-1);color:var(--pri-4)}
-.state--warn .badge{background:rgba(232,174,31,.2);color:#7A5200}
-.state h2{font-family:var(--brand);font-weight:700;font-size:19px;line-height:1.28;margin:0 0 6px}
-.state p{font-weight:700;font-size:14.5px;line-height:1.55;color:var(--ink-2);margin:0}
-
-.card{background:var(--surface);border-radius:24px;padding:20px 22px;margin-bottom:16px;box-shadow:var(--shadow)}
-.card h3{font-family:var(--brand);font-weight:700;font-size:16px;margin:0 0 6px}
-.card p{font-weight:700;font-size:14px;line-height:1.55;color:var(--ink-2);margin:0 0 14px}
-.card p:last-child{margin-bottom:0}
-
-.row{display:flex;gap:9px}
-.row input{flex:1;min-width:0;padding:15px 16px;border:none;border-radius:16px;
-  font-family:var(--brand);font-weight:700;font-size:15px;letter-spacing:.05em;text-transform:uppercase;
-  color:var(--ink);background:#fff;box-shadow:inset 0 0 0 1.5px rgba(45,27,69,.14);outline:none}
-.row input::placeholder{color:var(--ink-3);letter-spacing:.05em}
-.row input:focus{box-shadow:inset 0 0 0 2px var(--pri-2)}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:15px 24px;border:none;
-  border-radius:999px;cursor:pointer;font-family:var(--brand);font-weight:700;font-size:15px;
-  color:var(--ink);text-decoration:none;transition:transform .1s,filter .15s;white-space:nowrap}
-.btn:hover{filter:brightness(1.04);transform:translateY(-1px)}
-.btn:active{transform:translateY(3px)}
-.btn--pri{color:#fff;background:linear-gradient(180deg,#9B78FF,#7B4FF2 60%,#6E41E4);box-shadow:0 5px 0 var(--pri-4)}
-.btn--cta{background:linear-gradient(180deg,#FFF1B4,#FFD84D 60%,#FFC53A);box-shadow:0 5px 0 var(--sun-3)}
-.btn--soft{background:linear-gradient(180deg,#fff,#FFF6E9);box-shadow:0 5px 0 rgba(45,27,69,.1),var(--shadow)}
-.btn--wide{width:100%}
-.msg{min-height:20px;margin-top:10px;font-weight:800;font-size:13.5px;line-height:1.45}
-.msg--bad{color:var(--warn-3)}
-.msg--ok{color:var(--ok-3)}
-
-.games{display:flex;flex-direction:column;gap:10px}
-.g{display:flex;align-items:center;gap:14px;padding:15px 16px;border-radius:20px;text-decoration:none;
-  background:#fff;box-shadow:inset 0 0 0 1.5px rgba(45,27,69,.08)}
-.g:hover{box-shadow:inset 0 0 0 2px var(--pri-2)}
-.g .n{flex:none;width:38px;height:38px;border-radius:13px;display:flex;align-items:center;justify-content:center;
-  font-family:var(--brand);font-weight:700;font-size:15px;background:var(--pri-1);color:var(--pri-4)}
-.g b{display:block;font-family:var(--brand);font-weight:700;font-size:15px;color:var(--ink)}
-.g s{display:block;margin-top:3px;font-weight:700;font-size:12.5px;line-height:1.4;color:var(--ink-2);text-decoration:none}
-.g .tx{flex:1 1 auto;min-width:0}
-.g .tag{margin-left:auto;flex:none;padding:5px 11px;border-radius:999px;font-weight:800;font-size:11px}
-/* На узком экране номер и бирка вместе съедают половину строки, и название
-   игры ломается в столбик по одному слову. Номер убираем — порядок и так
-   виден сверху вниз, — а бирку опускаем под текст. */
-@media(max-width:430px){
-  .g{flex-wrap:wrap;row-gap:9px}
-  .g .n{display:none}
-  .g .tx{flex:1 1 100%}
-  .g .tag{margin-left:0}
-}
-.g .tag--free{background:var(--ok-1);color:var(--ok-3)}
-.g .tag--open{background:var(--ok-1);color:var(--ok-3)}
-.g .tag--lock{background:rgba(45,27,69,.07);color:var(--ink-3)}
-.g--lock{opacity:.72}
-
-/* Код показываем крупно и с кнопкой копирования: это единственное, что
-   человеку нужно унести с этой страницы, чтобы открыть игры на втором
-   устройстве. Мелким шрифтом такое переписывают с ошибками. */
-.code{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:14px 0 4px;
-  padding:15px 17px;border-radius:18px;background:#fff;box-shadow:inset 0 0 0 1.5px rgba(45,27,69,.12)}
-.code b{font-family:var(--brand);font-weight:700;font-size:19px;letter-spacing:.06em;
-  color:var(--ink);word-break:break-all}
-.code button{margin-left:auto;flex:none;padding:10px 16px;border:none;border-radius:999px;cursor:pointer;
-  font-family:var(--brand);font-weight:700;font-size:13px;color:var(--pri-4);background:var(--pri-1)}
-.code button:active{transform:translateY(2px)}
-/* Кнопка внутри текста: выглядит ссылкой, работает как копирование. */
-.lnk{padding:0;border:none;background:none;cursor:pointer;font:inherit;color:var(--pri-3);
-  text-decoration:underline;text-underline-offset:2px}
-.lnk:active{opacity:.6}
-.state--bad{background:linear-gradient(180deg,#FFEFEA,#FFE2DA);
-  box-shadow:var(--shadow),inset 0 0 0 2px rgba(217,74,52,.35)}
-.state--bad .badge{background:rgba(217,74,52,.14);color:#A8341F}
-.hint{font-weight:700;font-size:13px;line-height:1.6;color:var(--ink-3);margin-top:8px}
-.foot{margin-top:30px;padding-top:18px;border-top:1px solid var(--line);text-align:center;
-  font-weight:700;font-size:12.5px;line-height:1.7;color:var(--ink-3)}
-.foot a{font-size:12.5px}
-</style>
+<link href="/account/account.css" rel="stylesheet">
+<!-- Доступ живёт в аккаунте, поэтому страница за входом: без него
+     показывать нечего. Гостя nooka-account.js уводит на /login/. -->
+<script src="../games/nooka-account.js" data-require-login></script>
+<script src="../games/nooka-access.js"></script>
 </head>
 <body>
-<div class="wrap">
+<div class="wrap wrap--wide">
 
-  <div class="top"><div class="row" style="display:flex">
-    <a href="../index.html"><img src="../logo.svg" alt="Nooka"></a>
-    <a class="back" href="../index.html">← На главную</a>
-  </div></div>
+  <div class="top">
+    <a href="../"><img src="../logo.svg" alt="Nooka"></a>
+    <a class="back" href="../base/">← В кабинет</a>
+  </div>
 
   <h1>Мой доступ</h1>
-  <p class="lede">Здесь видно, что открыто и до какого числа. Аккаунта нет — доступ держится на коде.</p>
+  <p class="lede">Аккаунт <b data-nk-email hidden></b>. Доступ общий для всей семьи:
+  он открыт на каждом устройстве, где выполнен вход.</p>
 
-  <div class="state" id="state"><h2>Проверяем…</h2></div>
+  <div class="state" id="state">
+    <span class="state__dot"></span>
+    <div><b id="stateH">Проверяем…</b><span id="stateS"></span></div>
+  </div>
 
-  <div id="unlock"></div>
+  <p id="payRow" hidden><a class="btn btn--pri btn--wide" href="../base/pay.html">Открыть доступ</a></p>
 
   <div class="card">
     <h3>Игры курса</h3>
-    <div class="games" id="games"></div>
-    <p class="hint" id="gamesHint"></p>
+    <div class="glist" id="games"></div>
   </div>
 
-  <div id="help"></div>
+  <!-- Код от покупки до перехода на аккаунты. Привязывается один раз
+       и больше не нужен: дальше всё держится на входе по почте. -->
+  <div class="card" id="codeCard">
+    <h3>Остался код доступа?</h3>
+    <p class="lede">Код вида NOOKA-XXXX-XXXX выдавался до того, как появились
+    аккаунты. Привяжите его — и он больше не понадобится.</p>
+    <form id="codeForm" novalidate>
+      <label class="field">
+        <span>Код</span>
+        <input id="code" type="text" placeholder="NOOKA-••••-••••" autocomplete="off"
+               spellcheck="false" autocapitalize="characters" maxlength="20" required>
+      </label>
+      <button class="btn btn--pri btn--wide" id="codeBtn" type="submit">Привязать к аккаунту</button>
+      <div class="msg" id="codeMsg" role="alert"></div>
+    </form>
+  </div>
 
-  <p class="foot" id="foot"></p>
+  <p class="fine" id="foot"></p>
 </div>
 
 <script src="../games/nooka-levels.js"></script>
-<script src="../games/nooka-access.js"></script>
 <script src="../legal/requisites.js"></script>
 <script>
-/* nooka-access сам разбирает ?k=NOOKA-XXXX-YYYY и чистит адрес — к моменту
-   отрисовки доступ уже записан. Поэтому рисуем следующим тиком, а не сразу. */
-setTimeout(function () {
-  var A = window.nookaAccess, L = window.nookaLevels, R = window.NOOKA_LEGAL;
-  var manual = A.delivery !== 'auto';
+(function () {
+  var A = window.nookaAccess, ACC = window.nookaAccount, L = window.nookaLevels, R = window.NOOKA_LEGAL;
 
-  function plural(n, one, few, many) {
-    var a = Math.abs(n) % 100, b = a % 10;
-    if (a > 10 && a < 20) return many;
-    if (b > 1 && b < 5) return few;
-    if (b === 1) return one;
-    return many;
+  function plural(n, a, b, c) {
+    var m = Math.abs(n) % 100; if (m > 10 && m < 20) return c;
+    m = m % 10; return m === 1 ? a : (m >= 2 && m <= 4 ? b : c);
   }
-  function dstr(ms) {
-    var d = new Date(ms);
-    return String(d.getDate()).padStart(2, '0') + '.' +
-           String(d.getMonth() + 1).padStart(2, '0') + '.' + d.getFullYear();
+  function dstr(iso) {
+    /* без «г.» на конце: дата стоит в предложении, и точка уже есть у фразы */
+    return new Date(iso).toLocaleDateString('ru-RU',
+      { day: 'numeric', month: 'long', year: 'numeric' }).replace(' г.', '');
   }
 
-  /* Ссылка с кодом: её проще переслать в мессенджер, чем диктовать код. */
-  function linkFor() {
-    return location.origin + location.pathname.replace(/[^/]*$/, '') + '?k=' + (A.state().code || '');
-  }
-  function wireCopy(id, get, label) {
-    var b = document.getElementById(id);
-    if (!b) return;
-    b.onclick = function () {
-      var t = get();
-      if (navigator.clipboard) navigator.clipboard.writeText(t);
-      b.textContent = 'Скопировано';
-      setTimeout(function () { b.textContent = label; }, 1600);
-    };
-  }
+  /* Откуда доступ. Родителю это важнее, чем нам: «демо» и «оплачено»
+     заканчиваются по-разному, и узнать об этом лучше заранее. */
+  var SOURCE = {
+    purchase: 'Оплачено',
+    code: 'По коду от прежней покупки',
+    demo: 'Демо-доступ',
+    owner: 'Служебный доступ'
+  };
 
-  function render() {
-    var st = A.state();
-    var open = st.paid || A.openAll;
-    var pay = A.payInfo && A.payInfo();      // вернулись из платёжки?
-
-    /* ── состояние ─────────────────────────────────────────── */
+  function render(s) {
     var box = document.getElementById('state');
-    if (pay && pay.failed) {
-      box.className = 'state state--bad';
-      box.innerHTML = '<span class="badge">Оплата не прошла</span>' +
-        '<h2>Деньги не списаны</h2>' +
-        '<p>Банк не подтвердил оплату — доступ не открыт и платить заново за то же ' +
-        'не придётся. Обычно помогает повторить попытку или выбрать другой способ оплаты.</p>';
-    } else if (pay && pay.lost) {
-      box.className = 'state state--warn';
-      box.innerHTML = '<span class="badge">Нужна наша помощь</span>' +
-        '<h2>Оплата прошла, а код потерялся</h2>' +
-        '<p>Так бывает, если по дороге закрылась вкладка. Напишите нам — найдём ваш ' +
-        'платёж и откроем доступ вручную в тот же день. Платить ещё раз не нужно.</p>';
-    } else if (pay && pay.ok) {
-      /* Код показываем прямо здесь, а не только в карточке внизу: человек
-         после оплаты видит «готово» и уходит играть, а код нужен, чтобы
-         открыть игры на устройстве ребёнка. Ниже по странице он его не ищет. */
+    var h = document.getElementById('stateH'), sub = document.getElementById('stateS');
+    if (s.paid || A.openAll) {
       box.className = 'state state--on';
-      box.innerHTML = '<span class="badge">Оплата прошла</span>' +
-        '<h2>Готово — все три игры открыты</h2>' +
-        '<p>На этом устройстве вводить ничего не нужно. Сохраните код — им доступ ' +
-        'открывается на телефоне ребёнка и возвращается, если очистить браузер.</p>' +
-        (st.code
-          ? '<div class="code"><b id="payCode">' + st.code + '</b>' +
-            '<button id="copyPay">Скопировать</button></div>' +
-            '<p class="hint">Или отправьте ссылку — она открывает доступ одним нажатием: ' +
-            '<button class="lnk" id="copyPayLink">скопировать ссылку</button></p>'
-          : '');
-    } else if (st.paid) {
-      /* Считаем целые сутки вниз: код печатается с запасом вверх, и годовой
-         доступ иначе показывался бы как «367 дней» против обещанных 366. */
-      var left = Math.max(1, Math.floor((st.until - Date.now()) / 86400000));
-      box.className = 'state state--on';
-      box.innerHTML = '<span class="badge">Всё открыто</span>' +
-        '<h2>Доступ открыт: три игры, 31 уровень</h2>' +
-        '<p>Действует ещё ' + left + ' ' + plural(left, 'день', 'дня', 'дней') +
-        ' — до ' + dstr(st.until) + '. Дальше доступ закроется сам, ' +
-        'списывать нечего: карта не привязана.</p>';
-    } else if (A.openAll) {
-      box.className = 'state state--on';
-      box.innerHTML = '<span class="badge">Всё открыто</span>' +
-        '<h2>Открыты все три игры</h2><p>Сейчас курс открыт целиком.</p>';
-    } else if (st.demoOff) {
-      box.className = 'state state--warn';
-      box.innerHTML = '<span class="badge">Ссылка отозвана</span>' +
-        '<h2>Эта демо-ссылка больше не работает</h2>' +
-        '<p>Первая игра открыта всем и остаётся бесплатной — её можно пройти целиком.</p>';
-    } else if (st.expired) {
-      box.className = 'state state--warn';
-      box.innerHTML = '<span class="badge">Срок закончился</span>' +
-        '<h2>Срок доступа вышел</h2>' +
-        '<p>Первая игра остаётся открытой навсегда. Чтобы вернуть остальные две — ' +
-        'возьмите новый код, прогресс ребёнка при этом никуда не денется.</p>';
+      h.textContent = A.openAll ? 'Открыто всё' : 'Доступ открыт до ' + dstr(s.until);
+      sub.textContent = A.openAll
+        ? 'Сейчас на сайте открыты все игры — идёт показ.'
+        : (SOURCE[s.source] || 'Доступ') + ' · осталось ' + s.days + ' ' +
+          plural(s.days, 'день', 'дня', 'дней') + '. Продлевать заранее не нужно.';
+      document.getElementById('payRow').hidden = A.openAll;
+      document.getElementById('payRow').querySelector('.btn').textContent = 'Продлить доступ';
+      document.getElementById('codeCard').hidden = true;
+    } else if (s.offline) {
+      box.className = 'state';
+      h.textContent = 'Не получилось связаться с сервером';
+      sub.textContent = 'Проверьте интернет и обновите страницу — доступ никуда не делся.';
     } else {
-      box.className = 'state state--off';
-      box.innerHTML = '<span class="badge">Открыта первая игра</span>' +
-        '<h2>Пока открыта первая игра курса</h2>' +
-        '<p>Одиннадцать уровней бесплатно и без регистрации. Вторая и третья игры открываются кодом.</p>';
+      box.className = 'state';
+      h.textContent = 'Платная часть закрыта';
+      sub.textContent = 'Первая игра курса открыта целиком и без оплаты. Вторая и третья — по доступу.';
+      document.getElementById('payRow').hidden = false;
     }
 
-    wireCopy('copyPay', function () { return st.code; }, 'Скопировать');
-    wireCopy('copyPayLink', linkFor, 'скопировать ссылку');
-
-    /* ── ввод кода: не показываем тем, у кого уже открыто ──── */
-    var un = document.getElementById('unlock');
-    un.innerHTML = open ? '' :
-      '<div class="card">' +
-        '<h3>Ввести код доступа</h3>' +
-        '<p>Код пришёл в сообщении и выглядит так: NOOKA-K7M3-QP9F. ' +
-        'Регистр и дефисы не важны.</p>' +
-        '<div class="row">' +
-          '<input id="in" placeholder="NOOKA-••••-••••" autocomplete="off" spellcheck="false" ' +
-            'autocapitalize="characters">' +
-          '<button class="btn btn--pri" id="go">Открыть</button>' +
-        '</div>' +
-        '<div class="msg" id="msg"></div>' +
-      '</div>';
-
-    if (!open) {
-      var inp = document.getElementById('in'), msg = document.getElementById('msg');
-      document.getElementById('go').onclick = function () {
-        var r = A.unlock(inp.value);
-        if (r.ok) {
-          msg.className = 'msg msg--ok';
-          msg.textContent = 'Готово. Открываем…';
-          setTimeout(render, 700);
-        } else {
-          msg.className = 'msg msg--bad';
-          msg.textContent = r.why;
-          inp.focus();
-        }
-      };
-      inp.onkeydown = function (e) { if (e.key === 'Enter') document.getElementById('go').click(); };
-    }
-
-    /* ── игры с бирками доступа ────────────────────────────── */
-    var g = document.getElementById('games');
-    g.innerHTML = '';
-    L.games.forEach(function (game, i) {
-      var free = (game.free || 0) >= game.levels.length;
-      var locked = !free && !open;
-      var tag = free ? '<span class="tag tag--free">Бесплатно</span>'
-        : locked ? '<span class="tag tag--lock">По коду</span>'
-        : '<span class="tag tag--open">Открыто</span>';
-      var a = document.createElement('a');
-      a.className = 'g' + (locked ? ' g--lock' : '');
-      a.href = locked ? '../buy/' : '../games/game.html?g=' + game.key;
-      a.innerHTML = '<span class="n">' + (i + 1) + '</span>' +
-        '<span class="tx"><b>' + game.name + '</b><s>' + game.sub + ' · ' +
-        game.levels.length + ' уровней · ' + game.age + '</s></span>' + tag;
-      g.appendChild(a);
-    });
-    document.getElementById('gamesHint').textContent = open
-      ? 'Открывается на любом устройстве, где введён код: телефон, планшет, компьютер.'
-      : 'Первую игру можно проходить прямо сейчас — она бесплатна целиком и навсегда.';
-
-    /* ── помощь: разная до и после оплаты ──────────────────── */
-    var help = document.getElementById('help');
-    if (open) {
-      var shown = !!(pay && pay.ok && st.code);   // код уже стоит в блоке выше
-      help.innerHTML =
-        '<div class="card">' +
-          '<h3>' + (st.code && !shown ? 'Сохраните код доступа' : 'Доступ открыт') + '</h3>' +
-          '<p>Доступ записан в память браузера этого устройства. Чтобы открыть игры ' +
-          'на другом телефоне или планшете — введите там ' + (shown ? 'код, который выше' : 'этот код') +
-          '. Он же вернёт доступ, если очистить данные браузера.</p>' +
-          (st.code && !shown
-            ? '<div class="code"><b id="myCode">' + st.code + '</b>' +
-              '<button id="copyCode">Скопировать</button></div>' +
-              '<p class="hint">Или отправьте ссылку — она открывает доступ одним нажатием: ' +
-              '<button class="lnk" id="copyLink">скопировать ссылку</button></p>'
-            : '') +
-          '<a class="btn btn--cta btn--wide" style="margin-top:14px" ' +
-            'href="../games/game.html?g=data">Открыть игры →</a>' +
-        '</div>';
-      wireCopy('copyCode', function () { return st.code; }, 'Скопировать');
-      wireCopy('copyLink', linkFor, 'скопировать ссылку');
-    } else if (pay && pay.failed) {
-      help.innerHTML =
-        '<div class="card">' +
-          '<h3>Попробовать ещё раз</h3>' +
-          '<p>Ничего не потеряно: доступ не оплачен, деньги не списаны. Первая игра ' +
-          'при этом остаётся открытой — её можно проходить прямо сейчас.</p>' +
-          '<a class="btn btn--cta btn--wide" href="../buy/">Вернуться к оплате →</a>' +
-        '</div>';
-    } else {
-      help.innerHTML =
-        '<div class="card">' +
-          '<h3>Оплатили, но кода нет?</h3>' +
-          '<p>' + (manual
-            ? 'Напишите нам в Telegram, что оплатили, — пришлём код, обычно за ' + A.deliveryWait +
-              '. Если платили давно, приложите чек: найдём оплату и выдадим код повторно.'
-            : 'Код не присылают письмом — он показывается здесь же, сразу после оплаты. ' +
-              'Если вкладка закрылась раньше, чем вы его сохранили, напишите нам: найдём ' +
-              'оплату и откроем доступ в тот же день. Платить второй раз не нужно.') + '</p>' +
-          '<a class="btn btn--soft btn--wide" href="' + R.tg + '" target="_blank" rel="noopener">' +
-            'Написать в Telegram ' + R.tgName + '</a>' +
-        '</div>' +
-        '<div class="card">' +
-          '<h3>Ещё не оплачивали?</h3>' +
-          '<p>Вторая и третья игры — это ещё ' + nookaLevels.volume('paid').text + ': как управлять ИИ ' +
-          'и где он работает. Разовая оплата, без подписки, возврат в течение 14 дней.</p>' +
-          '<a class="btn btn--cta btn--wide" href="../buy/">Посмотреть тарифы →</a>' +
-        '</div>';
-    }
+    /* Игры курса: что открыто, а что нет — из общего реестра */
+    document.getElementById('games').innerHTML = L.games.map(function (g) {
+      var free = (g.free || 0) >= g.levels.length;
+      var open = free || s.paid || A.openAll;
+      return '<div><b>' + g.name + '</b><span class="n">' + g.levels.length + ' уровней</span>' +
+        '<span class="mark' + (open ? ' mark--on' : '') + '">' +
+          (open ? 'открыта' : 'по доступу') + (free ? ' · бесплатно' : '') + '</span></div>';
+    }).join('');
   }
 
-  render();
+  A.ready.then(render);
+
+  /* ── привязка старого кода ─────────────────────────────── */
+  var WHY = {
+    bad_code: 'Такого кода нет. Проверьте буквы — их легко перепутать.',
+    code_expired: 'Срок этого кода закончился.',
+    code_unknown: 'Этот код мы не находим среди выданных. Напишите нам — разберёмся и откроем доступ.',
+    code_used: 'Этот код уже привязан к другому аккаунту. Если это ваш второй аккаунт — напишите нам.',
+    too_many: 'Слишком много попыток. Попробуйте через час.',
+    not_logged_in: 'Сессия закончилась. Войдите ещё раз.'
+  };
+  var msg = document.getElementById('codeMsg'), btn = document.getElementById('codeBtn');
+  document.getElementById('codeForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var code = document.getElementById('code').value.trim();
+    if (!code) return;
+    btn.disabled = true;
+    msg.className = 'msg';
+    msg.textContent = 'Проверяем…';
+    ACC.call('POST', '/access/redeem', { code: code }).then(function (r) {
+      btn.disabled = false;
+      if (r.ok) {
+        msg.className = 'msg msg--ok';
+        msg.textContent = 'Готово. Доступ открыт до ' + dstr(r.data.access.until) + '.';
+        return A.refresh().then(render);
+      }
+      msg.className = 'msg msg--bad';
+      msg.textContent = (r.data && WHY[r.data.error]) ||
+        'Не получилось привязать код. Попробуйте ещё раз или напишите нам.';
+    });
+  });
+
   document.getElementById('foot').innerHTML =
-    '<a href="' + R.tg + '" target="_blank" rel="noopener">Поддержка в Telegram</a> · ' +
-    '<a href="../legal/oferta.html">Оферта</a> · ' +
-    '<a href="../legal/privacy.html">Персональные данные</a><br>' +
-    R.short + ' · ИНН ' + R.inn;
-}, 30);
+    'Вопрос по оплате или доступу — <a href="https://t.me/NookaGame" target="_blank" rel="noopener">Telegram</a> ' +
+    'или <a href="mailto:' + R.email + '">' + R.email + '</a>.<br>' +
+    R.seller + ' · ИНН ' + R.inn + ' · ' + '<a href="../legal/oferta.html">оферта</a>';
+})();
 </script>
 </body>
 </html>
