@@ -471,7 +471,7 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
   <section class="wrap section" id="course">
     <div class="nk-chip sec-head-chip">Курс из трёх игр</div>
     <h2 class="nk-t-h1 sec-h">Игры про ИИ-грамотность <span>для детей 8–12</span></h2>
-    <p class="nk-t-body sec-sub">ИИ уже рядом с ребёнком — в поиске, в переводчике, в чатах. Здесь он разбирается, откуда программа берёт ответы, почему она уверенно ошибается и чего ей нельзя о себе рассказывать. Тридцать один уровень, и ни одного, где надо просто читать.</p>
+    <p class="nk-t-body sec-sub">ИИ уже рядом с ребёнком — в поиске, в переводчике, в чатах. Здесь он разбирается, откуда программа берёт ответы, почему она уверенно ошибается и чего ей нельзя о себе рассказывать. <span id="courseVol">Тридцать три уровня и три мастерские</span> — и ни одного места, где надо просто читать.</p>
 
     <div class="course-grid" id="courseGrid"></div>
     <div class="course-note">Первая игра целиком бесплатна — без регистрации и без карты.
@@ -571,7 +571,7 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
         <div class="price-amt">0 ₽</div>
         <div class="nk-t-caption" style="margin-bottom:24px">без регистрации</div>
         <div class="pf">
-          <div><span class="ok">✓</span> <span class="pt">Вся первая игра, 10 уровней — <b>целиком, без урезаний</b></span></div>
+          <div><span class="ok">✓</span> <span class="pt">Вся первая игра, <span id="pfFree">11 уровней и мастерская</span> — <b>целиком, без урезаний</b></span></div>
           <div><span class="ok">✓</span> <span class="pt">Ребёнок обучит питомца и получит диплом</span></div>
           <div><span class="ok">✓</span> <span class="pt">Прогресс и коллекция сохранятся</span></div>
           <div class="no"><span>—</span> Вторая и третья игры закрыты</div>
@@ -584,7 +584,7 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
         <div class="nk-t-caption" style="margin-bottom:8px">92 дня, без автопродления</div>
         <div class="price-why">163 ₽ в месяц — дешевле одного занятия с репетитором</div>
         <div class="pf">
-          <div><span class="ok">✓</span> <span class="pt"><b>Ещё 20 уровней</b>: вторая и третья игры</span></div>
+          <div><span class="ok">✓</span> <span class="pt"><b>Ещё <span id="pfPaid">22 уровня и две мастерские</span></b>: вторая и третья игры</span></div>
           <div><span class="ok">✓</span> <span class="pt">Один код на <b>всю семью</b>, а не на одного ребёнка</span></div>
           <div><span class="ok">✓</span> <span class="pt">Отчёт родителю: что ребёнок освоил и о чём его спросить</span></div>
           <div><span class="ok">✓</span> <span class="pt">Карта не привязывается, <b>списывать нечего</b></span></div>
@@ -598,7 +598,7 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
         <div class="nk-t-caption price-amt-sub" style="margin-bottom:8px">121 ₽ в месяц вместо 163</div>
         <div class="price-why price-why--pro">Год выходит как три квартала. Каждая новая игра этого года — без доплаты</div>
         <div class="pf">
-          <div><span class="ok">✓</span> <span class="pt">Те же 20 уровней, но <b>на 12 месяцев</b></span></div>
+          <div><span class="ok">✓</span> <span class="pt">Те же <span id="pfPaidYear">22 уровня</span>, но <b>на 12 месяцев</b></span></div>
           <div><span class="ok">✓</span> <span class="pt">Плюс каждая игра, которая выйдет в течение года</span></div>
           <div><span class="ok">✓</span> <span class="pt">В планах науки и технологии, <b>доплачивать не нужно</b></span></div>
           <div><span class="ok">✓</span> <span class="pt">Не подошло, <b>вернём деньги</b> за 14 дней</span></div>
@@ -781,7 +781,7 @@ document.querySelectorAll('[data-buy]').forEach(function(b){ b.addEventListener(
             .map(function(t){ return '<li>'+t+'</li>'; }).join('') +
         '</ul>' +
       '</div>' +
-      '<div class="cc-foot"><b>'+st.total+' уровней</b>' +
+      '<div class="cc-foot"><b>'+nookaLevels.volume(g.key).text+'</b>' +
         /* Цена нужна, только пока есть что покупать. Когда доступ уже открыт —
            кодом, демо-ссылкой или показом — слово «Оплачено» было бы неправдой. */
         (freeGame || locked
@@ -809,6 +809,15 @@ document.querySelectorAll('[data-buy]').forEach(function(b){ b.addEventListener(
     card.addEventListener('click', function(){ openGame('games/game.html?g='+g.key); });
     box.appendChild(card);
   });
+})();
+/* Объём в тарифах — тоже из реестра: руками цифры разъезжаются с курсом */
+(function(){
+  if (!window.nookaLevels) return;
+  function put(id, text) { var el = document.getElementById(id); if (el) el.textContent = text; }
+  put('courseVol', nookaLevels.volume('all').text);
+  put('pfFree', nookaLevels.volume('free').text);
+  put('pfPaid', nookaLevels.volume('paid').text);
+  put('pfPaidYear', nookaLevels.volume('paid').short);
 })();
 document.querySelectorAll('[data-wait]').forEach(function(b){ b.addEventListener('click', function(){ window.open(WAITLIST_URL,'_blank','noopener'); }); });
 </script>
