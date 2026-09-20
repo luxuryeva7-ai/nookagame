@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Выдача доступа — Nooka</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="../logo.svg">
+<link href="/fonts/nooka-fonts.css" rel="stylesheet">
+<link href="/account/account.css" rel="stylesheet">
+<!-- Служебная страница: демо школам, разбор жалоб на оплату. Решает не она,
+     а сервер — он сверяет почту вошедшего со списком ADMIN_EMAILS. -->
+<script src="../games/nooka-account.js" data-require-login></script>
+</head>
+<body>
+<div class="wrap wrap--wide">
+
+  <div class="top">
+    <a href="../"><img src="../logo.svg" alt="Nooka"></a>
+    <a class="back" href="./">← В кабинет</a>
+  </div>
+
+  <div id="denied" hidden>
+    <h1>Это служебная страница</h1>
+    <p class="lede">Доступ к ней есть у владельца сайта. Если вы сюда попали случайно —
+    возвращайтесь <a href="./">в кабинет</a>.</p>
+  </div>
+
+  <div id="tools" hidden>
+    <h1>Выдача доступа</h1>
+    <p class="lede">Руками — демо школе, показ партнёру, разбор жалобы на оплату.
+    Каждая выдача записывается вместе с тем, кто её сделал.</p>
+
+    <div class="card">
+      <h3>Открыть доступ аккаунту</h3>
+      <p class="lede">Аккаунта может ещё не быть: человек войдёт по этой почте и увидит доступ открытым.</p>
+      <form id="grantForm" novalidate>
+        <label class="field"><span>Почта</span>
+          <input id="gEmail" type="email" autocomplete="off" autocapitalize="off" spellcheck="false" required></label>
+        <label class="field"><span>На сколько дней</span>
+          <input id="gDays" type="number" min="1" max="3650" value="90" required></label>
+        <label class="field"><span>Вид</span>
+          <select id="gKind">
+            <option value="demo">демо — показ, школа, партнёр</option>
+            <option value="purchase">покупка — оплата дошла мимо автомата</option>
+            <option value="owner">служебный — свой доступ</option>
+          </select></label>
+        <label class="field"><span>Примечание</span>
+          <input id="gNote" type="text" maxlength="200" placeholder="школа №7, показ 3 октября"></label>
+        <button class="btn btn--pri btn--wide" type="submit">Выдать</button>
+        <div class="msg" id="gMsg" role="alert"></div>
+      </form>
+    </div>
+
+    <div class="card">
+      <h3>Старые коды, выданные покупателям</h3>
+      <p class="lede">Только код из этого списка можно привязать к аккаунту. Подпись внутри кода
+      ничего не доказывает: алгоритм лежит в открытом репозитории, и напечатать похожий может любой.
+      Вставьте коды из переписки — по одному в строке или через запятую.</p>
+      <form id="codesForm" novalidate>
+        <label class="field"><span>Коды</span>
+          <textarea id="cList" rows="4" placeholder="NOOKA-XXXX-YYYY"></textarea></label>
+        <label class="field"><span>Примечание</span>
+          <input id="cNote" type="text" maxlength="200" placeholder="продажи в телеграме, август"></label>
+        <button class="btn btn--pri btn--wide" type="submit">Завести коды</button>
+        <div class="msg" id="cMsg" role="alert"></div>
+      </form>
+    </div>
+
+    <div class="card">
+      <h3>Что у аккаунта</h3>
+      <form id="lookForm" novalidate>
+        <label class="field"><span>Почта</span>
+          <input id="lEmail" type="email" autocomplete="off" autocapitalize="off" spellcheck="false" required></label>
+        <button class="btn btn--pri btn--wide" type="submit">Посмотреть</button>
+        <div class="msg" id="lMsg" role="alert"></div>
+      </form>
+      <div class="glist" id="lOut"></div>
+    </div>
+  </div>
+
+</div>
+<script>
+(function () {
+  var ACC = window.nookaAccount;
+
+  function dstr(iso) {
+    return new Date(iso).toLocaleDateString('ru-RU',
+      { day: 'numeric', month: 'long', year: 'numeric' }).replace(' г.', '');
+  }
+  function esc(t) {
+    return String(t == null ? '' : t).replace(/[<>&]/g, function (c) { return '&#' + c.charCodeAt(0) + ';'; });
+  }
+  function say(id, text, bad) {
+    var el = document.getElementById(id);
+    el.textContent = text || '';
+    el.className = 'msg' + (text ? (bad ? ' msg--bad' : ' msg--ok') : '');
+  }
+
+  /* Права проверяет сервер. Здесь — только чтобы не показывать формы,
+     которые всё равно ответят отказом. */
+  ACC.ready.then(function (user) {
+    if (!user) return;
+    document.getElementById(user.admin ? 'tools' : 'denied').hidden = false;
+  });
+
+  document.getElementById('grantForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    say('gMsg', 'Выдаём…');
+    ACC.call('POST', '/admin/grant', {
+      email: document.getElementById('gEmail').value.trim(),
+      days: Number(document.getElementById('gDays').value),
+      kind: document.getElementById('gKind').value,
+      note: document.getElementById('gNote').value.trim()
+    }).then(function (r) {
+      if (!r.ok) return say('gMsg', 'Не вышло: ' + ((r.data && r.data.error) || r.status), true);
+      say('gMsg', r.data.email + ' — доступ до ' + dstr(r.data.access.until) +
+        ' (' + r.data.access.days + ' дней)');
+    });
+  });
+
+  document.getElementById('codesForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    say('cMsg', 'Заводим…');
+    ACC.call('POST', '/admin/codes', {
+      codes: document.getElementById('cList').value,
+      note: document.getElementById('cNote').value.trim()
+    }).then(function (r) {
+      if (!r.ok) return say('cMsg', 'Не вышло: ' + ((r.data && r.data.error) || r.status), true);
+      say('cMsg', 'Разобрано кодов: ' + r.data.known + ', новых заведено: ' + r.data.added);
+    });
+  });
+
+  document.getElementById('lookForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    say('lMsg', 'Ищем…');
+    var out = document.getElementById('lOut');
+    out.innerHTML = '';
+    ACC.call('POST', '/admin/lookup', { email: document.getElementById('lEmail').value.trim() })
+      .then(function (r) {
+        if (!r.ok) return say('lMsg', 'Не вышло: ' + ((r.data && r.data.error) || r.status), true);
+        if (!r.data.found) return say('lMsg', 'Такого аккаунта ещё нет — человек ни разу не входил.', true);
+        var d = r.data;
+        say('lMsg', d.access.paid
+          ? 'Доступ открыт до ' + dstr(d.access.until) + ' (' + d.access.source + ')'
+          : 'Доступа нет');
+        out.innerHTML =
+          d.grants.map(function (g) {
+            return '<div><b>выдача</b><span class="n">' + esc(g.kind) + ' до ' + dstr(g.until) +
+              '</span><span class="mark">' + esc(g.note || '') + '</span></div>';
+          }).join('') +
+          d.orders.map(function (o) {
+            return '<div><b>заказ</b><span class="n">' + esc(o.order_id) + ' · ' + esc(o.plan) +
+              ' · ' + esc(o.amount) + ' ₽</span><span class="mark' +
+              (o.status === 'paid' ? ' mark--on' : '') + '">' + esc(o.status) + '</span></div>';
+          }).join('');
+      });
+  });
+})();
+</script>
+</body>
+</html>
