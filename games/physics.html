@@ -1084,7 +1084,10 @@ function Level1({
     height: 460,
     style: {
       width: '100%',
-      flex: 1,
+      /* держим пропорции: с flex:1 сцену растягивало по высоте
+         и круги превращались в овалы */
+      aspectRatio: '360 / 460',
+      flex: '0 1 auto',
       minHeight: 0,
       display: 'block'
     }
@@ -1493,7 +1496,10 @@ function Level2({
     height: 460,
     style: {
       width: '100%',
-      flex: 1,
+      /* держим пропорции: с flex:1 сцену растягивало по высоте
+         и круги превращались в овалы */
+      aspectRatio: '360 / 460',
+      flex: '0 1 auto',
       minHeight: 0,
       display: 'block'
     }
@@ -1566,17 +1572,19 @@ function Level2({
 // Задача 1: θ≈30°, лазер вниз-вправо → цель внизу-справа
 // Задача 2: θ≈20°, лазер вниз-вправо → цель внизу-справа (ближе)
 // Задача 3: θ≈145°, лазер вверх-вправо → цель вверху
+/* Цель держим выше плашки с углами: она рисуется от H-86, и звезда,
+   поставленная ниже, просто пряталась под ней. */
 const LVL3_PUZZLES = [{
   srcY: .489,
   tgt: {
-    x: .556,
-    y: .876
+    x: .730,
+    y: .700
   }
 }, {
   srcY: .478,
   tgt: {
-    x: .694,
-    y: .793
+    x: .480,
+    y: .650
   }
 }, {
   srcY: .540,
@@ -1755,7 +1763,7 @@ function Level3({
       ctx.fill();
       ctx.beginPath();
       ctx.arc(tgt.x, tgt.y, tgt.r, 0, Math.PI * 2);
-      ctx.fillStyle = hits ? 'rgba(93,217,160,.35)' : 'var(--ak-cta-1)';
+      ctx.fillStyle = hits ? 'rgba(93,217,160,.35)' : 'rgba(255,210,98,.85)';
       ctx.fill();
       ctx.strokeStyle = hits ? '#3CA876' : '#D4A22B';
       ctx.lineWidth = 3;
@@ -2003,7 +2011,8 @@ function Level3({
     height: 450,
     style: {
       width: '100%',
-      flex: 1,
+      aspectRatio: '360 / 450',
+      flex: '0 1 auto',
       minHeight: 0,
       display: 'block'
     }
