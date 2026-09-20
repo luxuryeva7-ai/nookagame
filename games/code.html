@@ -738,12 +738,12 @@ function IntroModal({
    ============================================================ */
 const CB_BLOCKS = {
   f: {
-    label: '⬆ Вперёд',
+    label: 'Вперёд',
     c: '#B5A1FF',
     d: '#7C5FE0'
   },
   f3: {
-    label: '⬆ Вперёд ×3',
+    label: 'Вперёд ×3',
     c: '#FFD262',
     d: '#D4A22B'
   },
@@ -886,15 +886,41 @@ function CBGrid({
       className: crashed ? 'ak-shake' : '',
       style: {
         position: 'absolute',
+        inset: 0
+      }
+    },
+    /* Вращается не робот, а стрелка-нос: эмодзи 🤖 смотрит на зрителя,
+       и поворот клал его набок — ребёнок не понимал, куда «вперёд». */
+    /*#__PURE__*/React.createElement("div", {
+      style: {
+        position: 'absolute',
+        inset: 0,
+        transform: `rotate(${CB_ROT[bot.dir]})`,
+        transition: 'transform .3s'
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        position: 'absolute',
+        top: '50%',
+        right: -2,
+        width: 0,
+        height: 0,
+        marginTop: -9,
+        borderTop: '9px solid transparent',
+        borderBottom: '9px solid transparent',
+        borderLeft: '12px solid #FFB020',
+        filter: 'drop-shadow(0 1px 0 rgba(45,27,69,.35))'
+      }
+    })), /*#__PURE__*/React.createElement("div", {
+      style: {
+        position: 'absolute',
         inset: 0,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontSize: 26,
-        transform: `rotate(${CB_ROT[bot.dir]})`,
-        transition: 'transform .3s'
+        fontSize: 26
       }
-    }, "🤖"));
+    }, "🤖")));
   }));
 }
 function CBLevel({
