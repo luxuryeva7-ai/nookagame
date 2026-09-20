@@ -102,7 +102,9 @@
       S.known = true; S.offline = true;
       return Promise.resolve(state());
     }
-    return A.call('GET', '/access').then(function (r) {
+    /* Адрес именно /access/state: на сайте есть страница /access/,
+       и короткий /access отобрал бы её у статики на боевом домене. */
+    return A.call('GET', '/access/state').then(function (r) {
       S.known = true;
       if (r.ok) {
         S.guest = false;
