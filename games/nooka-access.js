@@ -186,6 +186,8 @@
   function paywall(opts) {
     opts = opts || {};
     if (document.getElementById('nkpw')) return;
+    if (window.nkGoal) nkGoal('paywall_seen');   // упёрся в платный уровень
+    if (window.nkGoal) nkGoal('paywall_seen');   // упёрся в платный уровень
     if (!document.getElementById('nkpw-css')) {
       var st = document.createElement('style');
       st.id = 'nkpw-css';

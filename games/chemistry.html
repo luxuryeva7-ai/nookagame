@@ -72,6 +72,7 @@ input[type=range]::-moz-range-track{height:18px;border-radius:999px;background:l
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:36px;height:36px;border-radius:50%;background:linear-gradient(180deg,#fff 0%,#FFF7E8 100%);box-shadow:0 4px 0 rgba(45,27,69,.15),0 8px 18px -6px rgba(45,27,69,.2),inset 0 2px 0 rgba(255,255,255,.95);margin-top:-9px;cursor:pointer;transition:transform .1s;}
 input[type=range]::-webkit-slider-thumb:active{transform:scale(1.18);}
 </style>
+<script src="/metrika.js" defer></script>
 </head>
 <body>
 <div id="root"></div>
@@ -4120,7 +4121,7 @@ function App() {
   const [screen, setScreen] = React.useState('select');
   const [completed, setCompleted] = React.useState(() => new Set(window.nooka ? window.nooka.getCompleted('chem') : []));
   const done = n => {
-    if (window.nooka) window.nooka.missionWin('chem' + n, 60, { nextLabel: 'К выбору миссий →' });
+    if (window.nooka) window.nooka.missionWin('chem' + n, 60, { nextLabel: 'К выбору миссий →', onNext: function () {} });
     setCompleted(s => new Set([...s, n]));
     setScreen('select');
   };

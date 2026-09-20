@@ -206,6 +206,9 @@
 
     // Отметить миссию пройденной. XP начисляется один раз, день идёт в стрик всегда.
     completeMission: function (id, xp) {
+      /* Первый уровень курса — ключевая точка воронки: если ребёнок его
+         прошёл, он играет дальше. Считаем только первое прохождение. */
+      if (id === 'data1' && window.nkGoal && !load().missions[id]) nkGoal('level_1_done');
       var p = load();
       var t = dstr(new Date());
       if (p.days.indexOf(t) < 0) p.days.push(t);
@@ -341,7 +344,7 @@
          экран победы никуда не ведёт, — поэтому кнопка сама открывает
          следующий уровень этой же игры, а ссылка ниже возвращает к списку.
          Сам уровень никуда не уводит: любой переход тут только по клику. */
-      var hub = { href: '../base/', label: '\u041c\u043e\u044f \u0431\u0430\u0437\u0430' };
+      var hub = { href: '../base/', label: '\u041b\u0438\u0447\u043d\u044b\u0439 \u043a\u0430\u0431\u0438\u043d\u0435\u0442' };
       var next = null, hasArt = false, now = '', real = '', betOk = null;
       try {
         if (window.nookaLevels && opts.mid) {

@@ -45,6 +45,7 @@ input[type=range]{-webkit-appearance:none;width:100%;height:20px;border-radius:9
 input[type=range]::-webkit-slider-runnable-track{height:20px;border-radius:999px;background:linear-gradient(180deg,var(--ak-phys-1),var(--ak-phys-2));}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:38px;height:38px;border-radius:50%;margin-top:-9px;cursor:pointer;background:linear-gradient(180deg,#fff,#FFF7E8);box-shadow:0 4px 0 rgba(45,27,69,.15),0 8px 16px -6px rgba(45,27,69,.2);}
 </style>
+<script src="/metrika.js" defer></script>
 </head>
 <body><div id="root"></div>
 <script>
@@ -1232,9 +1233,9 @@ function Level2({
     ctx.fillStyle = '#FF6B35';
     ctx.font = 'bold 11px Nunito,sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('d₁ (близко)', cx - 28, cy - 20);
+    ctx.fillText('близко к опоре', cx - 28, cy - 20);
     ctx.fillStyle = '#4A9EFF';
-    ctx.fillText('d₂ (далеко)', cx + 54, cy - 20);
+    ctx.fillText('далеко от опоры', cx + 54, cy - 20);
     ctx.font = '30px serif';
     ctx.textBaseline = 'bottom';
     ctx.fillText('🐘', cx - 55, cy);
@@ -1368,7 +1369,7 @@ function Level2({
       ctx.fillStyle = '#FF6B35';
       ctx.font = 'bold 12px Nunito,sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText(`d₁=${pz.lDist}`, cx - pz.lDist / 2, cy - 22);
+      ctx.fillText(`${pz.lDist} шагов`, cx - pz.lDist / 2, cy - 52);
 
       // right weight (movable) — glow ring
       ctx.beginPath();
@@ -1394,7 +1395,7 @@ function Level2({
       ctx.fillStyle = '#4A9EFF';
       ctx.font = 'bold 12px Nunito,sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText(`d₂=${Math.round(rd)}`, cx + rd / 2, cy - 22);
+      ctx.fillText(`${Math.round(rd)} шагов`, cx + rd / 2, cy + 58);
       ctx.textAlign = 'left';
       ctx.textBaseline = 'alphabetic';
 
@@ -1411,20 +1412,20 @@ function Level2({
       // row 1: formula
       ctx.fillStyle = '#FF6B35';
       ctx.font = 'bold 13px Nunito,sans-serif';
-      ctx.fillText(`${pz.e1} × d₁`, W / 2 - 72, eqY + 20);
+      ctx.fillText(`${pz.e1} тянет`, W / 2 - 72, eqY + 20);
       ctx.fillStyle = balanced ? '#3CA876' : '#A797B8';
       ctx.font = 'bold 18px Nunito,sans-serif';
       ctx.fillText(balanced ? '=' : '≠', W / 2, eqY + 20);
       ctx.fillStyle = '#4A9EFF';
       ctx.font = 'bold 13px Nunito,sans-serif';
-      ctx.fillText(`${pz.e2} × d₂`, W / 2 + 72, eqY + 20);
+      ctx.fillText(`${pz.e2} тянет`, W / 2 + 72, eqY + 20);
       // row 2: numbers
       ctx.fillStyle = '#FF6B35';
       ctx.font = 'bold 17px Nunito,sans-serif';
       ctx.fillText(`${tL}`, W / 2 - 80, eqY + 46);
       ctx.fillStyle = '#A797B8';
       ctx.font = '12px Nunito,sans-serif';
-      ctx.fillText('ед', W / 2 - 52, eqY + 46);
+      ctx.fillText('', W / 2 - 52, eqY + 46);
       ctx.fillStyle = balanced ? '#3CA876' : '#A797B8';
       ctx.font = 'bold 18px Nunito,sans-serif';
       ctx.fillText(balanced ? '✓ =' : '≠', W / 2, eqY + 46);
@@ -1433,7 +1434,7 @@ function Level2({
       ctx.fillText(`${tR}`, W / 2 + 72, eqY + 46);
       ctx.fillStyle = '#A797B8';
       ctx.font = '12px Nunito,sans-serif';
-      ctx.fillText('ед', W / 2 + 96, eqY + 46);
+      ctx.fillText('', W / 2 + 96, eqY + 46);
       ctx.textAlign = 'left';
       if (balanced && !wonRef.current) {
         wonRef.current = true;
@@ -1453,7 +1454,7 @@ function Level2({
         ctx.fillStyle = '#A797B8';
         ctx.font = '13px Nunito,sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(diff > 0 ? '← сдвинь правее →' : '← сдвинь левее →', W / 2, eqY - 8);
+        ctx.fillText(diff > 0 ? 'отодвинь дальше от опоры →' : '← придвинь ближе к опоре', W / 2, eqY - 8);
         ctx.textAlign = 'left';
       } else {
         ctx.fillStyle = '#3CA876';
@@ -1490,7 +1491,7 @@ function Level2({
       justifyContent: 'center',
       padding: '2px 0'
     }
-  }, /*#__PURE__*/React.createElement(TaskBadge, null, "Найди равновесие! Уравнение меняется вживую 📐")), /*#__PURE__*/React.createElement("canvas", {
+  }, /*#__PURE__*/React.createElement(TaskBadge, null, "Двигай мышку, пока рычаг не встанет ровно")), /*#__PURE__*/React.createElement("canvas", {
     ref: canRef,
     width: 360,
     height: 460,
@@ -1522,11 +1523,11 @@ function Level2({
     style: {
       color: '#4A9EFF'
     }
-  }, LVL2_PUZZLES[pIdx]?.e2), " по рычагу: d₂ = ", /*#__PURE__*/React.createElement("strong", {
+  }, LVL2_PUZZLES[pIdx]?.e2), " — сейчас ", /*#__PURE__*/React.createElement("strong", {
     style: {
       color: 'var(--ak-phys-3)'
     }
-  }, Math.round(rDist))), /*#__PURE__*/React.createElement("input", {
+  }, Math.round(rDist)), " шагов от опоры"), /*#__PURE__*/React.createElement("input", {
     type: "range",
     min: "8",
     max: 138,
@@ -1542,9 +1543,9 @@ function Level2({
   })), phase === 'intro' && /*#__PURE__*/React.createElement(IntroModal, {
     emoji: "⚖️",
     title: "Как работает рычаг?",
-    law: 'Сила × Расстояние = Сила × Расстояние\n\nЛёгкий предмет ДАЛЕКО от опоры\nравен тяжёлому БЛИЗКО к опоре!\n\nЭто открыл Архимед 2200 лет назад!',
+    law: 'Чем дальше от опоры — тем сильнее тянет.\n\nЛёгкий далеко перевешивает\nтяжёлого близко к опоре.\n\nЭто открыл Архимед 2200 лет назад!',
     diagram: null,
-    tip: "Двигай ползунок, чтобы передвинуть гирю. Смотри, как меняется уравнение!",
+    tip: "Двигай ползунок — гиря поедет по рычагу. Смотри, как меняются числа.",
     onStart: () => {
       setPhase('play');
       setRDist(50);
@@ -1555,7 +1556,7 @@ function Level2({
     emoji: "⚖️",
     title: "Архимед гордится!",
     law: "Закон рычага — Архимед, III век до н. э.",
-    fact: "F₁×d₁ = F₂×d₂. Маленькая сила далеко = большая сила близко. Краны, весы, качели, ножницы — всё это рычаги!",
+    fact: "Лёгкий далеко тянет так же, как тяжёлый близко. Поэтому работают качели, ножницы, весы и подъёмный кран.",
     cta: "Уровень 3 →",
     onNext: onWin,
     onHome: onHome
@@ -2411,7 +2412,7 @@ function Level5Circuit({
     title: "Замкни цепь",
     law: 'Ток бежит только по замкнутому кругу:\nбатарейка → провод → лампа → назад.\n\nМеталлы пропускают ток (проводники),\nрезина и пластик — нет (изоляторы)',
     diagram: null,
-    tip: "В цепи фонарика — разрыв. Попробуй заткнуть его разными предметами!",
+    tip: "В цепи фонарика разрыв. Попробуй закрыть его разными предметами и смотри, загорится ли лампа.",
     onStart: () => setPhase('sandbox')
   }), phase === 'sandbox' && /*#__PURE__*/React.createElement("div", {
     style: {
@@ -2423,7 +2424,7 @@ function Level5Circuit({
       alignItems: 'center',
       overflowY: 'auto'
     }
-  }, /*#__PURE__*/React.createElement(TaskBadge, null, tried.size >= 3 ? 'Заметил? Металл проводит, резина — нет!' : 'Заткни разрыв цепи каждым предметом'), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement(TaskBadge, null, tried.size >= 3 ? 'Заметил? Металл проводит, резина — нет!' : 'Вставь в разрыв каждый предмет'), /*#__PURE__*/React.createElement("div", {
     style: {
       width: '100%',
       maxWidth: 340,
@@ -2993,22 +2994,22 @@ function App() {
   }, s === 'home' && /*#__PURE__*/React.createElement(HomeScreen, {
     onSelect: n => setS(`l${n}`)
   }), s === 'l1' && /*#__PURE__*/React.createElement(Level1, {
-    onWin: () => { setS('l2'); if (window.nooka) window.nooka.missionWin('phys1', 60, { nextLabel: 'Дальше →' }); },
+    onWin: () => { setS('l2'); if (window.nooka) window.nooka.missionWin('phys1', 60, { nextLabel: 'Дальше →', onNext: function () {} }); },
     onHome: () => setS('home')
   }), s === 'l2' && /*#__PURE__*/React.createElement(Level2, {
-    onWin: () => { setS('l3'); if (window.nooka) window.nooka.missionWin('phys2', 60, { nextLabel: 'Дальше →' }); },
+    onWin: () => { setS('l3'); if (window.nooka) window.nooka.missionWin('phys2', 60, { nextLabel: 'Дальше →', onNext: function () {} }); },
     onHome: () => setS('home')
   }), s === 'l3' && /*#__PURE__*/React.createElement(Level3, {
-    onWin: () => { setS('l4'); if (window.nooka) window.nooka.missionWin('phys3', 60, { nextLabel: 'Дальше →' }); },
+    onWin: () => { setS('l4'); if (window.nooka) window.nooka.missionWin('phys3', 60, { nextLabel: 'Дальше →', onNext: function () {} }); },
     onHome: () => setS('home')
   }), s === 'l4' && /*#__PURE__*/React.createElement(Level4Magnet, {
-    onWin: () => { setS('l5'); if (window.nooka) window.nooka.missionWin('phys4', 60, { nextLabel: 'Дальше →' }); },
+    onWin: () => { setS('l5'); if (window.nooka) window.nooka.missionWin('phys4', 60, { nextLabel: 'Дальше →', onNext: function () {} }); },
     onHome: () => setS('home')
   }), s === 'l5' && /*#__PURE__*/React.createElement(Level5Circuit, {
-    onWin: () => { setS('l6'); if (window.nooka) window.nooka.missionWin('phys5', 60, { nextLabel: 'Дальше →' }); },
+    onWin: () => { setS('l6'); if (window.nooka) window.nooka.missionWin('phys5', 60, { nextLabel: 'Дальше →', onNext: function () {} }); },
     onHome: () => setS('home')
   }), s === 'l6' && /*#__PURE__*/React.createElement(Level6Sound, {
-    onWin: () => { setS('home'); if (window.nooka) window.nooka.missionWin('phys6', 60, { nextLabel: 'Дальше →' }); },
+    onWin: () => { setS('home'); if (window.nooka) window.nooka.missionWin('phys6', 60, { nextLabel: 'Дальше →', onNext: function () {} }); },
     onHome: () => setS('home')
   }));
 }

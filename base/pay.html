@@ -9,6 +9,7 @@
 <link rel="icon" type="image/svg+xml" href="../logo.svg">
 <link href="/fonts/nooka-fonts.css" rel="stylesheet">
 <link href="/account/account.css" rel="stylesheet">
+<script src="/metrika.js" defer></script>
 <!-- Страница за входом: платит аккаунт, а не устройство. Без входа
      nooka-account.js сам уведёт на /login/ и вернёт сюда после кода. -->
 <script src="../games/nooka-account.js" data-require-login></script>
@@ -148,6 +149,7 @@
         i.type = 'hidden'; i.name = k; i.value = r.data.fields[k];
         f.appendChild(i);
       });
+      if (window.nkGoal) nkGoal('pay_click');   // ушёл на страницу банка
       document.body.appendChild(f);
       f.submit();
       /* если форма почему-то не ушла — вернуть кнопку в рабочий вид */
@@ -175,6 +177,7 @@
     say('Проверяем оплату…');
     waitForAccess(6).then(function (s) {
       if (s) {
+        if (window.nkGoal) nkGoal('paid');      // доступ открылся после оплаты
         say('Готово: доступ открыт до ' + dstr(s.until) + '. Можно играть на любом устройстве, где выполнен вход.');
         showState(s);
       } else {

@@ -285,7 +285,7 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
   .hour-num b{font-size:34px}}
 /* Подпись под логотипом стала длиннее и в полосе 640–700 px начинала
    поджимать кнопки шапки. Прячем её раньше: короткий вариант читается
-   так же, а «Моя база» и «Играть» не сжимаются. */
+   так же, а «Личный кабинет» и «Играть» не сжимаются. */
 @media(max-width:700px){
   .logo-desc .d-long{display:none}
   .logo-desc .d-short{display:inline}
@@ -294,7 +294,7 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
   .wrap{padding-left:18px;padding-right:18px}
   .hero{padding-top:34px;gap:28px}
   .section{padding-top:52px}
-  /* шапка на телефоне: логотип компактнее, «Моя база» прячем — она есть в футере */
+  /* шапка на телефоне: логотип компактнее, «Личный кабинет» прячем — она есть в футере */
   .hdr{gap:10px}
   .logo-mark{width:38px;height:38px;border-radius:13px}
   .logo-mark img{width:26px;height:26px}
@@ -303,7 +303,7 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
   .logo-desc{font-size:11px}
   .logo-desc .d-long{display:none}
   .logo-desc .d-short{display:inline}
-  /* на телефоне в шапке остаются «Моя база» и «Играть»: база — вход ребёнка
+  /* на телефоне в шапке остаются «Личный кабинет» и «Играть»: база — вход ребёнка
      к своему прогрессу, ею пользуются постоянно. «Час с ИИ» нужен учителю,
      он приходит по прямой ссылке — на узком экране прячем именно его. */
   nav .hdr-hour{display:none}
@@ -407,6 +407,7 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
 .pf b{font-weight:900}
 .price-hint{margin-top:18px;text-align:center;font-size:13px;font-weight:600;color:var(--nk-ink-2);line-height:1.5}
 </style>
+<script src="/metrika.js" defer></script>
 </head>
 <body>
 <div class="page" id="top">
@@ -423,7 +424,7 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
       <nav>
         <a class="nk-btn nk-btn--soft nk-btn--sm hdr-hour" href="teacher/">Час с ИИ</a>
         <a class="nk-btn nk-btn--soft nk-btn--sm" href="access/" id="navAccess" hidden><span class="d-long">Мой доступ</span><span class="d-short">Доступ</span></a>
-        <a class="nk-btn nk-btn--soft nk-btn--sm" href="base/">Моя база</a>
+        <a class="nk-btn nk-btn--soft nk-btn--sm" href="base/">Личный кабинет</a>
         <button class="nk-btn nk-btn--cta nk-btn--sm" data-play><span class="d-long">Играть бесплатно</span><span class="d-short">Играть</span></button>
       </nav>
     </div>
@@ -626,7 +627,7 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
     <div class="wrap ft">
       <div><div class="ft-logo">Noo<span>ka</span> · © 2026</div><div class="nk-t-caption" style="margin-top:4px">Цифровая игровая платформа для детей 6–14 лет</div></div>
       <div class="ft-links">
-        <a href="base/">Моя база</a>
+        <a href="base/">Личный кабинет</a>
         <a href="#plans">Тарифы</a>
         <a href="access/">Мой доступ</a>
         <a href="teacher/">Учителю</a>
@@ -709,7 +710,7 @@ document.addEventListener('keydown', function(e){ if(e.key==='Escape' && modal.c
 var toastEl = document.getElementById('toast'), _t;
 function toast(msg){ toastEl.textContent=msg; toastEl.classList.add('show'); clearTimeout(_t); _t=setTimeout(function(){ toastEl.classList.remove('show'); }, 3400); }
 
-document.querySelectorAll('[data-play]').forEach(function(b){ b.addEventListener('click', function(){ openGame('games/game.html?g=data'); }); });
+document.querySelectorAll('[data-play]').forEach(function(b){ b.addEventListener('click', function(){ if (window.nkGoal) nkGoal('play_click'); openGame('games/game.html?g=data'); }); });
 /* Кнопка «Мой доступ» в шапке — только для тех, у кого он открыт.
    Ответ о доступе приходит с сервера, поэтому ждём ready: до него
    про оплату ничего не известно. */

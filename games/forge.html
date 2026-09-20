@@ -101,6 +101,7 @@
 .rdlink__b{width:100%;margin-top:9px;}
 .rdlink__n{margin-top:9px;font-weight:700;font-size:11.5px;line-height:1.45;color:#8B7BAE;}
 </style>
+<script src="/metrika.js" defer></script>
 </head>
 <body>
 <div id="root"></div>
@@ -1060,7 +1061,7 @@ function LevelForge({
       if (window.nooka) window.nooka.missionWin('riddle1', 90, riddle
         ? { title: 'Загадка разгадана!', nextLabel: 'Что это за игры \u2192',
             onNext: function () { location.href = '../'; } }
-        : { title: 'Загадка разгадана!' });
+        : { title: 'Загадка разгадана!', onNext: function () {} });
     } else {
       setSay(miss.length === 1
         ? 'Почти. Одна деталь другая: посмотри на ' + FG_FIELD[miss[0]] + '.'
