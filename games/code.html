@@ -1294,7 +1294,8 @@ function App() {
     onWin: () => {
       setS('l2');
       if (window.nooka) window.nooka.missionWin('code1', 60, {
-        nextLabel: 'Дальше →'
+        nextLabel: 'Дальше →',
+        onNext: function () {}
       });
     },
     onHome: () => setS('home')
@@ -1303,7 +1304,8 @@ function App() {
     onWin: () => {
       setS('l3');
       if (window.nooka) window.nooka.missionWin('code2', 60, {
-        nextLabel: 'Дальше →'
+        nextLabel: 'Дальше →',
+        onNext: function () {}
       });
     },
     onHome: () => setS('home')
@@ -1312,7 +1314,8 @@ function App() {
     onWin: () => {
       setS('home');
       if (window.nooka) window.nooka.missionWin('code3', 60, {
-        nextLabel: 'На главную →'
+        nextLabel: 'На главную →',
+        onNext: function () {}
       });
     },
     onHome: () => setS('home')

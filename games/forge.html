@@ -1059,7 +1059,7 @@ function LevelForge({
       if (window.nooka) window.nooka.missionWin('riddle1', 90, riddle
         ? { title: 'Загадка разгадана!', nextLabel: 'Что это за игры \u2192',
             onNext: function () { location.href = '../'; } }
-        : { title: 'Загадка разгадана!' });
+        : { title: 'Загадка разгадана!', onNext: function () {} });
     } else {
       setSay(miss.length === 1
         ? 'Почти. Одна деталь другая: посмотри на ' + FG_FIELD[miss[0]] + '.'
