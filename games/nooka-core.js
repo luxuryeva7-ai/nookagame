@@ -206,6 +206,9 @@
 
     // Отметить миссию пройденной. XP начисляется один раз, день идёт в стрик всегда.
     completeMission: function (id, xp) {
+      /* Первый уровень курса — ключевая точка воронки: если ребёнок его
+         прошёл, он играет дальше. Считаем только первое прохождение. */
+      if (id === 'data1' && window.nkGoal && !load().missions[id]) nkGoal('level_1_done');
       var p = load();
       var t = dstr(new Date());
       if (p.days.indexOf(t) < 0) p.days.push(t);

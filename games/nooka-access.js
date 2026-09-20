@@ -242,6 +242,7 @@
   function paywall(opts) {
     opts = opts || {};
     if (document.getElementById('nkpw')) return;
+    if (window.nkGoal) nkGoal('paywall_seen');   // упёрся в платный уровень
     if (!document.getElementById('nkpw-css')) {
       var st = document.createElement('style');
       st.id = 'nkpw-css';
@@ -456,6 +457,7 @@
   function canPay() { return !!PAYKEEPER; }
 
   function startPay(plan) {
+    if (window.nkGoal) nkGoal('pay_click');      // ушёл на страницу банка
     if (!canPay()) { window.open(TG_URL, '_blank', 'noopener'); return false; }
     var p = PLANS[plan] || PLANS.quarter;
     var code = pendMake(plan);

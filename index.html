@@ -709,7 +709,7 @@ document.addEventListener('keydown', function(e){ if(e.key==='Escape' && modal.c
 var toastEl = document.getElementById('toast'), _t;
 function toast(msg){ toastEl.textContent=msg; toastEl.classList.add('show'); clearTimeout(_t); _t=setTimeout(function(){ toastEl.classList.remove('show'); }, 3400); }
 
-document.querySelectorAll('[data-play]').forEach(function(b){ b.addEventListener('click', function(){ openGame('games/game.html?g=data'); }); });
+document.querySelectorAll('[data-play]').forEach(function(b){ b.addEventListener('click', function(){ if (window.nkGoal) nkGoal('play_click'); openGame('games/game.html?g=data'); }); });
 /* Кнопка «Мой доступ» в шапке — только для тех, у кого доступ открыт.
    Там лежит код: после оплаты его нужно унести на устройство ребёнка,
    а искать ссылку в подвале никто не станет. */

@@ -188,6 +188,9 @@ setTimeout(function () {
     var st = A.state();
     var open = st.paid || A.openAll;
     var pay = A.payInfo && A.payInfo();      // вернулись из платёжки?
+    /* Последний шаг воронки: банк вернул человека с успешной оплатой.
+       Считаем только сам возврат, не каждое открытие страницы. */
+    if (pay && pay.ok && window.nkGoal) nkGoal('paid');
 
     /* ── состояние ─────────────────────────────────────────── */
     var box = document.getElementById('state');
