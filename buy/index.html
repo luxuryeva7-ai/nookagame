@@ -153,14 +153,6 @@ h1 span{color:var(--pri-3)}
     и что у него внутри. Разовая оплата — не подписка.</p>
   </div>
 
-  <div class="steps" id="steps"></div>
-
-  <div class="sec">
-    <h2 class="sec-h">Что откроется</h2>
-    <p class="sec-s">Две игры целиком. Первая игра курса как была бесплатной, так и останется.</p>
-    <div class="opens" id="opens"></div>
-  </div>
-
   <div class="sec">
     <h2 class="sec-h">Выберите срок</h2>
     <p class="sec-s">Доступ действует свой срок и заканчивается сам. Карта не привязывается —
@@ -209,33 +201,6 @@ h1 span{color:var(--pri-3)}
 (function () {
   var A = window.nookaAccess, L = window.nookaLevels, R = window.NOOKA_LEGAL;
 
-  /* ── три шага. Доступ живёт в аккаунте, поэтому первый шаг — вход:
-        так же, как в любом сервисе, где покупка должна найти хозяина. ── */
-  var STEPS = [
-    { h: 'Войдите по почте', p: 'Пароль придумывать не нужно: пришлём код в письме. ' +
-      'Аккаунт один на семью — в нём же живёт прогресс ребёнка.' },
-    { h: 'Оплатите', p: 'Картой или по QR через СБП — на защищённой странице банка. ' +
-      'Реквизиты карты остаются там, к нам они не попадают.' },
-    { h: 'Играйте где угодно', p: 'Доступ открывается сразу и работает на любом устройстве, ' +
-      'где выполнен вход: на телефоне ребёнка, на планшете, на компьютере.' }
-  ];
-  document.getElementById('steps').innerHTML = STEPS.map(function (s, i) {
-    return '<div class="step"><b>' + (i + 1) + '</b><div><h3>' + s.h + '</h3><p>' + s.p + '</p></div></div>';
-  }).join('');
-
-  /* ── что открывается: платные игры из реестра, без ручного дублирования ── */
-  var paid = L.games.filter(function (g) { return (g.free || 0) < g.levels.length; });
-  document.getElementById('opens').innerHTML = paid.map(function (g) {
-    var pick = g.levels.filter(function (l) { return l.href; }).slice(0, 3);
-    if (pick.length < 3) pick = g.levels.slice(0, 3);
-    return '<div class="op" style="--t:' + g.tint + '">' +
-      '<div class="n">' + nookaLevels.volume(g.key).text + ' · ' + g.age + '</div>' +
-      '<h4>' + g.name + '</h4><div class="s">' + g.sub + '</div>' +
-      /* то же, что на главной: понятные строки, а не названия уровней */
-      '<ul>' + (g.bullets || pick.map(function (l) { return l.t; }))
-        .map(function (t) { return '<li>' + t + '</li>'; }).join('') + '</ul></div>';
-  }).join('');
-
   /* ── тарифы. Кнопка ведёт туда, где реально можно заплатить: ссылка
         тарифа, общая ссылка или Telegram. Пустых кнопок не бывает. ── */
   var PLAN_VIEW = {
@@ -275,7 +240,9 @@ h1 span{color:var(--pri-3)}
   A.ready.then(function (st) {
     if (!st.guest) return;
     Array.prototype.forEach.call(document.querySelectorAll('[data-plan]'), function (b) {
-      var to = A.payUrl + '#' + b.getAttribute('data-plan');
+      /* auto=<тариф>: после входа оплата откроется сама. Тариф человек
+         уже выбрал здесь — показывать те же плитки второй раз незачем. */
+      var to = A.payUrl + '?auto=' + b.getAttribute('data-plan');
       b.setAttribute('href', A.loginUrl + '?next=' + encodeURIComponent(to));
     });
   });
