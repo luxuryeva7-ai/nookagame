@@ -229,7 +229,7 @@ h1 span{color:var(--pri-3)}
       '<div class="pl-why">' + v.why + '</div>' +
       '<ul class="pl-f">' + v.f.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul>' +
       '<a class="btn ' + (best ? 'btn--cta' : 'btn--pri') + '" data-plan="' + k + '" href="' +
-        A.payUrl + '#' + k + '">Оплатить ' + p.price + '</a>' +
+        A.payUrl + '?auto=' + k + '">Оплатить ' + p.price + '</a>' +
       '<p class="qr-hint">Карта или СБП · чек придёт на почту</p>' +
       '</div>';
   }).join('');
@@ -240,8 +240,8 @@ h1 span{color:var(--pri-3)}
   A.ready.then(function (st) {
     if (!st.guest) return;
     Array.prototype.forEach.call(document.querySelectorAll('[data-plan]'), function (b) {
-      /* auto=<тариф>: после входа оплата откроется сама. Тариф человек
-         уже выбрал здесь — показывать те же плитки второй раз незачем. */
+      /* Гостю по дороге нужен вход, но тариф он уже выбрал здесь —
+         после входа платёжка откроется сама, без второго выбора. */
       var to = A.payUrl + '?auto=' + b.getAttribute('data-plan');
       b.setAttribute('href', A.loginUrl + '?next=' + encodeURIComponent(to));
     });

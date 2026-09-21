@@ -133,6 +133,8 @@
     ACC.call('POST', '/pay/start', { plan: plan }).then(function (r) {
       if (!r.ok) {
         btn.disabled = false; btn.textContent = was;
+        /* Автопереход мог спрятать выбор — вернём его, раз оплата не началась */
+        document.getElementById('plans').hidden = false;
         if (r.status === 401) return location.href = '/login/?next=' + encodeURIComponent('/base/pay.html');
         if (r.data && r.data.error === 'pay_off') {
           return say('Оплата картой сейчас недоступна. Напишите нам в Telegram — откроем доступ вручную.', true);
@@ -168,10 +170,20 @@
   var auto = null;
   try { auto = new URLSearchParams(location.search).get('auto'); } catch (e) {}
   if (auto && A.plans[auto] && !back) {
+    /* Пока ждём ответ сервера, плитки прячем: человек выбрал тариф
+       на прошлом шаге, и второй такой же экран он читает как ошибку.
+       Не получилось начать оплату — плитки возвращаем, выбор остаётся. */
+    var plansBox = document.getElementById('plans');
+    plansBox.hidden = true;
+    say('Открываем страницу оплаты…');
     A.ready.then(function (st) {
-      if (st.paid) return;
+      if (st.paid) { plansBox.hidden = false; say(''); return; }
       var btn = document.querySelector('[data-plan="' + auto + '"]');
-      if (btn) pay(btn, auto);
+      if (!btn) { plansBox.hidden = false; say(''); return; }
+      pay(btn, auto);
+      /* Форма уходит в банк сама; если через восемь секунд мы всё ещё здесь,
+         значит что-то не сложилось — показываем выбор. */
+      setTimeout(function () { plansBox.hidden = false; }, 8000);
     });
   }
 
