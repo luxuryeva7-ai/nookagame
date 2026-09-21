@@ -161,6 +161,20 @@
     b.addEventListener('click', function () { pay(b, b.getAttribute('data-plan')); });
   });
 
+  /* Пришли со страницы «Открыть весь курс» через вход: тариф уже выбран,
+     второй экран с теми же плитками только удлиняет путь до оплаты.
+     Открываем платёжку сразу — кроме случая, когда человек вернулся
+     из банка или доступ у него уже есть. */
+  var auto = null;
+  try { auto = new URLSearchParams(location.search).get('auto'); } catch (e) {}
+  if (auto && A.plans[auto] && !back) {
+    A.ready.then(function (st) {
+      if (st.paid) return;
+      var btn = document.querySelector('[data-plan="' + auto + '"]');
+      if (btn) pay(btn, auto);
+    });
+  }
+
   /* Тариф из адреса: из игры сюда приходят ссылкой pay.html#year */
   var want = (location.hash || '').replace('#', '');
   if (want && document.getElementById(want)) {
