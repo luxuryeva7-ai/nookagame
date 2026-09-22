@@ -64,6 +64,14 @@
 
 /* карта зала */
 .lbmapwrap{margin:11px 14px 0;position:relative;touch-action:none;}
+/* На низком телефоне карта занимала 332 точки, и три книги на выбор уходили
+   под нижний край — читатель спрашивал «какую отдашь?», а отдавать было нечего.
+   Сжимаем всю карту целиком: касания считаются от её размеров. */
+@media (max-height:760px){
+  .lbmapwrap{width:min(calc(100% - 28px),33vh);margin:11px auto 0;}
+  /* когда читатель выбирает книгу, карта только показывает — её можно меньше */
+  .lbbody:has(.lbpick) .lbmapwrap{width:min(calc(100% - 28px),22vh);}
+}
 .lbmap{width:100%;display:block;border-radius:20px;
   background:radial-gradient(120% 100% at 50% 0%,rgba(255,208,138,.07),rgba(255,255,255,.03) 60%);
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.09);}
