@@ -43,6 +43,10 @@
    оставалось полэкрана пустоты, и экран читался незаконченным. */
 .clpile{padding:14px 10px;border-radius:20px;min-height:186px;
   background:rgba(255,255,255,.04);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.09);}
+/* Кучки Нейро идут в столбик, и высота от кучек ребёнка растягивала каждую
+   до 214px: три штуки не влезали в телефон вместе с кнопками, а прокрутку
+   внутри тела страницы дети не находят — уровень выглядел мёртвым. */
+.clzoo .clpile{min-height:0;padding:10px 10px 12px;}
 .clpile__t{font-weight:900;font-size:11px;color:#7E8CA8;text-align:center;margin-bottom:8px;}
 .clpile__i{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;}
 .clpile--3{grid-template-columns:repeat(3,1fr);}
@@ -342,10 +346,22 @@ function LevelCluster({ onWin, onHome }) {
           React.createElement('div', { className: 'clpile__i' },
             zooOf(side).map(b => React.createElement(ClBeast, { key: b.id, b: b, size: 40 })))))),
 
+      /* Выбор признака стоит выше кучек: на телефоне кучки занимали весь
+         экран, вопрос «на что мне смотреть» с кнопками уезжал под него,
+         и ребёнок не видел, чего от него ждут. */
+      phase === 'pick' && React.createElement('div', { className: 'clopts' },
+        React.createElement('div', { className: 'clopts__t' }, 'На какой признак мне смотреть?'),
+        Object.keys(CL_FEATURES).map(k => React.createElement('button', {
+          key: k, className: feat === k ? 'on' : '',
+          onClick: () => { setFeat(k);
+            setSay('Смотрю ' + CL_FEATURES[k].t + ' — и вот мои кучки. Их стало <b>' +
+              CL_FEATURES[k].n + '</b>. Заметь: зверей я не менял, поменялось только то, на что я смотрю.'); }
+        }, CL_FEATURES[k].q))),
+
       /* Нейро разложил по своему признаку */
       (phase === 'neuro' || phase === 'pick') && React.createElement('div', { className: 'clzoo' },
         groups().map(g => React.createElement('div', { className: 'clpile', key: g.k,
-          style: { margin: '10px 14px 0' } },
+          style: { margin: '8px 14px 0' } },
           React.createElement('div', { className: 'clpile__t' },
             'Кучка ' + (feat === 'color' ? CL_COLORS[g.k].t : g.k === 'round' ? 'круглые'
               : g.k === 'square' ? 'квадратные' : g.k === 'sharp' ? 'острые уши' : 'висячие уши') +
@@ -360,15 +376,6 @@ function LevelCluster({ onWin, onHome }) {
           key: k,
           className: guess === k ? (k === 'color' ? 'on--bad' : 'on') : '',
           onClick: () => checkWhy(k)
-        }, CL_FEATURES[k].q))),
-
-      phase === 'pick' && React.createElement('div', { className: 'clopts' },
-        React.createElement('div', { className: 'clopts__t' }, 'На какой признак мне смотреть?'),
-        Object.keys(CL_FEATURES).map(k => React.createElement('button', {
-          key: k, className: feat === k ? 'on' : '',
-          onClick: () => { setFeat(k);
-            setSay('Смотрю ' + CL_FEATURES[k].t + ' — и вот мои кучки. Их стало <b>' +
-              CL_FEATURES[k].n + '</b>. Заметь: зверей я не менял, поменялось только то, на что я смотрю.'); }
         }, CL_FEATURES[k].q))),
 
       /* проверка связи */
@@ -405,11 +412,13 @@ function LevelCluster({ onWin, onHome }) {
             'я просто складываю похожих рядом. Смотрю на цвет: вот что вышло.'); }
       }, 'Покажи, как разложишь ты'),
 
+      /* Было «Поменять признак» — дети читали это как отмену своего выбора
+         и не нажимали, а других кнопок на этом экране нет. */
       phase === 'neuro' && React.createElement('button', {
         className: 'nk-btn nk-btn--pri', style: { width: '100%' },
         onClick: () => { setPhase('pick');
           setSay('Могу и по-другому. Выбери, на что мне смотреть, — и увидишь, что будет.'); }
-      }, 'Поменять признак'),
+      }, 'А теперь по-другому \u2192'),
 
       phase === 'pick' && React.createElement('button', {
         className: 'nk-btn nk-btn--cta', style: { width: '100%' },
