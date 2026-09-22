@@ -46,6 +46,13 @@
   background:linear-gradient(180deg,#1A1430,#0D0A18);
   box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.08);}
 .nnscene svg{width:100%;display:block;}
+/* Схема с приметами занимала весь низкий экран, и регуляторы под ней
+   уезжали вниз — ребёнок не видел, чем крутить. */
+@media (max-height:760px){
+  .nnscene svg{max-height:26vh;width:auto;margin:0 auto;}
+  .nnsay{padding:10px 13px;}
+  .nnhow{margin-top:6px;padding:8px 12px;}
+}
 
 /* объяснение сцены одной строкой */
 .nnhow{margin:11px 14px 0;padding:10px 14px;border-radius:15px;text-align:center;
