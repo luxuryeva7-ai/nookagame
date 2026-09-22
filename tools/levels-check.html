@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Автопроверка уровней — Nooka</title>
+<meta name="robots" content="noindex">
+<link href="/fonts/nooka-fonts.css" rel="stylesheet">
+<style>
+:root{--bg:#FFF4E4;--card:#FFFDF8;--ink:#2D1B45;--ink2:#6B5680;--ink3:#A797B8;
+ --pri:#7B4FF2;--bad:#D94A34;--warn:#B07A00;--ok:#1FA76E;--line:rgba(45,27,69,.1)}
+*{box-sizing:border-box}
+body{margin:0;padding:0 0 60px;background:var(--bg);color:var(--ink);
+  font-family:'Nunito',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:980px;margin:0 auto;padding:0 18px}
+h1{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:24px;margin:22px 0 6px}
+h2{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:16px;margin:22px 0 8px}
+.sub{font-weight:700;font-size:14px;line-height:1.5;color:var(--ink2);margin:0 0 16px;max-width:720px}
+.bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.btn{padding:12px 20px;border:none;border-radius:999px;cursor:pointer;color:#fff;background:var(--pri);
+  font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:14px}
+.btn:disabled{opacity:.5;cursor:default}
+#state{font-weight:800;color:var(--ink2)}
+#sum{font-weight:900;font-size:16px}
+#frames{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 10px}
+#frames iframe{border:none;border-radius:18px;background:#080C18;box-shadow:0 0 0 1.5px var(--line)}
+.r{display:grid;grid-template-columns:24px 28px 260px 1fr;gap:8px;align-items:start;
+  padding:9px 12px;border-radius:14px;background:var(--card);margin-bottom:6px;font-size:14px;font-weight:700}
+.r b{font-size:16px}.r.ok b{color:var(--ok)}.r.warn b{color:var(--warn)}.r.bad b{color:var(--bad)}
+.r.bad{box-shadow:inset 0 0 0 1.5px rgba(217,74,52,.35)}
+.r .n{color:var(--ink3);font-weight:900}
+.r .t i{display:block;font-style:normal;font-size:11.5px;color:var(--ink3)}
+.r .x{color:var(--ink2);line-height:1.45}
+.r .x small{display:block;margin-top:3px;font-size:11.5px;color:var(--ink3)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Автопроверка уровней</h1>
+  <p class="sub">Бот играет в каждый уровень на экране размером с телефон (360×600) и ищет тупики,
+    зацикливание, кнопки под нижним краем и ошибки. «Не дошёл» — не поломка: уровни с загадкой
+    перебором не решаются, их стоит пройти руками. Запускать через <code>python3 tools/check-levels.py</code> —
+    тогда платные уровни открыты.</p>
+  <div class="bar">
+    <button class="btn" id="go">Проверить все</button>
+    <span id="state"></span>
+    <span id="sum"></span>
+  </div>
+  <div id="frames"></div>
+  <div id="rows"></div>
+</div>
+<script src="/games/nooka-levels.js"></script>
+<script src="levels-check.js"></script>
+</body>
+</html>
