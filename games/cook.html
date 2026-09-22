@@ -34,6 +34,12 @@
 
 /* тарелка */
 .costage{position:relative;margin:10px auto 0;width:74%;max-width:280px;}
+/* На телефоне тарелка занимала пол-экрана, и кнопки вопросов с продуктами
+   уезжали вниз: ребёнок видел «спроси гостя» и одну кнопку «Подать».
+   На высоком экране размер прежний. */
+@media (max-height:760px){
+  .costage{width:46%;max-width:180px;margin-top:6px;}
+}
 .costage.cooking .codish{animation:coShake .5s ease-in-out infinite;}
 .costeam{position:absolute;left:50%;top:2%;transform:translateX(-50%);display:flex;gap:14px;}
 .costeam span{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.5);
