@@ -154,14 +154,21 @@
   pointer-events:none;font-weight:800;font-size:14px;color:#4A3D69;}
 
 /* палитра */
-.wdink{display:flex;align-items:center;gap:7px;padding:0 12px;justify-content:center;}
-.wdink__c{width:33px;height:33px;border:none;cursor:pointer;border-radius:50%;padding:0;
+/* Двенадцать цветов в один ряд на телефон не влезают, а сжимать кружки
+   нельзя: пальцем по ним и так попадать непросто. Переносим на вторую
+   строку, толщина линии уходит под них. */
+.wdink{display:flex;flex-wrap:wrap;align-items:center;gap:7px;padding:0 12px;justify-content:center;}
+.wdink__c{width:33px;height:33px;flex:0 0 auto;border:none;cursor:pointer;border-radius:50%;padding:0;
   position:relative;transition:transform .13s;}
 .wdink__c:active{transform:scale(.88);}
 .wdink__c.on::after{content:'';position:absolute;inset:-4px;border-radius:50%;
   box-shadow:0 0 0 2.5px #fff;}
 .wdsize{display:flex;align-items:center;gap:7px;margin-left:5px;padding-left:10px;
   box-shadow:inset 1px 0 0 rgba(255,255,255,.15);}
+@media (max-width:460px){
+  .wdsize{width:100%;margin-left:0;padding-left:0;margin-top:3px;
+    justify-content:center;box-shadow:none;}
+}
 .wdsize button{width:33px;height:33px;border:none;cursor:pointer;border-radius:12px;padding:0;
   background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;}
 .wdsize button.on{background:rgba(255,255,255,.22);}
@@ -239,8 +246,13 @@ const SEEN = 'nooka_world_seen';
 const NAME_KEY = 'nooka_world_name';
 const NIGHT_KEY = 'nooka_world_time';
 
-/* палитра: рисовать одним синим скучно — цвет тут половина дела */
-const INKS = ['#FF6B6B', '#FFA94D', '#FFD84D', '#7CE8B0', '#7FE7FF', '#A98BFF', '#FF8FD4', '#FFFFFF'];
+/* палитра: рисовать одним синим скучно — цвет тут половина дела.
+   Восьми цветов не хватало на то, что дети рисуют чаще всего: не было ни
+   зелёного на траву и деревья, ни коричневого на ствол и шерсть, ни синего
+   на воду. Всё светлое: холст тёмный, тёмные цвета на нём не видно. */
+const INKS = ['#FF6B6B', '#FF8FD4', '#FFA94D', '#FFD84D', '#5BD75B', '#7CE8B0',
+              '#7FE7FF', '#6A8BFF', '#A98BFF', '#C98A4B', '#B8BCC9', '#FFFFFF'];
+const INK_START = '#7FE7FF';
 const SIZES = [5, 10, 18];
 
 const ZONES = [
@@ -591,11 +603,11 @@ function makeCard({ things, name, pal, W }) {
 function Pad({ onDone, onCancel }) {
   const cvRef = useRef(null);
   const [has, setHas] = useState(false);
-  const [ink, setInk] = useState(INKS[4]);
+  const [ink, setInk] = useState(INK_START);
   const [size, setSize] = useState(SIZES[1]);
   /* цвет и толщину держим ещё и в ref: обработчики указателя ставятся
      один раз, замыкание на состоянии в них устареет */
-  const st = useRef({ drawing: false, ink: INKS[4], size: SIZES[1] });
+  const st = useRef({ drawing: false, ink: INK_START, size: SIZES[1] });
   useEffect(() => { st.current.ink = ink; st.current.size = size; }, [ink, size]);
 
   useEffect(() => {
