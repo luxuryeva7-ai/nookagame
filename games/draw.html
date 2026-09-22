@@ -1395,8 +1395,10 @@ function LevelDraw({ n, onWin, onHome }) {
     if (add.length) { setModel(model.concat(add)); setFlash(true); }
   };
 
+  /* Круги разбора считаются по judged: rounds — журнал другого уровня, здесь
+     он всегда пуст, и раньше из-за этого «Дальше» не появлялась никогда. */
   const nextRound = () => {
-    if (rounds.length >= (L.rounds || 3)) { setPhase('quiz'); return; }
+    if (judged.length >= (L.rounds || 3)) { setPhase('quiz'); return; }
     dealRound(model, judged.length);
   };
 
@@ -1759,7 +1761,7 @@ function LevelDraw({ n, onWin, onHome }) {
 
       isJudge && judge && React.createElement('div', { className: 'dwjudge' },
         React.createElement('div', { className: 'dwjudge__h' },
-          React.createElement('b', null, 'Круг ' + (rounds.length + (judge.checked ? 0 : 1)) + ' из ' + (L.rounds || 3)),
+          React.createElement('b', null, 'Круг ' + (judged.length + (judge.checked ? 0 : 1)) + ' из ' + (L.rounds || 3)),
           React.createElement('span', null, judge.checked
             ? 'найдено ' + judge.marked.filter(i => judge.cards[i].said !== judge.cards[i].truth).length +
               ' из ' + judge.cards.filter(c => c.said !== c.truth).length
@@ -1984,7 +1986,7 @@ function LevelDraw({ n, onWin, onHome }) {
         className: 'nk-btn ' + (judge.checked ? 'nk-btn--ok' : 'nk-btn--pri'), style: { width: '100%' },
         onClick: judge.checked ? nextRound : checkJudge,
       }, judge.checked
-        ? (rounds.length >= (L.rounds || 3) ? 'Дальше' : 'Следующий круг')
+        ? (judged.length >= (L.rounds || 3) ? 'Дальше' : 'Следующий круг')
         : judge.marked.length ? 'Проверить разбор' : 'Здесь всё верно'),
 
       /* Выход из уровня не должен прятаться в серой кнопке: после первой
@@ -2035,16 +2037,18 @@ function LevelDraw({ n, onWin, onHome }) {
             }, 'Дать ещё пример'),
             /* Выход из круга. Раньше кнопка была одна, и ребёнок рисовал,
                пока Нейро не угадает: дети, которые рисуют неуверенно, доходили
-               до слёз. Промах Нейро — это и есть содержание уровня, поэтому
-               после двух дорисовок честно отпускаем дальше. */
-            extra >= 2 && React.createElement('button', {
+               до слёз. Потом выход добавили, но только после двух дорисовок —
+               и родители писали, что кнопки закончить уровень просто нет.
+               Промах Нейро — это и есть содержание уровня, поэтому дальше
+               отпускаем с первого же раза. */
+            React.createElement('button', {
               className: 'nk-btn nk-btn--soft',
               style: { width: '100%', marginTop: 8 },
               onClick: () => {
                 if (si + 1 < L.steps.length) { setSi(si + 1); setGuess(null); api.current.clear(); }
                 else setPhase('quiz');
               },
-            }, 'Дело не в рисунке — дальше')))));
+            }, si + 1 < L.steps.length ? 'Дело не в рисунке — дальше' : 'Дальше \u2192')))));
 }
 
 function App() {
