@@ -22,6 +22,34 @@
    ============================================================ */
 (function () {
 
+  /* Вход, оплата, тарифы, кабинет и документы не живут в рамке.
+     На компьютере главная открывает игру в окне шириной 520 точек (iframe
+     в модалке), и всё, куда игра ведёт дальше, грузилось бы в нём же.
+     В узком окне платёжка рисует мобильный вариант: «Оплатить» там —
+     ссылка в приложение банка, и с компьютера заплатить нельзя. Поэтому
+     ссылки на такие страницы из рамки открываются во всё окно, а страница,
+     которая всё же загрузилась в рамке (переход скриптом), выходит сама.
+     Рамки чужих сайтов не трогаем, автопроверку уровней (/tools/) — тоже:
+     она держит игры в рамках нарочно. */
+  var FULL_PAGE = /^\/(base|buy|login|access|legal)\//;
+  var inOurFrame = (function () {
+    try {
+      return window.top !== window.self && window.top.location.host === location.host &&
+        window.top.location.pathname.indexOf('/tools/') !== 0;
+    } catch (e) { return false; }
+  })();
+  if (inOurFrame && FULL_PAGE.test(location.pathname)) {
+    window.top.location.href = location.href;
+  } else if (inOurFrame) {
+    document.addEventListener('click', function (e) {
+      var a = e.target && e.target.closest && e.target.closest('a[href]');
+      if (!a || (a.target && a.target !== '_self')) return;
+      var u;
+      try { u = new URL(a.href, location.href); } catch (er) { return; }
+      if (u.host === location.host && FULL_PAGE.test(u.pathname)) a.target = '_top';
+    }, true);
+  }
+
   /* Сервер живёт на том же домене, что и страница — и на боевом сайте,
      и на тестовом стенде ветки. Поэтому адрес пустой: «тот же хост».
      Так cookie сессии выдаётся без атрибута Domain: она не уезжает ни
