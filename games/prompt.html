@@ -306,19 +306,22 @@ html::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .p5slot__e{font-size:15px;opacity:.3;}
 
 .p5deck{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px;}
-/* На телефоне сцена оранжереи забирала верх экрана, и кнопка «Запустить»
-   оказывалась под нижним краем: ребёнок собирал программу и не видел, чем
-   её пустить. На высоком экране сцена прежняя. */
-@media (max-height:760px){
-  .p5sc{max-height:26vh;overflow:hidden;}
-  .p5sc svg{max-height:26vh;width:auto;margin:0 auto;display:block;}
-  .p5deck{margin-top:6px;gap:6px;}
-  .p5cmd{padding:9px 10px;}
-}
 .p5cmd{display:flex;align-items:center;gap:8px;padding:11px 12px;border:none;border-radius:14px;cursor:pointer;
   text-align:left;font-family:var(--nk-body);font-weight:800;font-size:12.5px;line-height:1.15;
   color:#E9DFFF;background:rgba(255,255,255,.055);box-shadow:inset 0 0 0 1px rgba(255,255,255,.09);
   transition:transform .1s,box-shadow .15s,opacity .2s;}
+/* На телефоне сцена оранжереи забирала верх экрана, и кнопка «Запустить»
+   оказывалась под нижним краем: ребёнок собирал программу и не видел, чем
+   её пустить. На высоком экране сцена прежняя. */
+@media (max-height:760px){
+  .p5sc{width:min(100%,39.5vh) !important;margin:0 auto;}  /* ширина задана в самом элементе */
+  /* «Скажи числом»: после ответа на вопрос кнопка «Дальше» уезжала под нижний
+     край — сцену с ракетой ужимаем. Размер у неё задан в самом элементе, а
+     скрипт этого файла по правилам только уменьшаем, поэтому ловим по viewBox. */
+  svg[viewBox="0 0 200 150"]{width:min(100%,30vh) !important;margin:0 auto;display:block;}
+  .p5deck{margin-top:6px;gap:6px;}
+  .p5cmd{padding:9px 10px;}
+}
 .p5cmd:hover:not(:disabled){box-shadow:inset 0 0 0 1.5px rgba(181,123,255,.6);transform:translateY(-1px);}
 .p5cmd:active:not(:disabled){transform:translateY(2px);}
 .p5cmd:disabled{opacity:.35;cursor:default;}

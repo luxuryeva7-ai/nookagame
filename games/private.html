@@ -21,6 +21,12 @@
 .pv{height:100%;display:flex;flex-direction:column;overflow:hidden;
   background:linear-gradient(180deg,#1A1330 0%,#120D22 62%,#0A0714 100%);}
 .pvbody{flex:1;overflow-y:auto;padding:0 0 6px;-webkit-overflow-scrolling:touch;}
+/* На низком телефоне четыре реплики, картинка и варианты не помещались:
+   варианты ответа уезжали под край, а окно стояло на старых сообщениях.
+   Оставляем две последние реплики и сам вопрос. */
+@media (max-height:760px){
+  .pvchat .pvmsg:nth-last-child(n+4){display:none;}
+}
 
 /* переписка */
 .pvchat{margin:10px 14px 0;display:flex;flex-direction:column;gap:9px;}
@@ -296,6 +302,17 @@ function LevelPrivate({ onWin, onHome }) {
   const [q2, setQ2] = useState(null);
   const tRef = React.useRef([]);
   useEffect(() => () => tRef.current.forEach(clearTimeout), []);
+  /* Новый вопрос — докручиваем к вариантам ответа, как любой мессенджер */
+  useEffect(() => {
+    const down = () => {
+      const b = document.querySelector('.pvbody');
+      if (b) b.scrollTop = b.scrollHeight;
+    };
+    down();
+    /* и ещё раз, когда картинка с «чужим компьютером» дорисуется */
+    const t = setTimeout(down, 400);
+    return () => clearTimeout(t);
+  }, [si]);
 
   const step = PV_STEPS[si];
   const risky = kept.length;
