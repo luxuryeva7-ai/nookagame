@@ -657,7 +657,7 @@ var WAITLIST_URL = 'https://t.me/NookaGame';
 (function(){ var R = window.NOOKA_LEGAL, el = document.getElementById('ftReq');
   if (!R || !el) return;
   el.innerHTML = R.seller + ' · ИНН ' + R.inn + ' · ОГРНИП ' + R.ogrnip + ' · ' + R.address +
-    ' · <a href="mailto:' + R.email + '">' + R.email + '</a>'; })();
+    (R.email ? ' · <a href="mailto:' + R.email + '">' + R.email + '</a>' : ''); })();
 var V = '?v=202607211900';
 
 var PLANETS = [

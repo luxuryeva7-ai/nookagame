@@ -29,9 +29,11 @@ window.NOOKA_LEGAL = {
   address: '124527, г. Москва, Зеленоград, корп. 840',
 
   /* Связь. Почта обязана работать: на неё приходят обращения по данным
-     и претензии. Если ящика на домене нет — завести или поставить сюда
-     другой рабочий адрес. */
-  email:   'hello@nookagame.ru',
+     и претензии. Пока ящика нет — поле пустое, и сайт почту нигде не
+     показывает: в документах строки с data-need="email" убираются сами,
+     на страницах адрес выводится только если он задан. Завёлся ящик —
+     вписать сюда, и он появится везде. */
+  email:   '',
   tg:      'https://t.me/NookaGame',
   tgName:  '@NookaGame',
   site:    'nookagame.ru',
@@ -56,6 +58,11 @@ window.NOOKA_LEGAL.apply = function () {
      оставляем как есть: это опечатка в вёрстке, и её должно быть видно. */
   host.innerHTML = host.innerHTML.replace(/\{\{(\w+)\}\}/g, function (m, k) {
     return Object.prototype.hasOwnProperty.call(L, k) ? String(L[k]) : m;
+  });
+  /* Кусок текста, которому нужно пустое поле (data-need="email"), убираем
+     целиком — иначе в документе останется «или на ». */
+  [].forEach.call(host.querySelectorAll('[data-need]'), function (el) {
+    if (!L[el.getAttribute('data-need')]) el.remove();
   });
   if (!L.FILLED) {
     var d = document.createElement('div');
