@@ -656,8 +656,9 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
 var WAITLIST_URL = 'https://t.me/NookaGame';
 (function(){ var R = window.NOOKA_LEGAL, el = document.getElementById('ftReq');
   if (!R || !el) return;
-  el.innerHTML = R.seller + ' · ИНН ' + R.inn + ' · ОГРНИП ' + R.ogrnip + ' · ' + R.address +
-    ' · <a href="mailto:' + R.email + '">' + R.email + '</a>'; })();
+  /* Адрес на главной не нужен: он есть в оферте, а номер дома посторонним ни к чему */
+  el.innerHTML = R.seller + ' · ИНН ' + R.inn + ' · ОГРНИП ' + R.ogrnip +
+    (R.email ? ' · <a href="mailto:' + R.email + '">' + R.email + '</a>' : ''); })();
 var V = '?v=202607211900';
 
 var PLANETS = [
