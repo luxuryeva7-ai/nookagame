@@ -704,6 +704,15 @@ function openGame(src){
   gframe.src = url; modal.classList.add('open'); document.body.style.overflow='hidden';
 }
 function closeModal(){ modal.classList.remove('open'); gframe.src=''; document.body.style.overflow=''; }
+/* Вход, оплата, тарифы, кабинет и документы — только на всю страницу. В окне
+   игры (520 точек) платёжка рисует мобильный вариант, где «Оплатить» ведёт
+   в приложение банка, и с компьютера заплатить нельзя. Игра сама уводит такие
+   ссылки наверх (nooka-account.js), но у кого в кеше старый скрипт — ловим здесь. */
+gframe.addEventListener('load', function(){
+  var p;
+  try { p = gframe.contentWindow.location; } catch (e) { return; }
+  if (/^\/(base|buy|login|access|legal)\//.test(p.pathname)) { var to = p.href; closeModal(); location.href = to; }
+});
 document.getElementById('modalClose').addEventListener('click', closeModal);
 modal.addEventListener('click', function(e){ if(e.target===modal) closeModal(); });
 document.addEventListener('keydown', function(e){ if(e.key==='Escape' && modal.classList.contains('open')) closeModal(); });
