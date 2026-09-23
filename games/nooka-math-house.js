@@ -320,8 +320,8 @@
     album.style.display = 'none';
     again.onclick = function () { end.remove(); album.style.display = ''; round = 0; allFound = []; startRound(); };
     next.onclick = function () {
-      if (window.nooka) window.nooka.missionWin('ma2', 60, { nextLabel: 'К играм →', onNext: function () { location.href = '../'; } });
-      else location.href = '../';
+      if (window.nooka) window.nooka.missionWin('ma2', 60, { nextLabel: 'В Арену →', onNext: function () { location.href = 'math-arena.html'; } });
+      else location.href = 'math-arena.html';
     };
   }
 

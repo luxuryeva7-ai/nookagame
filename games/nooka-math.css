@@ -131,3 +131,61 @@
 /* тёмная тема ИИ-курса красит мягкую кнопку в тёмный — возвращаем светлую */
 .mh .nk-btn--soft{color:#2D1B45;background:linear-gradient(180deg,#fff,#FFF6E9);
   box-shadow:0 5px 0 rgba(45,27,69,.12),0 10px 20px -8px rgba(45,27,69,.14),inset 0 0 0 1.5px rgba(45,27,69,.08);}
+
+/* ============================================================
+   АРЕНА: монстрик Ням, облачко-желание, корзинки, ягоды, питомец
+   ============================================================ */
+.ma-nyam{position:absolute;z-index:14;width:46%;transform:translate(-50%,-88%);pointer-events:none;
+  transition:opacity .6s, transform .6s;}
+.ma-nyam img{display:block;width:100%;height:auto;transform-origin:50% 100%;
+  filter:drop-shadow(0 14px 12px rgba(45,27,69,.3));animation:mhIdle 2.8s ease-in-out infinite;}
+.ma-nyam.near img{transform:scale(1.06);animation:none;}
+.ma-nyam.chew img{animation:maChew .26s ease-in-out;}
+.ma-nyam.full img{animation:maFull .9s ease-in-out;}
+.ma-nyam.leave{opacity:0;transform:translate(-50%,-88%) scale(.7);}
+@keyframes maChew{50%{transform:scale(1.07,.93);}}
+@keyframes maFull{20%{transform:scale(1.12,.94) rotate(-4deg);}50%{transform:scale(1.08,.96) rotate(4deg);}}
+
+.ma-wish{position:absolute;z-index:16;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;
+  gap:4px;padding:10px 16px 11px;border-radius:24px;background:#FFFDF8;
+  box-shadow:0 5px 0 rgba(45,27,69,.12),0 16px 28px -12px rgba(45,27,69,.45);}
+.ma-wish::after{content:'';position:absolute;left:12px;bottom:-9px;width:18px;height:18px;border-radius:50%;background:#FFFDF8;
+  box-shadow:-10px 12px 0 -4px #FFFDF8;}
+.ma-wish b{font-family:var(--nk-brand);font-weight:700;font-size:clamp(30px,9vw,42px);line-height:1;color:#D9402E;}
+.ma-wish.ask{animation:mhPulse .8s ease-in-out 2;}
+
+.ma-basket{position:absolute;z-index:30;width:26%;transform:translate(-50%,-50%);touch-action:none;cursor:grab;}
+.ma-basket img{display:block;width:100%;pointer-events:none;filter:drop-shadow(0 10px 8px rgba(45,27,69,.3));}
+.ma-basket.carry{z-index:46;cursor:grabbing;}
+.ma-basket.locked{cursor:default;}
+.ma-basket.gone{opacity:0;transition:opacity .4s;}
+.ma-basket__n{position:absolute;right:-4%;top:-14%;min-width:30px;height:30px;padding:0 6px;border-radius:15px;
+  display:flex;align-items:center;justify-content:center;background:var(--nk-pri-3);color:#fff;
+  font-family:var(--nk-brand);font-weight:700;font-size:15px;box-shadow:0 3px 0 var(--nk-pri-4);}
+.ma-basket__n:empty{display:none;}
+
+.ma-berry{position:absolute;z-index:32;width:8.5%;transform:translate(-50%,-80%);cursor:pointer;touch-action:none;
+  transition:left .3s cubic-bezier(.3,1.3,.5,1), top .3s cubic-bezier(.3,1.3,.5,1), width .3s;}
+.ma-berry img{display:block;width:100%;pointer-events:none;filter:drop-shadow(0 4px 3px rgba(45,27,69,.3));}
+.ma-berry.in{width:6.6%;}
+.ma-berry.eaten{transition:left .35s ease-in, top .35s ease-in, opacity .35s, width .35s;opacity:0;width:3%;}
+
+.ma-egg{position:absolute;z-index:35;width:24%;transform:translate(-50%,-80%);cursor:pointer;touch-action:none;
+  animation:mhPop .6s cubic-bezier(.3,1.6,.5,1);}
+.ma-egg img{display:block;width:100%;pointer-events:none;filter:drop-shadow(0 10px 10px rgba(123,79,242,.45));}
+.ma-egg.knock img{animation:maKnock .35s ease-in-out;}
+@keyframes maKnock{25%{transform:rotate(-10deg);}75%{transform:rotate(10deg);}}
+
+.ma-pet{position:absolute;z-index:17;width:17%;transform:translate(-50%,-85%) scale(var(--grow,1));transform-origin:50% 100%;
+  pointer-events:none;transition:transform .5s cubic-bezier(.3,1.6,.5,1);}
+.ma-pet img{display:block;width:100%;filter:drop-shadow(0 8px 6px rgba(45,27,69,.3));animation:mhFloat 3s ease-in-out infinite;}
+.ma-pet.born img{animation:maBorn .8s cubic-bezier(.3,1.6,.5,1);}
+.ma-pet__bar{height:6px;margin:4px 12% 0;border-radius:3px;background:rgba(255,253,248,.7);overflow:hidden;}
+.ma-pet__bar i{display:block;height:100%;border-radius:3px;background:var(--nk-ok-2);}
+@keyframes maBorn{0%{transform:scale(.2) translateY(20%);}70%{transform:scale(1.15);}100%{transform:none;}}
+
+.ma-stars{margin-left:auto;display:flex;gap:4px;}
+.ma-stars i{width:22px;height:22px;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
+  background:rgba(255,253,248,.75);}
+.ma-stars i.on{background:linear-gradient(180deg,#FFE27A,#FFC63F);animation:mhPop .5s cubic-bezier(.3,1.6,.5,1);}
+.ma-wish:empty{display:none;}
