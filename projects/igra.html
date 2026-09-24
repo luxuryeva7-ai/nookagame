@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="theme-color" content="#0E0719">
+<title>Своя игра — Nooka</title>
+<meta name="robots" content="noindex">
+<link href="../fonts/nooka-fonts.css" rel="stylesheet">
+<link rel="stylesheet" href="../games/nooka-ui.css">
+<link rel="stylesheet" href="../games/nooka-workshop.css">
+<script src="../metrika.js" defer></script>
+</head>
+<body class="ws ws-maze">
+<div class="root">
+  <div class="hdr">
+    <button class="hdr-back" id="back" aria-label="Назад">←</button>
+    <div class="hdr-t" id="htitle">Своя игра</div>
+    <div class="hdr-r"></div>
+  </div>
+  <div class="prog"><i id="pbar" style="width:0"></i></div>
+  <div class="body" id="body"></div>
+  <div class="foot" id="foot"></div>
+</div>
+<div class="ovl" id="ovl"></div>
+<div class="sheet" id="sheet">
+  <div class="sheet-h"><div class="sheet-t" id="sheetT"></div><button class="sheet-x" id="sheetX">✕</button></div>
+  <div class="sheet-l" id="sheetL"></div>
+</div>
+<script src="../games/nooka-core.js"></script>
+<script src="../games/nooka-levels.js"></script>
+<script src="../games/nooka-account.js"></script>
+<script src="../games/nooka-access.js"></script>
+<script src="../games/nooka-maze.js"></script>
+</body>
+</html>
