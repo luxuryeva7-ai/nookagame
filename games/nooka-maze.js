@@ -1,0 +1,1270 @@
+/* «Своя игра» — мастерская курса Nooka. Код вынесен из projects/igra.html по правилам репозитория.
+   Связь с курсом: мастерская отмечается сделанной один раз (nooka.completeMission), назад — в хаб игры. */
+var WS_MID='maze1', WS_HUB='../games/game.html?g=control';
+function wsDone(){try{if(window.nooka&&window.nooka.completeMission)window.nooka.completeMission(WS_MID,150)}catch(e){}}
+/* ═══════════ ДАННЫЕ ═══════════ */
+const HEROES=[
+ {id:'fox',n:'лисёнок',a:'лисёнка',g:'лисёнка',sex:'m',c:'#E8863C',d:'#C25E1E',ears:'sharp'},
+ {id:'hog',n:'ёжик',a:'ёжика',g:'ёжика',sex:'m',c:'#9C7A5C',d:'#6E5340',ears:'tiny'},
+ {id:'cat',n:'котёнок',a:'котёнка',g:'котёнка',sex:'m',c:'#8A8A96',d:'#5E5E68',ears:'tri'},
+ {id:'wolf',n:'волчонок',a:'волчонка',g:'волчонка',sex:'m',c:'#7C8794',d:'#535D6A',ears:'sharp'},
+ {id:'drag',n:'дракончик',a:'дракончика',g:'дракончика',sex:'m',c:'#4FA86E',d:'#337A4E',ears:'horn'},
+ {id:'bot',n:'робот',a:'робота',g:'робота',sex:'m',c:'#8C93A8',d:'#636A80',ears:'ant'},
+ {id:'mouse',n:'мышонок',a:'мышонка',g:'мышонка',sex:'m',c:'#B0A3A8',d:'#867A80',ears:'big'},
+ {id:'peng',n:'пингвинёнок',a:'пингвинёнка',g:'пингвинёнка',sex:'m',c:'#3D4453',d:'#252A36',ears:'none'},
+ {id:'turt',n:'черепаха',a:'черепаху',g:'черепахи',sex:'f',c:'#6FA05A',d:'#4E7A3D',ears:'none'},
+ {id:'owl',n:'сова',a:'сову',g:'совы',sex:'f',c:'#A6875F',d:'#7C6244',ears:'tuft'},
+ {id:'panda',n:'панда',a:'панду',g:'панды',sex:'f',c:'#2E2E33',d:'#1A1A1E',ears:'rnd'},
+ {id:'squir',n:'белка',a:'белку',g:'белки',sex:'f',c:'#C46B3A',d:'#964E26',ears:'tuft'},
+];
+const WORLDS=[
+ {id:'forest',n:'старый лес',p:'в старом лесу',g:'старого леса',gp:'из старого леса',wall:'#4A6B42',floor:'#DCCFAE',dark:0},
+ {id:'libr',n:'заброшенная библиотека',p:'в заброшенной библиотеке',g:'библиотеки',gp:'из заброшенной библиотеки',wall:'#6B4A2F',floor:'#D6C2A0',dark:.15},
+ {id:'roofs',n:'крыши ночного города',p:'на крышах города',g:'города',gp:'с крыш города',wall:'#39415A',floor:'#8A93AE',dark:.3},
+ {id:'sea',n:'дно моря',p:'на дне моря',g:'морского дна',gp:'со дна моря',wall:'#1E5A78',floor:'#7FB8CE',dark:.2},
+ {id:'space',n:'космическая станция',p:'на космической станции',g:'станции',gp:'с космической станции',wall:'#2A3050',floor:'#6E7899',dark:.35},
+ {id:'snow',n:'снежная гора',p:'на снежной горе',g:'горы',gp:'со снежной горы',wall:'#A9BACD',floor:'#EDF3F9',dark:0},
+ {id:'ruins',n:'пустыня с руинами',p:'в пустыне среди руин',g:'руин',gp:'из пустыни',wall:'#B8A582',floor:'#E8CFA0',dark:0},
+ {id:'metro',n:'подземный тоннель',p:'в подземном тоннеле',g:'тоннеля',gp:'из подземного тоннеля',wall:'#3A3A47',floor:'#7A7A88',dark:.4},
+];
+const GOALS=[
+ {id:'collect',n:'Собрать всё',ic:'⭐',needItem:1,tpl:(h,w,it)=>`${h.sex==='f'?'Она должна':'Он должен'} собрать все ${it.ap} ${w.p}.`},
+ {id:'deliver',n:'Донести',ic:'📦',needItem:1,tpl:(h,w,it)=>`${h.sex==='f'?'Она должна':'Он должен'} донести ${it.a} до выхода ${w.p}.`},
+ {id:'survive',n:'Продержаться',ic:'🛡',needItem:0,tpl:(h,w)=>`${h.sex==='f'?'Она должна':'Он должен'} продержаться до конца ${w.p}.`},
+ {id:'escape',n:'Найти выход',ic:'🚪',needItem:0,tpl:(h,w)=>`${h.sex==='f'?'Она должна':'Он должен'} найти выход ${w.p}.`},
+ {id:'chase',n:'Догнать',ic:'🏃',needItem:0,tpl:(h,w)=>`${h.sex==='f'?'Она должна':'Он должен'} догнать всех, кто убегает, ${w.p}.`},
+ {id:'score',n:'Набрать очки',ic:'💯',needItem:0,tpl:(h,w)=>`${h.sex==='f'?'Она должна':'Он должен'} набрать 100 очков ${w.p}.`},
+];
+const ITEMS=[
+ {id:'key',n:'старый ключ',a:'старый ключ',ap:'старые ключи',c:'#E8C33C',sh:'key'},
+ {id:'stone',n:'светящийся камень',a:'светящийся камень',ap:'светящиеся камни',c:'#5EC5E8',sh:'gem'},
+ {id:'map',n:'карта',a:'карту',ap:'карты',c:'#EBD9AE',sh:'map'},
+ {id:'letter',n:'письмо',a:'письмо',ap:'письма',c:'#FBF3E2',sh:'env'},
+ {id:'comp',n:'компас',a:'компас',ap:'компасы',c:'#D9C79A',sh:'circ'},
+ {id:'lamp',n:'фонарик',a:'фонарик',ap:'фонарики',c:'#F2C337',sh:'lamp'},
+ {id:'egg',n:'яйцо',a:'яйцо',ap:'яйца',c:'#FBF0DC',sh:'egg'},
+ {id:'seed',n:'семечко',a:'семечко',ap:'семечки',c:'#A8814C',sh:'egg'},
+ {id:'shard',n:'осколок зеркала',a:'осколок зеркала',ap:'осколки зеркала',c:'#C8E4F0',sh:'shard'},
+ {id:'feath',n:'перо',a:'перо',ap:'перья',c:'#E8EDF5',sh:'feath'},
+ {id:'coin',n:'монета',a:'монету',ap:'монеты',c:'#F2C337',sh:'circ'},
+ {id:'box',n:'деревянная коробка',a:'деревянную коробку',ap:'деревянные коробки',c:'#B08A56',sh:'box'},
+];
+const OBST=[
+ {id:'drone',n:'сторожевой дрон',g:'сторожевого дрона',ic:'🛸',mode:'patrol',sp:.8,c:'#8A6BC4'},
+ {id:'spike',n:'колючий шар',g:'колючего шара',ic:'💥',mode:'bounce',sp:1,c:'#D14545'},
+ {id:'shadow',n:'тень',g:'тени',ic:'👻',mode:'chase',sp:.62,c:'#4A4458'},
+ {id:'cloud',n:'злая тучка',g:'злой тучки',ic:'🌩',mode:'sine',sp:.85,c:'#5C6C8A'},
+ {id:'ice',n:'ледяная лужа',g:'ледяной лужи',ic:'🧊',mode:'zone',sp:0,c:'#9AD8EE'},
+ {id:'sand',n:'зыбучий песок',g:'зыбучего песка',ic:'🏜',mode:'zone',sp:0,c:'#D9B681'},
+];
+const HELP=[
+ {id:'magnet',n:'магнит',ic:'🧲',fx:'предметы рядом летят к тебе'},
+ {id:'boost',n:'ускорялка',ic:'⚡',fx:'+35% скорости на 3 секунды'},
+ {id:'shield',n:'щит',ic:'🛡',fx:'одно касание не считается'},
+ {id:'torch',n:'фонарик',ic:'🔦',fx:'видно дальше в темноте'},
+ {id:'firefly',n:'светлячок',ic:'✨',fx:'подсвечивает ближайший предмет'},
+ {id:'freeze',n:'заморозка',ic:'❄️',fx:'все помехи стоят 2 секунды'},
+];
+const SCORE_RULES=[
+ {id:'flat',n:'+10 за каждый предмет'},
+ {id:'time',n:'+10 за предмет, +5 за секунду в запасе'},
+ {id:'combo',n:'+10 за предмет, ×2 за 3 подряд без касаний'},
+ {id:'risk',n:'+25 за предмет, −10 за касание'},
+];
+const LOSE_RULES=[
+ {id:'hits3',n:'3 касания — и всё'},
+ {id:'hits1',n:'одно касание — и всё'},
+ {id:'steal',n:'касание крадёт 5 секунд'},
+ {id:'timeonly',n:'касание тормозит, проигрыш только по времени'},
+];
+const TEMPO={calm:{sp:2.2,n:2,t:'спокойный'},normal:{sp:2.9,n:4,t:'обычный'},fast:{sp:3.5,n:6,t:'быстрый'}};
+const IF_COND=[
+ {id:'c3',ic:'⭐',n:'собрал 3 предмета',when:'соберёшь 3 предмета'},
+ {id:'t10',ic:'⏱',n:'осталось 10 секунд',when:'останется 10 секунд'},
+ {id:'hit',ic:'💢',n:'коснулся помехи',when:'коснёшься помехи'},
+ {id:'help',ic:'🎁',n:'подобрал помощника',when:'подберёшь помощника'},
+ {id:'half',ic:'🗺',n:'прошёл половину',when:'пройдёшь половину карты'},
+ {id:'idle',ic:'🧍',n:'стоишь 2 секунды',when:'постоишь на месте 2 секунды'},
+];
+const IF_THEN=[
+ {id:'freeze',ic:'❄️',n:'помехи замирают',then:'все помехи замрут на 3 секунды'},
+ {id:'more',ic:'✨',n:'ещё 3 предмета',then:'появятся ещё 3 предмета'},
+ {id:'fast',ic:'⚡',n:'ускорение',then:'герой ускорится до конца'},
+ {id:'time',ic:'⏱',n:'+15 секунд',then:'добавится 15 секунд'},
+ {id:'path',ic:'🚪',n:'короткий путь',then:'откроется короткий путь'},
+ {id:'pull',ic:'🧲',n:'предметы летят',then:'все предметы полетят к герою'},
+];
+const PALETTES=[
+ {id:'warm',bg:'#FFE9D0',ac:'#E65C00'},{id:'night',bg:'#26304F',ac:'#7FA8FF'},
+ {id:'mint',bg:'#DDF3E8',ac:'#189E70'},{id:'berry',bg:'#FBE3EF',ac:'#C43D7E'},
+];
+
+/* ═══════════ СОСТОЯНИЕ ═══════════ */
+const S={step:'s0',name:'',hero:null,goal:null,world:null,item:null,obst:null,help:null,
+ tempo:'normal',scoreRule:SCORE_RULES[0],loseRule:LOSE_RULES[0],ifCond:null,ifThen:null,
+ title:'',palette:PALETTES[0],cover:'start',seed:1234,record:0,lastScore:0,lastGot:0,
+abRound:0,abPair:null,abResults:{},decisions:0,frames:{},story:'',ending:'',runs:0,tab:'in'};
+const STEPS=['s0','s1','s2','s3','s4','s5','s6'];
+
+/* ═══════════ УТИЛИТЫ ═══════════ */
+const $=id=>document.getElementById(id);
+const B=()=>$('body'), F=()=>$('foot');
+function rng(seed){let s=seed>>>0;return()=>{s=(s+0x6D2B79F5)>>>0;let t=s;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
+function rint(r,a,b){return a+Math.floor(r()*(b-a+1))}
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
+function toast(t){const e=document.createElement('div');e.className='toast';e.textContent=t;document.body.appendChild(e);setTimeout(()=>e.remove(),2200)}
+
+
+/* ═══════════ РИСОВАНИЕ СПРАЙТОВ ═══════════ */
+function drawHero(ctx,x,y,r,h,gray){
+  const c=gray?'#9A9A9A':h.c, d=gray?'#6E6E6E':h.d;
+  ctx.save();ctx.translate(x,y);
+  ctx.fillStyle='rgba(0,0,0,.18)';ctx.beginPath();ctx.ellipse(0,r*.85,r*.8,r*.28,0,0,7);ctx.fill();
+  // уши
+  ctx.fillStyle=d;
+  const E=h?h.ears:'none';
+  if(E==='sharp'){[-1,1].forEach(s=>{ctx.beginPath();ctx.moveTo(s*r*.45,-r*.55);ctx.lineTo(s*r*.75,-r*1.35);ctx.lineTo(s*r*.05,-r*.75);ctx.closePath();ctx.fill()})}
+  if(E==='tri'){[-1,1].forEach(s=>{ctx.beginPath();ctx.moveTo(s*r*.4,-r*.6);ctx.lineTo(s*r*.68,-r*1.2);ctx.lineTo(s*r*.02,-r*.8);ctx.closePath();ctx.fill()})}
+  if(E==='big'){[-1,1].forEach(s=>{ctx.beginPath();ctx.arc(s*r*.72,-r*.62,r*.42,0,7);ctx.fill()})}
+  if(E==='rnd'){[-1,1].forEach(s=>{ctx.beginPath();ctx.arc(s*r*.62,-r*.7,r*.32,0,7);ctx.fill()})}
+  if(E==='tuft'){[-1,1].forEach(s=>{ctx.beginPath();ctx.moveTo(s*r*.4,-r*.62);ctx.lineTo(s*r*.6,-r*1.15);ctx.lineTo(s*r*.05,-r*.8);ctx.closePath();ctx.fill()})}
+  if(E==='tiny'){[-1,1].forEach(s=>{ctx.beginPath();ctx.arc(s*r*.45,-r*.6,r*.18,0,7);ctx.fill()})}
+  if(E==='horn'){[-1,1].forEach(s=>{ctx.beginPath();ctx.moveTo(s*r*.35,-r*.62);ctx.quadraticCurveTo(s*r*.7,-r*1.3,s*r*.2,-r*.95);ctx.closePath();ctx.fill()})}
+  if(E==='ant'){ctx.strokeStyle=d;ctx.lineWidth=r*.12;ctx.beginPath();ctx.moveTo(0,-r*.7);ctx.lineTo(0,-r*1.2);ctx.stroke();ctx.beginPath();ctx.arc(0,-r*1.32,r*.16,0,7);ctx.fill()}
+  // тело
+  ctx.fillStyle=c;ctx.beginPath();ctx.arc(0,0,r,0,7);ctx.fill();
+  // глаза
+  if(!gray){
+    ctx.fillStyle='#fff';[-1,1].forEach(s=>{ctx.beginPath();ctx.arc(s*r*.34,-r*.1,r*.26,0,7);ctx.fill()});
+    ctx.fillStyle='#22201E';[-1,1].forEach(s=>{ctx.beginPath();ctx.arc(s*r*.34,-r*.08,r*.14,0,7);ctx.fill()});
+  }
+  ctx.restore();
+}
+function drawItem(ctx,x,y,r,it){
+  ctx.save();ctx.translate(x,y);ctx.fillStyle=it.c;
+  ctx.shadowColor='rgba(0,0,0,.25)';ctx.shadowBlur=4;ctx.shadowOffsetY=1;
+  const S1=it.sh;
+  if(S1==='circ'){ctx.beginPath();ctx.arc(0,0,r,0,7);ctx.fill()}
+  else if(S1==='gem'){ctx.beginPath();ctx.moveTo(0,-r);ctx.lineTo(r*.85,-r*.2);ctx.lineTo(r*.5,r);ctx.lineTo(-r*.5,r);ctx.lineTo(-r*.85,-r*.2);ctx.closePath();ctx.fill()}
+  else if(S1==='key'){ctx.beginPath();ctx.arc(-r*.4,0,r*.5,0,7);ctx.fill();ctx.fillRect(-r*.1,-r*.18,r*1.1,r*.36);ctx.fillRect(r*.6,0,r*.22,r*.4)}
+  else if(S1==='box'){ctx.fillRect(-r,-r*.7,r*2,r*1.4);ctx.fillStyle='rgba(0,0,0,.2)';ctx.fillRect(-r,-r*.12,r*2,r*.24)}
+  else if(S1==='env'){ctx.fillRect(-r,-r*.65,r*2,r*1.3);ctx.strokeStyle='rgba(0,0,0,.3)';ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(-r,-r*.65);ctx.lineTo(0,r*.1);ctx.lineTo(r,-r*.65);ctx.stroke()}
+  else if(S1==='egg'){ctx.beginPath();ctx.ellipse(0,0,r*.75,r,0,0,7);ctx.fill()}
+  else if(S1==='map'){ctx.beginPath();ctx.moveTo(-r,-r*.6);ctx.lineTo(-r*.3,-r*.35);ctx.lineTo(r*.3,-r*.6);ctx.lineTo(r,-r*.35);ctx.lineTo(r,r*.6);ctx.lineTo(r*.3,r*.35);ctx.lineTo(-r*.3,r*.6);ctx.lineTo(-r,r*.35);ctx.closePath();ctx.fill()}
+  else if(S1==='shard'){ctx.beginPath();ctx.moveTo(-r*.6,-r);ctx.lineTo(r*.7,-r*.4);ctx.lineTo(r*.3,r);ctx.lineTo(-r*.5,r*.3);ctx.closePath();ctx.fill()}
+  else if(S1==='feath'){ctx.beginPath();ctx.ellipse(0,0,r*.45,r,0,0,7);ctx.fill()}
+  else if(S1==='lamp'){ctx.fillRect(-r*.35,-r*.3,r*.7,r*1.1);ctx.beginPath();ctx.moveTo(-r*.6,-r*.3);ctx.lineTo(r*.6,-r*.3);ctx.lineTo(r*.3,-r*.85);ctx.lineTo(-r*.3,-r*.85);ctx.closePath();ctx.fill()}
+  ctx.restore();
+}
+function drawObst(ctx,x,y,r,o,tick){
+  ctx.save();ctx.translate(x,y);
+  ctx.fillStyle=o.c;ctx.shadowColor='rgba(0,0,0,.3)';ctx.shadowBlur=5;
+  if(o.mode==='zone'){ctx.globalAlpha=.62;ctx.beginPath();ctx.arc(0,0,r*1.25,0,7);ctx.fill();
+    ctx.globalAlpha=.3;ctx.beginPath();ctx.arc(0,0,r*1.25*(0.7+0.3*Math.sin(tick/22)),0,7);ctx.fill()}
+  else if(o.mode==='bounce'){const sp=8;ctx.beginPath();
+    for(let i=0;i<sp*2;i++){const a=i*Math.PI/sp,rr=i%2?r*.55:r;ctx.lineTo(Math.cos(a)*rr,Math.sin(a)*rr)}
+    ctx.closePath();ctx.fill()}
+  else{ctx.beginPath();ctx.arc(0,0,r,0,7);ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,.85)';[-1,1].forEach(s=>{ctx.beginPath();ctx.arc(s*r*.32,-r*.08,r*.18,0,7);ctx.fill()});
+    ctx.fillStyle='#22201E';[-1,1].forEach(s=>{ctx.beginPath();ctx.arc(s*r*.32,-r*.06,r*.09,0,7);ctx.fill()})}
+  ctx.restore();
+}
+function drawHelp(ctx,x,y,r,h,tick){
+  ctx.save();ctx.translate(x,y+Math.sin(tick/18)*r*.14);
+  ctx.fillStyle='rgba(255,216,77,.35)';ctx.beginPath();ctx.arc(0,0,r*1.5,0,7);ctx.fill();
+  ctx.font=Math.round(r*1.8)+'px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(h.ic,0,0);ctx.restore();
+}
+
+/* ═══════════ ГЕНЕРАЦИЯ УРОВНЯ ═══════════ */
+const N=24;            // карта вчетверо больше прежней
+const VIEW=11;         // сколько клеток помещается на экране
+function genLevel(seed,itemCount){
+  for(let att=0;att<12;att++){
+    const r=rng(seed+att*7919);
+    const g=[];for(let y=0;y<N;y++){g.push([]);for(let x=0;x<N;x++)g[y].push(0)}
+    // рамка
+    for(let i=0;i<N;i++){g[0][i]=1;g[N-1][i]=1;g[i][0]=1;g[i][N-1]=1}
+    // блоки
+    const blocks=rint(r,64,96);
+    for(let i=0;i<blocks;i++){
+      const bx=rint(r,2,N-3),by=rint(r,2,N-3),len=rint(r,1,3),hor=r()>.5;
+      for(let k=0;k<len;k++){const x=hor?bx+k:bx,y=hor?by:by+k;
+        if(x>0&&x<N-1&&y>0&&y<N-1)g[y][x]=1}
+    }
+    const start={x:1,y:1};g[1][1]=0;g[1][2]=0;g[2][1]=0;
+    // предметы в проходимых клетках
+    const free=[];for(let y=1;y<N-1;y++)for(let x=1;x<N-1;x++)if(!g[y][x]&&!(x<3&&y<3))free.push({x,y});
+    if(free.length<itemCount+8)continue;
+    const dist=bfsDist(g,start);
+    const reach=free.filter(c=>dist[c.y][c.x]>=0);
+    if(reach.length<itemCount+3)continue;
+    // перемешиваем и берём
+    for(let i=reach.length-1;i>0;i--){const j=rint(r,0,i);[reach[i],reach[j]]=[reach[j],reach[i]]}
+    const items=reach.slice(0,itemCount).map(c=>({x:c.x+.5,y:c.y+.5,got:0}));
+    const exitC=reach[reach.length-1];
+    const helpC=reach[itemCount]||reach[0];
+    return {grid:g,start,items,exit:{x:exitC.x+.5,y:exitC.y+.5},help:{x:helpC.x+.5,y:helpC.y+.5,got:0},free:reach};
+  }
+  return null;
+}
+function bfsDist(g,from){
+  const d=[];for(let y=0;y<N;y++){d.push([]);for(let x=0;x<N;x++)d[y].push(-1)}
+  d[from.y][from.x]=0;const q=[from];
+  while(q.length){const c=q.shift();
+    [[1,0],[-1,0],[0,1],[0,-1]].forEach(([dx,dy])=>{
+      const x=c.x+dx,y=c.y+dy;
+      if(x>=0&&y>=0&&x<N&&y<N&&!g[y][x]&&d[y][x]<0){d[y][x]=d[c.y][c.x]+1;q.push({x,y})}})}
+  return d;
+}
+
+/* ═══════════ ИГРОВОЙ ДВИЖОК ═══════════ */
+const G={raf:0,run:0,acc:0,last:0,tick:0,onEnd:null};
+function startGame(cfg){
+  stopGame();
+  const wrap=$('arena');if(!wrap)return;
+  const size=Math.min(360,window.innerWidth-24,Math.max(240,window.innerHeight-300));
+  const dpr=Math.min(2,window.devicePixelRatio||1);
+  const cv=$('cv');cv.width=size*dpr;cv.height=size*dpr;cv.style.width=size+'px';cv.style.height=size+'px';
+  const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
+  const cell=size/VIEW;   // клетка считается от окна обзора, а не от всей карты
+  const W=cfg.world||WORLDS[0], H=cfg.hero, T=TEMPO[cfg.tempo||'normal'];
+  const itemCount=cfg.gray?0:(cfg.itemCount!==undefined?cfg.itemCount:14);
+  const lvl=cfg.gray?{grid:emptyGrid(),start:{x:5,y:5},items:[],exit:null,help:null,free:[]}
+                    :genLevel(cfg.seed||1234,itemCount);
+  if(!lvl)return;
+
+  const st={
+    p:{x:lvl.start.x+.5,y:lvl.start.y+.5,vx:0,vy:0},
+    target:null, items:lvl.items.slice(), help:lvl.help, exit:lvl.exit,
+    obs:[], score:0, got:0, hits:0, left:cfg.dur||45, over:0, win:0,
+    combo:0, boost:0, frozen:0, shield:0, ruleFired:0, idleT:0, extraSpeed:0, inv:0,
+    flash:0, shake:0, carried:0, face:0, lean:0, moving:0, trail:[], parts:[], pops:[],
+    intro:1.1, vx:0, vy:0,
+  };
+  // помехи
+  if(cfg.obst&&!cfg.gray){
+    const r=rng((cfg.seed||1234)*31);
+    const far=lvl.free.filter(c=>Math.hypot(c.x-lvl.start.x,c.y-lvl.start.y)>5);
+    const pool=far.length>=T.n?far:lvl.free;
+    for(let i=0;i<T.n;i++){
+      const c=pool[rint(r,0,pool.length-1)];
+      st.obs.push({x:c.x+.5,y:c.y+.5,ox:c.x+.5,oy:c.y+.5,a:r()*6.28,dir:r()>.5?1:-1,ph:r()*6.28,hunt:3});
+    }
+  }
+  G.cfg=cfg;G.st=st;G.lvl=lvl;G.ctx=ctx;G.cell=cell;G.size=size;G.W=W;G.H=H;G.T=T;
+  G.cam={x:st.p.x,y:st.p.y};   // камера едет за героем
+  G.run=1;G.acc=0;G.last=performance.now();G.tick=0;
+
+  // управление
+  const pos=e=>{const r=cv.getBoundingClientRect();const t=e.touches?e.touches[0]:e;
+    // экранная точка → мировая координата с учётом камеры
+    return {x:(t.clientX-r.left)/cell+G.cam.x-VIEW/2, y:(t.clientY-r.top)/cell+G.cam.y-VIEW/2}};
+  const down=e=>{e.preventDefault();st.target=pos(e)};
+  const move=e=>{if(st.target){e.preventDefault();st.target=pos(e)}};
+  const up=()=>{st.target=null};
+  cv.onpointerdown=down;cv.onpointermove=move;cv.onpointerup=up;cv.onpointercancel=up;
+  G.keys={};
+  G.kd=e=>{G.keys[e.key.toLowerCase()]=1};G.ku=e=>{G.keys[e.key.toLowerCase()]=0};
+  addEventListener('keydown',G.kd);addEventListener('keyup',G.ku);
+
+  G.onEnd=cfg.onEnd;
+  draw();          // первый кадр сразу — поле видно, не дожидаясь rAF
+  updHUD();
+  G.raf=requestAnimationFrame(loop);
+}
+function emptyGrid(){const g=[];for(let y=0;y<N;y++){g.push([]);for(let x=0;x<N;x++)g[y].push(y===0||x===0||y===N-1||x===N-1?1:0)}return g}
+function stopGame(){
+  if(G.raf)cancelAnimationFrame(G.raf);G.raf=0;G.run=0;
+  if(G.kd){removeEventListener('keydown',G.kd);removeEventListener('keyup',G.ku);G.kd=null}
+}
+function loop(t){
+  if(!G.run)return;
+  const dt=Math.min((t-G.last)/1000,.05);G.last=t;G.acc+=dt;
+  let n=0;while(G.acc>=1/60&&n<3){step(1/60);G.acc-=1/60;n++;G.tick++}
+  if(G.acc>1/60)G.acc=0;
+  draw();
+  if(G.run)G.raf=requestAnimationFrame(loop);
+}
+function step(dt){
+  const st=G.st,cfg=G.cfg,T=G.T,lvl=G.lvl;
+  if(st.over)return;
+  if(st.intro>0){st.intro-=dt;stepFx(st,dt);return}   // «три-два-один» до старта
+  st.left-=dt;
+  if(st.left<=0){st.left=0;endGame(cfg.goal&&cfg.goal.id==='survive');return}
+
+  // движение героя
+  let dx=0,dy=0;
+  if(st.target){dx=st.target.x-st.p.x;dy=st.target.y-st.p.y;
+    const d=Math.hypot(dx,dy);
+    if(d<.25){dx=dy=0}else{dx/=d;dy/=d}}
+  const K=G.keys||{};
+  if(K['arrowleft']||K['a'])dx=-1;if(K['arrowright']||K['d'])dx=1;
+  if(K['arrowup']||K['w'])dy=-1;if(K['arrowdown']||K['s'])dy=1;
+  if(dx||dy){const m=Math.hypot(dx,dy)||1;dx/=m;dy/=m;st.idleT=0}else st.idleT+=dt;
+
+  let sp=(T.sp/30)*(1+st.extraSpeed);
+  if(st.boost>0){sp*=1.35;st.boost-=dt}
+  // разгон и торможение: движение перестаёт быть «включил-выключил»
+  const acc=dx||dy?14:11;
+  st.vx+=((dx*sp)-st.vx)*Math.min(1,acc*dt);
+  st.vy+=((dy*sp)-st.vy)*Math.min(1,acc*dt);
+  const spd=Math.hypot(st.vx,st.vy);
+  if(spd>0.004){st.face=Math.atan2(st.vy,st.vx);st.moving=1}else st.moving=0;
+  st.lean=(st.lean||0)+((spd*46)-(st.lean||0))*Math.min(1,10*dt);
+  // след за героем на скорости
+  st.trail=st.trail||[];
+  if(spd>0.028){st.trail.push({x:st.p.x,y:st.p.y,t:1});if(st.trail.length>7)st.trail.shift()}
+  st.trail.forEach(p=>p.t-=dt*3.1);
+  st.trail=st.trail.filter(p=>p.t>0);
+  dx=st.vx/sp||0; dy=st.vy/sp||0;
+  // зоны замедления
+  st.obs.forEach(o=>{const ob=cfg.obst;if(ob&&ob.mode==='zone'&&Math.hypot(o.x-st.p.x,o.y-st.p.y)<1.1)sp*=.5});
+
+  moveWithWalls(st.p,dx*sp,dy*sp,lvl.grid);
+
+  // помехи
+  if(st.frozen>0)st.frozen-=dt;
+  else st.obs.forEach(o=>{
+    const ob=cfg.obst;if(!ob)return;
+    const osp=(T.sp/30)*ob.sp;
+    if(ob.mode==='patrol'){o.a+=dt*1.1*o.dir;
+      const nx=o.ox+Math.cos(o.a)*1.6,ny=o.oy+Math.sin(o.a)*1.6;
+      if(!solid(lvl.grid,nx,ny)){o.x=nx;o.y=ny}else o.dir*=-1}
+    else if(ob.mode==='bounce'){
+      const nx=o.x+Math.cos(o.a)*osp,ny=o.y+Math.sin(o.a)*osp;
+      if(solid(lvl.grid,nx,o.y))o.a=Math.PI-o.a;
+      else if(solid(lvl.grid,o.x,ny))o.a=-o.a;
+      else{o.x=nx;o.y=ny}}
+    else if(ob.mode==='chase'){
+      o.hunt=(o.hunt===undefined?3:o.hunt)-dt;
+      const d=Math.hypot(st.p.x-o.x,st.p.y-o.y);
+      if(o.hunt>0){
+        if(d>.1)moveWithWalls(o,(st.p.x-o.x)/d*osp,(st.p.y-o.y)/d*osp,lvl.grid);
+        if(d>5.5)o.hunt=3;                       // потеряла из виду — сбрасывает охоту
+      }else{
+        // след потерян: бродит вслепую 2.5 секунды
+        o.wa=(o.wa||0)+dt;
+        if(o.wa>2.5){o.wa=0;o.hunt=3}
+        o.wd=o.wd||Math.random()*6.283;
+        if(!moveWithWalls(o,Math.cos(o.wd)*osp*.6,Math.sin(o.wd)*osp*.6,lvl.grid))o.wd+=2.1;
+      }}
+    else if(ob.mode==='sine'){o.ph+=dt*1.6;
+      const nx=o.ox+Math.sin(o.ph)*2.2,ny=o.oy+Math.cos(o.ph*.7)*1.4;
+      if(!solid(lvl.grid,nx,ny)){o.x=nx;o.y=ny}}
+  });
+
+  // сбор предметов
+  const pull=st.ruleFired&&cfg.ifThen&&cfg.ifThen.id==='pull';
+  st.items.forEach(it=>{
+    if(it.got)return;
+    if(pull||(cfg.help&&cfg.help.id==='magnet')){
+      const d=Math.hypot(it.x-st.p.x,it.y-st.p.y);
+      if(d<(pull?99:2.2)&&d>.05){it.x+=(st.p.x-it.x)/d*.09;it.y+=(st.p.y-it.y)/d*.09}}
+    if(Math.hypot(it.x-st.p.x,it.y-st.p.y)<.62){
+      const sBefore=st.score;
+      it.got=1;st.got++;st.combo++;st.carried++;
+      burst(st,it.x,it.y,cfg.item?cfg.item.c:'#F2C337',12);
+      const R=cfg.scoreRule?cfg.scoreRule.id:'flat';
+      if(R==='flat')st.score+=10;
+      else if(R==='time')st.score+=10;
+      else if(R==='combo')st.score+=st.combo>=3?20:10;
+      else if(R==='risk')st.score+=25;
+      st.flash=8;
+      st.pops=st.pops||[];
+      st.pops.push({x:it.x,y:it.y-.25,t:1,v:'+'+(st.score-sBefore)});
+    }});
+  // помощник
+  if(st.help&&!st.help.got&&Math.hypot(st.help.x-st.p.x,st.help.y-st.p.y)<.62){
+    st.help.got=1;st.flash=10;
+    const h=cfg.help?cfg.help.id:'';
+    if(h==='boost')st.boost=3;
+    if(h==='shield')st.shield=1;
+    if(h==='freeze')st.frozen=2;
+    checkRule('help');
+  }
+  // касание помехи
+  if(st.inv>0)st.inv-=dt;
+  if(cfg.obst&&!st.over&&st.inv<=0){
+    st.obs.forEach(o=>{
+      if(o.cool>0){o.cool-=dt;return}
+      if(Math.hypot(o.x-st.p.x,o.y-st.p.y)<.68){
+        o.cool=1.2;
+        if(st.shield){st.shield=0;st.flash=10;return}
+        st.hits++;st.combo=0;st.shake=14;st.inv=1.5;   // передышка после удара
+        burst(st,st.p.x,st.p.y,'#D93030',10);
+        const L=cfg.loseRule?cfg.loseRule.id:'hits3';
+        if(cfg.scoreRule&&cfg.scoreRule.id==='risk')st.score=Math.max(0,st.score-10);
+        if(L==='hits1'){endGame(0);return}
+        if(L==='hits3'&&st.hits>=3){endGame(0);return}
+        if(L==='steal')st.left=Math.max(0,st.left-5);
+        checkRule('hit');
+      }});
+  }
+  // выход / цель
+  const goal=cfg.goal?cfg.goal.id:'collect';
+  if(goal==='collect'&&st.items.length&&st.items.every(i=>i.got))endGame(1);
+  if(goal==='score'&&st.score>=100)endGame(1);
+  if((goal==='escape'||goal==='deliver')&&st.exit){
+    const ok=goal==='escape'||st.carried>0;
+    if(ok&&Math.hypot(st.exit.x-st.p.x,st.exit.y-st.p.y)<.7)endGame(1);
+  }
+  // правило ЕСЛИ→ТО
+  if(cfg.ifCond&&!st.ruleFired){
+    const c=cfg.ifCond.id;
+    if(c==='c3'&&st.got>=3)fireRule();
+    if(c==='t10'&&st.left<=10)fireRule();
+    if(c==='half'&&st.items.length&&st.got>=Math.ceil(st.items.length/2))fireRule();
+    if(c==='idle'&&st.idleT>=2)fireRule();
+  }
+  // камера мягко следует за героем и не выезжает за край карты
+  const half=VIEW/2;
+  const tx=Math.max(half,Math.min(N-half,st.p.x));
+  const ty=Math.max(half,Math.min(N-half,st.p.y));
+  G.cam.x+=(tx-G.cam.x)*Math.min(1,7*dt);
+  G.cam.y+=(ty-G.cam.y)*Math.min(1,7*dt);
+  stepFx(st,dt);
+  if(st.flash>0)st.flash--;
+  if(st.shake>0)st.shake--;
+  updHUD();
+}
+/* короткие частицы: сбор, урон, срабатывание правила */
+function burst(st,x,y,color,n){
+  st.parts=st.parts||[];
+  for(let i=0;i<n;i++){
+    const a=Math.random()*6.283, v=.03+Math.random()*.07;
+    st.parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-.02,t:1,c:color,r:.06+Math.random()*.07});
+  }
+  if(st.parts.length>90)st.parts.splice(0,st.parts.length-90);
+}
+function stepFx(st,dt){
+  (st.parts||[]).forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=dt*.55;p.t-=dt*1.9});
+  st.parts=(st.parts||[]).filter(p=>p.t>0);
+  (st.pops||[]).forEach(p=>{p.y-=dt*1.15;p.t-=dt*1.15});
+  st.pops=(st.pops||[]).filter(p=>p.t>0);
+}
+function checkRule(kind){
+  const cfg=G.cfg,st=G.st;
+  if(!cfg.ifCond||st.ruleFired)return;
+  if(cfg.ifCond.id==='hit'&&kind==='hit')fireRule();
+  if(cfg.ifCond.id==='help'&&kind==='help')fireRule();
+}
+function fireRule(){
+  const cfg=G.cfg,st=G.st;
+  st.ruleFired=1;st.flash=20;st.shake=18;
+  for(let k=0;k<3;k++)burst(st,st.p.x,st.p.y,'#7B2FFF',14);
+  const t=cfg.ifThen?cfg.ifThen.id:'';
+  if(t==='freeze')st.frozen=3;
+  if(t==='fast')st.extraSpeed=.5;
+  if(t==='time')st.left+=15;
+  if(t==='more'){const r=rng(Date.now()&0xffff);
+    for(let i=0;i<3;i++){const c=G.lvl.free[rint(r,0,G.lvl.free.length-1)];
+      st.items.push({x:c.x+.5,y:c.y+.5,got:0})}}
+  if(t==='path'){const g=G.lvl.grid;for(let y=1;y<N-1;y++)for(let x=1;x<N-1;x++)if(g[y][x]&&Math.random()<.12)g[y][x]=0}
+  const bar=$('rulebar');
+  if(bar&&cfg.ifCond&&cfg.ifThen){bar.textContent='⚡ '+cap(cfg.ifThen.then)+'!';bar.style.color='var(--acc)';
+    setTimeout(()=>{if(bar)bar.style.color='var(--ink3)'},1600)}
+}
+function solid(g,x,y){const cx=Math.floor(x),cy=Math.floor(y);
+  if(cx<0||cy<0||cx>=N||cy>=N)return 1;return g[cy][cx]}
+function moveWithWalls(p,dx,dy,g){
+  const R=.34; let moved=false;
+  if(dx){const nx=p.x+dx;
+    if(!solid(g,nx+Math.sign(dx)*R,p.y-R*.9)&&!solid(g,nx+Math.sign(dx)*R,p.y+R*.9)){p.x=nx;moved=true}}
+  if(dy){const ny=p.y+dy;
+    if(!solid(g,p.x-R*.9,ny+Math.sign(dy)*R)&&!solid(g,p.x+R*.9,ny+Math.sign(dy)*R)){p.y=ny;moved=true}}
+  return moved;
+}
+function endGame(win){
+  const st=G.st,cfg=G.cfg;
+  if(st.over)return;
+  st.over=1;st.win=win?1:0;
+  if(cfg.scoreRule&&cfg.scoreRule.id==='time'&&win)st.score+=Math.floor(st.left)*5;
+  if(win)
+  G.run=0;
+  captureFrame('finish');
+  setTimeout(()=>{stopGame();G.onEnd&&G.onEnd(st)},420);
+}
+function updHUD(){
+  const st=G.st,h=$('hud');if(!h||!st)return;
+  const cfg=G.cfg;
+  const hearts=cfg.loseRule&&cfg.loseRule.id==='hits3'?'♥'.repeat(Math.max(0,3-st.hits))+'♡'.repeat(Math.min(3,st.hits))
+    :cfg.loseRule&&cfg.loseRule.id==='hits1'?(st.hits?'♡':'♥'):'';
+  h.innerHTML=`<span>⏱ ${Math.floor(st.left/60)}:${String(Math.floor(st.left%60)).padStart(2,'0')}</span>`
+    +(cfg.gray?'':`<span>⭐ ${st.score}</span>`)
+    +(hearts?`<span>${hearts}</span>`:'');
+}
+function draw(){
+  const {ctx,cell,size,W,H,st,cfg,lvl}=G;
+  if(!ctx)return;
+  ctx.save();
+  if(st.shake>0){ctx.translate((Math.random()-.5)*st.shake*.5,(Math.random()-.5)*st.shake*.5)}
+  const camX=G.cam.x-VIEW/2, camY=G.cam.y-VIEW/2;
+  ctx.save();
+  ctx.translate(-camX*cell,-camY*cell);   // мир едет под камеру
+  // пол — по всей карте
+  ctx.fillStyle=cfg.gray?'#D8D8D8':W.floor;ctx.fillRect(0,0,N*cell,N*cell);
+  // сетка — только в видимом окне, иначе тысячи линий впустую
+  ctx.strokeStyle='rgba(0,0,0,.05)';ctx.lineWidth=1;
+  const gx0=Math.max(0,Math.floor(camX)), gx1=Math.min(N,Math.ceil(camX+VIEW)+1);
+  const gy0=Math.max(0,Math.floor(camY)), gy1=Math.min(N,Math.ceil(camY+VIEW)+1);
+  for(let i=gx0;i<=gx1;i++){ctx.beginPath();ctx.moveTo(i*cell,gy0*cell);ctx.lineTo(i*cell,gy1*cell);ctx.stroke()}
+  for(let i=gy0;i<=gy1;i++){ctx.beginPath();ctx.moveTo(gx0*cell,i*cell);ctx.lineTo(gx1*cell,i*cell);ctx.stroke()}
+  // стены: тень под блоком, тело, светлая верхняя грань — плоские квадраты читались как заглушка
+  const wallC=cfg.gray?'#B4B4B4':W.wall;
+  const rr=cell*.2, lift=cell*.13;
+  const shade=(hex,k)=>{const p=h=>parseInt(h,16);
+    const r0=p(hex.slice(1,3)),g0=p(hex.slice(3,5)),b0=p(hex.slice(5,7));
+    const c=v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0');
+    return '#'+c(r0*k)+c(g0*k)+c(b0*k)};
+  const rbox=(px,py,w,h,r)=>{ctx.beginPath();
+    ctx.moveTo(px+r,py);ctx.arcTo(px+w,py,px+w,py+h,r);
+    ctx.arcTo(px+w,py+h,px,py+h,r);ctx.arcTo(px,py+h,px,py,r);
+    ctx.arcTo(px,py,px+w,py,r);ctx.closePath()};
+  for(let y=gy0;y<gy1;y++)for(let x=gx0;x<gx1;x++)if(lvl.grid[y]&&lvl.grid[y][x]){
+    const px=x*cell,py=y*cell;
+    ctx.fillStyle='rgba(0,0,0,.16)';rbox(px+1,py+3,cell-2,cell-2,rr);ctx.fill();
+    ctx.fillStyle=shade(wallC,.82);rbox(px,py,cell,cell,rr);ctx.fill();
+    ctx.fillStyle=wallC;rbox(px,py-lift*.35,cell,cell-lift*.2,rr);ctx.fill();
+    ctx.fillStyle=shade(wallC,1.22);rbox(px+cell*.13,py-lift*.2,cell*.74,cell*.3,rr*.7);ctx.fill();
+  }
+  // выход
+  if(st.exit&&cfg.goal&&(cfg.goal.id==='escape'||cfg.goal.id==='deliver')){
+    ctx.fillStyle='rgba(78,217,155,.55)';ctx.fillRect((st.exit.x-.42)*cell,(st.exit.y-.42)*cell,cell*.84,cell*.84);
+    ctx.font=Math.round(cell*.6)+'px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('🚪',st.exit.x*cell,st.exit.y*cell);
+  }
+  // предметы
+  if(cfg.item)st.items.forEach((it,k)=>{if(it.got)return;
+    const ph=G.tick*.055+k*1.3;
+    const bob=Math.sin(ph)*cell*.07;
+    ctx.save();
+    ctx.globalAlpha=.28;ctx.fillStyle=cfg.item.c;
+    ctx.beginPath();ctx.ellipse(it.x*cell,it.y*cell+cell*.24,cell*.2,cell*.07,0,0,7);ctx.fill();
+    ctx.globalAlpha=1;
+    drawItem(ctx,it.x*cell,it.y*cell+bob,cell*.28*(1+Math.sin(ph)*.05),cfg.item);
+    ctx.restore()});
+  // помощник
+  if(st.help&&!st.help.got&&cfg.help)drawHelp(ctx,st.help.x*cell,st.help.y*cell,cell*.3,cfg.help,G.tick);
+  // помехи
+  if(cfg.obst)st.obs.forEach(o=>drawObst(ctx,o.x*cell,o.y*cell,cell*.34,cfg.obst,G.tick));
+  // след героя на скорости
+  (st.trail||[]).forEach(p=>{ctx.save();ctx.globalAlpha=p.t*.2;
+    ctx.fillStyle=cfg.gray?'#9A9A9A':H.c;
+    ctx.beginPath();ctx.arc(p.x*cell,p.y*cell,cell*.3*p.t,0,7);ctx.fill();ctx.restore()});
+  // герой: слегка наклоняется в сторону бега
+  ctx.save();
+  ctx.translate(st.p.x*cell,st.p.y*cell);
+  if(st.moving)ctx.rotate(Math.cos(st.face)*Math.min(.16,(st.lean||0)*.006));
+  if(st.inv>0)ctx.globalAlpha=.45+Math.abs(Math.sin(G.tick*.35))*.55;   // мигает, пока неуязвим
+  drawHero(ctx,0,0,cell*.34,H,cfg.gray);
+  ctx.restore();
+  // частицы
+  (st.parts||[]).forEach(p=>{ctx.save();ctx.globalAlpha=Math.max(0,p.t);
+    ctx.fillStyle=p.c;ctx.beginPath();ctx.arc(p.x*cell,p.y*cell,p.r*cell*p.t,0,7);ctx.fill();ctx.restore()});
+  // всплывающие очки
+  (st.pops||[]).forEach(p=>{ctx.save();ctx.globalAlpha=Math.max(0,p.t);
+    ctx.fillStyle='#fff';ctx.strokeStyle='rgba(0,0,0,.35)';ctx.lineWidth=3;
+    ctx.font='800 '+Math.round(cell*.42)+'px Nunito, system-ui';ctx.textAlign='center';
+    ctx.strokeText(p.v,p.x*cell,p.y*cell);ctx.fillText(p.v,p.x*cell,p.y*cell);ctx.restore()});
+  ctx.restore();   // конец мировых координат — дальше экранные эффекты
+  // виньетка по краям экрана
+  const vg=ctx.createRadialGradient(size/2,size/2,size*.3,size/2,size/2,size*.8);
+  vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.16)');
+  ctx.fillStyle=vg;ctx.fillRect(0,0,size,size);
+  // темнота
+  const dk=cfg.gray?0:W.dark*(cfg.help&&cfg.help.id==='torch'&&st.help&&st.help.got?.4:1);
+  if(dk>0){
+    const hx=(st.p.x-camX)*cell, hy=(st.p.y-camY)*cell;
+    const gr=ctx.createRadialGradient(hx,hy,cell*1.4,hx,hy,cell*5);
+    gr.addColorStop(0,'rgba(10,12,26,0)');gr.addColorStop(1,'rgba(10,12,26,'+dk+')');
+    ctx.fillStyle=gr;ctx.fillRect(0,0,size,size);
+  }
+  // вспышка
+  if(st.flash>0){ctx.fillStyle='rgba(255,255,255,'+(st.flash/40)+')';ctx.fillRect(0,0,size,size)}
+  // стрелка к ближайшему предмету — на большой карте без неё теряешься
+  if(!cfg.gray&&!st.over&&st.intro<=0){
+    let best=null,bd=1e9;
+    st.items.forEach(it=>{if(it.got)return;const d=Math.hypot(it.x-st.p.x,it.y-st.p.y);if(d<bd){bd=d;best=it}});
+    if(st.exit&&cfg.goal&&(cfg.goal.id==='escape'||cfg.goal.id==='deliver')){
+      const d=Math.hypot(st.exit.x-st.p.x,st.exit.y-st.p.y);
+      if(!best||(cfg.goal.id==='escape'))({}); if(!best||d<bd){bd=d;best=st.exit}
+    }
+    if(best&&bd>VIEW*0.42){
+      const hx=size/2, hy=size/2;
+      const a=Math.atan2(best.y-st.p.y,best.x-st.p.x);
+      const rad=size*0.4;
+      ctx.save();ctx.translate(hx+Math.cos(a)*rad,hy+Math.sin(a)*rad);ctx.rotate(a);
+      ctx.globalAlpha=.75;ctx.fillStyle=cfg.item?cfg.item.c:'#F2C337';
+      ctx.beginPath();ctx.moveTo(cell*.34,0);ctx.lineTo(-cell*.2,cell*.2);ctx.lineTo(-cell*.2,-cell*.2);
+      ctx.closePath();ctx.fill();ctx.restore();
+    }
+  }
+  // отсчёт перед стартом
+  if(st.intro>0){
+    ctx.fillStyle='rgba(20,14,8,.32)';ctx.fillRect(0,0,size,size);
+    const n=Math.ceil(st.intro);
+    const k=1-(st.intro%1);
+    ctx.save();ctx.globalAlpha=Math.min(1,1.6-k*1.2);
+    ctx.translate(size/2,size/2);ctx.scale(.8+k*.5,.8+k*.5);
+    ctx.fillStyle='#fff';ctx.font='800 '+Math.round(size*.26)+'px Unbounded, Nunito, system-ui';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(n>0?String(n):'В путь!',0,0);ctx.restore();
+  }
+  // подсказки в пустоте
+  if(cfg.gray){
+    ctx.fillStyle='rgba(90,90,90,.75)';ctx.font='600 12px Nunito, system-ui';ctx.textAlign='left';
+    const el=(cfg.dur||20)-st.left;
+    if(el>6)ctx.fillText('цель не задана',10,20);
+    if(el>13)ctx.fillText('герой не задан',10,38);
+    if(st.tapped){ctx.fillText('тапать бесполезно — ты не сказал, что должно происходить',10,size-12)}
+  }
+  ctx.restore();
+}
+function captureFrame(key){
+  try{const cv=$('cv');if(!cv)return;
+    const o=document.createElement('canvas');o.width=180;o.height=180;
+    o.getContext('2d').drawImage(cv,0,0,180,180);
+    S.frames[key]=o.toDataURL('image/png');
+  }catch(e){}
+}
+
+/* ═══════════ ПРОМПТ ═══════════ */
+function promptText(){
+  if(!S.hero)return 'Сделай игру.';
+  let t='Герой — '+S.hero.n+'. ';
+  if(S.goal)t+=S.goal.tpl(S.hero,S.world||WORLDS[0],S.item||ITEMS[0]);
+  if(S.obst)t+=' '+(S.hero.sex==='f'?'Ей':'Ему')+' мешает '+S.obst.n+'.';
+  if(S.help)t+=' '+(S.hero.sex==='f'?'Ей':'Ему')+' помогает '+S.help.n+'.';
+  return t;
+}
+function promptCard(mini){
+  if(mini)return `<div class="pcard mini" onclick="alert(promptText())">${promptText()}</div>`;
+  const sl=(k,label,val)=>`<button class="slot ${val?'':'todo pulse'}" onclick="openSheet('${k}')">${val||label}<em>▾</em></button>`;
+  // «Сделай игру» показываем только на первом шаге — это и есть промпт из двух слов.
+  // Дальше карточка обязана быть со слотами, иначе на экране выбора нечего тапать.
+  if(S.step==='s1')return `<div class="pcard">Сделай игру.</div>`;
+  let p='Герой — '+sl('hero','кто?',S.hero&&S.hero.n)+'. ';
+  p+=(S.hero&&S.hero.sex==='f'?'Она должна ':'Он должен ')+sl('goal','что делать?',S.goal&&S.goal.n.toLowerCase());
+  if(S.goal&&S.goal.needItem)p+=' '+sl('item','что?',S.item&&S.item.ap);
+  p+=' '+sl('world','где?',S.world&&S.world.p.replace(/^(в|на|со|с) /,''))+'.';
+  if(S.step==='s3'||S.step==='s4'||S.step==='s5'){
+    p+=' '+(S.hero&&S.hero.sex==='f'?'Ей':'Ему')+' мешает '+sl('obst','кто?',S.obst&&S.obst.n)+'.';
+    p+=' '+(S.hero&&S.hero.sex==='f'?'Ей':'Ему')+' помогает '+sl('help','кто?',S.help&&S.help.n)+'.';
+  }
+  if(S.step==='s4'||S.step==='s5')p+=' Темп — '+TEMPO[S.tempo].t+'.';
+  return `<div class="pcard">${p}</div>`;
+}
+
+/* ═══════════ ШИТЫ ═══════════ */
+const SHEETS={
+ hero:{t:'Кто герой?',list:()=>HEROES.map(h=>({v:h,n:h.n,draw:(c)=>{const x=c.getContext('2d');x.clearRect(0,0,44,44);drawHero(x,22,24,15,h)}})),set:v=>{S.hero=v;S.decisions++}},
+ goal:{t:'Что он должен делать?',list:()=>GOALS.map(g=>({v:g,n:g.n,emo:g.ic})),set:v=>{S.goal=v;S.decisions++;if(v.needItem&&!S.item)S.item=null}},
+ item:{t:'Что собирать?',list:()=>ITEMS.map(i=>({v:i,n:i.n,draw:(c)=>{const x=c.getContext('2d');x.clearRect(0,0,44,44);drawItem(x,22,22,13,i)}})),set:v=>{S.item=v;S.decisions++}},
+ world:{t:'Где всё происходит?',list:()=>WORLDS.map(w=>({v:w,n:w.n,draw:(c)=>{const x=c.getContext('2d');x.fillStyle=w.floor;x.fillRect(0,0,44,44);x.fillStyle=w.wall;
+   x.fillRect(4,4,12,12);x.fillRect(28,10,12,8);x.fillRect(10,28,10,12);x.fillRect(30,30,8,8);
+   if(w.dark>0){x.fillStyle='rgba(10,12,26,'+w.dark+')';x.fillRect(0,0,44,44)}}})),set:v=>{S.world=v;S.decisions++}},
+ obst:{t:'Кто мешает?',list:()=>OBST.map(o=>({v:o,n:o.n,emo:o.ic})),set:v=>{S.obst=v;S.decisions++}},
+ help:{t:'Кто помогает?',list:()=>HELP.map(h=>({v:h,n:h.n,emo:h.ic,sub:h.fx})),set:v=>{S.help=v;S.decisions++}},
+ ifCond:{t:'ЕСЛИ…',list:()=>IF_COND.map(c=>({v:c,n:c.n,emo:c.ic})),set:v=>{S.ifCond=v;S.decisions++}},
+ ifThen:{t:'…ТО',list:()=>IF_THEN.map(c=>({v:c,n:c.n,emo:c.ic})),set:v=>{S.ifThen=v;S.decisions++}},
+};
+let sheetKey=null;
+function openSheet(k){
+  sheetKey=k;const C=SHEETS[k];
+  $('sheetT').textContent=C.t;
+  const cur=S[k];
+  $('sheetL').innerHTML='<div class="grid3">'+C.list().map((o,i)=>`
+    <button class="cell${cur&&cur.id===o.v.id?' on':''}" onclick="pickOpt(${i})">
+      ${o.draw?`<canvas width="44" height="44" data-i="${i}"></canvas>`:`<span style="font-size:30px">${o.emo||'•'}</span>`}
+      <span class="cell-n">${o.n}</span>
+    </button>`).join('')+'</div>';
+  C.list().forEach((o,i)=>{if(o.draw){const c=$('sheetL').querySelector('canvas[data-i="'+i+'"]');if(c)o.draw(c)}});
+  $('ovl').classList.add('on');
+  const sh=$('sheet');sh.style.display='flex';sh.classList.add('on');
+}
+function closeSheet(){$('ovl').classList.remove('on');const sh=$('sheet');sh.classList.remove('on');sh.style.display='none'}
+function pickOpt(i){const C=SHEETS[sheetKey];C.set(C.list()[i].v);closeSheet();render()}
+$('ovl').onclick=closeSheet;$('sheetX').onclick=closeSheet;
+
+/* ═══════════ АНИМАЦИЯ СБОРКИ ═══════════ */
+const STAGES=['Читаю твой бриф','Отбираю детали','Собираю уровень'];
+let genBusy=false;
+function assemble(after){
+  if(genBusy)return;genBusy=true;
+  // страховка: если браузер притормозил таймеры (вкладка в фоне),
+  // флаг не должен залипнуть навсегда — иначе кнопка «Собрать» умрёт
+  clearTimeout(window.__genGuard);
+  window.__genGuard=setTimeout(()=>{genBusy=false},6000);
+  const g=document.createElement('div');g.className='gen';
+  g.innerHTML=`<div style="width:100%;max-width:300px">${STAGES.map((s,i)=>
+    `<div class="gst" id="gs${i}"><div class="gst-b">${i+1}</div>${s}</div>`).join('')}</div>`;
+  document.body.appendChild(g);
+  let i=0;
+  const run=()=>{
+    if(i>0)$('gs'+(i-1)).className='gst done';
+    if(i>=STAGES.length){setTimeout(()=>{g.remove();genBusy=false;clearTimeout(window.__genGuard);after&&after()},170);return}
+    $('gs'+i).className='gst on';i++;setTimeout(run,620);
+  };
+  setTimeout(run,100);
+}
+
+/* ═══════════ ЭКРАНЫ ═══════════ */
+function go(s){S.step=s;stopGame();render();window.scrollTo({top:0,behavior:'smooth'})}
+function pct(){return Math.round(STEPS.indexOf(S.step)/(STEPS.length-1)*100)}
+
+function arenaHTML(rule,live){
+  return `<div class="arena-wrap" id="arena">
+    <div class="hud" id="hud"></div>
+    <canvas id="cv"></canvas>
+    <div class="rulebar" id="rulebar">${rule||''}</div>
+  </div>`+(live?liveBarHTML():'');
+}
+/* инструменты, которые работают НА ХОДУ — игра не останавливается */
+const LIVE=[
+ {k:'obst', ic:'💥', l:'помеха'},
+ {k:'help', ic:'🎁', l:'помощник'},
+ {k:'item', ic:'⭐', l:'предмет'},
+ {k:'world',ic:'🗺', l:'мир'},
+ {k:'tempo',ic:'⚡', l:'темп'},
+ {k:'add',  ic:'➕', l:'добавить'},
+];
+function liveBarHTML(){
+  return `<div class="live"><div class="live-t">Меняй на ходу — игра не остановится</div>
+    <div class="live-r">${LIVE.map(d=>
+      `<button class="dk" onclick="liveTap('${d.k}')">
+        <span class="dk-ic">${d.ic}</span><span class="dk-l">${d.l}</span></button>`).join('')}</div></div>`;
+}
+function liveTap(k){
+  if(!G.st||!G.cfg){return}
+  if(k==='add'){addStuff();return}
+  if(k==='tempo'){
+    const o=['calm','normal','fast'];S.tempo=o[(o.indexOf(S.tempo)+1)%3];S.decisions++;
+    G.T=TEMPO[S.tempo];G.cfg.tempo=S.tempo;
+    syncObstacles();
+    toast('Темп: '+TEMPO[S.tempo].t);return;
+  }
+  liveKey=k; openPick(k);
+}
+let liveKey=null;
+/* подменяем деталь прямо в идущей игре */
+function applyLive(k,v){
+  S[k]=v; S.decisions++;
+  if(!G.st||!G.cfg)return;
+  G.cfg[k]=v;
+  if(k==='world'){G.W=v; G.cfg.world=v}
+  if(k==='obst'){syncObstacles(); toast('Теперь мешает: '+v.n)}
+  if(k==='help'){if(G.st.help)G.st.help.got=0; toast('Теперь помогает: '+v.n)}
+  if(k==='item'){toast('Теперь собираешь: '+v.n)}
+  if(k==='world')toast('Мир: '+v.n);
+  const bar=$('rulebar');
+  if(bar&&S.ifCond&&S.ifThen)bar.textContent='Твоё правило: когда '+S.ifCond.when;
+}
+/* число помех подгоняем под темп, не перезапуская игру */
+function syncObstacles(){
+  const st=G.st,T=G.T,lvl=G.lvl;
+  if(!st||!lvl)return;
+  const want=T.n;
+  while(st.obs.length>want)st.obs.pop();
+  const r=rng((S.seed||1)+st.obs.length*17+Math.floor(st.left));
+  const far=lvl.free.filter(c=>Math.hypot(c.x-st.p.x,c.y-st.p.y)>6);
+  const pool=far.length?far:lvl.free;
+  while(st.obs.length<want){
+    const c=pool[rint(r,0,pool.length-1)];
+    st.obs.push({x:c.x+.5,y:c.y+.5,ox:c.x+.5,oy:c.y+.5,a:r()*6.28,dir:r()>.5?1:-1,ph:r()*6.28,hunt:3});
+  }
+}
+/* докидываем предметы в живую игру */
+function addStuff(){
+  const st=G.st,lvl=G.lvl;
+  if(!st||!lvl)return;
+  const r=rng(Math.floor(st.left*97)+st.items.length);
+  const near=lvl.free.filter(c=>{const d=Math.hypot(c.x-st.p.x,c.y-st.p.y);return d>2&&d<9});
+  const pool=near.length>=5?near:lvl.free;
+  for(let i=0;i<5;i++){
+    const c=pool[rint(r,0,pool.length-1)];
+    st.items.push({x:c.x+.5,y:c.y+.5,got:0});
+    burst(st,c.x+.5,c.y+.5,G.cfg.item?G.cfg.item.c:'#F2C337',6);
+  }
+  st.left+=6;
+  toast('+5 предметов и 6 секунд');
+}
+function cfgNow(extra){
+  return Object.assign({hero:S.hero,world:S.world,goal:S.goal,item:S.item,obst:S.obst,help:S.help,
+    tempo:S.tempo,scoreRule:S.scoreRule,loseRule:S.loseRule,ifCond:S.ifCond,ifThen:S.ifThen,
+    seed:S.seed,itemCount:16,dur:60},extra||{});
+}
+
+function render(){
+  $('pbar').style.width=pct()+'%';
+  $('back').style.visibility=S.step==='s0'?'hidden':'visible';
+  const st=S.step;
+
+  if(st==='s0'){
+    $('htitle').textContent='Своя игра';
+    B().innerHTML=`<div class="center">
+      <div style="width:150px;height:150px;border-radius:22px;background:#F2E4CC;position:relative;margin-bottom:14px;overflow:hidden">
+        <svg viewBox="0 0 150 150" style="position:absolute;inset:0;width:100%;height:100%"><g fill="none" stroke="#3A2A18" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20 h110 v110 h-110 z"/><path d="M50 20 v60 M50 80 h30 M80 50 v60 M110 50 v50 h-30 M20 110 h30"/></g><circle cx="128" cy="128" r="9" fill="#2E9E5B" stroke="#2B2118" stroke-width="3"/></svg>
+        <div style="position:absolute;width:26px;height:26px;border-radius:50%;background:#E65C00;border:3px solid #2B2118;top:22px;left:22px;animation:drift 3.4s ease-in-out infinite alternate"></div>
+      </div>
+      <h1 class="h1">Мастерская: своя игра</h1>
+      <p class="lead">Сегодня ты не игрок.\nСегодня ты тот, кто игру <b>заказывает</b>.</p>
+      <input class="field" id="nm" maxlength="16" placeholder="Как тебя зовут?" value="${S.name}">
+    </div>
+    <style>@keyframes drift{from{transform:translate(0,0)}to{transform:translate(0,58px)}}</style>`;
+    F().innerHTML=`<button class="btn nk-btn nk-btn--cta" onclick="S.name=($('nm').value||'Автор').trim();go('s1')">Я готов</button>`;
+    return;
+  }
+
+  if(st==='s1'){
+    $('htitle').textContent='Шаг 1';
+    B().innerHTML=promptCard()+say('Вот твой заказ. Два слова.\nСмотри, что я по нему пойму.');
+    F().innerHTML=`<button class="btn nk-btn nk-btn--cta" onclick="runV0()">Собрать игру</button>`;
+    return;
+  }
+  if(st==='v0'){
+    $('htitle').textContent='Что получилось';
+    B().innerHTML=arenaHTML('')+say('Скучно? Мне тоже.\nТы не сказал <b>кто</b>, <b>где</b> и <b>что делать</b> — я и не сделал.');
+    F().innerHTML=`<button class="btn nk-btn nk-btn--cta" onclick="go('s2')">Сказать точнее</button>`;
+    return;
+  }
+
+  if(st==='s2'){
+    $('htitle').textContent='Шаг 2';
+    const ok=S.hero&&S.goal&&S.world&&(!S.goal.needItem||S.item);
+    B().innerHTML=promptCard()
+      +(S.hero?`<div style="display:flex;justify-content:center;margin-top:12px"><canvas id="prev" width="88" height="88" style="width:88px;height:88px;box-shadow:none;background:${S.world?S.world.floor:'#EEE4D2'};border-radius:16px"></canvas></div>`:'')
+      +say(ok?'Теперь бриф из 9 слов вместо двух. Собираю.':'Скажи, <b>кто</b> герой, <b>что</b> он должен сделать и <b>где</b>.');
+    F().innerHTML=`<button class="btn nk-btn nk-btn--cta" ${ok?'':'disabled'} onclick="runV1()">Собрать игру</button>`;
+    if(S.hero){const c=$('prev');if(c){const x=c.getContext('2d');x.clearRect(0,0,88,88);drawHero(x,44,48,26,S.hero)}}
+    return;
+  }
+
+  if(st==='s3'){
+    $('htitle').textContent='Шаг 3';
+    const ok=S.obst&&S.help;
+    B().innerHTML=promptCard()+say(ok?'Двое новых. Один против тебя, один за тебя.':'Пусто: тебе никто не мешает и никто не помогает.');
+    F().innerHTML=`<button class="btn nk-btn nk-btn--cta" ${ok?'':'disabled'} onclick="runV2()">Собрать игру</button>`;
+    return;
+  }
+
+  if(st==='tempo'){
+    $('htitle').textContent='Как ощущалось';
+    B().innerHTML=`<div class="result"><div class="result-big">${S.lastScore}</div>
+      <div class="result-sub">${S.lastGot} ${plural(S.lastGot,'предмет','предмета','предметов')} собрано</div></div>`
+      +say('Тебе было весело?');
+    F().innerHTML=`<div class="btnrow">
+      <button class="btn nk-btn nk-btn--soft nk-btn--sm" onclick="setTempo('fast')">Слишком спокойно</button>
+      <button class="btn nk-btn nk-btn--soft nk-btn--sm" onclick="setTempo('calm')">Слишком нервно</button></div>
+      <button class="txtbtn" onclick="setTempo('normal')">В самый раз</button>`;
+    return;
+  }
+
+  if(st==='howto'){
+    $('htitle').textContent='Откуда я это взял';
+    const cards=[['Фон','8 миров'],['Герой','12 фигур'],['Помеха','6 моторчиков'],
+      ['Предмет','12 значков'],['Лабиринт','из твоего seed'],['Правила','из твоего брифа']];
+    B().innerHTML=`<div class="strip">${cards.map(c=>`<div class="strip-c"><b>${c[0]}</b><span>${c[1]}</span></div>`).join('')}</div>`
+      +say('Я ничего не нарисовал сейчас.\nЯ сложил из готовых деталей — то, что ты назвал.');
+    F().innerHTML=`<button class="btn nk-btn nk-btn--cta" onclick="go('s4')">Дальше — правила</button>`;
+    return;
+  }
+
+  if(st==='s4'){
+    $('htitle').textContent='Шаг 4';
+    B().innerHTML=promptCard(1)+say('Два способа считать очки.\nПопробуй оба, оставишь один.');
+    F().innerHTML=`<button class="btn nk-btn nk-btn--cta" onclick="startAB(0)">Сыграть с правилом A</button>`;
+    return;
+  }
+  if(st==='abplay'){
+    $('htitle').textContent=S.abRound===0?'Очки':'Проигрыш';
+    const r=S.abPair[S.abIdx];
+    B().innerHTML=arenaHTML('Правило '+(S.abIdx?'B':'A')+': '+r.n);
+    F().innerHTML='';
+    return;
+  }
+  if(st==='abpick'){
+    const rd=S.abRound===0?'как считать очки':'что считается проигрышем';
+    $('htitle').textContent='Выбери правило';
+    B().innerHTML=say('Ты сыграл оба. Какое оставляем — '+rd+'?')
+      +`<div class="ab">${S.abPair.map((r,i)=>`
+        <div class="abcard" onclick="pickRule(${i})">
+          <div class="ab-rule">${i?'B':'A'} — ${r.n}</div>
+          <div class="ab-res">твой результат: ${S.abResults[i]!==undefined?S.abResults[i]+' очков':'—'}</div>
+        </div>`).join('')}</div>`;
+    F().innerHTML='';
+    return;
+  }
+
+  if(st==='ifthen'){
+    $('htitle').textContent='Своё правило';
+    const ok=S.ifCond&&S.ifThen;
+    B().innerHTML=say('А теперь правило, которого у меня в списке нет.\nСобери его сам.')
+      +`<div class="ifthen">
+        <div class="plate${S.ifCond?'':' todo'}" onclick="openSheet('ifCond')">
+          <div class="plate-l">ЕСЛИ</div><div class="plate-v">${S.ifCond?S.ifCond.n:'выбери…'}</div></div>
+        <div class="ifthen-ar">→</div>
+        <div class="plate${S.ifThen?'':' todo'}" onclick="openSheet('ifThen')">
+          <div class="plate-l">ТО</div><div class="plate-v">${S.ifThen?S.ifThen.n:'выбери…'}</div></div>
+      </div>`
+      +(ok?`<div class="preview">Когда ${S.ifCond.when} — ${S.ifThen.then}.</div>`:'');
+    F().innerHTML=`<button class="btn nk-btn nk-btn--cta" ${ok?'':'disabled'} onclick="testRule()">Проверить моё правило</button>`;
+    return;
+  }
+  if(st==='ruletest'){
+    $('htitle').textContent='Проверка правила';
+    B().innerHTML=arenaHTML('Твоё правило: когда '+S.ifCond.when+' — '+S.ifThen.then);
+    F().innerHTML='';
+    return;
+  }
+  if(st==='ruledone'){
+    $('htitle').textContent='Сработало';
+    B().innerHTML=say('Это правило придумал не я.\nОно теперь есть только в твоей игре.','happy')
+      +`<div class="preview">Когда ${S.ifCond.when} — ${S.ifThen.then}.</div>`;
+    F().innerHTML=S.back2free
+      ? `<div class="btnrow"><button class="btn nk-btn nk-btn--soft nk-btn--sm" onclick="S.back2free=0;go('free')">В мастерскую</button>
+         <button class="btn nk-btn nk-btn--cta nk-btn--sm" onclick="S.back2free=0;runV3()">▶ Играть</button></div>`
+      : `<button class="btn nk-btn nk-btn--cta" onclick="runV3()">Играть свою игру</button>`;
+    return;
+  }
+
+  if(st==='play'){
+    $('htitle').textContent='Твоя игра';
+    B().innerHTML=arenaHTML(S.ifCond&&S.ifThen?('Твоё правило: когда '+S.ifCond.when):'',true);
+    F().innerHTML='';
+    return;
+  }
+  if(st==='played'){
+    $('htitle').textContent='Результат';
+    const best=Math.max(S.record,S.lastScore);S.record=best;
+    B().innerHTML=`<div class="result"><div class="result-big">${S.lastScore}</div>
+      <div class="result-sub">${S.lastWin?'Получилось!':'Не успел'} · рекорд ${best}</div></div>`
+      +say(S.lastWin?'Твоя игра работает. И правила в ней — твои.':'Попробуй ещё. Или оставь как есть — это твоя игра.');
+    F().innerHTML=`<div class="btnrow"><button class="btn nk-btn nk-btn--soft nk-btn--sm" onclick="runV3()">Ещё раз</button>
+      <button class="btn nk-btn nk-btn--cta nk-btn--sm" onclick="go('free')">Что-нибудь поменять</button></div>`
+      +`<button class="txtbtn" onclick="go('s5')">Готово, хочу паспорт →</button>`;
+    return;
+  }
+
+  if(st==='free'){
+    $('htitle').textContent='Мастерская';
+    B().innerHTML=say('Здесь всё твоё. Меняй что хочешь — и сразу играй.')
+      +`<div class="pcard" style="font-size:14.5px;line-height:1.5">${promptText()}</div>`
+      +`<div class="result" style="margin-top:10px">Твой рекорд: <b style="color:var(--acc)">${S.record}</b> · сыграно забегов: ${S.runs||0}</div>`;
+    F().innerHTML=dockHTML();
+    return;
+  }
+
+  if(st==='story'){
+    $('htitle').textContent='История';
+    const starts=['Всё началось, когда…','Никто не знал, что…','Однажды ночью…',
+      'Это была обычная ночь, пока…','Говорят, что…','Давным-давно…'];
+    B().innerHTML=say('У игры есть правила. Теперь придумай, <b>зачем</b> это всё.','think')
+      +`<div class="pcard" style="font-size:14.5px;line-height:1.5">${promptText()}</div>`
+      +`<div class="grp-t">Как всё началось?</div>
+        <textarea class="field" id="fst" rows="4" maxlength="220" placeholder="Напиши свою историю…"
+          oninput="S.story=this.value" style="resize:none;line-height:1.5">${S.story||''}</textarea>
+        <div class="chips">${starts.map(t=>`<button class="chip" onclick="startStory('${t}')">${t}</button>`).join('')}</div>
+        <div class="grp-t">Что будет, если победишь?</div>
+        <textarea class="field" id="fen" rows="3" maxlength="140" placeholder="Чем всё закончится…"
+          oninput="S.ending=this.value" style="resize:none;line-height:1.5">${S.ending||''}</textarea>`;
+    F().innerHTML=`<div class="btnrow">
+      <button class="btn nk-btn nk-btn--soft nk-btn--sm" onclick="go('free')">Назад к игре</button>
+      <button class="btn nk-btn nk-btn--cta nk-btn--sm" onclick="go('s5')">К паспорту →</button></div>`;
+    return;
+  }
+
+  if(st==='s5'){
+    $('htitle').textContent='Название';
+    B().innerHTML=say('Игре нужно имя.\nВозьми готовое или напиши своё.')
+      +`<div class="chips">${titles().map(t=>`<button class="chip${S.title===t?' on':''}" onclick="S.title='${t.replace(/'/g,"\\'")}';S.decisions++;render()">${t}</button>`).join('')}</div>`
+      +`<input class="field" id="tt" maxlength="24" placeholder="…или своё название" value="${S.title}">`
+      +`<div style="margin-top:16px;font-size:11px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3)">Рамка</div>
+        <div class="chips">${PALETTES.map((p,i)=>`<button class="chip${S.palette.id===p.id?' on':''}" onclick="S.palette=PALETTES[${i}];render()" style="border-color:${p.ac}">${['Тёплая','Ночная','Мятная','Ягодная'][i]}</button>`).join('')}</div>`;
+    F().innerHTML=`<button class="btn nk-btn nk-btn--cta" onclick="S.title=($('tt').value||titles()[0]).trim();go('s6')">Сделать паспорт</button>`;
+    return;
+  }
+
+  if(st==='s6'){renderPassport();return}
+}
+
+/* Нейро — персонаж, а не системный эмодзи (единый с остальными Мастерскими) */
+function svgNeuro(size,mood){
+  const sz=size||50,m=mood||'idle';
+  const eye={idle:'#4FD1C5',think:'#FFC94D',happy:'#7BE495',oops:'#FF9A76'}[m]||'#4FD1C5';
+  const tilt={idle:0,think:-6,happy:3,oops:-3}[m]||0;
+  const lid={idle:0,think:2.4,happy:1.6,oops:0}[m]||0;
+  return `<svg viewBox="0 0 64 64" width="${sz}" height="${sz}" style="display:block;overflow:visible">
+   <ellipse cx="32" cy="59" rx="15" ry="3" fill="rgba(120,72,28,.16)"/>
+   <g transform="rotate(${tilt} 32 34)">
+     <line x1="32" y1="12" x2="32" y2="19" stroke="#C9B49B" stroke-width="2.4" stroke-linecap="round"/>
+     <circle cx="32" cy="9.5" r="3.4" fill="${eye}"/><circle cx="32" cy="9.5" r="6.5" fill="${eye}" opacity=".22"/>
+     <path d="M14 30 q18 -20 36 0 z" fill="#E4DCCF"/>
+     <rect x="13" y="28" width="38" height="30" rx="13" fill="#F2ECE1" stroke="#D8CDBB" stroke-width="1.4"/>
+     <rect x="18" y="34" width="28" height="15" rx="7.5" fill="#2B2118"/>
+     <ellipse cx="25.5" cy="${41.5+lid}" rx="3.4" ry="${3.4-lid*.7}" fill="${eye}"/>
+     <ellipse cx="38.5" cy="${41.5+lid}" rx="3.4" ry="${3.4-lid*.7}" fill="${eye}"/>
+     <circle cx="24.3" cy="${40.3+lid}" r="1.05" fill="#fff" opacity=".9"/>
+     <circle cx="37.3" cy="${40.3+lid}" r="1.05" fill="#fff" opacity=".9"/>
+     ${m==='happy'?'<path d="M27 53 q5 4 10 0" stroke="#C9B49B" stroke-width="1.8" fill="none" stroke-linecap="round"/>':''}
+     ${m==='oops'?'<path d="M28 54 q4 -3 8 0" stroke="#C9B49B" stroke-width="1.8" fill="none" stroke-linecap="round"/>':''}
+     <rect x="8" y="38" width="5" height="12" rx="2.5" fill="#DCD2C2"/>
+     <rect x="51" y="38" width="5" height="12" rx="2.5" fill="#DCD2C2"/>
+   </g></svg>`;
+}
+
+/* панель инструментов: любую часть игры можно менять в любой момент */
+const DOCK=[
+ {k:'hero', ic:'🦊', l:'герой',    get:()=>S.hero&&S.hero.n},
+ {k:'goal', ic:'🎯', l:'цель',     get:()=>S.goal&&S.goal.n},
+ {k:'item', ic:'⭐', l:'предмет',  get:()=>S.item&&S.item.n, when:()=>S.goal&&S.goal.needItem},
+ {k:'world',ic:'🗺', l:'мир',      get:()=>S.world&&S.world.n},
+ {k:'obst', ic:'💥', l:'помеха',   get:()=>S.obst&&S.obst.n},
+ {k:'help', ic:'🎁', l:'помощник', get:()=>S.help&&S.help.n},
+ {k:'tempo',ic:'⚡', l:'темп',     get:()=>TEMPO[S.tempo].t},
+ {k:'score',ic:'🔢', l:'очки',     get:()=>S.scoreRule&&S.scoreRule.n},
+ {k:'lose', ic:'💔', l:'проигрыш', get:()=>S.loseRule&&S.loseRule.n},
+ {k:'rule', ic:'✨', l:'правило',  get:()=>S.ifCond&&S.ifThen?'своё':'нет'},
+ {k:'story',ic:'📖', l:'история',  get:()=>S.story?'есть':'нет'},
+];
+function dockHTML(){
+  const items=DOCK.filter(d=>!d.when||d.when());
+  return `<div class="dock-play">
+      <button class="btn nk-btn nk-btn--soft" onclick="go('s5')">К паспорту</button>
+      <button class="btn nk-btn nk-btn--cta" onclick="runV3()">▶ Играть</button>
+    </div>
+    <div class="dock"><div class="dock-r">${items.map(d=>
+      `<button class="dk" onclick="dockTap('${d.k}')">
+        <span class="dk-ic">${d.ic}</span><span class="dk-l">${d.l}</span>
+        <span class="dk-v">${short(d.get())}</span></button>`).join('')}</div></div>`;
+}
+function short(v){
+  if(!v)return '—';
+  const map={'Собрать всё':'собрать','Найти выход':'выход','Продержаться':'выжить',
+    'Набрать очки':'очки','Догнать':'догнать','Донести':'донести'};
+  if(map[v])return map[v];
+  const first=String(v).split(/[ ,-]/)[0];
+  return first.length>9?first.slice(0,8)+'…':first;
+}
+function startStory(t){const f=$('fst');f.value=t+' ';S.story=f.value;f.focus();
+  f.setSelectionRange(f.value.length,f.value.length)}
+function dockTap(k){
+  if(k==='tempo'){const o=['calm','normal','fast'];S.tempo=o[(o.indexOf(S.tempo)+1)%3];S.decisions++;render();toast('Темп: '+TEMPO[S.tempo].t);return}
+  if(k==='score'){S.scoreRule=SCORE_RULES[(SCORE_RULES.indexOf(S.scoreRule)+1)%4];S.decisions++;render();toast(S.scoreRule.n);return}
+  if(k==='lose'){S.loseRule=LOSE_RULES[(LOSE_RULES.indexOf(S.loseRule)+1)%4];S.decisions++;render();toast(S.loseRule.n);return}
+  if(k==='rule'){S.back2free=1;S.step='ifthen';render();return}
+  if(k==='story'){go('story');return}
+  openPick(k);
+}
+function openPick(k){
+  const src={hero:HEROES,goal:GOALS,item:ITEMS,world:WORLDS,obst:OBST,help:HELP}[k];
+  const title={hero:'Кто герой?',goal:'Что он должен делать?',item:'Что собирать?',
+    world:'Где всё происходит?',obst:'Кто мешает?',help:'Кто помогает?'}[k];
+  $('sheetT').textContent=title;
+  const cur=S[k];
+  $('sheetL').innerHTML='<div class="grid3">'+src.map((t,i)=>{
+    const ic=t.ic||(k==='hero'?'🦊':k==='world'?'🗺':'⭐');
+    return `<button class="cell${cur&&cur.id===t.id?' on':''}" onclick="pickFree('${k}',${i})">
+      <span style="font-size:28px">${ic}</span><span class="cell-n">${t.n}</span></button>`}).join('')+'</div>';
+  $('ovl').classList.add('on');
+  const sh=$('sheet'); sh.style.display='flex'; sh.classList.add('on');
+}
+function pickFree(k,i){
+  const src={hero:HEROES,goal:GOALS,item:ITEMS,world:WORLDS,obst:OBST,help:HELP}[k];
+  const v=src[i];
+  if(liveKey&&G.run){                 // идёт игра — подменяем деталь на ходу
+    liveKey=null; closeSheet(); applyLive(k,v); return;
+  }
+  if(!S[k]||S[k].id!==v.id)S.decisions++;
+  S[k]=v;
+  if(k==='goal'&&S.goal.needItem&&!S.item)S.item=ITEMS[10];
+  closeSheet(); render();
+}
+function say(t,mood){return `<div class="say"><div class="say-av">${svgNeuro(50,mood)}</div><div class="say-b">${t}</div></div>`}
+function plural(n,a,b,c){const m=n%10,h=n%100;return h>=11&&h<=14?c:m===1?a:m>=2&&m<=4?b:c}
+
+/* ═══════════ ПЕРЕХОДЫ ═══════════ */
+function runV0(){
+  assemble(()=>{
+    S.step='v0';render();
+    setTimeout(()=>{
+      startGame({hero:HEROES[0],gray:1,dur:20,onEnd:()=>{
+        const b=$('rulebar');if(b)b.textContent='';
+      }});
+      const cv=$('cv');if(cv)cv.addEventListener('pointerdown',()=>{if(G.st)G.st.tapped=1},{once:true});
+    },60);
+  });
+}
+function runV1(){
+  S.seed=1000+Math.floor(Math.random()*3000);
+  assemble(()=>{
+    S.step='play1';S.step='v1';
+    $('htitle').textContent='Твоя игра v1';
+    B().innerHTML=arenaHTML('');F().innerHTML='';
+    $('pbar').style.width='42%';
+    setTimeout(()=>startGame(cfgNow({obst:null,help:null,dur:40,onEnd:(st)=>{
+      S.lastScore=st.score;S.lastGot=st.got;S.lastWin=st.win;
+      B().innerHTML=`<div class="result"><div class="result-big">${st.score}</div>
+        <div class="result-sub">собрано ${st.got} из ${st.items.length}</div></div>`
+        +say('Уже игра. Но пусто: тебе никто не мешает и никто не помогает.');
+      F().innerHTML=`<div class="btnrow"><button class="btn nk-btn nk-btn--soft nk-btn--sm" onclick="runV1()">Ещё раз</button>
+        <button class="btn nk-btn nk-btn--cta nk-btn--sm" onclick="go('s3')">Добавить обоих</button></div>`;
+    }})),60);
+  });
+}
+function runV2(){
+  assemble(()=>{
+    S.step='v2';$('htitle').textContent='Твоя игра v2';
+    B().innerHTML=arenaHTML('');F().innerHTML='';
+    setTimeout(()=>startGame(cfgNow({dur:45,onEnd:(st)=>{
+      S.lastScore=st.score;S.lastGot=st.got;go('tempo');
+    }})),60);
+  });
+}
+function setTempo(t){S.tempo=t;S.decisions++;go('howto')}
+
+function startAB(idx){
+  if(!S.abPair){
+    const pairs=S.abRound===0?[[SCORE_RULES[0],SCORE_RULES[2]],[SCORE_RULES[0],SCORE_RULES[3]]]
+                             :[[LOSE_RULES[0],LOSE_RULES[2]],[LOSE_RULES[0],LOSE_RULES[1]]];
+    S.abPair=pairs[Math.floor(Math.random()*pairs.length)];S.abResults={};
+  }
+  S.abIdx=idx;S.step='abplay';render();
+  const extra=S.abRound===0?{scoreRule:S.abPair[idx],dur:15}:{loseRule:S.abPair[idx],dur:15};
+  setTimeout(()=>startGame(cfgNow(Object.assign(extra,{onEnd:(st)=>{
+    S.abResults[idx]=st.score;
+    if(idx===0){S.step='abnext';$('htitle').textContent='Теперь второе';
+      B().innerHTML=`<div class="result"><div class="result-big">${st.score}</div>
+        <div class="result-sub">правило A: ${S.abPair[0].n}</div></div>`+say('Теперь то же самое, но по другому правилу.');
+      F().innerHTML=`<button class="btn nk-btn nk-btn--cta" onclick="startAB(1)">Сыграть с правилом B</button>`;
+    }else{go('abpick')}
+  }}))),60);
+}
+function pickRule(i){
+  if(S.abRound===0){S.scoreRule=S.abPair[i];S.decisions++;S.abRound=1;S.abPair=null;S.abResults={};
+    S.step='s4b';$('htitle').textContent='Проигрыш';
+    B().innerHTML=say('Записал. Теперь второе: что считается проигрышем?');
+    F().innerHTML=`<button class="btn nk-btn nk-btn--cta" onclick="startAB(0)">Сыграть с правилом A</button>`;
+  }else{S.loseRule=S.abPair[i];S.decisions++;go('ifthen')}
+}
+function testRule(){
+  assemble(()=>{
+    S.step='ruletest';render();
+    setTimeout(()=>startGame(cfgNow({dur:20,itemCount:4,onEnd:()=>go('ruledone')})),60);
+  });
+}
+function runV3(){
+  assemble(()=>{
+    S.step='play';render();
+    S.runs=(S.runs||0)+1;
+    setTimeout(()=>startGame(cfgNow({dur:60,onEnd:(st)=>{
+      S.lastScore=st.score;S.lastWin=st.win;
+      if(st.score>S.record)S.record=st.score;
+      captureFrame('finish');go('played');
+    }})),60);
+  });
+}
+
+function titles(){
+  const h=S.hero,w=S.world,it=S.item,o=S.obst;
+  const out=[];
+  if(it)out.push(cap(h.n)+' и '+it.n);
+  out.push('Побег '+w.gp);
+  if(it)out.push(cap(it.n)+' '+w.p);
+  out.push('Ночь '+w.p);
+  if(o)out.push(cap(h.n)+' против '+o.g);
+  if(o)out.push('Осторожно, '+o.n+'!');
+  out.push('Тайна '+w.g);
+  return out.slice(0,6).map(cap);
+}
+
+/* ═══════════ ПАСПОРТ ═══════════ */
+function renderPassport(){wsDone();
+  $('htitle').textContent='Паспорт игры';
+  const P=S.palette;
+  B().innerHTML=`<div class="passport">
+    <div class="pp-cover" style="background:${P.bg}">
+      <canvas id="cover" width="360" height="240"></canvas>
+      <div class="pp-title">${S.title}</div>
+    </div>
+    <div class="pp-by">Автор: ${S.name}</div>
+    <div class="pp-then">
+      <div class="pp-fr"><canvas id="fr0" width="92" height="92"></canvas><span>2 слова</span></div>
+      <div class="pp-ar">→</div>
+      <div class="pp-fr"><canvas id="fr1" width="92" height="92"></canvas><span>${promptText().split(/\s+/).length} слов</span></div>
+    </div>
+    ${S.story?`<div class="pp-story">${S.story}${S.ending?`<div class="pp-end">${S.ending}</div>`:''}</div>`:''}
+    <div class="pp-rules">
+      <div class="pp-rule"><b>Герой</b>${S.hero.n} ${S.goal.needItem&&S.item?'· собирает '+S.item.ap:''}</div>
+      <div class="pp-rule"><b>Мир</b>${S.world.n}, темп ${TEMPO[S.tempo].t}</div>
+      <div class="pp-rule"><b>Мешает</b>${S.obst?S.obst.n:'никто'}</div>
+      <div class="pp-rule"><b>Помогает</b>${S.help?S.help.n:'никто'}</div>
+      <div class="pp-rule"><b>Очки</b>${S.scoreRule.n}</div>
+      ${S.ifCond&&S.ifThen?`<div class="pp-rule pp-own"><b>Своё правило</b>Когда ${S.ifCond.when} — ${S.ifThen.then}</div>`:''}
+    </div>
+    <div class="pp-lesson">Игра получилась такой, потому что ты <b>${S.decisions} раз</b> сказал, какой она должна быть.<br>
+      Компьютер не догадался сам — он собрал ровно то, что ты назвал.</div>
+    <div class="pp-foot"><span>твоих решений: ${S.decisions}</span><span>побей мой рекорд: <b style="color:var(--acc)">${S.record}</b></span></div>
+  </div>`
+  +say('Готово. Расскажи дома, почему у твоего героя ' + (S.help?S.help.n:'помощник') + ' — и что было бы без него.');
+  F().innerHTML=`<button class="btn nk-btn nk-btn--cta" onclick="share()">Дать другу ссылку</button>
+    <div class="btnrow" style="margin-top:9px">
+      <button class="btn nk-btn nk-btn--soft nk-btn--sm" onclick="go('free')">Доработать</button>
+      <button class="btn nk-btn nk-btn--soft nk-btn--sm" onclick="savePng()">Сохранить картинку</button></div>`;
+  drawCover();
+}
+function drawCover(){
+  const c=$('cover');if(!c)return;
+  const x=c.getContext('2d'),P=S.palette,W=S.world;
+  x.fillStyle=W.floor;x.fillRect(0,0,360,240);
+  const r=rng(S.seed);
+  x.fillStyle=W.wall;
+  for(let i=0;i<26;i++){const bx=rint(r,0,11)*30,by=rint(r,0,7)*30;x.fillRect(bx,by,30,30)}
+  if(W.dark>0){x.fillStyle='rgba(10,12,26,'+W.dark+')';x.fillRect(0,0,360,240)}
+  if(S.item)for(let i=0;i<5;i++)drawItem(x,rint(r,40,320),rint(r,40,190),11,S.item);
+  drawHero(x,180,130,32,S.hero);
+  x.strokeStyle=P.ac;x.lineWidth=8;x.strokeRect(4,4,352,232);
+  // мини-кадры
+  const f0=$('fr0'),f1=$('fr1');
+  if(f0){const a=f0.getContext('2d');a.fillStyle='#D8D8D8';a.fillRect(0,0,92,92);drawHero(a,46,48,17,HEROES[0],1)}
+  if(f1){const b=f1.getContext('2d');b.fillStyle=W.floor;b.fillRect(0,0,92,92);
+    b.fillStyle=W.wall;b.fillRect(6,6,20,20);b.fillRect(58,20,24,16);b.fillRect(16,58,18,22);
+    if(S.item)drawItem(b,70,66,9,S.item);
+    drawHero(b,46,50,17,S.hero)}
+}
+function encode(){
+  const idx=(arr,v)=>Math.max(0,arr.findIndex(a=>a.id===(v&&v.id)));
+  const bits=[[1,4],[idx(HEROES,S.hero),4],[idx(WORLDS,S.world),3],[idx(GOALS,S.goal),3],
+    [idx(ITEMS,S.item),4],[idx(OBST,S.obst),4],[idx(HELP,S.help),3],
+    [idx(SCORE_RULES,S.scoreRule),2],[idx(LOSE_RULES,S.loseRule),2],
+    [{calm:0,normal:1,fast:2}[S.tempo],2],[idx(IF_COND,S.ifCond),3],[idx(IF_THEN,S.ifThen),3],
+    [S.seed&4095,12],[Math.min(1023,S.record),10]];
+  let s='';bits.forEach(([v,n])=>{s+=(v>>>0).toString(2).padStart(n,'0')});
+  const A='23456789abcdefghjkmnpqrstuvwxyz';
+  let out='';for(let i=0;i<s.length;i+=5)out+=A[parseInt(s.slice(i,i+5).padEnd(5,'0'),2)%31];
+  return out;
+}
+function share(){
+  const u=location.origin+location.pathname+'?g='+encode()
+    +'&n='+encodeURIComponent(S.title)+'&by='+encodeURIComponent(S.name);
+  if(navigator.share)navigator.share({title:S.title,url:u}).catch(()=>{});
+  else if(navigator.clipboard){navigator.clipboard.writeText(u);toast('Ссылка скопирована')}
+  else toast('Скопируй адрес из строки браузера');
+}
+function savePng(){
+  const c=$('cover');if(!c)return;
+  try{c.toBlob(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);
+    a.download=(S.title||'moya-igra')+'.png';a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),3000);toast('Сохранено')})}
+  catch(e){toast('Сделай скриншот — так быстрее')}
+}
+
+/* ═══════════ НАВИГАЦИЯ ═══════════ */
+$('back').onclick=()=>{
+  stopGame();
+  const map={v0:'s1',s2:'s1',v1:'s2',s3:'s2',v2:'s3',tempo:'s3',howto:'s3',s4:'s4',free:'played',story:'free',
+    abplay:'s4',abnext:'s4',abpick:'s4',ifthen:'s4',ruletest:'ifthen',ruledone:'ifthen',
+    play:'ifthen',played:'ifthen',s5:'played',s6:'s5',s1:'s0'};
+  const p=map[S.step]||'s0';S.step=p;render();
+};
+render();
