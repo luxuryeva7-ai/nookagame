@@ -10,9 +10,26 @@
     p.xp = p.xp || 0;
     p.missions = p.missions || {};
     p.days = p.days || [];
+    /* xpBy — опыт за каждую миссию. Нужен, чтобы прогресс с двух устройств
+       сложился без двойного счёта (nooka-sync.js). В старых профилях его
+       нет: делим накопленный опыт поровну между пройденными миссиями —
+       сумма сходится, а сервер делит так же. */
+    if (!p.xpBy) {
+      p.xpBy = {};
+      var ids = Object.keys(p.missions);
+      if (ids.length) {
+        var each = Math.floor(p.xp / ids.length);
+        ids.forEach(function (id, i) { p.xpBy[id] = each + (i === 0 ? p.xp - each * ids.length : 0); });
+      } else if (p.xp) {
+        p.xpBy._extra = p.xp;
+      }
+    }
     return p;
   }
-  function save(p) { try { localStorage.setItem(KEY, JSON.stringify(p)); } catch (e) {} }
+  function save(p) {
+    try { localStorage.setItem(KEY, JSON.stringify(p)); } catch (e) {}
+    if (window.nookaSync) window.nookaSync.changed();
+  }
   function dstr(d) {
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
   }
@@ -110,6 +127,42 @@
     setTimeout(function () { logPush('открыт', document.title); }, 900);
   }
 
+  /* ── уровень целиком на экране компьютера ──────────────────
+     Игры свёрстаны под телефон: узкая колонка в высоту экрана, внутри неё
+     прокрутка. На компьютере высота примерно та же, что у телефона, а вот
+     кнопки ответа оказываются под нижним краем — ребёнок крутит колесо и не
+     видит, чем отвечать.
+
+     Рычаг тут неожиданный: сцена уровня квадратная, её высота растёт вместе
+     с шириной колонки. Значит на большом экране колонку надо не расширять,
+     а сузить — сцена становится ниже, и всё помещается. Ширины хватает: на
+     компьютере по бокам и так пусто. */
+  function fitWide() {
+    var id = 'nooka-fit';
+    var st = document.getElementById(id);
+    if (window.innerWidth < 900) { if (st) st.remove(); return; }
+    if (st) return;
+    st = document.createElement('style');
+    st.id = id;
+    st.textContent = '@media(min-width:900px){#root>*{max-width:408px}}';
+    document.head.appendChild(st);
+  }
+  window.addEventListener('resize', fitWide);
+  document.addEventListener('DOMContentLoaded', fitWide);
+  fitWide();
+
+  /* Служебный параметр перехода между уровнями одного файла в адресе не нужен:
+     ребёнок копирует ссылку, показывает её другу — там должен быть чистый адрес. */
+  (function tidyGo() {
+    try {
+      var q = new URLSearchParams(location.search);
+      if (!q.has('_go')) return;
+      q.delete('_go');
+      var qs = q.toString();
+      history.replaceState(null, '', location.pathname + (qs ? '?' + qs : '') + location.hash);
+    } catch (e) {}
+  })();
+
   window.nooka = {
     icon: icon,
     log: logPush,
@@ -129,15 +182,38 @@
       return many;
     },
 
-    addXP: function (n) { var p = load(); p.xp += n; save(p); return p.xp; },
+    /* Перемешать варианты ответа. Во всех викторинах правильный вариант стоял
+       первым — за пару уровней ребёнок это замечает и дальше жмёт первый, не
+       читая. Порядок считается от текстов, поэтому он одинаков при каждой
+       перерисовке экрана и варианты не прыгают под пальцем. */
+    shuffled: function (list) {
+      if (!list || list.length < 2) return list || [];
+      function key(x) {
+        var t = String((x && (x.t || x.text)) || x), h = 2166136261;
+        for (var i = 0; i < t.length; i++) { h ^= t.charCodeAt(i); h = (h * 16777619) >>> 0; }
+        return h;
+      }
+      return list.slice().sort(function (a, b) { return key(a) - key(b); });
+    },
+
+    addXP: function (n) {
+      var p = load();
+      p.xp += n;
+      p.xpBy._extra = (p.xpBy._extra || 0) + n;
+      save(p);
+      return p.xp;
+    },
 
     // Отметить миссию пройденной. XP начисляется один раз, день идёт в стрик всегда.
     completeMission: function (id, xp) {
+      /* Первый уровень курса — ключевая точка воронки: если ребёнок его
+         прошёл, он играет дальше. Считаем только первое прохождение. */
+      if (id === 'data1' && window.nkGoal && !load().missions[id]) nkGoal('level_1_done');
       var p = load();
       var t = dstr(new Date());
       if (p.days.indexOf(t) < 0) p.days.push(t);
       var isNew = !p.missions[id];
-      if (isNew) { p.missions[id] = Date.now(); p.xp += (xp || 60); }
+      if (isNew) { p.missions[id] = Date.now(); p.xp += (xp || 60); p.xpBy[id] = xp || 60; }
       save(p);
       return isNew;
     },
@@ -189,7 +265,9 @@
       el.id = 'nooka-beat';
       el.innerHTML =
         '<style>' +
-        '#nooka-beat{position:fixed;left:12px;right:12px;bottom:14px;z-index:9998;display:flex;justify-content:center;' +
+        /* Плашка висит СВЕРХУ. Снизу она садилась ровно на кнопку действия —
+           ребёнок жал и попадал в подсказку, а не в кнопку. */
+        '#nooka-beat{position:fixed;left:12px;right:12px;top:12px;z-index:9998;display:flex;justify-content:center;' +
         'pointer-events:none;animation:nkBeatIn .38s cubic-bezier(.34,1.4,.64,1)}' +
         '#nooka-beat.out{animation:nkBeatOut .3s ease forwards}' +
         '#nooka-beat .nkb{pointer-events:auto;cursor:pointer;max-width:460px;width:100%;display:flex;gap:12px;align-items:flex-start;' +
@@ -197,9 +275,12 @@
         'box-shadow:0 14px 34px rgba(0,0,0,.45);font-family:\'Space Grotesk\',system-ui,sans-serif}' +
         '#nooka-beat i{flex:none;width:5px;align-self:stretch;background:#FFD84D;border-radius:4px}' +
         '#nooka-beat span{display:block;font-size:17px;line-height:1.3;font-weight:700;color:#FFF6DC}' +
-        '@keyframes nkBeatIn{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}' +
-        '@keyframes nkBeatOut{to{opacity:0;transform:translateY(14px)}}' +
-        '</style><div class="nkb"><i></i><span>' + text + '</span></div>';
+        '#nooka-beat b{flex:none;align-self:center;width:26px;height:26px;border-radius:50%;display:flex;' +
+        'align-items:center;justify-content:center;font-size:15px;font-weight:400;color:#FFE7B8;' +
+        'background:rgba(255,255,255,.08)}' +
+        '@keyframes nkBeatIn{from{opacity:0;transform:translateY(-22px)}to{opacity:1;transform:none}}' +
+        '@keyframes nkBeatOut{to{opacity:0;transform:translateY(-14px)}}' +
+        '</style><div class="nkb"><i></i><span>' + text + '</span><b>\u2715</b></div>';
       document.body.appendChild(el);
 
       var gone = false;
@@ -263,7 +344,7 @@
          экран победы никуда не ведёт, — поэтому кнопка сама открывает
          следующий уровень этой же игры, а ссылка ниже возвращает к списку.
          Сам уровень никуда не уводит: любой переход тут только по клику. */
-      var hub = { href: '../base/', label: '\u041c\u043e\u044f \u0431\u0430\u0437\u0430' };
+      var hub = { href: '../base/', label: '\u041b\u0438\u0447\u043d\u044b\u0439 \u043a\u0430\u0431\u0438\u043d\u0435\u0442' };
       var next = null, hasArt = false, now = '', real = '', betOk = null;
       try {
         if (window.nookaLevels && opts.mid) {
@@ -337,9 +418,30 @@
       var pct = rank.next ? Math.min(100, Math.round((total - rank.at) / (rank.next.at - rank.at) * 100)) : 100;
       requestAnimationFrame(function () { wrap.querySelector('.nk-bar i').style.width = pct + '%'; });
 
+      /* Переход дальше. Несколько уровней живут в одном файле и отличаются только
+         решёткой (prompt.html#l1 → #l2). Браузер в этом случае меняет адрес, но
+         страницу не перезагружает — и ребёнок остаётся на уже пройденном уровне.
+         Кнопка «Дальше» из-за этого выглядела сломанной. Перезагружаем руками. */
+      function goNext(href) {
+        var a = document.createElement('a');
+        a.href = href;                       // разворачиваем относительный адрес
+        var samePage = a.pathname === location.pathname && a.search === location.search;
+        if (samePage) {
+          /* Тот же файл, отличается только решётка. Программная перезагрузка тут
+             ненадёжна — браузер занят обработкой смены решётки и глотает её.
+             Поэтому уходим обычным переходом на адрес, который отличается ещё и
+             параметром: такую навигацию браузер выполняет всегда. Параметр
+             убирается из адреса сразу после загрузки (см. tidyGo ниже). */
+          var q = a.search ? a.search + '&' : '?';
+          location.href = a.pathname + q + '_go=' + Date.now() + a.hash;
+          return;
+        }
+        location.href = href;
+      }
+
       wrap.querySelector('.nk-next').onclick = function () {
         if (opts.onNext) { wrap.remove(); opts.onNext(); return; }
-        window.location.href = next ? next.href : hub.href;
+        goNext(next ? next.href : hub.href);
       };
 
       // конфетти
@@ -398,4 +500,20 @@
       }, 700 * (i + 1));
     });
   } catch (e) {}
+})();
+
+/* Прогресс в аккаунте родителя: модули лежат рядом с этим файлом.
+   Подключаем отсюда, чтобы не вписывать их в каждую игру. */
+(function () {
+  if (window.nookaSync) return;
+  var me = document.currentScript;
+  if (!me || !me.src) return;
+  var dir = me.src.replace(/[^\/]*$/, '');
+  var files = window.nookaAccount ? ['nooka-sync.js'] : ['nooka-account.js', 'nooka-sync.js'];
+  files.forEach(function (f) {
+    var s = document.createElement('script');
+    s.src = dir + f;
+    s.async = false;   // по порядку: sync опирается на account
+    document.head.appendChild(s);
+  });
 })();
