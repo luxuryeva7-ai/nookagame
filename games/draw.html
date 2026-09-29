@@ -1473,7 +1473,7 @@ function LevelDraw({ n, onWin, onHome }) {
     model.forEach(m => { if (words.indexOf(m.label) < 0) words.push(m.label); });
     const hasArt = !!L.win.art;
     return React.createElement('div', { className: 'dw' },
-      React.createElement(TopBar, { level: n, title: L.title, onHome, step: 1, total: 1 }),
+      React.createElement(TopBar, { level: (window.nookaLevels && window.nookaLevels.numberOf(L.mid)) || n, title: L.title, onHome, step: 1, total: 1 }),
       React.createElement('div', { className: 'dwbody dwdone' },
         L.win.show === 'diploma'
           ? React.createElement(DwDiploma, {
@@ -1583,7 +1583,7 @@ function LevelDraw({ n, onWin, onHome }) {
        выбора считается по нему же, иначе ответ и проверка разъедутся. */
     const qo = nkMix(L.quiz.opts);
     return React.createElement('div', { className: 'dw' },
-      React.createElement(TopBar, { level: n, title: L.title, onHome, step: 1, total: 1 }),
+      React.createElement(TopBar, { level: (window.nookaLevels && window.nookaLevels.numberOf(L.mid)) || n, title: L.title, onHome, step: 1, total: 1 }),
       React.createElement('div', { className: 'dwbody' },
         React.createElement('div', { className: 'dwq' },
           React.createElement('div', { className: 'dwq__t' }, L.quiz.q),
@@ -1624,7 +1624,7 @@ function LevelDraw({ n, onWin, onHome }) {
   const hit = guess && (step.unknown || (!guess.unsure && guess.label === step.expect));
 
   return React.createElement('div', { className: 'dw' },
-    React.createElement(TopBar, { level: n, title: L.title, onHome, step: 1, total: 1 }),
+    React.createElement(TopBar, { level: (window.nookaLevels && window.nookaLevels.numberOf(L.mid)) || n, title: L.title, onHome, step: 1, total: 1 }),
 
     phase === 'intro' && React.createElement(IntroModal, {
       emoji: NKM('hello', 88),
