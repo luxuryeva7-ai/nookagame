@@ -58,7 +58,11 @@
         'Увидит своими глазами, почему ИИ ошибается',
         'Научится проверять ответы, а не верить сразу',
       ],
-      free: 11,              // первая игра открыта целиком: платными идут вторая и третья
+      /* Бесплатны первые три уровня (29.09.2026). Раньше была открыта вся первая
+         игра, и по Метрике до оплаты не доходил никто: 11 уровней и мастерская
+         закрывали интерес бесплатно. Остальное — по доступу, одно число здесь
+         решает и стену, и тексты на сайте. */
+      free: 3,
       levels: [
         { n: 1,  t: 'Где спрятан ИИ', goal: 'искать, в каких вещах дома живёт ИИ', do: 'Посвети фонарём и найди вещи, в которых есть ИИ',       s: 'Светит фонариком по тёмной комнате и ищет, в каких вещах есть ИИ, а в каких обычная программа', learn: 'Не всякая техника с кнопками — искусственный интеллект. Обычную программу человек написал по шагам, а ИИ научили на примерах — поэтому он может и ошибиться', href: 'room.html', mid: 'data1', v: 'u', xp: 60, g: 'eye', art: null, idea: 1 },
         { n: 2,  t: 'Нарисуй — и научи', goal: 'учить ИИ узнавать кота по своим рисункам', do: 'Нарисуй пальцем несколько котов и домов', now: 'Обучить ИИ своими примерами',    s: 'Рисует пальцем несколько котов и домиков — и программа начинает отличать одно от другого по этим самым рисункам', learn: 'ИИ научился узнавать котов только потому, что ребёнок показал ему своих котов. Ничего, кроме показанного, он не знает', ask: 'Откуда программа знает, как выглядит кот?', bets: ['Ему показали много котов', 'Он сам догадался', 'Он знал это всегда'], bet: 0, real: 'Ему показали примеры — и кроме них он не знает ничего', href: 'draw.html?n=2', mid: 'data2', v: 'u', xp: 80, g: 'brush', art: 'Питомец', idea: 3 },
@@ -315,26 +319,44 @@
   function shopsWord(n) { return n ? (SHOPS[n] || n + ' мастерских') : ''; }
 
   /* Сколько всего в одной игре или в наборе игр: уровни, бонусы, мастерские.
-     keys — ключ игры, список ключей или 'free' / 'paid'. */
+     keys — ключ игры, список ключей, 'all', 'free' или 'paid'.
+     'free' — только бесплатные уровни (первые free в каждой игре);
+     'paid' — всё, что открывает доступ: остальные уровни, бонусы и мастерские.
+     Мастерская бесплатна, только если бесплатна вся её игра. */
   function volume(keys) {
-    var list;
-    if (keys === 'all') list = GAMES.slice();
-    else if (keys === 'free') list = GAMES.filter(function (g) { return (g.free || 0) >= g.levels.length; });
-    else if (keys === 'paid') list = GAMES.filter(function (g) { return (g.free || 0) < g.levels.length; });
-    else if (typeof keys === 'string') list = [game(keys)].filter(Boolean);
-    else list = keys.map(game).filter(Boolean);
-
     var lv = 0, shops = 0;
-    list.forEach(function (g) {
-      lv += g.levels.length + ((g.extras || []).length);
-      if (g.sandbox) shops++;
-    });
+    if (keys === 'free' || keys === 'paid') {
+      GAMES.forEach(function (g) {
+        var free = Math.min(g.free || 0, g.levels.length), whole = free >= g.levels.length;
+        if (keys === 'free') { lv += free; if (whole && g.sandbox) shops++; }
+        else if (!whole) { lv += g.levels.length - free + ((g.extras || []).length); if (g.sandbox) shops++; }
+      });
+    } else {
+      var list;
+      if (keys === 'all') list = GAMES.slice();
+      else if (typeof keys === 'string') list = [game(keys)].filter(Boolean);
+      else list = keys.map(game).filter(Boolean);
+      list.forEach(function (g) {
+        lv += g.levels.length + ((g.extras || []).length);
+        if (g.sandbox) shops++;
+      });
+    }
     return {
       levels: lv,
       shops: shops,
       text: levelsWord(lv) + (shops ? ' и ' + shopsWord(shops) : ''),
       short: levelsWord(lv)
     };
+  }
+
+  /* Что бесплатно — одной фразой для стены, карточек и страницы покупки.
+     «первые 3 уровня игры «Что такое ИИ»» — число и игра из реестра. */
+  function freeText() {
+    var g = GAMES.filter(function (x) { return (x.free || 0) > 0; })[0];
+    if (!g) return '';
+    var n = Math.min(g.free, g.levels.length);
+    if (n >= g.levels.length) return 'вся игра «' + g.name + '»';
+    return 'первые ' + levelsWord(n) + ' игры «' + g.name + '»';
   }
 
   window.nookaLevels = {
@@ -346,6 +368,7 @@
     stats: stats,
     totals: totals,
     volume: volume,
+    freeText: freeText,
     levelsWord: levelsWord,
     nextLevel: nextLevel,
     report: report,

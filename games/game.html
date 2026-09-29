@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Игра — Nooka</title>
 <meta property="og:title" content="Игры про ИИ-грамотность — Nooka">
-<meta property="og:description" content="Курс ИИ-грамотности для детей 8–12: три игры, тридцать три уровня. Первая игра — бесплатно, с телефона, без установки.">
+<meta property="og:description" content="Курс ИИ-грамотности для детей 8–12: три игры, тридцать три уровня. Первые уровни — бесплатно, с телефона, без установки.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://nookagame.ru/games/game.html">
 <meta property="og:image" content="https://nookagame.ru/screenshots/og.jpg">
@@ -332,14 +332,12 @@ function wallNote() {
   var open = G.levels.some(function (lv) { return lv.href && nookaAccess.canPlay(key, lv.n); });
   if (open) return '';
   var guest = nookaAccess.state().guest;
-  var freeGame = nookaLevels.games.filter(function (x) {
-    return (x.free || 0) >= x.levels.length; })[0];
+  var freeText = nookaLevels.freeText ? nookaLevels.freeText() : '';
   var next = encodeURIComponent(location.pathname + location.search);
   return '<div class="wall">' +
     '<b>Эта игра — в платной части</b>' +
-    '<p>Первая игра курса бесплатна целиком' +
-      (freeGame ? ' — «' + esc(freeGame.name) + '», ' + freeGame.levels.length + ' уровней' : '') +
-      '. Вторая и третья открываются доступом на всю семью: разовая оплата, ' +
+    '<p>' + (freeText ? 'Бесплатно — ' + esc(freeText) + '. ' : '') +
+      'Весь курс открывается доступом на всю семью: разовая оплата, ' +
       'без подписки, возврат в течение 14 дней.</p>' +
     '<div class="wall-row">' +
       (guest

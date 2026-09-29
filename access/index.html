@@ -104,17 +104,18 @@
     } else {
       box.className = 'state';
       h.textContent = 'Платная часть закрыта';
-      sub.textContent = 'Первая игра курса открыта целиком и без оплаты. Вторая и третья — по доступу.';
+      sub.textContent = 'Бесплатно — ' + (L.freeText ? L.freeText() : 'первые уровни') + '. Остальное — по доступу.';
       document.getElementById('payRow').hidden = false;
     }
 
     /* Игры курса: что открыто, а что нет — из общего реестра */
     document.getElementById('games').innerHTML = L.games.map(function (g) {
-      var free = (g.free || 0) >= g.levels.length;
+      var free = (g.free || 0) >= g.levels.length, some = !free && (g.free || 0) > 0;
       var open = free || s.paid || A.openAll;
-      return '<div><b>' + g.name + '</b><span class="n">' + g.levels.length + ' уровней</span>' +
+      return '<div><b>' + g.name + '</b><span class="n">' + L.levelsWord(g.levels.length) + '</span>' +
         '<span class="mark' + (open ? ' mark--on' : '') + '">' +
-          (open ? 'открыта' : 'по доступу') + (free ? ' · бесплатно' : '') + '</span></div>';
+          (open ? 'открыта' : some ? L.levelsWord(g.free) + ' бесплатно' : 'по доступу') +
+          (free ? ' · бесплатно' : '') + '</span></div>';
     }).join('');
   }
 
