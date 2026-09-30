@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0E0719">
 <title>Что не рассказывать ИИ — Nooka</title>
 <meta property="og:title" content="Что не рассказывать ИИ — Nooka">
-<meta property="og:description" content="Курс ИИ-грамотности для детей 8–12: три игры, тридцать три уровня. Первая игра — бесплатно, с телефона, без установки.">
+<meta property="og:description" content="Курс ИИ-грамотности для детей 8–12: три игры, тридцать три уровня. Первые уровни — бесплатно, с телефона, без установки.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://nookagame.ru/games/private.html">
 <meta property="og:image" content="https://nookagame.ru/screenshots/og.jpg">
@@ -99,9 +99,12 @@
 <script src="nooka-gallery.js"></script>
 <script src="nooka-ui.js"></script>
 <script>
+/* Номер в шапке — из реестра: уровень переехал третьим в первую игру (29.09) */
+const LV_NO = (window.nookaLevels && window.nookaLevels.numberOf('in10')) || 3;
 /* ============================================================
-   ЧТО НЕ РАССКАЗЫВАТЬ ИИ — уровень 10 игры «Как применять ИИ в жизни».
-   Последний уровень курса.
+   ЧТО НЕ РАССКАЗЫВАТЬ ИИ — уровень 3 игры «Что такое ИИ», бесплатный
+   (с 29.09.2026; до этого был десятым в игре «Как применять ИИ в жизни»).
+   Третий, чтобы родитель сразу увидел пользу про безопасность.
 
    Помощник вежливый и правда полезный: он придумывает игры
    для дня рождения, помогает с открыткой. И между делом просит
@@ -335,7 +338,7 @@ function LevelPrivate({ onWin, onHome }) {
   if (phase === 'done') {
     const safe = kept.length === 0;
     return React.createElement('div', { className: 'pv' },
-      React.createElement(TopBar, { level: 10, title: 'Что не говорить ИИ', onHome, step: 1, total: 1 }),
+      React.createElement(TopBar, { level: LV_NO, title: 'Что не говорить ИИ', onHome, step: 1, total: 1 }),
       React.createElement('div', { className: 'pvbody pvdone' },
         React.createElement(PvCard, { kept: kept, safe: safe }),
         React.createElement('div', { className: 'pvlaw' },
@@ -379,7 +382,7 @@ function LevelPrivate({ onWin, onHome }) {
     ]);
     const both = q1 !== null && o1[q1].ok && q2 !== null && o2[q2].ok;
     return React.createElement('div', { className: 'pv' },
-      React.createElement(TopBar, { level: 10, title: 'Что не говорить ИИ', onHome, step: 1, total: 1 }),
+      React.createElement(TopBar, { level: LV_NO, title: 'Что не говорить ИИ', onHome, step: 1, total: 1 }),
       React.createElement('div', { className: 'pvbody' },
         React.createElement('div', { className: 'pvq' },
           React.createElement('div', { className: 'pvq__t' }, 'Помощник был вежливый и правда помогал. Почему адрес ему говорить не стоило?'),
@@ -412,7 +415,7 @@ function LevelPrivate({ onWin, onHome }) {
   /* ── переписка ── */
   const shown = log.slice(-4);
   return React.createElement('div', { className: 'pv' },
-    React.createElement(TopBar, { level: 10, title: 'Что не говорить ИИ', onHome, step: 1, total: 1 }),
+    React.createElement(TopBar, { level: LV_NO, title: 'Что не говорить ИИ', onHome, step: 1, total: 1 }),
 
     phase === 'intro' && React.createElement(IntroModal, {
       emoji: NKM('hello', 88),
@@ -452,7 +455,7 @@ function App() {
       onWin: () => {
         if (window.nooka) window.nooka.missionWin('in10', 110);
       },
-      onHome: () => { window.location.href = 'game.html?g=inside'; },
+      onHome: () => { window.location.href = 'game.html?g=data'; },
     }));
 }
 ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App, null));

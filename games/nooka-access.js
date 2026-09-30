@@ -29,9 +29,9 @@
 
   /* ── переключатели запуска ────────────────────────────────
      OPEN_ALL = true  — вся платформа открыта (показы, тесты, до старта продаж)
-     OPEN_ALL = false — работает платная стена: бесплатна вся первая игра
-                        целиком (поле free в реестре), две другие — по оплате */
-  var OPEN_ALL = false;  // ← стена включена: бесплатна только первая игра
+     OPEN_ALL = false — работает платная стена: бесплатны первые уровни
+                        первой игры (поле free в реестре), остальное — по оплате */
+  var OPEN_ALL = false;  // ← стена включена
 
   /* Поддержка: сюда ведут за помощью, если с оплатой что-то не так. */
   var TG_URL = 'https://t.me/NookaGame';
@@ -137,6 +137,15 @@
   /* ── можно ли играть ─────────────────────────────────────
      Ответ синхронный — по тому, что уже известно. До ready платным
      уровням отвечает «нет», поэтому страницы платных уровней ждут. */
+  /* Что бесплатно и что открывает доступ — словами из реестра, чтобы стена
+     не разъезжалась с тем, сколько уровней на самом деле открыто */
+  function freeLine() {
+    var t = window.nookaLevels && window.nookaLevels.freeText ? window.nookaLevels.freeText() : '';
+    return t ? 'Бесплатно — ' + t + '.' : '';
+  }
+  function paidLine() {
+    return window.nookaLevels ? window.nookaLevels.volume('paid').text : 'остальные уровни';
+  }
   function isFree(gameKey, n) {
     var g = window.nookaLevels && window.nookaLevels.game(gameKey);
     return !!(g && n <= (g.free || 0));
@@ -215,7 +224,7 @@
           ' Если доступ уже оплачен, войдите по почте — и всё откроется на этом устройстве тоже.</p>' +
         '<a class="nkpw__go" href="' + LOGIN_URL + '?next=' + nextUrl() + '">Войти по почте</a>' +
         '<a class="nkpw__alt" href="' + BUY_URL + '">Что входит в доступ и сколько стоит →</a>'
-      : '<p class="nkpw__s">' + (opts.sub || 'Первая игра открыта всем целиком. Две другие — по доступу для одной семьи.') + '</p>' +
+      : '<p class="nkpw__s">' + (opts.sub || freeLine() + ' Весь курс — ' + paidLine() + ' — по доступу для одной семьи.') + '</p>' +
         '<div class="nkpw__plans">' + plan('quarter') + plan('year') + '</div>' +
         '<a class="nkpw__alt" href="' + BUY_URL + '">Подробнее о том, что открывается →</a>';
 
@@ -348,7 +357,7 @@
         var sf = String(g.sandbox.href).split(/[?#]/)[0].toLowerCase();
         if (sf === file) {
           var last = g.levels.length;
-          out.push({ game: g, level: { n: last, t: g.sandbox.t, href: g.sandbox.href, mid: g.sandbox.mid } });
+          out.push({ game: g, shop: true, level: { n: last, t: g.sandbox.t, href: g.sandbox.href, mid: g.sandbox.mid } });
         }
       }
     });
@@ -390,11 +399,17 @@
       if (S.paid) return;
       var hub = 'game.html?g=' + cur.game.key;
       if (S.offline) return offlineWall({ hub: hub });
+      /* В игре, которая начинается бесплатно, говорим про «эту игру», а не
+         повторяем её название дважды */
+      var here = (cur.game.free || 0) > 0
+        ? 'Бесплатно открыты первые ' + window.nookaLevels.levelsWord(cur.game.free) + ' этой игры.'
+        : freeLine();
       paywall({
-        title: whole ? 'Эта игра — в платной части' : 'Этот уровень — в платной части',
-        sub: whole
-          ? 'Игра «' + cur.game.name + '» открывается по доступу. Первая игра курса бесплатна целиком.'
-          : '«' + cur.level.t + '» из игры «' + cur.game.name + '». Бесплатно открыта вся первая игра.',
+        title: cur.shop ? 'Мастерская — в платной части'
+          : whole ? 'Эта игра — в платной части' : 'Этот уровень — в платной части',
+        sub: cur.shop ? 'Мастерская «' + cur.level.t + '» открывается по доступу. ' + here
+          : whole ? 'Игра «' + cur.game.name + '» открывается по доступу. ' + freeLine()
+          : '«' + cur.level.t + '» из игры «' + cur.game.name + '». ' + here,
         onClose: function () { location.href = hub; }
       });
     });
