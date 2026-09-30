@@ -90,5 +90,44 @@
     };
   }
 
-  window.nookaMath = { el: el, dots: dots, bond: bond, sparks: sparks, hand: hand };
+  /* Курс «Числа-друзья» — свой список, отдельно от реестра ИИ-курса
+     (nooka-levels.js): пока математика не вышла, она не должна попадать
+     ни в подсчёты на главной, ни на стену оплаты. */
+  var COURSE = {
+    name: 'Числа-друзья',
+    levels: [
+      { n: 1, t: 'Светлячки', aha: 'последнее число — это сколько всего' },
+      { n: 2, t: 'Домик для числа', aha: 'число — это домик из двух частей', href: 'math-house.html', mid: 'ma2', img: 'math/house-bg.webp' },
+      { n: 3, t: 'Рамка десяти', aha: 'десять — это два ряда по пять', href: 'math-frame.html', mid: 'ma3', img: 'math/arena-bg.webp' },
+      { n: 4, t: 'Голодный крокодил', aha: 'сравниваем, где больше' },
+      { n: 5, t: 'Прыжки кузнечика', aha: '+3 — это три прыжка вперёд' },
+      { n: 6, t: 'Убежавшие зайцы', aha: 'вычесть — узнать, сколько осталось' },
+      { n: 7, t: 'Через десяток', aha: 'сначала до десяти, потом дальше' },
+      { n: 8, t: 'Близнецы', aha: '6 + 7 — это близнецы и ещё один' },
+      { n: 9, t: 'Загадка весов', aha: 'сколько не хватает — вычитаем' },
+      { n: 10, t: 'Лавка', aha: 'одну сумму собирают разными монетами' },
+    ],
+    arena: { t: 'Арена', aha: 'накорми Няма и вырасти питомца', href: 'math-arena.html', img: 'math/nyam-idle.webp' },
+  };
+
+  /* Страница курса: уровни по порядку, готовые — со ссылкой, остальные «скоро» */
+  function hub(box) {
+    var done = [];
+    try { done = window.nooka ? window.nooka.getCompleted('ma') : []; } catch (e) {}
+    function card(lv, isArena) {
+      var ready = !!lv.href, ok = lv.n && done.indexOf(lv.n) >= 0;
+      var a = el(ready ? 'a' : 'div', 'mhub__lv' + (ready ? '' : ' mhub__lv--soon') + (isArena ? ' mhub__lv--arena' : ''));
+      if (ready) a.href = lv.href;
+      a.innerHTML =
+        '<span class="mhub__shot">' + (lv.img ? '<img src="' + lv.img + '" alt="" loading="lazy">' : '') + '</span>' +
+        '<span class="mhub__tx"><i>' + (isArena ? '◆ Мастерская' : 'Уровень ' + lv.n) + (ok ? ' · пройден' : '') + '</i>' +
+        '<b>' + lv.t + '</b><span>' + lv.aha + '</span></span>' +
+        '<span class="mhub__go">' + (ok ? '✓' : ready ? '→' : 'скоро') + '</span>';
+      return a;
+    }
+    COURSE.levels.forEach(function (lv) { box.appendChild(card(lv)); });
+    box.appendChild(card(COURSE.arena, true));
+  }
+
+  window.nookaMath = { el: el, dots: dots, bond: bond, sparks: sparks, hand: hand, course: COURSE, hub: hub };
 })();

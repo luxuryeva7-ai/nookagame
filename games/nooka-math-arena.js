@@ -390,7 +390,7 @@
     };
   }
 
-  document.getElementById('back').onclick = function () { history.length > 1 ? history.back() : (location.href = 'math-house.html'); };
+  document.getElementById('back').onclick = function () { location.href = 'math.html'; };
   if (st.pet) drawPet(false);
   drawStars();
   newTask();
