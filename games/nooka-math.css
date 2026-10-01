@@ -461,3 +461,29 @@ body.mhub-body{background:linear-gradient(180deg,#DDEFF6,#FFF4E4 45%);height:100
 @keyframes mmPair{0%{transform:translate(-50%,-50%) scale(.4);}100%{transform:translate(-50%,-50%) scale(1);}}
 /* карточки ответа — на пустой стене, чтобы не закрывать горки на столе */
 .mm-cards{top:31%;bottom:auto;}
+
+/* ============================================================
+   ЗАГАДКА ВЕСОВ: коромысло, чаши, гирьки на столе
+   ============================================================ */
+.ms-base,.ms-beam,.ms-pan{position:absolute;pointer-events:none;}
+.ms-base{z-index:9;}
+.ms-pan{z-index:11;}
+.ms-beam{z-index:12;transform-origin:50% 22%;}
+.ms-base img,.ms-beam img,.ms-pan>img{display:block;width:100%;pointer-events:none;filter:drop-shadow(0 8px 8px rgba(45,27,69,.28));}
+.ms-beam.even img{filter:drop-shadow(0 0 10px #FFD84D) drop-shadow(0 8px 8px rgba(45,27,69,.28));}
+.ms-it{position:absolute;width:20%;transform:translateX(-50%);border:none;background:none;padding:0;margin:0;pointer-events:none;}
+.ms-it img{display:block;width:100%;pointer-events:none;filter:drop-shadow(0 3px 2px rgba(45,27,69,.3));}
+/* добавленные гирьки светятся — их и считаем; касание снимает обратно */
+.ms-it.added{pointer-events:auto;cursor:pointer;}
+.ms-it.added img{filter:drop-shadow(0 0 6px #FFD84D) drop-shadow(0 0 3px #FFC53A);}
+.ms-it.pop{animation:msPop .38s cubic-bezier(.3,1.5,.5,1);}
+@keyframes msPop{0%{transform:translateX(-50%) translateY(-90%) scale(.6);opacity:.4;}100%{transform:translateX(-50%);opacity:1;}}
+.ms-it.hop{animation:msHop .5s cubic-bezier(.3,1.4,.5,1);}
+@keyframes msHop{40%{transform:translateX(-50%) translateY(-35%);}}
+.ms-badge{position:absolute;left:50%;top:100%;transform:translateX(-50%);margin-top:4px;padding:3px 12px;border-radius:999px;
+  font-family:var(--nk-brand);font-weight:700;font-size:20px;line-height:1.2;color:var(--nk-ink);background:#FFFDF8;
+  box-shadow:0 3px 0 rgba(45,27,69,.12);}
+.ms-tray{position:absolute;left:0;right:0;top:90%;height:0;z-index:20;transition:opacity .3s;}
+.ms-tray .ms-spare{width:9%;bottom:0;pointer-events:auto;cursor:pointer;}
+.ms-tray .ms-spare:active{transform:translateX(-50%) scale(.92);}
+.ms-tray.dim{opacity:.5;}
