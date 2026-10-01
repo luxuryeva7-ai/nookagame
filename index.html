@@ -357,7 +357,8 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
 .cc-st svg{width:13px;height:13px;flex:none}
 .cc-st--free{color:#0C2A1E;background:#5FE3A6;box-shadow:0 6px 16px -6px rgba(0,0,0,.55)}
 .cc-st--lock{color:#FFE7AE;background:rgba(18,12,34,.9);box-shadow:inset 0 0 0 1px rgba(255,216,77,.5)}
-.cc-shot--lock img{filter:saturate(.5) brightness(.62)}
+/* платные — чуть приглушены, но рендер должен манить: замок и так показан биркой */
+.cc-shot--lock img{filter:saturate(.85) brightness(.82)}
 .cc-shot--lock::before{content:'';position:absolute;inset:0;z-index:1;
   background:linear-gradient(180deg,rgba(12,8,24,.34),rgba(12,8,24,.06))}
 .cc-no{color:var(--t)}
@@ -755,7 +756,8 @@ document.querySelectorAll('[data-buy]').forEach(function(b){ b.addEventListener(
     var card = document.createElement('div');
     card.className = 'cc';
     card.style.setProperty('--t', g.tint);
-    var SHOT = { data: 'cover-data', control: 'cover-control', inside: 'cover-inside' };
+    /* Обложки — 3D-рендеры в технике Нейро (Higgsfield, 01.10.2026); старые SVG лежат рядом */
+    var SHOT = { data: 'cover-data-3d', control: 'cover-control-3d', inside: 'cover-inside-3d' };
     /* Бирка говорит то, чего не видно из названия игры: чем она берёт. */
     var MARK = { data: 'Рисует пальцем', control: 'Заказывает словами', inside: 'Три профессии' };
     var full = st.ready === st.total;
@@ -782,7 +784,7 @@ document.querySelectorAll('[data-buy]').forEach(function(b){ b.addEventListener(
         '<span class="cc-tag' + (full ? '' : ' cc-tag--soon') + '">' +
           (full ? MARK[g.key] : 'Готово ' + st.ready + ' из ' + st.total) + '</span>' +
         status +
-        '<img src="shots/' + SHOT[g.key] + '.svg" alt="Обложка игры «' + g.name + '»" loading="lazy">' +
+        '<img src="shots/' + SHOT[g.key] + '.webp" alt="Обложка игры «' + g.name + '»" loading="lazy">' +
       '</div>' +
       '<div class="cc-body">' +
         '<div class="cc-top"><span class="cc-no">'+NO[i+1]+'</span><span class="cc-age">'+g.age+'</span></div>' +
