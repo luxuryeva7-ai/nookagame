@@ -95,7 +95,7 @@
   var COURSE = {
     name: 'Числа-друзья',
     levels: [
-      { n: 1, t: 'Светлячки', aha: 'последнее число — это сколько всего' },
+      { n: 1, t: 'Светлячки', aha: 'последнее число — это сколько всего', href: 'math-fireflies.html', mid: 'ma1', img: 'math/night-bg.webp' },
       { n: 2, t: 'Домик для числа', aha: 'число — это домик из двух частей', href: 'math-house.html', mid: 'ma2', img: 'math/house-bg.webp' },
       { n: 3, t: 'Рамка десяти', aha: 'десять — это два ряда по пять', href: 'math-frame.html', mid: 'ma3', img: 'math/arena-bg.webp' },
       { n: 4, t: 'Голодный крокодил', aha: 'сравниваем, где больше' },

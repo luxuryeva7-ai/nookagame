@@ -260,3 +260,34 @@ body.mhub-body{background:linear-gradient(180deg,#DDEFF6,#FFF4E4 45%);overflow:a
 .mhub__lv--arena .mhub__shot{background:#DCCFF9;}
 .mhub__lv--arena .mhub__shot img{object-fit:contain;object-position:50% 100%;}
 .mh-pal.seat{width:14.5%;}
+
+/* ============================================================
+   СВЕТЛЯЧКИ: спящий светлячок, свечение по касанию, номер
+   ============================================================ */
+.mff-bug{position:absolute;z-index:20;width:18%;padding:0;border:none;background:none;cursor:pointer;
+  transform:translate(-50%,-50%);transition:left .7s cubic-bezier(.4,0,.2,1),top .7s cubic-bezier(.4,0,.2,1),width .5s;
+  -webkit-tap-highlight-color:transparent;}
+.mff-bug__in{position:relative;display:block;}
+.mff-bug img{position:relative;display:block;width:100%;pointer-events:none;filter:brightness(.55) saturate(.7);
+  transition:filter .4s;}
+/* летают только спящие: посчитанный замирает — видно, кого уже считал */
+.mff-fly .mff-bug:not(.lit) .mff-bug__in{animation:mffDrift var(--d,4s) ease-in-out var(--delay,0s) infinite alternate;}
+@keyframes mffDrift{0%{transform:translate(-8px,4px);}50%{transform:translate(6px,-8px);}100%{transform:translate(9px,5px);}}
+.mff-glow{position:absolute;left:4%;top:42%;width:58%;aspect-ratio:1;border-radius:50%;opacity:0;
+  background:radial-gradient(circle,rgba(255,240,170,1) 0%,rgba(255,214,92,.85) 35%,rgba(255,190,60,0) 70%);
+  transition:opacity .4s, transform .4s;transform:scale(.6);}
+.mff-bug.lit img{filter:brightness(1.12) saturate(1.05) drop-shadow(0 0 10px rgba(255,214,92,.9));}
+.mff-bug.lit .mff-glow{opacity:1;transform:scale(1.5);animation:mffPulse 1.8s ease-in-out infinite;}
+@keyframes mffPulse{50%{transform:scale(1.75);opacity:.8;}}
+.mff-num{position:absolute;left:50%;top:-34%;transform:translateX(-50%) scale(0);font-family:var(--nk-brand);font-weight:700;
+  font-size:30px;line-height:1;color:#FFE27A;text-shadow:0 0 12px rgba(255,200,60,.9),0 2px 0 rgba(0,0,0,.25);
+  transition:transform .35s cubic-bezier(.3,1.6,.5,1);}
+.mff-bug.lit .mff-num{transform:translateX(-50%) scale(1);}
+.mff-bug.pop .mff-bug__in{animation:mffPop .45s cubic-bezier(.3,1.6,.5,1);}
+.mff-bug.hint .mff-num{animation:mffHint .5s ease-in-out 3;}
+@keyframes mffPop{0%{transform:scale(.8);}60%{transform:scale(1.18);}100%{transform:none;}}
+@keyframes mffHint{50%{transform:translateX(-50%) scale(1.5);}}
+.mff-bug.home{width:9%;z-index:13;}
+.mff-bug.home .mff-num{opacity:0;}
+.mff-badge{min-width:84px;}
+.mff-badge.on{background:linear-gradient(180deg,#FFF6D2,#FFE89A);box-shadow:0 5px 0 #E8AE1F,0 0 30px rgba(255,214,92,.65);}
