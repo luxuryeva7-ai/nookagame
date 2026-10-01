@@ -291,3 +291,35 @@ body.mhub-body{background:linear-gradient(180deg,#DDEFF6,#FFF4E4 45%);overflow:a
 .mff-bug.home .mff-num{opacity:0;}
 .mff-badge{min-width:84px;}
 .mff-badge.on{background:linear-gradient(180deg,#FFF6D2,#FFE89A);box-shadow:0 5px 0 #E8AE1F,0 0 30px rgba(255,214,92,.65);}
+
+/* ============================================================
+   ГОЛОДНЫЙ КРОКОДИЛ: крокодил, кучки яблок, запись «3 < 6»
+   ============================================================ */
+.mcr-croc{position:absolute;z-index:22;width:46%;transform:translate(-50%,-80%);touch-action:none;cursor:grab;
+  transition:left .45s cubic-bezier(.3,1.2,.5,1);}
+.mcr-croc img{display:block;width:100%;pointer-events:none;filter:drop-shadow(0 12px 10px rgba(30,60,30,.35));
+  transform-origin:50% 100%;}
+.mcr-croc.left img{transform:scaleX(-1);}
+.mcr-croc.nope img{animation:mcrNope .55s ease-in-out;}
+.mcr-croc.left.nope img{animation:mcrNopeL .55s ease-in-out;}
+.mcr-croc.full img{animation:mcrFull .6s cubic-bezier(.3,1.5,.5,1);}
+.mcr-croc.left.full img{animation:mcrFullL .6s cubic-bezier(.3,1.5,.5,1);}
+@keyframes mcrNope{25%{transform:rotate(-7deg);}75%{transform:rotate(7deg);}}
+@keyframes mcrNopeL{25%{transform:scaleX(-1) rotate(-7deg);}75%{transform:scaleX(-1) rotate(7deg);}}
+@keyframes mcrFull{40%{transform:scale(1.1,.92);}}
+@keyframes mcrFullL{40%{transform:scaleX(-1.1) scaleY(.92);}}
+.mcr-pile{position:absolute;z-index:18;width:30%;height:16%;transform:translate(-50%,-50%);transition:opacity .4s;}
+.mcr-pile.shake{animation:mhNope .45s ease-in-out;}
+.mcr-pile.gone{opacity:0;}
+.mcr-apple{position:absolute;width:23%;transform:translateX(-50%);filter:drop-shadow(0 4px 3px rgba(45,27,69,.3));
+  transition:transform .35s ease-in, opacity .35s;}
+.mcr-apple.gone{transform:translateX(-50%) scale(.2) translateY(160%);opacity:0;}
+.mcr-pile--digit{display:flex;align-items:center;justify-content:center;width:26%;height:auto;aspect-ratio:1.15;border-radius:22px;
+  background:linear-gradient(180deg,#D39460,#AE6E3B);box-shadow:0 6px 0 #7A4A22,0 16px 26px -12px rgba(45,27,69,.5);}
+.mcr-pile--digit b{font-family:var(--nk-brand);font-weight:700;font-size:54px;color:#FFF6E5;text-shadow:0 2px 0 rgba(90,50,20,.4);}
+.mcr-strip{position:absolute;left:50%;top:14%;z-index:30;transform:translateX(-50%) scale(.6);opacity:0;display:flex;gap:12px;
+  align-items:center;padding:10px 20px;border-radius:24px;background:#FFFDF8;box-shadow:0 6px 0 rgba(45,27,69,.12),0 16px 28px -12px rgba(45,27,69,.45);
+  transition:transform .4s cubic-bezier(.3,1.6,.5,1),opacity .3s;}
+.mcr-strip.on{transform:translateX(-50%) scale(1);opacity:1;}
+.mcr-strip span{font-family:var(--nk-brand);font-weight:700;font-size:38px;color:var(--nk-ink);}
+.mcr-strip i{font-style:normal;font-family:var(--nk-brand);font-weight:700;font-size:44px;color:var(--nk-ok-3);}
