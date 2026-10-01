@@ -431,3 +431,33 @@ body.mhub-body{background:linear-gradient(180deg,#DDEFF6,#FFF4E4 45%);height:100
 .mt-go.on{transform:translate(-50%,-50%) translateY(5px);box-shadow:0 2px 0 #E8AE1F,0 0 0 6px rgba(255,216,77,.45),0 0 0 14px rgba(255,216,77,.2);
   animation:mtHold .65s ease-in-out infinite;}
 @keyframes mtHold{50%{box-shadow:0 2px 0 #E8AE1F,0 0 0 10px rgba(255,216,77,.5),0 0 0 22px rgba(255,216,77,.15);}}
+
+/* ============================================================
+   БЛИЗНЕЦЫ: зеркало, запотевшее стекло, горки и пары
+   ============================================================ */
+.mm-mirror{position:absolute;z-index:10;transform:translate(-50%,-100%);touch-action:none;cursor:grab;}
+.mm-mirror img{display:block;width:100%;pointer-events:none;filter:drop-shadow(0 14px 12px rgba(45,27,69,.35));}
+.mm-mirror.wipe img{animation:mmWipe .22s ease-out;}
+@keyframes mmWipe{50%{transform:rotate(.8deg);}}
+/* запотевшее стекло: ребёнок стирает его пальцем */
+.mm-fog,.mm-glow{position:absolute;left:15%;right:15%;top:14%;bottom:13%;border-radius:50%;pointer-events:none;}
+.mm-fog{background:radial-gradient(ellipse at 40% 35%,rgba(255,255,255,.96),rgba(214,222,236,.94) 60%,rgba(190,198,220,.92));
+  box-shadow:inset 0 0 18px rgba(255,255,255,.9);transition:opacity .2s;}
+.mm-glow{opacity:0;background:radial-gradient(ellipse,rgba(255,255,255,.95) 0,rgba(214,200,255,.55) 45%,rgba(169,139,255,0) 72%);transition:opacity .4s;}
+.mm-mirror.lit .mm-glow{opacity:1;animation:mmGlow 1.6s ease-in-out infinite;}
+@keyframes mmGlow{50%{opacity:.55;}}
+.mm-item{position:absolute;z-index:14;transform:translate(-50%,-100%);pointer-events:none;
+  filter:drop-shadow(0 5px 4px rgba(45,27,69,.3));
+  transition:left .6s cubic-bezier(.3,1.2,.5,1),top .6s cubic-bezier(.3,1.2,.5,1),opacity .3s,transform .3s;}
+.mm-item.fly{opacity:0;transform:translate(-50%,-100%) scale(.3);}
+.mm-item.hop{animation:mmHop .5s cubic-bezier(.3,1.4,.5,1);}
+@keyframes mmHop{40%{transform:translate(-50%,-128%) scale(1.06);}}
+.mm-item.paired{filter:drop-shadow(0 0 7px rgba(169,139,255,.95)) drop-shadow(0 5px 4px rgba(45,27,69,.3));}
+/* тот, у кого нет близнеца, светится жёлтым */
+.mm-item.extra{filter:drop-shadow(0 0 10px #FFD84D) drop-shadow(0 0 4px #FFD84D);animation:mmExtra 1.1s ease-in-out infinite;}
+@keyframes mmExtra{50%{transform:translate(-50%,-112%) scale(1.12);}}
+.mm-pair{position:absolute;z-index:13;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;
+  border:3px solid rgba(169,139,255,.95);box-shadow:0 0 12px rgba(169,139,255,.7);animation:mmPair .4s cubic-bezier(.3,1.4,.5,1);}
+@keyframes mmPair{0%{transform:translate(-50%,-50%) scale(.4);}100%{transform:translate(-50%,-50%) scale(1);}}
+/* карточки ответа — на пустой стене, чтобы не закрывать горки на столе */
+.mm-cards{top:31%;bottom:auto;}

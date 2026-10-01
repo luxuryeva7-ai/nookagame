@@ -102,7 +102,7 @@
       { n: 5, t: 'Прыжки кузнечика', aha: '+3 — это три прыжка вперёд', href: 'math-hop.html', mid: 'ma5', img: 'math/pond-bg.webp' },
       { n: 6, t: 'Убежавшие зайцы', aha: 'вычесть — узнать, сколько осталось', href: 'math-bunny.html', mid: 'ma6', img: 'math/garden-bg.webp' },
       { n: 7, t: 'Через десяток', aha: 'сначала до десяти, потом дальше', href: 'math-train.html', mid: 'ma7', img: 'math/station-bg.webp' },
-      { n: 8, t: 'Близнецы', aha: '6 + 7 — это близнецы и ещё один' },
+      { n: 8, t: 'Близнецы', aha: '6 + 7 — это близнецы и ещё один', href: 'math-twins.html', mid: 'ma8', img: 'math/room-bg.webp' },
       { n: 9, t: 'Загадка весов', aha: 'сколько не хватает — вычитаем' },
       { n: 10, t: 'Лавка', aha: 'одну сумму собирают разными монетами' },
     ],
