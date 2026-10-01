@@ -104,7 +104,7 @@
       { n: 7, t: 'Через десяток', aha: 'сначала до десяти, потом дальше', href: 'math-train.html', mid: 'ma7', img: 'math/station-bg.webp' },
       { n: 8, t: 'Близнецы', aha: '6 + 7 — это близнецы и ещё один', href: 'math-twins.html', mid: 'ma8', img: 'math/room-bg.webp' },
       { n: 9, t: 'Загадка весов', aha: 'сколько не хватает — вычитаем', href: 'math-scales.html', mid: 'ma9', img: 'math/room-bg.webp' },
-      { n: 10, t: 'Лавка', aha: 'одну сумму собирают разными монетами' },
+      { n: 10, t: 'Лавка', aha: 'одну сумму собирают разными монетами', href: 'math-shop.html', mid: 'ma10', img: 'math/shop-bg.webp' },
     ],
     arena: { t: 'Арена', aha: 'накорми Няма и вырасти питомца', href: 'math-arena.html', img: 'math/nyam-idle.webp' },
   };

@@ -487,3 +487,42 @@ body.mhub-body{background:linear-gradient(180deg,#DDEFF6,#FFF4E4 45%);height:100
 .ms-tray .ms-spare{width:9%;bottom:0;pointer-events:auto;cursor:pointer;}
 .ms-tray .ms-spare:active{transform:translateX(-50%) scale(.92);}
 .ms-tray.dim{opacity:.5;}
+
+/* ============================================================
+   ЛАВКА: продавец, товар с ценником, тарелочка, монеты
+   ============================================================ */
+.ml-seller{position:absolute;z-index:12;left:77%;top:62%;width:27%;transform:translate(-50%,-100%);pointer-events:none;
+  filter:drop-shadow(0 10px 10px rgba(45,27,69,.3));transform-origin:50% 100%;}
+.ml-seller.cheer{animation:mlCheer .6s cubic-bezier(.3,1.5,.5,1);}
+@keyframes mlCheer{40%{transform:translate(-50%,-100%) translateY(-10%) scale(1.06);}}
+.ml-item{position:absolute;z-index:16;width:16%;transform:translate(-50%,-100%);pointer-events:none;}
+.ml-item img{display:block;width:100%;filter:drop-shadow(0 6px 5px rgba(45,27,69,.3));}
+.ml-item.sold img{animation:mlSold .9s cubic-bezier(.3,1.4,.5,1);}
+@keyframes mlSold{35%{transform:translateY(-30%) scale(1.15) rotate(-6deg);}}
+.ml-tag{position:absolute;right:-30%;top:-8%;padding:3px 10px;border-radius:9px;transform:rotate(9deg);
+  font-family:var(--nk-brand);font-weight:700;font-size:22px;line-height:1.2;color:var(--nk-ink);background:#FFFDF8;
+  box-shadow:0 3px 0 rgba(45,27,69,.15);}
+.ml-dish{position:absolute;z-index:18;width:34%;aspect-ratio:2.6;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 40%,#FFFFFF,#ECE6F5 60%,#CFC4E2);box-shadow:0 6px 0 #B3A6CC,0 14px 20px -8px rgba(45,27,69,.4);}
+.ml-dish b{position:absolute;right:-6%;top:-38%;min-width:40px;padding:5px 11px;border-radius:999px;text-align:center;
+  font-family:var(--nk-brand);font-weight:700;font-size:22px;line-height:1;color:var(--nk-ink);background:#FFD84D;box-shadow:0 4px 0 #E8AE1F;}
+.ml-dish b:empty{display:none;}
+.ml-dish.shake{animation:mhNope .45s ease-in-out;}
+.ml-coin{position:absolute;z-index:22;aspect-ratio:1;transform:translate(-50%,-50%);border:none;padding:0;border-radius:50%;cursor:pointer;
+  touch-action:none;background:url(math/coin.webp) center/contain no-repeat;display:flex;align-items:center;justify-content:center;
+  filter:drop-shadow(0 5px 4px rgba(45,27,69,.35));
+  transition:left .45s cubic-bezier(.3,1.1,.5,1),top .45s cubic-bezier(.3,1.1,.5,1),transform .15s;}
+.ml-coin b{font-family:var(--nk-brand);font-weight:700;font-size:clamp(16px,5.4vw,24px);line-height:1;color:#8A5A0A;
+  text-shadow:0 1px 0 rgba(255,255,255,.7);pointer-events:none;}
+.ml-coin--10 b{font-size:clamp(16px,5vw,23px);}
+.ml-coin.in{z-index:21;transform:translate(-50%,-50%) scale(.8);cursor:default;}
+.ml-coin.grab{transition:none;}
+.ml-coin.nope{animation:mlNope .4s ease-in-out;}
+@keyframes mlNope{25%{transform:translate(-50%,-50%) translateX(-5px);}75%{transform:translate(-50%,-50%) translateX(5px);}}
+.ml-card b{display:flex;align-items:center;gap:8px;}
+.ml-coin-ico{width:28px;height:28px;border-radius:50%;background:url(math/coin.webp) center/contain no-repeat;}
+.ml-slots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:300px;}
+.ml-slots i{min-width:36px;height:26px;padding:0 8px;border-radius:10px;border:2px dashed #C9B8E8;font-style:normal;
+  font-family:var(--nk-brand);font-weight:700;font-size:13px;line-height:22px;color:var(--nk-ink);white-space:nowrap;}
+.ml-slots i.on{border:2px solid var(--nk-ok-3);background:var(--nk-ok-1);}
+.ml-slots i.wink{animation:mtChip .8s ease-in-out 2;}
