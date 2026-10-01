@@ -124,8 +124,12 @@
         '<span class="mhub__go">' + (ok ? '✓' : ready ? '→' : 'скоро') + '</span>';
       return a;
     }
-    COURSE.levels.forEach(function (lv) { box.appendChild(card(lv)); });
+    /* Арена — сразу после готовых уровней, «скоро» — в самом низу */
+    var ready = COURSE.levels.filter(function (lv) { return lv.href; });
+    var soon = COURSE.levels.filter(function (lv) { return !lv.href; });
+    ready.forEach(function (lv) { box.appendChild(card(lv)); });
     box.appendChild(card(COURSE.arena, true));
+    soon.forEach(function (lv) { box.appendChild(card(lv)); });
   }
 
   window.nookaMath = { el: el, dots: dots, bond: bond, sparks: sparks, hand: hand, course: COURSE, hub: hub };

@@ -234,7 +234,9 @@
 /* ============================================================
    СТРАНИЦА КУРСА «Числа-друзья»
    ============================================================ */
-body.mhub-body{background:linear-gradient(180deg,#DDEFF6,#FFF4E4 45%);overflow:auto;}
+/* nooka-ui.css запирает html и body (overflow:hidden) — для игр; страница курса длинная,
+   поэтому прокручивается сам body высотой в экран */
+body.mhub-body{background:linear-gradient(180deg,#DDEFF6,#FFF4E4 45%);height:100vh;height:100dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 .mhub{--nk-ink:#2D1B45;--nk-ink-2:#6B5680;--nk-ink-3:#A797B8;max-width:520px;margin:0 auto;padding:22px 16px 40px;
   font-family:var(--nk-display);color:var(--nk-ink);}
 .mhub__head{display:flex;gap:12px;align-items:center;margin-bottom:18px;}
