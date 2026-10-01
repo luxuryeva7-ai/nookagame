@@ -359,3 +359,30 @@ body.mhub-body{background:linear-gradient(180deg,#DDEFF6,#FFF4E4 45%);height:100
 .mhp-card.pulse{animation:mhPulseC .8s ease-in-out 2;}
 @keyframes mhPulseC{50%{transform:translateX(-50%) scale(1.12);}}
 .mhp-cards{top:auto;bottom:6%;}
+
+/* ============================================================
+   УБЕЖАВШИЕ ЗАЙЦЫ: зайцы на огороде, меловая черта, следы
+   ============================================================ */
+.mz-hare{position:absolute;z-index:20;width:14%;transform:translate(-50%,-94%);pointer-events:none;
+  transition:left .7s cubic-bezier(.4,0,.6,1), top .7s cubic-bezier(.4,0,.6,1), width .7s, opacity .35s;}
+.mz-hare img{display:block;width:100%;filter:drop-shadow(0 8px 6px rgba(40,70,30,.3));
+  animation:mzBreath 2.4s ease-in-out infinite;animation-delay:var(--delay,0s);transform-origin:50% 100%;}
+@keyframes mzBreath{50%{transform:scale(1.03,.97);}}
+.mz-hare.run{width:17%;z-index:24;}
+.mz-hare.run img{animation:mzRun .3s ease-in-out infinite;}
+.mz-hare.run.left img{transform:scaleX(-1);animation-name:mzRunL;}
+@keyframes mzRun{50%{transform:translateY(-14%);}}
+@keyframes mzRunL{0%,100%{transform:scaleX(-1);}50%{transform:scaleX(-1) translateY(-14%);}}
+.mz-hare.away{opacity:0;width:7%;}
+.mz-hare.nope img{animation:mhNope .45s ease-in-out;}
+.mz-hare.hop img{animation:mzHop .5s cubic-bezier(.3,1.4,.5,1);}
+@keyframes mzHop{40%{transform:translateY(-22%) scale(1.04);}}
+/* следы на месте убежавшего: пустой кружок, как зачёркнутое в тетради */
+.mz-spot{position:absolute;z-index:19;width:10%;aspect-ratio:2.2;transform:translate(-50%,-50%);border-radius:50%;
+  border:3px dashed rgba(255,253,248,.9);background:rgba(60,90,40,.18);pointer-events:none;}
+.mz-spot.hop{animation:mzSpot .5s ease-in-out;}
+@keyframes mzSpot{50%{transform:translate(-50%,-50%) scale(1.35);border-color:#FFD84D;}}
+.mz-ink{position:absolute;inset:0;width:100%;height:100%;z-index:26;pointer-events:none;overflow:visible;}
+.mz-ink polyline{fill:none;stroke:#FFFDF8;stroke-width:7;stroke-linecap:round;stroke-linejoin:round;
+  filter:drop-shadow(0 2px 2px rgba(45,27,69,.35));transition:opacity .5s;}
+.mz-ink polyline.fade{opacity:0;}
