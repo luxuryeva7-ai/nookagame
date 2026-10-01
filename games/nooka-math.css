@@ -92,14 +92,14 @@
 @keyframes mhPop{0%{transform:scale(.4);}100%{transform:scale(1);}}
 @keyframes mhFlash{50%{background:#FFF1B4;transform:scale(1.12);}}
 
-/* мини-схема: сверху целое, снизу две части */
-.mh-bond{position:relative;width:52px;height:52px;}
-.mh-bond svg{position:absolute;inset:0;width:100%;height:100%;}
-.mh-bond span{position:absolute;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-  font-family:var(--nk-brand);font-weight:700;font-size:12px;background:#F3EEFF;color:var(--nk-pri-4);}
-.mh-bond .w{left:15px;top:0;background:var(--nk-pri-3);color:#fff;}
-.mh-bond .a{left:0;bottom:0;}
-.mh-bond .b{right:0;bottom:0;}
+/* состав числа — школьный «домик»: крыша с числом, две клетки-этажа */
+.mh-bond{position:relative;width:52px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:22px 24px;gap:0;}
+.mh-bond span{display:flex;align-items:center;justify-content:center;font-family:var(--nk-brand);font-weight:700;font-size:13px;
+  color:var(--nk-pri-4);background:#F3EEFF;box-shadow:inset 0 0 0 1.5px #CBB9F5;}
+.mh-bond .w{grid-column:1 / 3;align-items:flex-end;padding-bottom:1px;color:#fff;background:var(--nk-pri-3);box-shadow:none;
+  clip-path:polygon(50% 0,100% 100%,0 100%);}
+.mh-bond .a{border-radius:0 0 0 6px;}
+.mh-bond .b{border-radius:0 0 6px 0;}
 
 /* Нейро-проводник */
 .mh__neuro{position:absolute;z-index:18;width:24%;left:4%;bottom:12%;pointer-events:none;

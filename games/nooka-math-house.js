@@ -350,7 +350,48 @@
     layoutGrass(); layoutFloor(0); layoutFloor(1);
     refresh();
     roof.classList.remove('pulse'); void roof.offsetWidth; roof.classList.add('pulse');
+    if (round === 0 && !demoDone) return setTimeout(demo, 900);
     idle(round === 0 ? 1600 : 2600);
+  }
+
+  /* «Смотри — повтори». Шестилетка не читает и не слышит задание, поэтому
+     в начале игра показывает ход сама: рука берёт пушика и сажает наверх,
+     второго — вниз, загораются счётчики и точки на крыше, оба возвращаются
+     на траву — и ход переходит к ребёнку. Пока идёт показ, касания не
+     принимаются. Один раз за заход на страницу. */
+  var demoDone = false;
+  function demo() {
+    demoDone = true;
+    busy = true;
+    var grass = pals.filter(function (p) { return p.floor < 0; });
+    var moves = [[grass[0], 0], [grass[1], 1]];
+    var i = 0;
+    (function step() {
+      if (i >= moves.length) {
+        return setTimeout(function () {
+          moves.forEach(function (m) { m[0].floor = -1; });
+          layoutGrass(); layoutFloor(0); layoutFloor(1); refresh();
+          busy = false;
+          idle(2200);
+        }, 1300);
+      }
+      var p = moves[i][0], fi = moves[i][1], f = SCENE.floors[fi];
+      var to = [(f.x0 + f.x1) / 2 + (fi ? 8 : -8), f.feet];
+      hand.drag([p.home[0], p.home[1] - 6], [to[0], to[1] - 6], false);
+      setTimeout(function () {                       // рука «взяла» пушика — он едет вместе с ней
+        p.el.classList.add('carry');
+        p.el.style.transition = 'left 1.1s ease-in-out, top 1.1s ease-in-out';
+        place(p, to[0], to[1]);
+      }, 450);
+      setTimeout(function () {
+        p.el.classList.remove('carry');
+        p.el.style.transition = '';
+        p.floor = fi;
+        layoutFloor(fi); hop(p); refresh();
+        i++;
+        setTimeout(step, 500);
+      }, 1600);
+    })();
   }
 
   function nextRound() {
