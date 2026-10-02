@@ -668,7 +668,7 @@ function IntroModal({
       marginBottom: 16,
       textAlign: 'center'
     }
-  }, title), /*#__PURE__*/React.createElement("div", {
+  }, title), diagram && /*#__PURE__*/React.createElement("div", {
     style: {
       width: '100%',
       maxWidth: 320,
@@ -701,7 +701,7 @@ function IntroModal({
       color: 'var(--ak-phys-3)',
       marginBottom: 6
     }
-  }, "📐 Закон физики:"), /*#__PURE__*/React.createElement("div", {
+  }, "💡 Правило"), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 14,
       color: 'var(--ak-ink)',
@@ -735,591 +735,749 @@ function IntroModal({
    ══════════════════════════════════════════════════════════════ */
 
 /* ============================================================
-   КодБот — программирование для 6–12. Nooka.
+   КодБот — программирование для 8–12. Nooka.
+
+   Один робот на поле из клеток, но в каждом уровне ребёнок делает
+   с программой новое: собирает, экономит, обходит, чинит чужую,
+   повторяет, задаёт правило, собирает свою команду, читает без
+   запуска, пишет одну программу на разные комнаты, ищет самую
+   короткую. После победы — проверка связи: два вопроса, ошибка
+   не наказывает, объяснение и дальше (GAME_SYSTEM_METHOD, п. 7).
+
+   Поля проверены симулятором cbSim: у каждого уровня задуманное
+   решение доходит, а типичная ошибка ведёт туда, куда задумано
+   (в «Если стена» правило «налево» гоняет робота по кругу,
+   в «До стены» «Вперёд ×3» работает только в одной комнате).
    ============================================================ */
 const CB_BLOCKS = {
-  f: {
-    label: 'Вперёд',
-    c: '#B5A1FF',
-    d: '#7C5FE0'
-  },
-  f3: {
-    label: 'Вперёд ×3',
-    c: '#FFD262',
-    d: '#D4A22B'
-  },
-  l: {
-    label: '⟲ Налево',
-    c: '#8FCAF0',
-    d: '#4A93C9'
-  },
-  r: {
-    label: '⟳ Направо',
-    c: '#FFA17A',
-    d: '#D96D49'
-  }
+  f: { label: 'Вперёд', c: '#B5A1FF', d: '#7C5FE0' },
+  f3: { label: 'Вперёд ×3', c: '#FFD262', d: '#D4A22B' },
+  l: { label: '⟲ Налево', c: '#8FCAF0', d: '#4A93C9' },
+  r: { label: '⟳ Направо', c: '#FFA17A', d: '#D96D49' },
+  w: { label: 'Вперёд до стены', c: '#7BE0B0', d: '#38B07A' },
+  fn: { label: '★ Моя команда', c: '#FFB8E0', d: '#D9659F' }
 };
+const CB_FIX_CYCLE = ['f', 'l', 'r'];
+
 const CB_LEVELS = [{
-  n: 1,
-  title: 'Первые шаги',
-  grid: 5,
-  start: {
-    x: 0,
-    y: 4,
-    dir: 1
-  },
-  stars: [[4, 4]],
-  walls: [],
-  blocks: ['f', 'l', 'r'],
-  limit: 6,
-  intro: {
-    emoji: '🤖',
-    title: 'Первые шаги',
-    law: 'Робот понимает только команды.\nСоставь программу из блоков —\nи он выполнит её шаг за шагом.\n\nСначала думаем, потом запускаем!',
-    tip: 'Тапай блоки внизу — они встанут в программу. Доведи робота до ⭐'
-  },
-  win: {
-    emoji: '🤖',
-    title: 'Робот ожил!',
+  n: 1, title: 'Первые шаги', sub: 'Команды по порядку', kind: 'build',
+  grid: 5, start: { x: 2, y: 4, dir: 0 }, stars: [[2, 0]], walls: [],
+  blocks: ['f', 'l', 'r'], limit: 6,
+  task: 'Доведи робота до звезды',
+  intro: { emoji: '🤖', title: 'Первые шаги',
+    law: 'Робот едет туда, куда смотрит его нос. «Налево» и «Направо» — поворот на месте.',
+    tip: 'Касайся блоков внизу. Доведи робота до ⭐' },
+  win: { emoji: '🤖', title: 'Робот ожил!',
     law: 'Программа — это список команд, которые робот выполняет по порядку',
-    fact: 'Первым программистом в истории была Ада Лавлейс — она писала программы в 1843 году, когда компьютеров ещё не существовало!'
-  }
+    fact: 'Первым программистом в истории была Ада Лавлейс — она писала программы в 1843 году, когда компьютеров ещё не существовало!' },
+  quiz: [
+    { q: 'Робот смотрит вверх. Программа: Вперёд, Вперёд, Налево. Куда он смотрит в конце?',
+      opts: [{ t: 'Влево', ok: true }, { t: 'Вправо' }, { t: 'Вниз' }],
+      yes: 'Да: робот проехал вверх и повернулся на месте налево.',
+      no: 'Представь, что ты сам робот и смотришь вверх. Повернись налево — куда теперь смотришь?' },
+    { q: 'Что будет, если в программе поменять местами две команды?',
+      opts: [{ t: 'Робот придёт в другое место', ok: true }, { t: 'Ничего не изменится' }, { t: 'Робот сам разберётся, что имелось в виду' }],
+      yes: 'Верно. Порядок команд — это и есть программа.',
+      no: 'Робот не догадывается. Он выполняет команды ровно в том порядке, в каком они стоят.' }
+  ]
 }, {
-  n: 2,
-  title: 'Экономная программа',
-  grid: 5,
-  start: {
-    x: 0,
-    y: 4,
-    dir: 1
-  },
-  stars: [[4, 0]],
-  walls: [],
-  blocks: ['f', 'f3', 'l', 'r'],
-  limit: 5,
-  intro: {
-    emoji: '📦',
-    title: 'Экономная программа',
-    law: 'Хорошая программа — короткая программа.\n\nБлок «Вперёд ×3» заменяет три блока\n«Вперёд». Это называется цикл —\nповторение без лишней писанины.',
-    tip: 'Всего 5 ячеек в программе! Без блока ×3 не обойтись'
-  },
-  win: {
-    emoji: '📦',
-    title: 'Кратко и чётко!',
+  n: 2, title: 'Экономная программа', sub: 'Цикл ×3 — экономим блоки', kind: 'build',
+  grid: 5, start: { x: 0, y: 4, dir: 0 }, stars: [[4, 0]], walls: [],
+  blocks: ['f', 'f3', 'l', 'r'], limit: 5,
+  task: 'Доведи робота до звезды',
+  intro: { emoji: '📦', title: 'Экономная программа',
+    law: 'Блок «Вперёд ×3» заменяет три «Вперёд». Программа станет короче.',
+    tip: 'В программе всего 5 мест — без ×3 не уложиться' },
+  win: { emoji: '📦', title: 'Кратко и чётко!',
     law: 'Цикл повторяет команду — программа становится короче',
-    fact: 'Программисты — самые «ленивые» люди на свете: они пишут программы, чтобы за них работали машины. И блок ×3 — первый шаг!'
-  }
+    fact: 'Программисты — самые «ленивые» люди на свете: они пишут программы, чтобы за них работали машины. И блок ×3 — первый шаг!' },
+  quiz: [
+    { q: 'Чем «Вперёд ×3» лучше, чем три блока «Вперёд»?',
+      opts: [{ t: 'Программа короче, а делает то же самое', ok: true }, { t: 'Робот едет быстрее' }, { t: 'Ничем, это одно и то же' }],
+      yes: 'Да. Робот делает те же три шага, а программу проще читать.',
+      no: 'Робот проедет те же три клетки. Разница в самой программе: она короче.' },
+    { q: 'Сколько клеток проедет робот: «Вперёд ×3», «Вперёд ×3»?',
+      opts: [{ t: '6', ok: true }, { t: '3' }, { t: '2' }],
+      yes: 'Верно: три и ещё три.',
+      no: 'Каждый блок «×3» — это три шага. Блоков два.' }
+  ]
 }, {
-  n: 3,
-  title: 'Лабиринт',
-  grid: 5,
-  start: {
-    x: 0,
-    y: 4,
-    dir: 1
-  },
-  stars: [[1, 1], [4, 4]],
-  walls: [[2, 4], [2, 3], [2, 2]],
-  blocks: ['f', 'f3', 'l', 'r'],
-  limit: 8,
-  intro: {
-    emoji: '🧱',
-    title: 'Лабиринт',
-    law: 'Впереди стена! Врезаться нельзя —\nпродумай обход заранее.\n\nСобери ОБЕ звезды за один запуск.\nПорядок команд решает всё.',
-    tip: 'Проведи пальцем путь по клеткам, потом собери программу'
-  },
-  win: {
-    emoji: '🏆',
-    title: 'Мастер маршрутов!',
+  n: 3, title: 'Лабиринт', sub: 'Обойди стену, собери всё', kind: 'build',
+  grid: 5, start: { x: 0, y: 4, dir: 0 }, stars: [[1, 1], [4, 4]], walls: [[2, 4], [2, 3], [2, 2]],
+  blocks: ['f', 'f3', 'l', 'r'], limit: 8,
+  task: 'Собери 2 звезды одной программой',
+  intro: { emoji: '🧱', title: 'Лабиринт',
+    law: 'Впереди стена. Продумай обход и собери обе звезды за один запуск.',
+    tip: 'Сначала проведи путь глазами, потом собирай' },
+  win: { emoji: '🏆', title: 'Мастер маршрутов!',
     law: 'Сложная задача = много простых шагов в правильном порядке',
-    fact: 'Марсоход управляется программой, которую пишут на Земле: сигнал летит до Марса 20 минут, поэтому каждый шаг продуман заранее — как у тебя!'
-  }
+    fact: 'Марсоход управляется программой, которую пишут на Земле: сигнал летит до Марса 20 минут, поэтому каждый шаг продуман заранее — как у тебя!' },
+  quiz: [
+    { q: 'Робот врезался в стену. Кто виноват?',
+      opts: [{ t: 'Программа: робот делает ровно то, что написано', ok: true }, { t: 'Робот: он плохо смотрит' }, { t: 'Стена: она не на месте' }],
+      yes: 'Да. Робот не видит стену — он просто выполняет команды.',
+      no: 'Робот не решает сам. Если он врезался, значит, так было написано в программе.' },
+    { q: 'Как проще придумать длинный маршрут?',
+      opts: [{ t: 'Разбить на куски: до первой звезды, потом до второй', ok: true }, { t: 'Запускать наугад, пока не повезёт' }, { t: 'Сразу собрать все блоки подряд' }],
+      yes: 'Именно так и работают программисты: большую задачу — на маленькие.',
+      no: 'Так можно долго промучиться. Проще разбить путь на куски и собирать по одному.' }
+  ]
+}, {
+  n: 4, title: 'Найди ошибку', sub: 'Почини чужую программу', kind: 'fix',
+  grid: 5, start: { x: 0, y: 4, dir: 0 }, stars: [[3, 0]], walls: [[2, 3], [2, 4]],
+  given: ['f', 'f', 'l', 'f', 'f', 'f', 'l', 'f', 'f'],
+  task: 'Найди и почини неверную команду',
+  intro: { emoji: '🐞', title: 'Найди ошибку',
+    law: 'Программу уже написали, но робот врезается. Найди неверную команду и почини.',
+    tip: 'Касание блока меняет его: Вперёд → Налево → Направо' },
+  win: { emoji: '🐞', title: 'Ошибка поймана!',
+    law: 'Ошибка в программе — это нормально: её ищут шаг за шагом',
+    fact: 'Ошибку в программе называют «баг» — жук. В 1947 году в компьютер залетела настоящая моль и сломала его работу. Её вклеили в журнал с подписью «первый найденный баг».' },
+  quiz: [
+    { q: 'Робот врезался на пятой команде. Где искать ошибку?',
+      opts: [{ t: 'Пройти программу по шагам до места аварии', ok: true }, { t: 'Стереть всё и написать заново' }, { t: 'Только в последней команде' }],
+      yes: 'Да. Идёшь по шагам вместе с роботом — и видишь, где он свернул не туда.',
+      no: 'Ошибка может прятаться раньше, чем авария. Проще пройти по шагам и найти, где робот свернул не туда.' },
+    { q: 'Программист нашёл в программе ошибку. Что это значит?',
+      opts: [{ t: 'Обычное дело: ошибки есть у всех, их ищут и чинят', ok: true }, { t: 'Он плохой программист' }, { t: 'Программу надо выбросить' }],
+      yes: 'Верно. Искать ошибки — половина работы любого программиста.',
+      no: 'Ошибаются все, даже самые опытные. Хороший программист — тот, кто умеет их находить.' }
+  ]
+}, {
+  n: 5, title: 'Повтори', sub: 'Повтор N раз', kind: 'loop',
+  grid: 5, start: { x: 0, y: 4, dir: 0 }, stars: [[4, 0]], walls: [[2, 4], [3, 4], [4, 4], [3, 3], [4, 3], [4, 2]],
+  blocks: ['f', 'l', 'r'], bodyMax: 4, repMax: 5,
+  task: 'Собери ступеньку и повтори её',
+  intro: { emoji: '🪜', title: 'Повтори',
+    law: 'Лестница — это одна ступенька много раз. Собери ступеньку и повтори.',
+    tip: 'Число в блоке «Повтори» меняется касанием' },
+  win: { emoji: '🪜', title: 'Лестница пройдена!',
+    law: 'Цикл повторяет кусок программы столько раз, сколько скажешь',
+    fact: 'Мультфильм на экране — тоже повтор: компьютер много раз в секунду рисует кадр, чуть сдвигая героя.' },
+  quiz: [
+    { q: 'Повтори 3 раза: Вперёд, Направо. Сколько команд выполнит робот?',
+      opts: [{ t: '6', ok: true }, { t: '3' }, { t: '2' }],
+      yes: 'Да: две команды, три раза.',
+      no: 'Внутри повтора две команды, и выполнятся они три раза.' },
+    { q: 'Когда в программе нужен повтор?',
+      opts: [{ t: 'Когда кусок программы повторяется много раз', ok: true }, { t: 'Когда программа короткая' }, { t: 'Когда робот устал' }],
+      yes: 'Верно. Один раз написать — и повторять сколько нужно.',
+      no: 'Повтор нужен, когда одно и то же надо сделать много раз: ступенька, забор, круг.' }
+  ]
+}, {
+  n: 6, title: 'Если стена', sub: 'Если стена — поверни', kind: 'rule',
+  grid: 5, start: { x: 0, y: 4, dir: 0 }, stars: [[2, 2]], walls: [[1, 1], [1, 2], [1, 3], [1, 4], [3, 1], [3, 2], [3, 3]],
+  task: 'Выбери правило на случай стены',
+  intro: { emoji: '🚦', title: 'Если стена',
+    law: 'Робот едет сам. Дай ему одно правило на случай стены.',
+    tip: 'Выбери поворот и запусти' },
+  win: { emoji: '🚦', title: 'Робот думает сам!',
+    law: 'Условие: программа сама решает, что делать. Если стена — поворачивай',
+    fact: 'Робот-пылесос обходит комнату по похожим правилам: упёрся — повернул.' },
+  quiz: [
+    { q: 'Почему одно правило провело робота через весь лабиринт?',
+      opts: [{ t: 'Робот проверял его на каждом шаге', ok: true }, { t: 'Робот запомнил лабиринт' }, { t: 'Повезло' }],
+      yes: 'Да. Перед каждым шагом робот смотрит: стена? Если да — поворачивает.',
+      no: 'Робот ничего не запоминает. Он перед каждым шагом проверяет условие: стена впереди или нет.' },
+    { q: 'Где ещё работает правило «если… то…»?',
+      opts: [{ t: 'Светофор: если красный — стой', ok: true }, { t: 'Таблица умножения' }, { t: 'Алфавит' }],
+      yes: 'Верно. «Если красный — стой, если зелёный — иди» — это условие.',
+      no: 'Ищи, где решение зависит от того, что происходит. Например, светофор: если красный — стой.' }
+  ]
+}, {
+  n: 7, title: 'Своя команда', sub: 'Собери команду ★', kind: 'func',
+  grid: 5, start: { x: 1, y: 3, dir: 0 }, stars: [[1, 1], [3, 1], [3, 3]], walls: [[2, 2]],
+  blocks: ['f', 'l', 'r'], fnMax: 3, limit: 4,
+  task: 'Обойди квадрат и собери 3 звезды',
+  intro: { emoji: '⭐', title: 'Своя команда',
+    law: 'Собери команду ★ из трёх блоков — и зови её одним блоком.',
+    tip: 'Стрелки собирают ★, а блок ★ встаёт в программу' },
+  win: { emoji: '⭐', title: 'Своя команда работает!',
+    law: 'Своя команда — кусок программы с именем. Пишешь один раз — зовёшь сколько угодно',
+    fact: 'Программы в телефоне собраны из тысяч таких команд: программисты строят новые из готовых, как дом из кирпичей.' },
+  quiz: [
+    { q: 'Зачем давать кусочку программы своё имя?',
+      opts: [{ t: 'Чтобы звать его одним блоком сколько угодно раз', ok: true }, { t: 'Чтобы робот ехал быстрее' }, { t: 'Просто для красоты' }],
+      yes: 'Да. ★ пишется один раз — и дальше хватает одного блока.',
+      no: 'Робот поедет так же. Выигрыш в программе: длинный кусок превращается в один блок.' },
+    { q: '★ = Вперёд, Вперёд, Направо. Программа: ★ ★. Сколько команд выполнит робот?',
+      opts: [{ t: '6', ok: true }, { t: '2' }, { t: '3' }],
+      yes: 'Верно: в каждой ★ три команды, а ★ две.',
+      no: 'Каждая ★ — это три команды. В программе их две.' }
+  ]
+}, {
+  n: 8, title: 'Угадай, где будет', sub: 'Прочитай и угадай', kind: 'predict',
+  rounds: [
+    { grid: 5, start: { x: 0, y: 4, dir: 0 }, walls: [], prog: ['f', 'f', 'r', 'f'] },
+    { grid: 5, start: { x: 0, y: 4, dir: 0 }, walls: [], prog: ['f', 'r', 'f', 'f', 'r', 'f'] },
+    { grid: 5, start: { x: 2, y: 2, dir: 0 }, walls: [], prog: [{ rep: 3, body: ['f', 'r'] }] }
+  ],
+  task: 'Где окажется робот? Коснись клетки',
+  intro: { emoji: '🔮', title: 'Угадай, где будет',
+    law: 'Собирать ничего не нужно. Прочитай программу и угадай, где окажется робот.',
+    tip: 'Коснись клетки — потом проверим запуском' },
+  win: { emoji: '🔮', title: 'Читаешь код!',
+    law: 'Программу можно прочитать и понять, не запуская',
+    fact: 'Программисты читают код больше, чем пишут: на одну написанную строчку приходится примерно десять прочитанных.' },
+  quiz: [
+    { q: 'Как узнать, куда приедет робот, не запуская программу?',
+      opts: [{ t: 'Пройти её в голове шаг за шагом', ok: true }, { t: 'Никак, только запуском' }, { t: 'Посчитать, сколько всего блоков' }],
+      yes: 'Да. Это называют «выполнить программу в уме».',
+      no: 'Можно! Иди по командам по одной и двигай робота в голове.' },
+    { q: 'Зачем программисту читать чужую программу?',
+      opts: [{ t: 'Чтобы понять, что она делает, и найти ошибки', ok: true }, { t: 'Чтобы переписать слово в слово' }, { t: 'Незачем' }],
+      yes: 'Верно. Большие программы пишут командой, и все читают код друг друга.',
+      no: 'Большие программы пишут вместе. Чтобы что-то добавить или починить, сначала надо понять, как оно устроено.' }
+  ]
+}, {
+  n: 9, title: 'До стены', sub: 'Одна программа на всё', kind: 'rooms',
+  rooms: [
+    { grid: 5, start: { x: 0, y: 4, dir: 0 }, stars: [[4, 0]], walls: [] },
+    { grid: 4, start: { x: 0, y: 3, dir: 0 }, stars: [[3, 0]], walls: [] },
+    { grid: 6, start: { x: 0, y: 5, dir: 0 }, stars: [[5, 0]], walls: [] }
+  ],
+  blocks: ['f', 'f3', 'w', 'l', 'r'], limit: 5,
+  task: 'Одна программа на три комнаты',
+  intro: { emoji: '🏠', title: 'До стены',
+    law: 'Три комнаты разного размера. Одна программа должна сработать во всех.',
+    tip: 'Блок «Вперёд до стены» едет, пока не упрётся' },
+  win: { emoji: '🏠', title: 'Подходит везде!',
+    law: 'Цикл «пока»: повторяй шаг, пока что-то не случится',
+    fact: 'Лифт тоже работает циклом «пока»: едет вверх, пока не доедет до нужного этажа.' },
+  quiz: [
+    { q: 'Почему «Вперёд до стены» сработал во всех комнатах, а «Вперёд ×3» — нет?',
+      opts: [{ t: 'Он шагает, пока не упрётся, — сколько бы ни было клеток', ok: true }, { t: 'Он быстрее' }, { t: 'Комнаты одинаковые' }],
+      yes: 'Да. «×3» — всегда три шага, а «до стены» — сколько понадобится.',
+      no: 'Комнаты разные. «×3» всегда делает три шага, а «до стены» — столько, сколько нужно.' },
+    { q: 'Что из этого — тоже «повторяй, пока…»?',
+      opts: [{ t: 'Мыть тарелки, пока раковина не опустеет', ok: true }, { t: 'Один раз закрыть дверь' }, { t: 'Сказать «привет»' }],
+      yes: 'Верно: моешь по одной, пока не кончатся.',
+      no: 'Ищи дело, которое повторяют, пока что-то не случится. Например, мыть тарелки, пока раковина не опустеет.' }
+  ]
+}, {
+  n: 10, title: 'Короче всех', sub: 'Самая короткая программа', kind: 'short',
+  grid: 5, start: { x: 0, y: 4, dir: 0 }, stars: [[0, 0], [4, 0]], walls: [],
+  blocks: ['f', 'f3', 'w', 'l', 'r'], limit: 8, best: 3,
+  task: 'Собери обе звезды самой короткой программой',
+  intro: { emoji: '✂️', title: 'Короче всех',
+    law: 'Две звезды. Собери обе программой как можно короче.',
+    tip: 'Самая короткая — всего 3 блока' },
+  win: { emoji: '✂️', title: 'Короче не бывает!',
+    law: 'Хорошая программа — короткая и понятная',
+    fact: 'Программу для полёта людей на Луну распечатали — и стопка бумаги оказалась ростом со взрослого человека. Каждую строчку там проверяли много раз.' },
+  quiz: [
+    { q: 'Две программы приводят робота к цели. Какая лучше?',
+      opts: [{ t: 'Та, что короче и понятнее', ok: true }, { t: 'Та, что длиннее' }, { t: 'Без разницы' }],
+      yes: 'Да. Делают одно и то же, но короткую легче читать.',
+      no: 'Если результат одинаковый, лучше та, которую проще прочитать и проверить, — короткая.' },
+    { q: 'Почему короткую программу легче проверять?',
+      opts: [{ t: 'В ней меньше мест, где спрячется ошибка', ok: true }, { t: 'Она быстрее печатается' }, { t: 'Короткие программы не ошибаются' }],
+      yes: 'Верно. Меньше команд — меньше мест для ошибки.',
+      no: 'Ошибаться могут и короткие. Но в них меньше мест, где ошибка спрячется.' }
+  ]
 }];
+
 const CB_DIRS = [[0, -1], [1, 0], [0, 1], [-1, 0]];
-const CB_ROT = {
-  0: '-90deg',
-  1: '0deg',
-  2: '90deg',
-  3: '180deg'
-};
-function CBGrid({
-  lvl,
-  bot,
-  got,
-  crashed
-}) {
+
+/* ── программа → шаги; шаги → кадры ─────────────────────── */
+function cbExpand(prog, fn, path) {
+  const out = [];
+  (prog || []).forEach((t, i) => {
+    const p = (path || []).concat(i);
+    if (typeof t === 'string') {
+      if (t === 'f3') out.push({ op: 'f', pc: p }, { op: 'f', pc: p }, { op: 'f', pc: p });
+      else if (t === 'fn') (fn || []).forEach((x, j) => out.push({ op: x === 'f3' ? 'f' : x, pc: p, fi: j }));
+      else out.push({ op: t, pc: p });
+    } else if (t.rep) {
+      for (let k = 0; k < t.rep; k++) cbExpand(t.body, fn, p).forEach(s => out.push(s));
+    }
+  });
+  return out;
+}
+/* Кадры движения. rule — 'l'/'r' для уровня «Если стена»: робот едет сам
+   и при стене поворачивает; ходит по кругу — конец 'loop'. */
+function cbSim(L, ops, rule) {
+  const W = new Set((L.walls || []).map(w => w.join(','))), g = new Set();
+  let b = { ...L.start };
+  const fr = [{ ...b, got: [] }];
+  const free = (x, y) => x >= 0 && y >= 0 && x < L.grid && y < L.grid && !W.has(x + ',' + y);
+  const take = () => (L.stars || []).forEach(([sx, sy], i) => { if (sx === b.x && sy === b.y) g.add(i); });
+  const all = () => g.size === (L.stars || []).length;
+  if (rule) {
+    const seen = new Set();
+    for (let n = 0; n < 80; n++) {
+      if (all()) return { end: 'goal', fr };
+      const k = b.x + ',' + b.y + ',' + b.dir;
+      if (seen.has(k)) return { end: 'loop', fr };
+      seen.add(k);
+      const [dx, dy] = CB_DIRS[b.dir];
+      if (free(b.x + dx, b.y + dy)) { b = { ...b, x: b.x + dx, y: b.y + dy }; take(); }
+      else b = { ...b, dir: (b.dir + (rule === 'r' ? 1 : 3)) % 4 };
+      fr.push({ ...b, got: [...g] });
+    }
+    return { end: 'loop', fr };
+  }
+  for (const s of ops) {
+    if (s.op === 'l') b = { ...b, dir: (b.dir + 3) % 4 };
+    else if (s.op === 'r') b = { ...b, dir: (b.dir + 1) % 4 };
+    else if (s.op === 'w') {
+      for (let c = 0; c < 20; c++) {
+        const [dx, dy] = CB_DIRS[b.dir];
+        if (!free(b.x + dx, b.y + dy)) break;
+        b = { ...b, x: b.x + dx, y: b.y + dy }; take();
+        fr.push({ ...b, got: [...g], pc: s.pc, fi: s.fi });
+      }
+      continue;
+    } else {
+      const [dx, dy] = CB_DIRS[b.dir];
+      if (!free(b.x + dx, b.y + dy)) return { end: 'crash', fr, at: s.pc, wall: W.has((b.x + dx) + ',' + (b.y + dy)) };
+      b = { ...b, x: b.x + dx, y: b.y + dy }; take();
+    }
+    fr.push({ ...b, got: [...g], pc: s.pc, fi: s.fi });
+  }
+  return { end: all() ? 'goal' : 'done', fr };
+}
+function cbCount(prog) {
+  return prog.reduce((n, t) => n + (typeof t === 'string' ? 1 : 1 + t.body.length), 0);
+}
+
+/* ── поле ─────────────────────────────────────────────────── */
+function CBGrid({ lvl, bot, got, crashed, trail, onCell, guess, mark, max }) {
   const size = lvl.grid;
-  const wallSet = new Set(lvl.walls.map(w => w.join(',')));
+  const turn = useRef(null);
+  if (!turn.current) turn.current = { dir: bot.dir, a: bot.dir * 90 };
+  else if (turn.current.dir !== bot.dir) {
+    let d = (bot.dir - turn.current.dir + 4) % 4;
+    if (d === 3) d = -1;
+    turn.current = { dir: bot.dir, a: turn.current.a + d * 90 };
+  }
+  const rot = turn.current.a;
+  const wallSet = new Set((lvl.walls || []).map(w => w.join(',')));
   return /*#__PURE__*/React.createElement("div", {
     style: {
-      display: 'grid',
-      gridTemplateColumns: `repeat(${size},1fr)`,
-      gap: 4,
-      width: '100%',
-      maxWidth: 320,
-      aspectRatio: '1',
-      background: 'rgba(255,255,255,.55)',
-      borderRadius: 20,
-      padding: 8,
-      boxSizing: 'border-box',
-      boxShadow: '0 6px 0 rgba(45,27,69,.08)'
+      display: 'grid', gridTemplateColumns: `repeat(${size},1fr)`, gridTemplateRows: `repeat(${size},1fr)`, gap: 4, width: '100%', maxWidth: max || 320,
+      aspectRatio: '1', background: 'rgba(255,255,255,.55)', borderRadius: 20, padding: 8,
+      boxSizing: 'border-box', boxShadow: '0 6px 0 rgba(45,27,69,.08)', flexShrink: 0
     }
-  }, Array.from({
-    length: size * size
-  }, (_, i) => {
-    const x = i % size,
-      y = i / size | 0;
-    const isWall = wallSet.has(x + ',' + y);
-    const isStar = lvl.stars.some(([sx, sy], si) => sx === x && sy === y && !got.has(si));
+  }, Array.from({ length: size * size }, (_, i) => {
+    const x = i % size, y = i / size | 0, k = x + ',' + y;
+    const isWall = wallSet.has(k);
+    const isStar = (lvl.stars || []).some(([sx, sy], si) => sx === x && sy === y && !got.has(si));
     const isBot = bot.x === x && bot.y === y;
+    const isGuess = guess && guess.x === x && guess.y === y;
+    const isMark = mark && mark.x === x && mark.y === y;
     return /*#__PURE__*/React.createElement("div", {
       key: i,
+      onClick: onCell && !isWall ? () => onCell(x, y) : undefined,
       style: {
         borderRadius: 8,
-        background: isWall ? '#4A3B63' : 'rgba(229,220,255,.55)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: 24,
-        position: 'relative'
+        background: isWall ? '#4A3B63' : isMark ? 'rgba(93,217,160,.55)' : trail && trail.has(k) ? 'rgba(181,161,255,.5)' : 'rgba(229,220,255,.55)',
+        boxShadow: isGuess ? 'inset 0 0 0 3px #FFB020' : 'none',
+        cursor: onCell && !isWall ? 'pointer' : 'default',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: size > 5 ? 20 : 24, lineHeight: 1,
+        position: 'relative', transition: 'background .25s', minHeight: 0, overflow: 'visible'
       }
     }, isWall ? '🧱' : isStar ? '⭐' : '', isBot && /*#__PURE__*/React.createElement("div", {
       className: crashed ? 'ak-shake' : '',
-      style: {
-        position: 'absolute',
-        inset: 0
-      }
+      style: { position: 'absolute', inset: 2 }
     },
-    /* Вращается не робот, а стрелка-нос: эмодзи 🤖 смотрит на зрителя,
-       и поворот клал его набок — ребёнок не понимал, куда «вперёд». */
-    /*#__PURE__*/React.createElement("div", {
-      style: {
-        position: 'absolute',
-        inset: 0,
-        transform: `rotate(${CB_ROT[bot.dir]})`,
-        transition: 'transform .3s'
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        position: 'absolute',
-        top: '50%',
-        right: -2,
-        width: 0,
-        height: 0,
-        marginTop: -9,
-        borderTop: '9px solid transparent',
-        borderBottom: '9px solid transparent',
-        borderLeft: '12px solid #FFB020',
-        filter: 'drop-shadow(0 1px 0 rgba(45,27,69,.35))'
-      }
-    })), /*#__PURE__*/React.createElement("div", {
-      style: {
-        position: 'absolute',
-        inset: 0,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: 26
-      }
-    }, "🤖")));
+    /* Робот — машинка сверху: нос и глаза смотрят по ходу, и она целиком
+       поворачивается на «Налево/Направо». Раньше был эмодзи лицом к зрителю
+       со стрелкой сбоку — «Вперёд» уводил вправо, и было непонятно почему. */
+    /*#__PURE__*/React.createElement("svg", {
+      viewBox: '0 0 40 40',
+      style: { width: '100%', height: '100%', transform: `rotate(${rot}deg)`, transition: 'transform .3s', overflow: 'visible' }
+    },
+      /*#__PURE__*/React.createElement("path", { d: 'M20 0 L26 7 L14 7 Z', fill: '#FFB020', stroke: '#C77F00', strokeWidth: 1 }),
+      /*#__PURE__*/React.createElement("rect", { x: 4, y: 12, width: 6, height: 20, rx: 2.5, fill: '#4A3B63' }),
+      /*#__PURE__*/React.createElement("rect", { x: 30, y: 12, width: 6, height: 20, rx: 2.5, fill: '#4A3B63' }),
+      /*#__PURE__*/React.createElement("rect", { x: 8, y: 8, width: 24, height: 28, rx: 9, fill: '#FFFFFF', stroke: '#7C5FE0', strokeWidth: 2.2 }),
+      /*#__PURE__*/React.createElement("rect", { x: 11.5, y: 11, width: 17, height: 10, rx: 4, fill: '#2D1B45' }),
+      /*#__PURE__*/React.createElement("circle", { cx: 16, cy: 16, r: 2.2, fill: '#7BF0BC' }),
+      /*#__PURE__*/React.createElement("circle", { cx: 24, cy: 16, r: 2.2, fill: '#7BF0BC' }),
+      /*#__PURE__*/React.createElement("rect", { x: 14, y: 26, width: 12, height: 4, rx: 2, fill: '#E4DDF5' }))));
   }));
 }
-function CBLevel({
-  lvl,
-  onWin,
-  onHome
-}) {
-  const [phase, setPhase] = useState('intro'); // intro | edit | run | win
-  const [prog, setProg] = useState([]);
-  const [bot, setBot] = useState(lvl.start);
+
+/* блок программы: обычный, в повторе, в своей команде */
+function CBChip({ id, on, onClick, small }) {
+  const B = CB_BLOCKS[id];
+  return /*#__PURE__*/React.createElement("button", {
+    onClick: onClick,
+    style: {
+      border: 'none', cursor: onClick ? 'pointer' : 'default', borderRadius: 10,
+      padding: small ? '6px 8px' : '7px 9px', fontSize: small ? 12 : 12.5, fontWeight: 800,
+      fontFamily: 'var(--ak-body)', color: '#2D1B45', background: B.c,
+      boxShadow: on ? '0 0 0 3px #2D1B45' : `0 3px 0 ${B.d}`, transition: 'box-shadow .15s'
+    }
+  }, B.label);
+}
+function CBRow({ label, count, children, hint }) {
+  return /*#__PURE__*/React.createElement("div", { style: { width: '100%', maxWidth: 320 } },
+    /*#__PURE__*/React.createElement("div", {
+      style: { display: 'flex', justifyContent: 'space-between', fontSize: 12, fontWeight: 700, color: 'var(--ak-ink-2)', fontFamily: 'var(--ak-display)', marginBottom: 4 }
+    }, /*#__PURE__*/React.createElement("span", null, label), count != null && /*#__PURE__*/React.createElement("span", null, count)),
+    /*#__PURE__*/React.createElement("div", {
+      style: { minHeight: 44, background: 'rgba(255,255,255,.75)', borderRadius: 14, padding: 6, display: 'flex', gap: 5, flexWrap: 'wrap', alignItems: 'center', boxShadow: 'inset 0 2px 6px rgba(45,27,69,.08)' }
+    }, children, hint && /*#__PURE__*/React.createElement("span", {
+      style: { fontSize: 12.5, color: 'var(--ak-ink-3)', padding: '8px 6px', fontFamily: 'var(--ak-display)' }
+    }, hint)));
+}
+function CBPalette({ blocks, disabled, onAdd }) {
+  return /*#__PURE__*/React.createElement("div", {
+    style: { display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }
+  }, blocks.map(id => /*#__PURE__*/React.createElement("button", {
+    key: id, className: "ak-tap", disabled: disabled, onClick: () => onAdd(id),
+    style: {
+      border: 'none', cursor: 'pointer', borderRadius: 14, padding: blocks.length > 4 ? '9px 11px' : '11px 14px',
+      fontSize: blocks.length > 4 ? 13 : 14, fontWeight: 800,
+      fontFamily: 'var(--ak-body)', color: '#2D1B45', background: CB_BLOCKS[id].c,
+      boxShadow: `0 5px 0 ${CB_BLOCKS[id].d}`, opacity: disabled ? .5 : 1
+    }
+  }, CB_BLOCKS[id].label)));
+}
+
+/* ── проверка связи: два вопроса, ошибку можно поправить ─── */
+function CBQuiz({ lvl, onDone }) {
+  const qs = React.useMemo(() => lvl.quiz.map(q => ({ ...q, opts: window.nooka && window.nooka.shuffled ? window.nooka.shuffled(q.opts) : q.opts })), [lvl]);
+  const [pick, setPick] = useState([null, null]);
+  const both = qs.every((q, i) => pick[i] != null && q.opts[pick[i]].ok);
+  return /*#__PURE__*/React.createElement("div", {
+    style: { flex: 1, display: 'flex', flexDirection: 'column', gap: 12, padding: '6px 16px 20px', overflowY: 'auto', alignItems: 'center' }
+  }, /*#__PURE__*/React.createElement(TaskBadge, null, 'Проверка связи: два вопроса'),
+  qs.map((q, qi) => /*#__PURE__*/React.createElement("div", {
+    key: qi,
+    style: { width: '100%', maxWidth: 340, background: 'rgba(255,255,255,.85)', borderRadius: 20, padding: '14px 14px 10px', boxShadow: '0 6px 0 rgba(45,27,69,.06)' }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: { fontFamily: 'var(--ak-display)', fontWeight: 700, fontSize: 15, color: 'var(--ak-ink)', lineHeight: 1.35, marginBottom: 10 }
+  }, q.q), q.opts.map((o, oi) => {
+    const on = pick[qi] === oi;
+    return /*#__PURE__*/React.createElement("button", {
+      key: oi,
+      onClick: () => setPick(p => { const n = p.slice(); n[qi] = oi; return n; }),
+      style: {
+        display: 'block', width: '100%', marginBottom: 7, padding: '11px 13px', border: 'none', borderRadius: 14,
+        cursor: 'pointer', textAlign: 'left', fontFamily: 'var(--ak-body)', fontWeight: 700, fontSize: 13.5,
+        color: 'var(--ak-ink)',
+        background: on ? (o.ok ? 'rgba(93,217,160,.28)' : 'rgba(255,122,100,.22)') : 'rgba(229,220,255,.45)',
+        boxShadow: on ? `inset 0 0 0 2px ${o.ok ? '#3FC685' : '#FF7A64'}` : 'none'
+      }
+    }, o.t);
+  }), pick[qi] != null && /*#__PURE__*/React.createElement("div", {
+    style: { fontSize: 13, lineHeight: 1.45, color: 'var(--ak-ink-2)', padding: '2px 4px 4px' }
+  }, q.opts[pick[qi]].ok ? q.yes : q.no))),
+  /*#__PURE__*/React.createElement("button", {
+    className: "ak-btn ak-btn--ok", style: { width: '100%', maxWidth: 340 }, disabled: !both, onClick: onDone
+  }, both ? 'Дальше' : 'Ответь на оба'));
+}
+
+/* ── уровень ──────────────────────────────────────────────── */
+function CBLevel({ lvl, onWin, onHome }) {
+  const first = lvl.kind === 'predict' ? lvl.rounds[0] : lvl.kind === 'rooms' ? lvl.rooms[0] : lvl;
+  const [phase, setPhase] = useState('intro'); // intro | edit | run | quiz | win
+  const [prog, setProg] = useState(lvl.kind === 'fix' ? lvl.given.slice() : []);
+  const [rep, setRep] = useState(2);
+  const [fn, setFn] = useState([]);
+  const [rule, setRule] = useState(null);
+  const [room, setRoom] = useState(0);
+  const [rd, setRd] = useState(0);               // раунд «Угадай»
+  const [guess, setGuess] = useState(null);
+  const [mark, setMark] = useState(null);
+  const [score, setScore] = useState(0);
+  const [bot, setBot] = useState(first.start);
   const [got, setGot] = useState(new Set());
+  const [trail, setTrail] = useState(new Set());
   const [fail, setFail] = useState(null);
   const [crashed, setCrashed] = useState(false);
-  const [pc, setPc] = useState(-1);
+  const [pc, setPc] = useState(null);
+  const [fi, setFi] = useState(null);
   const timer = useRef(null);
   useEffect(() => () => clearInterval(timer.current), []);
-  const reset = () => {
+  /* Поле 320 пикселей плюс программа и блоки не влезали в низкий телефон:
+     «Запуск» уезжал под край, и ребёнок не видел, что нажимать. Поле
+     уменьшается ровно настолько, насколько не хватает места (не меньше 160). */
+  const body = useRef(null);
+  const [gridMax, setGridMax] = useState(320);
+  React.useLayoutEffect(() => {
+    const el = body.current;
+    if (!el) return;
+    const over = el.scrollHeight - el.clientHeight;
+    if (over > 0 && gridMax > 160) setGridMax(m => Math.max(160, m - over));
+  });
+
+  const board = lvl.kind === 'predict' ? lvl.rounds[rd] : lvl.kind === 'rooms' ? lvl.rooms[room] : lvl;
+  const editing = phase === 'edit';
+  const program = lvl.kind === 'loop' ? [{ rep: rep, body: prog }] : lvl.kind === 'predict' ? board.prog : prog;
+
+  const reset = (to) => {
     clearInterval(timer.current);
-    setBot(lvl.start);
-    setGot(new Set());
-    setPc(-1);
-    setCrashed(false);
+    const b = to || board;
+    setBot(b.start); setGot(new Set()); setTrail(new Set()); setPc(null); setFi(null); setCrashed(false);
     setPhase('edit');
   };
-  const add = id => {
-    if (prog.length < lvl.limit && phase === 'edit') setProg(p => [...p, id]);
-  };
-  const removeAt = i => {
-    if (phase === 'edit') setProg(p => p.filter((_, j) => j !== i));
-  };
-  const run = () => {
-    if (!prog.length) return;
-    setPhase('run');
-    const steps = [];
-    prog.forEach((id, pi) => {
-      if (id === 'f3') {
-        steps.push(['f', pi], ['f', pi], ['f', pi]);
-      } else steps.push([id, pi]);
-    });
-    let b = {
-      ...lvl.start
-    };
-    const g = new Set();
-    const wallSet = new Set(lvl.walls.map(w => w.join(',')));
+  /* проиграть кадры; done(res) — когда робот остановился */
+  const play = (B, res, done) => {
+    clearInterval(timer.current);
+    setPhase('run'); setCrashed(false);
+    setBot(B.start); setGot(new Set()); setTrail(new Set([B.start.x + ',' + B.start.y]));
     let i = 0;
-    setBot(b);
-    setGot(new Set());
-    setCrashed(false);
     timer.current = setInterval(() => {
-      if (i >= steps.length) {
-        clearInterval(timer.current);
-        if (g.size === lvl.stars.length) setPhase('win');else setFail(g.size ? 'Одна звезда есть, но не все! Дособери маршрут.' : 'Робот выполнил программу, но до звезды не дошёл. Подправь команды!');
-        return;
-      }
-      const [id, pi] = steps[i];
       i++;
-      setPc(pi);
-      if (id === 'l') b = {
-        ...b,
-        dir: (b.dir + 3) % 4
-      };else if (id === 'r') b = {
-        ...b,
-        dir: (b.dir + 1) % 4
-      };else {
-        const [dx, dy] = CB_DIRS[b.dir];
-        const nx = b.x + dx,
-          ny = b.y + dy;
-        if (nx < 0 || ny < 0 || nx >= lvl.grid || ny >= lvl.grid || wallSet.has(nx + ',' + ny)) {
-          clearInterval(timer.current);
-          setCrashed(true);
-          setFail(wallSet.has(nx + ',' + ny) ? 'Бум! Робот упёрся в стену. Обойди её командами поворота.' : 'Ой! Робот чуть не упал с поля. Посчитай шаги точнее.');
-          return;
-        }
-        b = {
-          ...b,
-          x: nx,
-          y: ny
-        };
-        lvl.stars.forEach(([sx, sy], si) => {
-          if (sx === nx && sy === ny) g.add(si);
-        });
-        setGot(new Set(g));
+      if (i >= res.fr.length) {
+        clearInterval(timer.current);
+        if (res.end === 'crash') setCrashed(true);
+        return done(res);
       }
-      setBot({
-        ...b
-      });
-    }, 420);
+      const f = res.fr[i];
+      setBot({ x: f.x, y: f.y, dir: f.dir }); setGot(new Set(f.got)); setPc(f.pc || null); setFi(f.fi == null ? null : f.fi);
+      setTrail(t => { const n = new Set(t); n.add(f.x + ',' + f.y); return n; });
+    }, 380);
   };
-  return /*#__PURE__*/React.createElement("div", {
+  const failText = (res) =>
+    res.end === 'crash' ? (res.wall ? 'Бум! Робот упёрся в стену. Посмотри, на какой команде.' : 'Ой! Робот чуть не упал с поля. Посчитай шаги точнее.')
+      : res.end === 'loop' ? 'Робот ходит по кругу: с этим поворотом лабиринт не пройти. Попробуй другой.'
+        : res.fr[res.fr.length - 1].got.length ? 'Одна звезда есть, но не все! Дособери маршрут.' : 'Робот выполнил программу, но до звезды не дошёл. Подправь команды!';
+
+  const run = () => {
+    if (lvl.kind === 'rule') {
+      if (!rule) return;
+      const res = cbSim(board, [], rule);
+      return play(board, res, r => r.end === 'goal' ? setPhase('quiz') : setFail(failText(r)));
+    }
+    if (lvl.kind === 'rooms') {
+      /* одна программа по очереди во всех комнатах */
+      const go = (k) => {
+        const B = lvl.rooms[k];
+        setRoom(k);
+        const res = cbSim(B, cbExpand(prog));
+        play(B, res, r => {
+          if (r.end !== 'goal') return setFail(`В комнате ${k + 1} робот не дошёл: она ${B.grid === 4 ? 'меньше' : B.grid === 6 ? 'больше' : 'другая'}. Программа должна подходить к любой.`);
+          if (k + 1 < lvl.rooms.length) setTimeout(() => go(k + 1), 650);
+          else setPhase('quiz');
+        });
+      };
+      if (!prog.length) return;
+      return go(0);
+    }
+    if (!cbCount(program) || (lvl.kind === 'func' && !fn.length)) return;
+    const res = cbSim(board, cbExpand(program, fn));
+    play(board, res, r => r.end === 'goal' ? setPhase('quiz') : setFail(failText(r)));
+  };
+
+  /* «Угадай»: коснулся клетки — запускаем и сравниваем */
+  const tapCell = (x, y) => {
+    if (phase !== 'edit' || lvl.kind !== 'predict' || guess) return;
+    setGuess({ x, y });
+    const res = cbSim(board, cbExpand(board.prog));
+    setTimeout(() => play(board, res, () => {
+      const end = res.fr[res.fr.length - 1];
+      setMark({ x: end.x, y: end.y });
+      if (end.x === x && end.y === y) setScore(s => s + 1);
+      setPhase('edit');
+    }), 350);
+  };
+  const nextRound = () => {
+    if (rd + 1 >= lvl.rounds.length) return setPhase('quiz');
+    const B = lvl.rounds[rd + 1];
+    setRd(rd + 1); setGuess(null); setMark(null);
+    reset(B);
+  };
+
+  const add = id => {
+    if (!editing) return;
+    if (lvl.kind === 'loop') { if (prog.length < lvl.bodyMax) setProg(p => [...p, id]); return; }
+    if (cbCount(prog) < lvl.limit) setProg(p => [...p, id]);
+  };
+  const removeAt = i => { if (editing) setProg(p => p.filter((_, j) => j !== i)); };
+  const cycleAt = i => { if (editing) setProg(p => p.map((t, j) => j === i ? CB_FIX_CYCLE[(CB_FIX_CYCLE.indexOf(t) + 1) % 3] : t)); };
+
+  const n = cbCount(prog);
+  const top = /*#__PURE__*/React.createElement(TopBar, { key: 'top', level: lvl.n, title: lvl.title, onHome: onHome, step: lvl.kind === 'predict' ? rd : 1, total: lvl.kind === 'predict' ? lvl.rounds.length : 1 });
+  const shell = (kids) => /*#__PURE__*/React.createElement("div", {
     className: "ak",
     style: {
-      minHeight: '100vh',
-      height: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      background: 'radial-gradient(120% 60% at 50% -10%,#E5DCFF 0%,transparent 60%),linear-gradient(180deg,var(--ak-bg-2),var(--ak-bg))',
-      overflow: 'hidden'
+      minHeight: '100vh', height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden',
+      background: 'radial-gradient(120% 60% at 50% -10%,#E5DCFF 0%,transparent 60%),linear-gradient(180deg,var(--ak-bg-2),var(--ak-bg))'
     }
-  }, /*#__PURE__*/React.createElement(TopBar, {
-    level: lvl.n,
-    title: lvl.title,
-    onHome: onHome,
-    step: 1,
-    total: 1
-  }), phase === 'intro' && /*#__PURE__*/React.createElement(IntroModal, {
-    emoji: lvl.intro.emoji,
-    title: lvl.intro.title,
-    law: lvl.intro.law,
-    diagram: null,
-    tip: lvl.intro.tip,
-    onStart: () => setPhase('edit')
-  }), phase !== 'intro' && /*#__PURE__*/React.createElement("div", {
-    style: {
-      flex: 1,
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 10,
-      padding: '6px 16px 20px',
-      alignItems: 'center',
-      overflowY: 'auto'
-    }
-  }, /*#__PURE__*/React.createElement(TaskBadge, null, lvl.stars.length > 1 ? `Собери ${lvl.stars.length} ${window.nooka.plural(lvl.stars.length, 'звезду', 'звезды', 'звёзд')} одной программой` : 'Доведи робота до звезды'), /*#__PURE__*/React.createElement(CBGrid, {
-    lvl: lvl,
-    bot: bot,
-    got: got,
-    crashed: crashed
-  }), /*#__PURE__*/React.createElement("div", {
-    style: {
-      width: '100%',
-      maxWidth: 320
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      fontSize: 12,
-      fontWeight: 700,
-      color: 'var(--ak-ink-2)',
-      fontFamily: 'var(--ak-display)',
-      marginBottom: 4
-    }
-  }, /*#__PURE__*/React.createElement("span", null, "Программа"), /*#__PURE__*/React.createElement("span", null, prog.length, " / ", lvl.limit)), /*#__PURE__*/React.createElement("div", {
-    style: {
-      minHeight: 44,
-      background: 'rgba(255,255,255,.75)',
-      borderRadius: 14,
-      padding: 6,
-      display: 'flex',
-      gap: 5,
-      flexWrap: 'wrap',
-      boxShadow: 'inset 0 2px 6px rgba(45,27,69,.08)'
-    }
-  }, prog.length === 0 && /*#__PURE__*/React.createElement("span", {
-    style: {
-      fontSize: 12.5,
-      color: 'var(--ak-ink-3)',
-      padding: '8px 6px',
-      fontFamily: 'var(--ak-display)'
-    }
-  }, "← добавь команды снизу"), prog.map((id, i) => /*#__PURE__*/React.createElement("button", {
-    key: i,
-    onClick: () => removeAt(i),
-    style: {
-      border: 'none',
-      cursor: 'pointer',
-      borderRadius: 10,
-      padding: '7px 9px',
-      fontSize: 12.5,
-      fontWeight: 800,
-      fontFamily: 'var(--ak-body)',
-      color: '#2D1B45',
-      background: CB_BLOCKS[id].c,
-      boxShadow: pc === i && phase === 'run' ? '0 0 0 3px #2D1B45' : `0 3px 0 ${CB_BLOCKS[id].d}`
-    }
-  }, CB_BLOCKS[id].label)))), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: 'flex',
-      gap: 8,
-      flexWrap: 'wrap',
-      justifyContent: 'center'
-    }
-  }, lvl.blocks.map(id => /*#__PURE__*/React.createElement("button", {
-    key: id,
-    className: "ak-tap",
-    disabled: phase !== 'edit' || prog.length >= lvl.limit,
-    onClick: () => add(id),
-    style: {
-      border: 'none',
-      cursor: 'pointer',
-      borderRadius: 14,
-      padding: '11px 14px',
-      fontSize: 14,
-      fontWeight: 800,
-      fontFamily: 'var(--ak-body)',
-      color: '#2D1B45',
-      background: CB_BLOCKS[id].c,
-      boxShadow: `0 5px 0 ${CB_BLOCKS[id].d}`,
-      opacity: phase !== 'edit' || prog.length >= lvl.limit ? .5 : 1
-    }
-  }, CB_BLOCKS[id].label))), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: 'flex',
-      gap: 10,
-      width: '100%',
-      maxWidth: 320
-    }
-  }, /*#__PURE__*/React.createElement("button", {
-    className: "ak-btn ak-btn--ok",
-    style: {
-      flex: 1
-    },
-    disabled: phase === 'run' || !prog.length,
-    onClick: run
-  }, "▶ Запуск!"), /*#__PURE__*/React.createElement("button", {
-    className: "ak-btn",
-    style: {
-      background: 'rgba(255,255,255,.9)',
-      boxShadow: '0 6px 0 rgba(45,27,69,.12)'
-    },
-    onClick: () => {
-      reset();
-      setProg([]);
-    }
-  }, "🗑"))), fail && /*#__PURE__*/React.createElement(FailModal, {
-    tip: fail,
-    onRetry: () => {
-      setFail(null);
-      reset();
-    }
-  }), phase === 'win' && /*#__PURE__*/React.createElement(WinModal, {
-    emoji: lvl.win.emoji,
-    title: lvl.win.title,
-    law: lvl.win.law,
-    fact: lvl.win.fact,
-    cta: lvl.n < 3 ? 'Дальше →' : 'На главную →',
-    onNext: onWin,
-    onHome: onHome
-  }));
+  }, kids);
+
+  if (phase === 'quiz' || phase === 'win') {
+    const len = lvl.kind === 'short' ? n : 0;
+    const shortOk = lvl.kind !== 'short' || len <= lvl.best;
+    return shell([top,
+      phase === 'quiz' && /*#__PURE__*/React.createElement(CBQuiz, { key: 'q', lvl: lvl, onDone: () => setPhase('win') }),
+      phase === 'win' && /*#__PURE__*/React.createElement(WinModal, {
+        key: 'w', emoji: lvl.win.emoji,
+        title: shortOk ? (lvl.kind === 'predict' ? `${lvl.win.title} ${score} из ${lvl.rounds.length}` : lvl.win.title) : `Работает — ${len} ${window.nooka ? window.nooka.plural(len, 'блок', 'блока', 'блоков') : 'блоков'}`,
+        law: lvl.win.law,
+        fact: shortOk ? lvl.win.fact : `А можно уложиться в ${lvl.best} блока — попробуй «Вперёд до стены».`,
+        cta: lvl.n < CB_LEVELS.length ? 'Дальше →' : 'На главную →', onNext: onWin, onHome: onHome
+      })]);
+  }
+
+  /* что ставится в «программу» на экране для каждого вида уровня */
+  const lit = (i) => phase === 'run' && pc && pc[0] === i;
+  let editor = null;
+  if (lvl.kind === 'build' || lvl.kind === 'short' || lvl.kind === 'rooms') {
+    editor = [
+      /*#__PURE__*/React.createElement(CBRow, { key: 'p', label: 'Программа', count: n + ' / ' + lvl.limit, hint: prog.length ? null : '← добавь команды снизу' },
+        prog.map((id, i) => /*#__PURE__*/React.createElement(CBChip, { key: i, id: id, on: lit(i), onClick: () => removeAt(i) }))),
+      /*#__PURE__*/React.createElement(CBPalette, { key: 'b', blocks: lvl.blocks, disabled: !editing || n >= lvl.limit, onAdd: add })
+    ];
+  } else if (lvl.kind === 'fix') {
+    editor = [
+      /*#__PURE__*/React.createElement(CBRow, { key: 'p', label: 'Чужая программа · коснись блока, чтобы поменять' },
+        prog.map((id, i) => /*#__PURE__*/React.createElement(CBChip, { key: i, id: id, on: lit(i), onClick: () => cycleAt(i) })))
+    ];
+  } else if (lvl.kind === 'loop') {
+    editor = [
+      /*#__PURE__*/React.createElement(CBRow, { key: 'p', label: 'Программа' },
+        /*#__PURE__*/React.createElement("div", {
+          style: { display: 'flex', flexWrap: 'wrap', gap: 5, alignItems: 'center', padding: '6px 8px', borderRadius: 12, background: 'rgba(255,210,98,.35)', boxShadow: phase === 'run' ? '0 0 0 3px #2D1B45' : 'inset 0 0 0 2px #D4A22B', width: '100%', boxSizing: 'border-box' }
+        }, /*#__PURE__*/React.createElement("button", {
+          onClick: () => editing && setRep(r => r >= lvl.repMax ? 2 : r + 1),
+          style: { border: 'none', cursor: 'pointer', borderRadius: 10, padding: '7px 10px', fontWeight: 900, fontSize: 13, fontFamily: 'var(--ak-body)', color: '#5A3A08', background: '#FFD262', boxShadow: '0 3px 0 #D4A22B' }
+        }, '↻ Повтори ', rep, ' ', window.nooka ? window.nooka.plural(rep, 'раз', 'раза', 'раз') : 'раз'),
+        prog.map((id, i) => /*#__PURE__*/React.createElement(CBChip, { key: i, id: id, small: true, on: phase === 'run' && pc && pc[1] === i, onClick: () => removeAt(i) })),
+        Array.from({ length: lvl.bodyMax - prog.length }, (_, i) => /*#__PURE__*/React.createElement("span", {
+          key: 'e' + i, style: { width: 34, height: 28, borderRadius: 9, border: '2px dashed rgba(212,162,43,.6)', boxSizing: 'border-box' }
+        })))),
+      /*#__PURE__*/React.createElement(CBPalette, { key: 'b', blocks: lvl.blocks, disabled: !editing || prog.length >= lvl.bodyMax, onAdd: add })
+    ];
+  } else if (lvl.kind === 'func') {
+    editor = [
+      /*#__PURE__*/React.createElement(CBRow, { key: 'd', label: '★ Моя команда — это:', count: fn.length + ' / ' + lvl.fnMax, hint: fn.length ? null : 'собери из блоков ниже' },
+        fn.map((id, i) => /*#__PURE__*/React.createElement(CBChip, { key: i, id: id, small: true, on: phase === 'run' && fi === i, onClick: () => editing && setFn(f => f.filter((_, j) => j !== i)) }))),
+      /*#__PURE__*/React.createElement(CBRow, { key: 'p', label: 'Программа', count: n + ' / ' + lvl.limit, hint: prog.length ? null : 'зови ★ блоком ниже' },
+        prog.map((id, i) => /*#__PURE__*/React.createElement(CBChip, { key: i, id: id, on: lit(i), onClick: () => removeAt(i) }))),
+      /* одна палитра: стрелки собирают ★, а сама ★ встаёт в программу */
+      /*#__PURE__*/React.createElement(CBPalette, { key: 'b', blocks: lvl.blocks.concat('fn'), disabled: !editing, onAdd: id => {
+        if (!editing) return;
+        if (id === 'fn') return add(id);
+        if (fn.length < lvl.fnMax) setFn(f => [...f, id]);
+      } })
+    ];
+  } else if (lvl.kind === 'rule') {
+    editor = [
+      /*#__PURE__*/React.createElement(CBRow, { key: 'p', label: 'Правило робота' },
+        /*#__PURE__*/React.createElement("span", { style: { fontWeight: 800, fontSize: 13.5, color: 'var(--ak-ink)', padding: '0 4px' } }, 'Едь вперёд. Если впереди стена —'),
+        ['l', 'r'].map(id => /*#__PURE__*/React.createElement(CBChip, { key: id, id: id, on: rule === id, onClick: () => editing && setRule(id) })))
+    ];
+  } else if (lvl.kind === 'predict') {
+    editor = [
+      /*#__PURE__*/React.createElement(CBRow, { key: 'p', label: 'Программа · раунд ' + (rd + 1) + ' из ' + lvl.rounds.length },
+        board.prog.map((t, i) => typeof t === 'string'
+          ? /*#__PURE__*/React.createElement(CBChip, { key: i, id: t, on: lit(i) })
+          : /*#__PURE__*/React.createElement("div", {
+            key: i, style: { display: 'flex', gap: 5, alignItems: 'center', padding: '5px 7px', borderRadius: 12, background: 'rgba(255,210,98,.35)', boxShadow: lit(i) ? '0 0 0 3px #2D1B45' : 'inset 0 0 0 2px #D4A22B' }
+          }, /*#__PURE__*/React.createElement("b", { style: { fontSize: 12.5, color: '#5A3A08', padding: '0 4px' } }, '↻ Повтори ' + t.rep + ' раза'),
+          t.body.map((id, j) => /*#__PURE__*/React.createElement(CBChip, { key: j, id: id, small: true }))))),
+      mark && /*#__PURE__*/React.createElement("div", {
+        key: 'r', style: { fontFamily: 'var(--ak-display)', fontWeight: 700, fontSize: 15, color: guess && mark.x === guess.x && mark.y === guess.y ? 'var(--ak-ok-3)' : 'var(--ak-ink-2)' }
+      }, guess && mark.x === guess.x && mark.y === guess.y ? 'Точно! Получилось выполнить программу в уме' : 'Робот приехал в зелёную клетку. Пройди по шагам ещё раз')
+    ];
+  }
+
+  const canRun = lvl.kind === 'rule' ? !!rule : lvl.kind === 'func' ? fn.length && prog.length : cbCount(program) > 0;
+  return shell([top,
+    phase === 'intro' && /*#__PURE__*/React.createElement(IntroModal, {
+      key: 'i', emoji: lvl.intro.emoji, title: lvl.intro.title, law: lvl.intro.law, diagram: null, tip: lvl.intro.tip,
+      onStart: () => setPhase('edit')
+    }),
+    phase !== 'intro' && /*#__PURE__*/React.createElement("div", {
+      key: 'b', ref: body, style: { flex: 1, display: 'flex', flexDirection: 'column', gap: 10, padding: '6px 16px 20px', alignItems: 'center', overflowY: 'auto' }
+    }, /*#__PURE__*/React.createElement(TaskBadge, null, lvl.kind === 'rooms' ? `Комната ${room + 1} из ${lvl.rooms.length} · ${lvl.task}` : lvl.task),
+    /*#__PURE__*/React.createElement(CBGrid, {
+      lvl: board, bot: bot, got: got, crashed: crashed, trail: trail,
+      onCell: lvl.kind === 'predict' && editing && !guess ? tapCell : null, guess: guess, mark: mark, max: gridMax
+    }), editor,
+    lvl.kind === 'predict'
+      ? (mark && phase === 'edit' && /*#__PURE__*/React.createElement("button", {
+        className: "ak-btn ak-btn--ok", style: { width: '100%', maxWidth: 320 }, onClick: nextRound
+      }, rd + 1 < lvl.rounds.length ? 'Следующая программа →' : 'Дальше'))
+      : /*#__PURE__*/React.createElement("div", {
+        style: { display: 'flex', gap: 10, width: '100%', maxWidth: 320 }
+      }, /*#__PURE__*/React.createElement("button", {
+        className: "ak-btn ak-btn--ok", style: { flex: 1 }, disabled: phase === 'run' || !canRun, onClick: run
+      }, "▶ Запуск!"), lvl.kind !== 'fix' && lvl.kind !== 'rule' && /*#__PURE__*/React.createElement("button", {
+        className: "ak-btn", style: { background: 'rgba(255,255,255,.9)', boxShadow: '0 6px 0 rgba(45,27,69,.12)' },
+        onClick: () => { setRoom(0); reset(lvl.kind === 'rooms' ? lvl.rooms[0] : null); setProg([]); setFn([]); }
+      }, "🗑"))),
+    fail && /*#__PURE__*/React.createElement(FailModal, {
+      key: 'f', tip: fail,
+      onRetry: () => { setFail(null); setRoom(0); reset(lvl.kind === 'rooms' ? lvl.rooms[0] : null); }
+    })]);
 }
-function CBHome({
-  onSelect
-}) {
+
+/* ── список уровней игры ─────────────────────────────────── */
+function CBHome({ onSelect }) {
   const doneSet = new Set(window.nooka ? window.nooka.getCompleted('code') : []);
+  const N = CB_LEVELS.length;
   return /*#__PURE__*/React.createElement("div", {
     className: "ak",
     style: {
-      minHeight: '100vh',
-      height: '100vh',
+      minHeight: '100vh', height: '100vh', boxSizing: 'border-box', overflowY: 'auto',
       background: 'radial-gradient(120% 60% at 50% -10%,var(--ak-phys-1) 0%,transparent 60%),linear-gradient(180deg,var(--ak-bg-2),var(--ak-bg))',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      padding: '52px 20px 32px',
-      boxSizing: 'border-box',
-      overflowY: 'auto'
+      display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '52px 20px 32px'
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      width: 64,
-      height: 64,
-      borderRadius: 20,
-      background: 'linear-gradient(180deg,var(--ak-phys-1),var(--ak-phys-2))',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontSize: 32,
-      marginBottom: 10,
-      boxShadow: '0 8px 0 var(--ak-phys-3),0 16px 28px -8px rgba(124,95,224,.35)'
+      width: 64, height: 64, borderRadius: 20, background: 'linear-gradient(180deg,var(--ak-phys-1),var(--ak-phys-2))',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, marginBottom: 10,
+      boxShadow: '0 8px 0 var(--ak-phys-3),0 16px 28px -8px rgba(124,95,224,.35)', flexShrink: 0
     }
   }, "🤖"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontFamily: 'var(--ak-display)',
-      fontSize: 30,
-      fontWeight: 700,
-      color: 'var(--ak-ink)',
-      marginBottom: 2
-    }
+    style: { fontFamily: 'var(--ak-display)', fontSize: 30, fontWeight: 700, color: 'var(--ak-ink)', marginBottom: 2 }
   }, "КодБот"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontFamily: 'var(--ak-display)',
-      fontSize: 15,
-      color: 'var(--ak-ink-2)',
-      marginBottom: 32
-    }
-  }, "Программирование · 3 урока"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 12,
-      width: '100%',
-      maxWidth: 340
-    }
+    style: { fontFamily: 'var(--ak-display)', fontSize: 15, color: 'var(--ak-ink-2)', marginBottom: 32 }
+  }, "Программирование · ", N, " ", window.nooka ? window.nooka.plural(N, 'урок', 'урока', 'уроков') : 'уроков'), /*#__PURE__*/React.createElement("div", {
+    style: { display: 'flex', flexDirection: 'column', gap: 12, width: '100%', maxWidth: 340 }
   }, CB_LEVELS.map(l => /*#__PURE__*/React.createElement("button", {
-    key: l.n,
-    onClick: () => onSelect(l.n),
+    key: l.n, onClick: () => onSelect(l.n),
     style: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: 14,
-      background: 'rgba(255,255,255,.88)',
-      borderRadius: 22,
-      padding: '15px 18px',
-      border: 'none',
-      cursor: 'pointer',
-      textAlign: 'left',
+      display: 'flex', alignItems: 'center', gap: 14, background: 'rgba(255,255,255,.88)', borderRadius: 22,
+      padding: '15px 18px', border: 'none', cursor: 'pointer', textAlign: 'left', flexShrink: 0,
       boxShadow: '0 6px 0 rgba(45,27,69,.08),0 12px 24px -8px rgba(45,27,69,.12),inset 0 2px 0 #fff'
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      width: 52,
-      height: 52,
-      borderRadius: '50%',
-      flexShrink: 0,
-      background: `radial-gradient(circle at 35% 30%,#fff,var(--ak-phys-1) 70%)`,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontSize: 24,
-      boxShadow: '0 4px 0 rgba(45,27,69,.08)'
+      width: 52, height: 52, borderRadius: '50%', flexShrink: 0, background: `radial-gradient(circle at 35% 30%,#fff,var(--ak-phys-1) 70%)`,
+      display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, boxShadow: '0 4px 0 rgba(45,27,69,.08)'
     }
   }, l.intro.emoji), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontFamily: 'var(--ak-display)',
-      fontSize: 17,
-      fontWeight: 700,
-      color: 'var(--ak-ink)'
-    }
+    style: { fontFamily: 'var(--ak-display)', fontSize: 17, fontWeight: 700, color: 'var(--ak-ink)' }
   }, l.n, ". ", l.title), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontFamily: 'var(--ak-display)',
-      fontSize: 13,
-      color: 'var(--ak-ink-2)',
-      marginTop: 2
-    }
-  }, l.n === 1 ? 'Команды по порядку' : l.n === 2 ? 'Цикл ×3 — экономим блоки' : 'Обойди стену, собери всё')), /*#__PURE__*/React.createElement("div", {
-    style: {
-      marginLeft: 'auto',
-      fontSize: 18,
-      color: 'var(--ak-ink-3)'
-    }
+    style: { fontFamily: 'var(--ak-display)', fontSize: 13, color: 'var(--ak-ink-2)', marginTop: 2 }
+  }, l.sub)), /*#__PURE__*/React.createElement("div", {
+    style: { marginLeft: 'auto', fontSize: 18, color: 'var(--ak-ink-3)' }
   }, doneSet.has(l.n) ? '✅' : '→')))), /*#__PURE__*/React.createElement("div", {
     style: {
-      marginTop: 24,
-      padding: '14px 18px',
-      background: 'rgba(255,255,255,.65)',
-      borderRadius: 18,
-      maxWidth: 340,
-      fontFamily: 'var(--ak-display)',
-      fontSize: 13.5,
-      color: 'var(--ak-ink-2)',
-      textAlign: 'center',
-      lineHeight: 1.5
+      marginTop: 24, padding: '14px 18px', background: 'rgba(255,255,255,.65)', borderRadius: 18, maxWidth: 340,
+      fontFamily: 'var(--ak-display)', fontSize: 13.5, color: 'var(--ak-ink-2)', textAlign: 'center', lineHeight: 1.5
     }
   }, "Каждый уровень: составь программу — и робот выполнит её сам!"));
 }
+
+/* ── переходы: ?n=4 открывает уровень сразу ──────────────── */
 function App() {
-  const [s, setS] = useState('home');
+  const q = new URLSearchParams(location.search);
+  const start = +q.get('n');
+  const [s, setS] = useState(start >= 1 && start <= CB_LEVELS.length ? start : 0);
+  const lvl = s ? CB_LEVELS[s - 1] : null;
   return /*#__PURE__*/React.createElement("div", {
-    style: {
-      width: '100%',
-      height: '100vh',
-      maxWidth: 480,
-      margin: '0 auto',
-      position: 'relative',
-      overflow: 'hidden'
-    }
-  }, s === 'home' && /*#__PURE__*/React.createElement(CBHome, {
-    onSelect: n => setS('l' + n)
-  }), s === 'l1' && /*#__PURE__*/React.createElement(CBLevel, {
-    lvl: CB_LEVELS[0],
+    style: { width: '100%', height: '100vh', maxWidth: 480, margin: '0 auto', position: 'relative', overflow: 'hidden' }
+  }, !lvl && /*#__PURE__*/React.createElement(CBHome, { onSelect: n => setS(n) }),
+  lvl && /*#__PURE__*/React.createElement(CBLevel, {
+    key: s, lvl: lvl,
     onWin: () => {
-      setS('l2');
-      if (window.nooka) window.nooka.missionWin('code1', 60, {
-        nextLabel: 'Дальше →',
+      const last = s >= CB_LEVELS.length;
+      setS(last ? 0 : s + 1);
+      if (window.nooka) window.nooka.missionWin('code' + s, s > 3 ? 80 : 60, {
+        nextLabel: last ? 'На главную →' : 'Дальше →',
         onNext: function () {}
       });
     },
-    onHome: () => setS('home')
-  }), s === 'l2' && /*#__PURE__*/React.createElement(CBLevel, {
-    lvl: CB_LEVELS[1],
-    onWin: () => {
-      setS('l3');
-      if (window.nooka) window.nooka.missionWin('code2', 60, {
-        nextLabel: 'Дальше →',
-        onNext: function () {}
-      });
-    },
-    onHome: () => setS('home')
-  }), s === 'l3' && /*#__PURE__*/React.createElement(CBLevel, {
-    lvl: CB_LEVELS[2],
-    onWin: () => {
-      setS('home');
-      if (window.nooka) window.nooka.missionWin('code3', 60, {
-        nextLabel: 'На главную →',
-        onNext: function () {}
-      });
-    },
-    onHome: () => setS('home')
+    onHome: () => setS(0)
   }));
 }
 ReactDOM.createRoot(document.getElementById('root')).render(/*#__PURE__*/React.createElement(App, null));
