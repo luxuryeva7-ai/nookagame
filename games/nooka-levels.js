@@ -205,7 +205,9 @@
   var EXTRA = [
     { key: 'chem',   name: 'Хемо Лаб', sub: 'Химия',            total: 10, href: '../games/chemistry.html' },
     { key: 'phys',   name: 'КвантУм',  sub: 'Физика',           total: 10, href: '../games/physics.html' },
-    { key: 'code',   name: 'КодБот',   sub: 'Программирование', total: 10, href: '../games/code.html' }
+    { key: 'code',   name: 'КодБот',   sub: 'Программирование', total: 10, href: '../games/code.html' },
+    /* платная: бесплатны две миссии, остальное проверяет сама игра через nooka-access */
+    { key: 'space',  name: 'КосмоПорт', sub: 'Астрономия',      total: 10, href: '../games/space.html' }
   ];
 
   /* ── прогресс ─────────────────────────────────────────────
