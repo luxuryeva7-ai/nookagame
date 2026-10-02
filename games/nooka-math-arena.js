@@ -12,7 +12,12 @@
    Заклинания открываются уровнями курса:
    · «Отсчитай» — всегда: одна корзинка, ровно N ягод;
    · «Две корзинки» — после «Домика для числа»: в одной уже k ягод,
-     дополни вторую до N (состав числа из уровня 2).
+     дополни вторую до N (состав числа из уровня 2);
+   · «Прыжки» — после «Кузнечика»: Ням просит «3 + 2»;
+   · «Убежали» — после «Зайцев»: Ням просит «7 − 3»;
+   · «Близнецы» — после уровня 8: Ням просит «4 + 4».
+   Ответ всегда один и тот же жест — положить ровно столько ягод, —
+   меняется только вопрос. Чем новее навык, тем чаще он выпадает.
 
    Задачи генерируются, сложность подстраивается: три удачи подряд —
    ступень выше (больше числа, потом без подсказки точками), два
@@ -34,10 +39,31 @@
   var PET_GROW = [0, 6, 15, 30];          // задач до следующего роста питомца
 
   var st = load();
-  var houseDone = (function () {
-    try { return (window.nooka && window.nooka.getCompleted('ma').indexOf(2) >= 0) || /[?&]all=1/.test(location.search); }
-    catch (e) { return false; }
+  var DONE = (function () {
+    try { return /[?&]all=1/.test(location.search) ? [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] : (window.nooka ? window.nooka.getCompleted('ma') : []); }
+    catch (e) { return []; }
   })();
+  function done(n) { return DONE.indexOf(n) >= 0; }
+  /* виды просьб: какой уровень открывает и вес (новые навыки выпадают чаще) */
+  var KINDS = [
+    { kind: 'count', w: 1 },
+    { kind: 'two', lv: 2, w: 1.2 },
+    { kind: 'plus', lv: 5, w: 1.5 },
+    { kind: 'minus', lv: 6, w: 1.6 },
+    { kind: 'double', lv: 8, w: 1.4 },
+  ];
+  function pickKind(n) {
+    var open = KINDS.filter(function (k) {
+      if (k.lv && !done(k.lv)) return false;
+      if (k.kind === 'two' || k.kind === 'plus') return n >= 3;
+      if (k.kind === 'double') return n % 2 === 0;
+      if (k.kind === 'minus') return n <= 9;
+      return true;
+    });
+    var sum = open.reduce(function (a, k) { return a + k.w; }, 0), r = Math.random() * sum;
+    for (var i = 0; i < open.length; i++) { r -= open[i].w; if (r <= 0) return open[i].kind; }
+    return 'count';
+  }
 
   function load() {
     try { var s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s && s.v === 1) return s; } catch (e) {}
@@ -79,10 +105,13 @@
   function newTask() {
     var S = STEPS[st.step];
     var n = rnd(S.lo, S.hi);
-    /* «Две корзинки» — если уровень пройден и число не совсем маленькое */
-    var two = houseDone && n >= 4 && Math.random() < .5;
-    var k = two ? rnd(1, n - 2) : 0;
-    task = { n: n, two: two, k: k, dots: S.dots };
+    var kind = pickKind(n), two = kind === 'two';
+    var k = two ? rnd(1, n - 2) : 0, expr = null;
+    if (kind === 'plus') { var a = rnd(1, n - 1); expr = a + ' + ' + (n - a); }
+    if (kind === 'minus') { var m = rnd(n + 1, Math.min(10, n + 5)); expr = m + ' − ' + (m - n); }
+    if (kind === 'double') expr = (n / 2) + ' + ' + (n / 2);
+    /* в примере точки-подсказки не показываем: иначе ответ виден без счёта */
+    task = { n: n, two: two, k: k, dots: S.dots && !expr, expr: expr };
     fed = 0; triedWrong = false;
     build();
   }
@@ -109,7 +138,8 @@
 
   function drawWish(missing) {
     wish.innerHTML = '';
-    var b = M.el('b', '', String(task.n));
+    /* пример показываем, пока Ням ничего не съел; если не хватило — просит остаток числом */
+    var b = M.el('b', task.expr && missing == null ? 'expr' : '', task.expr && missing == null ? task.expr : String(task.n));
     wish.appendChild(b);
     if (task.dots || missing != null) {
       var have = missing != null ? task.n - missing : 0;
@@ -257,7 +287,7 @@
       return setTimeout(function () { next(true); }, 1200);
     }
     /* мало: съел и ждёт — пустые кружки показывают, сколько не хватило */
-    task.n = need - total; task.k = 0;
+    task.n = need - total; task.k = 0; task.expr = null;
     if (task.two) { baskets[0].el.classList.add('gone'); }
     drawWish(task.n);
     wish.classList.remove('ask'); void wish.offsetWidth; wish.classList.add('ask');
@@ -386,7 +416,7 @@
   if (/[?&]debug=1/.test(location.search)) {
     window.__ma = {
       put: function (n) { var mine = baskets.length - 1; berries.filter(function (r) { return r.basket < 0; }).slice(0, n).forEach(function (r) { r.basket = mine; }); layout(); },
-      serve: serve, task: function () { return task; }, state: function () { return st; },
+      serve: serve, task: function () { return task; }, state: function () { return st; }, kinds: function (n) { var c = {}; for (var i = 0; i < 400; i++) { var k = pickKind(n); c[k] = (c[k] || 0) + 1; } return c; },
     };
   }
 

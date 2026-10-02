@@ -159,6 +159,7 @@
 .ma-wish::after{content:'';position:absolute;left:12px;bottom:-9px;width:18px;height:18px;border-radius:50%;background:#FFFDF8;
   box-shadow:-10px 12px 0 -4px #FFFDF8;}
 .ma-wish b{font-family:var(--nk-brand);font-weight:700;font-size:clamp(30px,9vw,42px);line-height:1;color:#D9402E;}
+.ma-wish b.expr{font-size:clamp(24px,7vw,32px);white-space:nowrap;}
 .ma-wish.ask{animation:mhPulse .8s ease-in-out 2;}
 
 .ma-basket{position:absolute;z-index:30;width:26%;transform:translate(-50%,-50%);touch-action:none;cursor:grab;}
