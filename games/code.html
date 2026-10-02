@@ -761,20 +761,20 @@ const CB_FIX_CYCLE = ['f', 'l', 'r'];
 
 const CB_LEVELS = [{
   n: 1, title: 'Первые шаги', sub: 'Команды по порядку', kind: 'build',
-  grid: 5, start: { x: 0, y: 4, dir: 1 }, stars: [[4, 4]], walls: [],
+  grid: 5, start: { x: 2, y: 4, dir: 0 }, stars: [[2, 0]], walls: [],
   blocks: ['f', 'l', 'r'], limit: 6,
   task: 'Доведи робота до звезды',
   intro: { emoji: '🤖', title: 'Первые шаги',
-    law: 'Робот понимает только команды. Собери программу — он выполнит её по порядку.',
+    law: 'Робот едет туда, куда смотрит его нос. «Налево» и «Направо» — поворот на месте.',
     tip: 'Касайся блоков внизу. Доведи робота до ⭐' },
   win: { emoji: '🤖', title: 'Робот ожил!',
     law: 'Программа — это список команд, которые робот выполняет по порядку',
     fact: 'Первым программистом в истории была Ада Лавлейс — она писала программы в 1843 году, когда компьютеров ещё не существовало!' },
   quiz: [
-    { q: 'Робот смотрит вправо. Программа: Вперёд, Вперёд, Налево. Куда он смотрит в конце?',
-      opts: [{ t: 'Вверх', ok: true }, { t: 'Вниз' }, { t: 'Влево' }],
-      yes: 'Да: налево от «вправо» — это вверх. Робот поворачивается на месте.',
-      no: 'Представь, что ты сам робот и смотришь вправо. Поверни налево — куда теперь смотришь?' },
+    { q: 'Робот смотрит вверх. Программа: Вперёд, Вперёд, Налево. Куда он смотрит в конце?',
+      opts: [{ t: 'Влево', ok: true }, { t: 'Вправо' }, { t: 'Вниз' }],
+      yes: 'Да: робот проехал вверх и повернулся на месте налево.',
+      no: 'Представь, что ты сам робот и смотришь вверх. Повернись налево — куда теперь смотришь?' },
     { q: 'Что будет, если в программе поменять местами две команды?',
       opts: [{ t: 'Робот придёт в другое место', ok: true }, { t: 'Ничего не изменится' }, { t: 'Робот сам разберётся, что имелось в виду' }],
       yes: 'Верно. Порядок команд — это и есть программа.',
@@ -782,7 +782,7 @@ const CB_LEVELS = [{
   ]
 }, {
   n: 2, title: 'Экономная программа', sub: 'Цикл ×3 — экономим блоки', kind: 'build',
-  grid: 5, start: { x: 0, y: 4, dir: 1 }, stars: [[4, 0]], walls: [],
+  grid: 5, start: { x: 0, y: 4, dir: 0 }, stars: [[4, 0]], walls: [],
   blocks: ['f', 'f3', 'l', 'r'], limit: 5,
   task: 'Доведи робота до звезды',
   intro: { emoji: '📦', title: 'Экономная программа',
@@ -803,7 +803,7 @@ const CB_LEVELS = [{
   ]
 }, {
   n: 3, title: 'Лабиринт', sub: 'Обойди стену, собери всё', kind: 'build',
-  grid: 5, start: { x: 0, y: 4, dir: 1 }, stars: [[1, 1], [4, 4]], walls: [[2, 4], [2, 3], [2, 2]],
+  grid: 5, start: { x: 0, y: 4, dir: 0 }, stars: [[1, 1], [4, 4]], walls: [[2, 4], [2, 3], [2, 2]],
   blocks: ['f', 'f3', 'l', 'r'], limit: 8,
   task: 'Собери 2 звезды одной программой',
   intro: { emoji: '🧱', title: 'Лабиринт',
@@ -845,7 +845,7 @@ const CB_LEVELS = [{
   ]
 }, {
   n: 5, title: 'Повтори', sub: 'Повтор N раз', kind: 'loop',
-  grid: 5, start: { x: 0, y: 4, dir: 1 }, stars: [[4, 0]], walls: [[2, 4], [3, 4], [4, 4], [3, 3], [4, 3], [4, 2]],
+  grid: 5, start: { x: 0, y: 4, dir: 0 }, stars: [[4, 0]], walls: [[2, 4], [3, 4], [4, 4], [3, 3], [4, 3], [4, 2]],
   blocks: ['f', 'l', 'r'], bodyMax: 4, repMax: 5,
   task: 'Собери ступеньку и повтори её',
   intro: { emoji: '🪜', title: 'Повтори',
@@ -908,7 +908,7 @@ const CB_LEVELS = [{
 }, {
   n: 8, title: 'Угадай, где будет', sub: 'Прочитай и угадай', kind: 'predict',
   rounds: [
-    { grid: 5, start: { x: 0, y: 4, dir: 1 }, walls: [], prog: ['f', 'f', 'l', 'f'] },
+    { grid: 5, start: { x: 0, y: 4, dir: 0 }, walls: [], prog: ['f', 'f', 'r', 'f'] },
     { grid: 5, start: { x: 0, y: 4, dir: 0 }, walls: [], prog: ['f', 'r', 'f', 'f', 'r', 'f'] },
     { grid: 5, start: { x: 2, y: 2, dir: 0 }, walls: [], prog: [{ rep: 3, body: ['f', 'r'] }] }
   ],
@@ -956,7 +956,7 @@ const CB_LEVELS = [{
   ]
 }, {
   n: 10, title: 'Короче всех', sub: 'Самая короткая программа', kind: 'short',
-  grid: 5, start: { x: 0, y: 4, dir: 1 }, stars: [[4, 4], [4, 0]], walls: [],
+  grid: 5, start: { x: 0, y: 4, dir: 0 }, stars: [[0, 0], [4, 0]], walls: [],
   blocks: ['f', 'f3', 'w', 'l', 'r'], limit: 8, best: 3,
   task: 'Собери обе звезды самой короткой программой',
   intro: { emoji: '✂️', title: 'Короче всех',
@@ -978,7 +978,6 @@ const CB_LEVELS = [{
 }];
 
 const CB_DIRS = [[0, -1], [1, 0], [0, 1], [-1, 0]];
-const CB_ROT = { 0: '-90deg', 1: '0deg', 2: '90deg', 3: '180deg' };
 
 /* ── программа → шаги; шаги → кадры ─────────────────────── */
 function cbExpand(prog, fn, path) {
@@ -1045,10 +1044,18 @@ function cbCount(prog) {
 /* ── поле ─────────────────────────────────────────────────── */
 function CBGrid({ lvl, bot, got, crashed, trail, onCell, guess, mark, max }) {
   const size = lvl.grid;
+  const turn = useRef(null);
+  if (!turn.current) turn.current = { dir: bot.dir, a: bot.dir * 90 };
+  else if (turn.current.dir !== bot.dir) {
+    let d = (bot.dir - turn.current.dir + 4) % 4;
+    if (d === 3) d = -1;
+    turn.current = { dir: bot.dir, a: turn.current.a + d * 90 };
+  }
+  const rot = turn.current.a;
   const wallSet = new Set((lvl.walls || []).map(w => w.join(',')));
   return /*#__PURE__*/React.createElement("div", {
     style: {
-      display: 'grid', gridTemplateColumns: `repeat(${size},1fr)`, gap: 4, width: '100%', maxWidth: max || 320,
+      display: 'grid', gridTemplateColumns: `repeat(${size},1fr)`, gridTemplateRows: `repeat(${size},1fr)`, gap: 4, width: '100%', maxWidth: max || 320,
       aspectRatio: '1', background: 'rgba(255,255,255,.55)', borderRadius: 20, padding: 8,
       boxSizing: 'border-box', boxShadow: '0 6px 0 rgba(45,27,69,.08)', flexShrink: 0
     }
@@ -1067,26 +1074,28 @@ function CBGrid({ lvl, bot, got, crashed, trail, onCell, guess, mark, max }) {
         background: isWall ? '#4A3B63' : isMark ? 'rgba(93,217,160,.55)' : trail && trail.has(k) ? 'rgba(181,161,255,.5)' : 'rgba(229,220,255,.55)',
         boxShadow: isGuess ? 'inset 0 0 0 3px #FFB020' : 'none',
         cursor: onCell && !isWall ? 'pointer' : 'default',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: size > 5 ? 20 : 24,
-        position: 'relative', transition: 'background .25s'
+        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: size > 5 ? 20 : 24, lineHeight: 1,
+        position: 'relative', transition: 'background .25s', minHeight: 0, overflow: 'visible'
       }
     }, isWall ? '🧱' : isStar ? '⭐' : '', isBot && /*#__PURE__*/React.createElement("div", {
       className: crashed ? 'ak-shake' : '',
-      style: { position: 'absolute', inset: 0 }
+      style: { position: 'absolute', inset: 2 }
     },
-    /* Вращается не робот, а стрелка-нос: эмодзи 🤖 смотрит на зрителя,
-       и поворот клал его набок — ребёнок не понимал, куда «вперёд». */
-    /*#__PURE__*/React.createElement("div", {
-      style: { position: 'absolute', inset: 0, transform: `rotate(${CB_ROT[bot.dir]})`, transition: 'transform .3s' }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        position: 'absolute', top: '50%', right: -2, width: 0, height: 0, marginTop: -9,
-        borderTop: '9px solid transparent', borderBottom: '9px solid transparent', borderLeft: '12px solid #FFB020',
-        filter: 'drop-shadow(0 1px 0 rgba(45,27,69,.35))'
-      }
-    })), /*#__PURE__*/React.createElement("div", {
-      style: { position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: size > 5 ? 22 : 26 }
-    }, "🤖")));
+    /* Робот — машинка сверху: нос и глаза смотрят по ходу, и она целиком
+       поворачивается на «Налево/Направо». Раньше был эмодзи лицом к зрителю
+       со стрелкой сбоку — «Вперёд» уводил вправо, и было непонятно почему. */
+    /*#__PURE__*/React.createElement("svg", {
+      viewBox: '0 0 40 40',
+      style: { width: '100%', height: '100%', transform: `rotate(${rot}deg)`, transition: 'transform .3s', overflow: 'visible' }
+    },
+      /*#__PURE__*/React.createElement("path", { d: 'M20 0 L26 7 L14 7 Z', fill: '#FFB020', stroke: '#C77F00', strokeWidth: 1 }),
+      /*#__PURE__*/React.createElement("rect", { x: 4, y: 12, width: 6, height: 20, rx: 2.5, fill: '#4A3B63' }),
+      /*#__PURE__*/React.createElement("rect", { x: 30, y: 12, width: 6, height: 20, rx: 2.5, fill: '#4A3B63' }),
+      /*#__PURE__*/React.createElement("rect", { x: 8, y: 8, width: 24, height: 28, rx: 9, fill: '#FFFFFF', stroke: '#7C5FE0', strokeWidth: 2.2 }),
+      /*#__PURE__*/React.createElement("rect", { x: 11.5, y: 11, width: 17, height: 10, rx: 4, fill: '#2D1B45' }),
+      /*#__PURE__*/React.createElement("circle", { cx: 16, cy: 16, r: 2.2, fill: '#7BF0BC' }),
+      /*#__PURE__*/React.createElement("circle", { cx: 24, cy: 16, r: 2.2, fill: '#7BF0BC' }),
+      /*#__PURE__*/React.createElement("rect", { x: 14, y: 26, width: 12, height: 4, rx: 2, fill: '#E4DDF5' }))));
   }));
 }
 
