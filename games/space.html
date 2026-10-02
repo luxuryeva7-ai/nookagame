@@ -1093,6 +1093,858 @@ function Level3Jump({ onWin, onHome }) {
     }));
 }
 
+/* ── полёт вверх: небо темнеет с высотой, видны облака и линия космоса ──
+   Высота в «условных километрах»: облака — 30, космос — 100 (настоящая
+   граница космоса тоже на высоте 100 км). На экране 2 точки на единицу. */
+const SP_PAD = 300, SP_K = 2;
+const spMix = (a, b, t) => {
+  const p = c => [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16)), A = p(a), B = p(b);
+  return '#' + A.map((v, i) => Math.round(v + (B[i] - v) * t).toString(16).padStart(2, '0')).join('');
+};
+const spY = (alt, cam) => SP_PAD - (alt - cam) * SP_K;
+function SpAscentSky({ cam, H, lines, id }) {
+  const t1 = spClamp((cam + 40) / 90, 0, 1), t2 = spClamp(cam / 80, 0, 1);
+  return h('g', { pointerEvents: 'none' },
+    h('defs', null, h('linearGradient', { id: id + 'sky', x1: 0, y1: 0, x2: 0, y2: 1 },
+      h('stop', { offset: 0, stopColor: spMix('#2E5BC4', '#070A18', t1) }), h('stop', { offset: 1, stopColor: spMix('#8FCBFF', '#121A3A', t2) }))),
+    h('rect', { x: 0, y: 0, width: 340, height: H, fill: `url(#${id}sky)` }),
+    h('g', { opacity: spClamp((cam + 20) / 70, 0.15, 1) }, h(SpStars, { H })),
+    /* облака на высоте 30 */
+    [[40, 0], [120, 6], [230, -4], [300, 4]].map(([x, o], i) => h('g', { key: i, transform: `translate(${x} ${spY(30, cam) + o})`, opacity: 0.85 },
+      h('ellipse', { cx: 0, cy: 0, rx: 30, ry: 9, fill: '#fff' }), h('ellipse', { cx: -12, cy: -6, rx: 14, ry: 8, fill: '#fff' }), h('ellipse', { cx: 10, cy: -7, rx: 16, ry: 9, fill: '#fff' }))),
+    (lines || []).map(l => h('g', { key: l.alt },
+      h('line', { x1: 0, y1: spY(l.alt, cam), x2: 340, y2: spY(l.alt, cam), stroke: l.col, strokeWidth: 2, strokeDasharray: '8 6', opacity: 0.85 }),
+      h('rect', { x: 4, y: spY(l.alt, cam) - 21, width: l.name.length * 7.4 + 12, height: 17, rx: 8, fill: 'rgba(8,12,24,.7)' }),
+      h('text', { x: 10, y: spY(l.alt, cam) - 8, fontSize: 12, fontWeight: 900, fill: l.col, fontFamily: 'var(--ak-body)' }, l.name))),
+    /* стартовый стол и земля */
+    h('rect', { x: 0, y: spY(0, cam), width: 340, height: 60, fill: '#2F6B4A' }),
+    h('rect', { x: 0, y: spY(0, cam), width: 340, height: 5, fill: '#4CC27A' }),
+    h('rect', { x: 100, y: spY(0, cam) - 6, width: 80, height: 8, rx: 2, fill: '#5B6585' }),
+    h('rect', { x: 176, y: spY(0, cam) - 120, width: 6, height: 116, fill: '#5B6585' }));
+}
+/* Дым у стола на старте */
+function SpSmoke({ x, y, t }) {
+  return h('g', { pointerEvents: 'none', opacity: Math.max(0, 1 - t * 0.6) }, [-1, 1].map(s => [0, 1, 2].map(i => h('circle', {
+    key: s + '' + i, cx: x + s * (10 + i * 12 + t * 30), cy: y - 4 - i * 2, r: 8 + i * 3 + t * 10, fill: '#D8DCE8', opacity: 0.7 - i * 0.15
+  }))));
+}
+
+/* ══════════════════════════════════════════════════════════════
+   МИССИЯ 4 — Собери ракету
+   Своя ракета: имя и цвет. Ребёнок перетаскивает баки и двигатели,
+   жмёт «Поехали!». Модель честная в главном: топливо весит, тяга
+   постоянная. 1 двигатель: 1 бак — до облаков, 2–4 — до космоса,
+   5 баков — не взлетает. Спутник везут только два двигателя с 4–5 баками.
+   Числа подобраны скриптом (tune2.js в истории сессии).
+   ══════════════════════════════════════════════════════════════ */
+const L4_T = 21, L4_B = 0.8, L4_SPEED = 3.2, L4_X = 140;
+const L4_ROUNDS = [
+  { t: 'Долети до облаков', target: 30, name: 'облака', start: { tanks: 0, engines: 1 }, eng: false, sat: 0, yes: 'Выше облаков! Одного бака хватило.' },
+  { t: 'Ракета не взлетает! Убери лишнее и долети до космоса', target: 100, name: 'космос', start: { tanks: 5, engines: 1 }, eng: false, sat: 0, yes: 'Космос! Лишние баки только мешали взлететь.' },
+  { t: 'Отвези спутник в космос', target: 100, name: 'космос', start: { tanks: 2, engines: 1 }, eng: true, sat: 2, yes: 'Спутник в космосе! Тяжёлый груз везут два двигателя.' }
+];
+const SP_NAMES = ['Искра', 'Комета', 'Ласточка', 'Восход', 'Звёздочка', 'Буран'];
+function L4Name({ onDone }) {
+  const [name, setName] = useState(SP_NAMES[0]);
+  const [color, setColor] = useState('blue');
+  return h(SpBody, null,
+    h(TaskBadge, null, 'Своя ракета: выбери имя и цвет'),
+    h('div', { className: 'nk-card', style: { width: '100%', maxWidth: 360, padding: '10px 0 4px', boxSizing: 'border-box', display: 'flex', justifyContent: 'center' } },
+      h('svg', { viewBox: '-70 -130 140 160', style: { width: 170, height: 194 } },
+        h('circle', { cx: 0, cy: -40, r: 66, fill: 'rgba(123,79,242,.12)' }),
+        h(SpRocket, { color, tanks: 3, engines: 1, flame: false, scale: 1 }),
+        h('text', { x: 0, y: 24, textAnchor: 'middle', fontSize: 14, fontWeight: 900, fill: '#fff', fontFamily: 'var(--ak-body)' }, name))),
+    h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8, width: '100%', maxWidth: 360 } }, SP_NAMES.map(n => h('button', {
+      key: n, onClick: () => { SFX.pop(); setName(n); }, className: 'nk-choice' + (name === n ? ' nk-choice--sel' : ''), style: { borderRadius: 14, padding: '11px 4px', fontSize: 14 }
+    }, n))),
+    h('div', { style: { display: 'flex', gap: 12, justifyContent: 'center', margin: '4px 0' } }, SP_COLORS.map(c => h('button', {
+      key: c.id, 'aria-label': 'Цвет', onClick: () => { SFX.pop(); setColor(c.id); },
+      style: { width: 42, height: 42, borderRadius: '50%', border: 'none', cursor: 'pointer', background: c.body, boxShadow: color === c.id ? '0 0 0 3px #080C18,0 0 0 6px #fff' : `0 4px 0 ${c.dark}` }
+    }))),
+    h('button', { className: 'nk-btn nk-btn--pri', style: { width: '100%', maxWidth: 360 }, onClick: () => { SFX.ok(); const r = { name, color }; spRocketSave(r); onDone(r); } }, 'Это моя ракета →'));
+}
+function Level4Build({ onWin, onHome }) {
+  const [phase, setPhase] = useState('intro');
+  const [rocket, setRocket] = useState(spRocketLoad());
+  const [rd, setRd] = useState(0);
+  const R = L4_ROUNDS[rd];
+  const [cfg, setCfg] = useState(R.start);
+  const [st, setSt] = useState('build');               // build | count | fly | stuck | done
+  const [fl, setFl] = useState({ alt: 0, cam: 0, burn: false, apex: null, t: 0 });
+  const [note, setNote] = useState('');
+  const [solved, setSolved] = useState(false);
+  const [ghost, setGhost] = useState(null);
+  const svg = useRef(null), drag = useRef(null), F = useRef(null);
+  const color = rocket ? rocket.color : 'blue';
+  const reset = (c) => { setCfg(c || cfg); setSt('build'); setFl({ alt: 0, cam: 0, burn: false, apex: null, t: 0 }); setNote(''); };
+  /* перетаскивание: с лотка на ракету — добавить, с ракеты прочь — снять */
+  const top = SP_PAD - 10 - cfg.tanks * 16 - 18 - 30 - (R.sat ? 14 : 0);
+  const onRocket = p => Math.abs(p.x - L4_X) < 36 && p.y > top - 10 && p.y < SP_PAD + 12;
+  const tray = R.eng ? [{ kind: 'tank', x: 285, y: 120, label: 'Бак' }, { kind: 'engine', x: 285, y: 215, label: 'Двигатель' }] : [{ kind: 'tank', x: 285, y: 160, label: 'Бак' }];
+  const down = e => {
+    if (st !== 'build') return;
+    const p = spPt(svg.current, e), it = tray.find(t => Math.hypot(p.x - t.x, p.y - t.y) < 34);
+    if (it) drag.current = { kind: it.kind, from: 'tray', x0: p.x, y0: p.y };
+    else if (onRocket(p)) drag.current = { kind: p.y > SP_PAD - 10 && cfg.engines > 1 ? 'engine' : 'tank', from: 'rocket', x0: p.x, y0: p.y };
+    else return;
+    e.currentTarget.setPointerCapture(e.pointerId);
+    setGhost({ kind: drag.current.kind, x: p.x, y: p.y });
+  };
+  const move = e => { if (!drag.current) return; const p = spPt(svg.current, e); setGhost(g => g && { ...g, x: p.x, y: p.y }); };
+  const up = e => {
+    const d = drag.current; drag.current = null; setGhost(null);
+    if (!d) return;
+    const p = spPt(svg.current, e), tap = Math.hypot(p.x - d.x0, p.y - d.y0) < 8;
+    const c = { ...cfg };
+    if (d.from === 'tray' && (tap || onRocket(p) || Math.abs(p.x - L4_X) < 60)) {
+      if (d.kind === 'tank' && c.tanks < 5) c.tanks++; else if (d.kind === 'engine' && c.engines < 2) c.engines++; else return SFX.no();
+    } else if (d.from === 'rocket' && (tap || Math.abs(p.x - L4_X) > 50)) {
+      if (d.kind === 'tank' && c.tanks > 0) c.tanks--; else if (d.kind === 'engine' && c.engines > 1) c.engines--; else return;
+    } else return;
+    SFX.pop(); setCfg(c); setNote('');
+  };
+  /* полёт */
+  const launch = () => {
+    if (!cfg.tanks) { SFX.no(); return setNote('Без топлива не полетит — перетащи бак на ракету.'); }
+    setNote(''); setSt('count');
+  };
+  const fly = () => {
+    const m0 = 1 + R.sat + 2 * cfg.engines + 4 * cfg.tanks;
+    if (L4_T * cfg.engines <= m0) {
+      setSt('stuck'); SFX.no();
+      setTimeout(() => {
+        setSt('done');
+        setNote(R.eng ? 'Не взлетела: слишком тяжело для одного двигателя. Поставь второй или убери бак.' : 'Не взлетела: баки слишком тяжёлые, двигатель не может их поднять. Убери лишние.');
+      }, 1700);
+      return;
+    }
+    F.current = { alt: 0, v: 0, m: m0, fuel: 3 * cfg.tanks, t: 0, apex: 0 };
+    setSt('fly');
+  };
+  useLoop(dt => {
+    const f = F.current; if (!f) return;
+    let left = dt * L4_SPEED;
+    while (left > 0) {
+      const s = Math.min(0.02, left); left -= s;
+      let a = -1;
+      if (f.fuel > 0) { a = L4_T * cfg.engines / f.m - 1; const b = L4_B * cfg.engines * s; f.fuel -= b; f.m -= b; }
+      f.v += a * s; f.alt += f.v * s; f.t += s; f.apex = Math.max(f.apex, f.alt);
+    }
+    if (f.v < 0 && f.fuel <= 0) {
+      F.current = null;
+      const ok = f.apex >= R.target;
+      setFl({ alt: f.apex, cam: Math.max(0, f.apex - 90), burn: false, apex: f.apex, t: f.t });
+      setSt('done');
+      if (ok) { setSolved(true); SFX.ok(); setNote(R.yes); }
+      else setNote(R.sat && cfg.engines < 2 ? 'Спутник тяжёлый: одному двигателю не хватает сил. Нужен второй двигатель.' : `Топлива не хватило до линии «${R.name}». Добавь бак.`);
+      return;
+    }
+    setFl({ alt: f.alt, cam: Math.max(0, f.alt - 90), burn: f.fuel > 0, apex: null, t: f.t });
+  }, st === 'fly');
+  const next = () => {
+    if (rd + 1 < L4_ROUNDS.length) { const n = rd + 1; setRd(n); setSolved(false); reset(L4_ROUNDS[n].start); }
+    else setPhase('win');
+  };
+  const lines = [{ alt: 30, name: 'облака', col: '#FFFFFF' }, { alt: 100, name: 'космос', col: '#FFD84D' }];
+  const ry = spY(fl.alt, fl.cam);
+  return h(SpShell, { n: 4, title: 'Собери ракету', step: rd, total: L4_ROUNDS.length, onHome },
+    phase === 'intro' && h(IntroModal, {
+      title: 'Собери ракету', ask: 'Своя ракета — с именем и цветом',
+      task: 'Перетащи баки на ракету и жми «Поехали!». Хватит ли топлива?', tip: 'Тащи бак с лотка на ракету. Снять — утащи обратно',
+      onStart: () => setPhase(rocket ? 'play' : 'name')
+    }),
+    phase === 'name' && h(L4Name, { onDone: r => { setRocket(r); setPhase('play'); } }),
+    phase === 'play' && h(SpBody, null,
+      h(TaskBadge, null, R.t),
+      h('div', { style: { position: 'relative', width: '100%', maxWidth: 360 } },
+        h(SpScene, { H: 340, svgRef: svg, sky: '#070A18', shake: st === 'stuck', onPointerDown: down, onPointerMove: move, onPointerUp: up, onPointerCancel: up },
+          h(SpAscentSky, { cam: fl.cam, H: 340, lines, id: 'l4' }),
+          fl.apex != null && h('g', null,
+            h('line', { x1: 60, y1: spY(fl.apex, fl.cam), x2: 220, y2: spY(fl.apex, fl.cam), stroke: solved ? '#06D6A0' : '#FF6B6B', strokeWidth: 2 }),
+            h('text', { x: 222, y: spY(fl.apex, fl.cam) + 4, fontSize: 11, fontWeight: 900, fill: solved ? '#06D6A0' : '#FF9A85', fontFamily: 'var(--ak-body)' }, 'долетели сюда')),
+          (st === 'stuck' || (st === 'fly' && fl.t < 2)) && h(SpSmoke, { x: L4_X, y: spY(0, fl.cam), t: st === 'stuck' ? 0.4 : fl.t / 2 }),
+          h('g', { transform: `translate(${L4_X} ${ry - 10})` }, h(SpRocket, { color, tanks: cfg.tanks, engines: cfg.engines, flame: fl.burn || st === 'stuck', sat: !!R.sat })),
+          rocket && st === 'build' && h('text', { x: L4_X, y: SP_PAD + 24, textAnchor: 'middle', fontSize: 12, fontWeight: 900, fill: '#fff', fontFamily: 'var(--ak-body)' }, rocket.name),
+          /* лоток */
+          st === 'build' && tray.map(t => h('g', { key: t.kind, transform: `translate(${t.x} ${t.y})` },
+            h('rect', { x: -32, y: -30, width: 64, height: 66, rx: 14, fill: 'rgba(16,28,50,.85)', stroke: '#A98BFF', strokeWidth: 1.5, strokeDasharray: '4 4' }),
+            t.kind === 'tank'
+              ? h('g', null, h('rect', { x: -11, y: -18, width: 22, height: 28, rx: 4, fill: '#fff', stroke: spColor(color).dark, strokeWidth: 1.5 }), h('rect', { x: -8, y: -8, width: 16, height: 5, rx: 2, fill: spColor(color).body }))
+              : h('path', { d: 'M-8 -14 L8 -14 L12 6 L-12 6 Z', fill: '#5B5470', stroke: '#8296B4', strokeWidth: 1.5 }),
+            h('text', { x: 0, y: 28, textAnchor: 'middle', fontSize: 11, fontWeight: 900, fill: '#C4D4EE', fontFamily: 'var(--ak-body)' }, t.label))),
+          ghost && h('g', { transform: `translate(${ghost.x} ${ghost.y})`, opacity: 0.85, pointerEvents: 'none' },
+            ghost.kind === 'tank' ? h('rect', { x: -11, y: -14, width: 22, height: 28, rx: 4, fill: '#fff', stroke: '#A98BFF', strokeWidth: 2 })
+              : h('path', { d: 'M-8 -10 L8 -10 L12 10 L-12 10 Z', fill: '#5B5470', stroke: '#A98BFF', strokeWidth: 2 })),
+          st === 'build' && rd === 0 && cfg.tanks === 0 && h('g', { transform: 'translate(240 196)' }, h('text', { className: 'sp-hint', fontSize: 24 }, '👆'))),
+        st === 'count' && h(SpCountdown, { onDone: fly })),
+      h('div', { style: { display: 'flex', gap: 8, width: '100%', maxWidth: 360, justifyContent: 'center' } },
+        h('div', { className: 'nk-card', style: { padding: '8px 14px', fontSize: 13, fontWeight: 800, color: 'var(--ak-ink-2)' } }, 'Баков: ', h('b', { style: { color: '#fff' } }, cfg.tanks), ' из 5'),
+        R.eng && h('div', { className: 'nk-card', style: { padding: '8px 14px', fontSize: 13, fontWeight: 800, color: 'var(--ak-ink-2)' } }, 'Двигателей: ', h('b', { style: { color: '#fff' } }, cfg.engines))),
+      h(SpNote, { ok: solved }, note),
+      solved ? h(SpNext, { last: rd + 1 === L4_ROUNDS.length, onClick: next })
+        : st === 'done' ? h('button', { className: 'nk-btn nk-btn--pri', style: { width: '100%', maxWidth: 360 }, onClick: () => { SFX.pop(); reset(); } }, 'Вернуть на старт')
+        : h('button', { className: 'nk-btn nk-btn--go', style: { width: '100%', maxWidth: 360 }, disabled: st !== 'build', onClick: launch }, 'Поехали! 🚀')),
+    phase === 'win' && h(WinModal, {
+      title: rocket ? `«${rocket.name}» готова!` : 'Ракета собрана!',
+      law: 'Ракета летит, выбрасывая газ назад. Циолковский в 1903 году показал, что так можно долететь до космоса',
+      fact: 'Почти вся ракета — это баки с топливом. Кабина с людьми — крошечная верхушка.',
+      onNext: onWin, onHome
+    }));
+}
+
+/* ══════════════════════════════════════════════════════════════
+   МИССИЯ 5 — Ступени
+   Ракета из ступеней. Опустевшая ступень мигает красным, ребёнок
+   жмёт «Отцепить» — она падает, загорается следующая. Рано — топливо
+   улетает вместе со ступенью; поздно — пустой бак тянет вниз; не
+   отцепить — следующая ступень так и не загорится.
+   Подбор (tune3.js): 2 ступени — вовремя 137, на секунду позже 125,
+   на две 113, рано 86, без отцепки 28; цель 115. 3 ступени — вовремя 160,
+   цель 120.
+   ══════════════════════════════════════════════════════════════ */
+const L5_SPEED = 2, L5_X = 150;
+const L5_ROUNDS = [
+  { t: 'Выведи ракету на орбиту: отцепляй пустые ступени', target: 115,
+    S: [{ dry: 3, fuel: 9, T: 24, b: 1.6, w: 30, hh: 54 }, { dry: 1, fuel: 3, T: 8, b: 0.6, w: 22, hh: 38 }] },
+  { t: 'Теперь три ступени. Отцепляй каждую вовремя', target: 120,
+    S: [{ dry: 3, fuel: 9, T: 30, b: 1.8, w: 32, hh: 52 }, { dry: 1.5, fuel: 4.5, T: 12, b: 0.9, w: 24, hh: 38 }, { dry: 0.6, fuel: 1.8, T: 5, b: 0.4, w: 18, hh: 28 }] }
+];
+function L5Stack({ S, fuel, i, color, blink }) {
+  const c = spColor(color);
+  let y = 0;
+  const parts = [];
+  /* рисуем снизу вверх, начиная с текущей нижней ступени */
+  for (let k = i; k < S.length; k++) {
+    const s = S[k], f = fuel[k] / s.fuel, empty = fuel[k] <= 0;
+    parts.push(h('g', { key: k, transform: `translate(0 ${y})` },
+      h('rect', { x: -s.w / 2, y: -s.hh, width: s.w, height: s.hh - 2, rx: 4, fill: '#F4F2FA', stroke: empty && k === i && blink ? '#FF6B6B' : c.dark, strokeWidth: empty && k === i ? 3 : 1.5 }),
+      h('rect', { x: -s.w / 2 + 4, y: -s.hh + 4 + (s.hh - 10) * (1 - f), width: s.w - 8, height: (s.hh - 10) * f, rx: 2, fill: '#FFB347' }),
+      empty && k === i && h('text', { x: s.w / 2 + 6, y: -s.hh / 2 + 4, fontSize: 11, fontWeight: 900, fill: '#FF6B6B', fontFamily: 'var(--ak-body)' }, 'пусто!')));
+    y -= s.hh;
+  }
+  const w = S[S.length - 1].w;
+  parts.push(h('g', { key: 'cap', transform: `translate(0 ${y})` },
+    h('rect', { x: -w / 2, y: -14, width: w, height: 14, rx: 3, fill: '#fff', stroke: c.dark, strokeWidth: 1.5 }),
+    h('circle', { cx: 0, cy: -7, r: 3.5, fill: '#9FD8FF' }),
+    h('path', { d: `M${-w / 2} -14 Q0 -40 ${w / 2} -14 Z`, fill: c.body, stroke: c.dark, strokeWidth: 1.5 })));
+  return h('g', null, parts);
+}
+function Level5Stages({ onWin, onHome }) {
+  const [phase, setPhase] = useState('intro');
+  const [rd, setRd] = useState(0);
+  const R = L5_ROUNDS[rd];
+  const rocket = spRocketLoad(), color = rocket ? rocket.color : 'blue';
+  const [st, setSt] = useState('ready');                // ready | count | fly | done
+  const [view, setView] = useState({ alt: 0, cam: 0, i: 0, fuel: R.S.map(s => s.fuel), burn: false, apex: null, t: 0 });
+  const [drops, setDrops] = useState([]);
+  const [note, setNote] = useState('');
+  const [solved, setSolved] = useState(false);
+  const F = useRef(null);
+  const reset = r => { const S = L5_ROUNDS[r == null ? rd : r].S; F.current = null; setSt('ready'); setView({ alt: 0, cam: 0, i: 0, fuel: S.map(s => s.fuel), burn: false, apex: null, t: 0 }); setDrops([]); setNote(''); };
+  const start = () => { setNote(''); setSt('count'); };
+  const go = () => { F.current = { alt: 0, v: 0, i: 0, fuel: R.S.map(s => s.fuel), empty: 0, t: 0, apex: 0, why: '' }; setSt('fly'); };
+  const cut = () => {
+    const f = F.current; if (!f || f.i >= R.S.length - 1) return;
+    const s = R.S[f.i];
+    if (f.fuel[f.i] > s.fuel * 0.25) f.why = f.why || 'early';
+    if (f.empty > 1.2) f.why = f.why || 'late';
+    SFX.pop();
+    setDrops(d => d.concat({ k: f.i, alt: f.alt, t0: f.t, w: s.w, hh: s.hh, fuel: f.fuel[f.i] / s.fuel }));
+    f.i++; f.empty = 0;
+  };
+  useLoop(dt => {
+    const f = F.current; if (!f) return;
+    let left = dt * L5_SPEED;
+    while (left > 0) {
+      const s = Math.min(0.02, left); left -= s;
+      const cur = R.S[f.i], m = 1 + R.S.slice(f.i).reduce((a, q, k) => a + q.dry + f.fuel[f.i + k], 0);
+      let a = -1;
+      if (f.fuel[f.i] > 0) { a = cur.T / m - 1; f.fuel[f.i] = Math.max(0, f.fuel[f.i] - cur.b * s); }
+      else { f.empty += s; if (f.i < R.S.length - 1 && f.empty > 4) f.why = f.why || 'never'; }
+      f.v += a * s; f.alt += f.v * s; f.t += s; f.apex = Math.max(f.apex, f.alt);
+    }
+    const lastEmpty = f.fuel[R.S.length - 1] <= 0 || (f.i < R.S.length - 1 && f.empty > 6);
+    /* пересекли линию орбиты — победа сразу, без долгого полёта по инерции */
+    if (f.alt >= R.target || (f.v < 0 && lastEmpty) || f.alt < -1) {
+      F.current = null;
+      const ok = f.apex >= R.target;
+      setView(v => ({ ...v, alt: f.apex, cam: Math.max(0, f.apex - 90), burn: false, apex: f.apex }));
+      setSt('done');
+      if (ok) { setSolved(true); SFX.ok(); setNote(rd === 0 ? 'Орбита! Пустая ступень улетела вниз, и ракете стало легче.' : 'Орбита! Три ступени — и ни одного лишнего бака.'); }
+      else setNote({
+        early: 'Отцепили, когда в ступени было топливо, — оно улетело вместе с ней.',
+        late: 'Пустая ступень летела лишним грузом. Отцепляй, как только она мигнёт.',
+        never: 'Ступень опустела, а ракета тащила её дальше. Пустую ступень надо отцепить!'
+      }[f.why] || 'Не хватило до орбиты. Отцепляй ступени сразу, как опустеют.');
+      return;
+    }
+    setView({ alt: f.alt, cam: Math.max(0, f.alt - 90), i: f.i, fuel: f.fuel.slice(), burn: f.fuel[f.i] > 0, apex: null, t: f.t });
+  }, st === 'fly');
+  const next = () => { if (rd + 1 < L5_ROUNDS.length) { setRd(rd + 1); setSolved(false); reset(rd + 1); } else setPhase('win'); };
+  const ry = spY(view.alt, view.cam), blink = Math.floor(view.t * 4) % 2 === 0;
+  const canCut = st === 'fly' && view.i < R.S.length - 1;
+  return h(SpShell, { n: 5, title: 'Ступени', step: rd, total: L5_ROUNDS.length, onHome },
+    phase === 'intro' && h(IntroModal, {
+      title: 'Ступени', ask: 'Как полетел Гагарин?',
+      task: 'Ступень опустела — отцепи её! Не раньше и не позже', tip: 'Жми «Отцепить», когда ступень мигает красным', onStart: () => setPhase('play')
+    }),
+    phase === 'play' && h(SpBody, null,
+      h(TaskBadge, null, R.t),
+      h('div', { style: { position: 'relative', width: '100%', maxWidth: 360 } },
+        h(SpScene, { H: 340, sky: '#070A18', onPointerDown: () => canCut && cut() },
+          h(SpAscentSky, { cam: view.cam, H: 340, lines: [{ alt: R.target, name: 'орбита', col: '#FFD84D' }], id: 'l5' }),
+          view.apex != null && h('line', { x1: 70, y1: spY(view.apex, view.cam), x2: 230, y2: spY(view.apex, view.cam), stroke: solved ? '#06D6A0' : '#FF6B6B', strokeWidth: 2 }),
+          drops.map((d, k) => {
+            const tt = Math.max(0, view.t - d.t0), y = spY(d.alt - tt * tt * 6, view.cam);
+            return y < 360 && h('g', { key: k, transform: `translate(${L5_X - 4 - tt * 10} ${y}) rotate(${-tt * 40})`, opacity: 0.9 },
+              h('rect', { x: -d.w / 2, y: -d.hh, width: d.w, height: d.hh - 2, rx: 4, fill: '#C9C4DA' }));
+          }),
+          h('g', { transform: `translate(${L5_X} ${ry - 10})` },
+            view.burn && h('g', { transform: 'translate(0 0)' },
+              h('path', { className: 'sp-flame', d: 'M-8 0 Q0 36 8 0 Z', fill: '#FFB347' }), h('path', { className: 'sp-flame', d: 'M-4 0 Q0 22 4 0 Z', fill: '#FFF3B0' })),
+            h(L5Stack, { S: R.S, fuel: view.fuel, i: view.i, color, blink })),
+          st === 'fly' && view.t < 2 && h(SpSmoke, { x: L5_X, y: spY(0, view.cam), t: view.t / 2 })),
+        st === 'count' && h(SpCountdown, { onDone: go })),
+      h(SpNote, { ok: solved }, note),
+      solved ? h(SpNext, { last: rd + 1 === L5_ROUNDS.length, onClick: next })
+        : st === 'fly' ? h('button', { className: 'nk-btn nk-btn--go', style: { width: '100%', maxWidth: 360 }, disabled: !canCut, onPointerDown: e => { e.preventDefault(); cut(); } }, canCut ? 'Отцепить ступень ✂️' : 'Летим…')
+        : st === 'done' ? h('button', { className: 'nk-btn nk-btn--pri', style: { width: '100%', maxWidth: 360 }, onClick: () => { SFX.pop(); reset(); } }, 'Ещё раз')
+        : h('button', { className: 'nk-btn nk-btn--go', style: { width: '100%', maxWidth: 360 }, disabled: st !== 'ready', onClick: start }, 'Поехали! 🚀')),
+    phase === 'win' && h(WinModal, {
+      title: 'Точно по ступенькам!',
+      law: 'Ракету из ступеней построил Королёв. На такой ракете в 1961 году полетел Гагарин',
+      fact: 'Сегодня некоторые ступени не выбрасывают: они сами возвращаются, садятся на землю и летят снова.',
+      onNext: onWin, onHome
+    }));
+}
+
+/* ══════════════════════════════════════════════════════════════
+   МИССИЯ 6 — Пушка на горе (опыт Ньютона)
+   Настоящее притяжение к центру Земли. Ребёнок оттягивает пушку:
+   10 делений силы. Слабо — падает рядом, сильнее — дальше, на 6–8
+   делении ядро облетает Землю и не падает, на 9–10 — улетает навсегда.
+   Подбор (tune3.js): деление 3 падает на 42° — там город.
+   ══════════════════════════════════════════════════════════════ */
+const L6_E = { x: 170, y: 196, R: 92 }, L6_R0 = 120, L6_VC = 188, L6_GM = L6_VC * L6_VC * L6_R0;
+const L6_POW = [0.4, 0.55, 0.7, 0.8, 0.88, 0.97, 1.0, 1.05, 1.42, 1.6];
+const L6_CITY = 42;
+const L6_ROUNDS = [
+  { t: 'Попади ядром в город', ok: r => r.kind === 'fall' && Math.abs(r.ang - L6_CITY) < 9, yes: 'Попали! Чем сильнее выстрел, тем дальше падает ядро.' },
+  { t: 'Выстрели так, чтобы ядро облетело Землю и не упало', ok: r => r.kind === 'orbit', yes: 'Ядро падает, но промахивается мимо Земли — круг за кругом. Это и есть спутник!' },
+  { t: 'А теперь — чтобы ядро улетело навсегда', ok: r => r.kind === 'escape', yes: 'Улетело! Ещё быстрее — и Земля уже не может его удержать.' }
+];
+function Level6Orbit({ onWin, onHome }) {
+  const [phase, setPhase] = useState('intro');
+  const [rd, setRd] = useState(0);
+  const [pull, setPull] = useState(0);                  // 0..10 делений
+  const [ball, setBall] = useState(null);
+  const [trails, setTrails] = useState([]);
+  const [note, setNote] = useState('');
+  const [solved, setSolved] = useState(false);
+  const [touched, setTouched] = useState(false);
+  const svg = useRef(null), drag = useRef(null), B = useRef(null);
+  const E = L6_E, gun = { x: E.x, y: E.y - L6_R0 }, task = L6_ROUNDS[rd];
+  const down = e => {
+    if (B.current) return;
+    const p = spPt(svg.current, e);
+    if (Math.hypot(p.x - gun.x, p.y - gun.y) > 70) return;
+    drag.current = true; setTouched(true); e.currentTarget.setPointerCapture(e.pointerId);
+  };
+  const move = e => {
+    if (!drag.current) return;
+    const p = spPt(svg.current, e), d = Math.max(0, gun.x - p.x) + Math.max(0, (p.y - gun.y) * 0.3);
+    const k = spClamp(Math.ceil(d / 11), 0, 10);
+    if (k !== pull) SFX.tick();
+    setPull(k);
+  };
+  const up = () => {
+    if (!drag.current) return; drag.current = false;
+    if (!pull) return;
+    const k = L6_POW[pull - 1];
+    B.current = { x: 0, y: -L6_R0, vx: k * L6_VC, vy: 0, ang: 0, prev: -Math.PI / 2, path: [[gun.x, gun.y]], t: 0, pow: pull };
+    SFX.boom(); setNote(''); setPull(0);
+  };
+  const finish = res => {
+    const b = B.current; B.current = null;
+    setTrails(t => t.slice(-2).concat({ pts: b.path, kind: res.kind }));
+    setBall(res.kind === 'fall' ? { x: b.path[b.path.length - 1][0], y: b.path[b.path.length - 1][1], hit: true } : null);
+    if (!solved && task.ok(res)) { setSolved(true); SFX.ok(); setNote(task.yes); }
+    else if (res.kind === 'fall') setNote(rd === 0 && res.ang < L6_CITY ? 'Недолёт — оттяни сильнее.' : rd === 0 ? 'Перелёт — оттяни чуть слабее.' : 'Упало. Нужно ещё сильнее!');
+    else if (res.kind === 'orbit') setNote(rd === 2 ? 'Облетело и вернулось — Земля всё ещё держит. Сильнее!' : 'Облетело Землю! Но задача другая.');
+    else setNote(rd === 1 ? 'Слишком сильно — улетело навсегда. Чуть слабее!' : 'Улетело навсегда!');
+  };
+  useLoop(dt => {
+    const b = B.current; if (!b) return;
+    let left = dt;
+    while (left > 0) {
+      const s = Math.min(0.002, left); left -= s;
+      const r = Math.hypot(b.x, b.y), a = L6_GM / (r * r * r);
+      b.vx -= a * b.x * s; b.vy -= a * b.y * s; b.x += b.vx * s; b.y += b.vy * s; b.t += s;
+      const th = Math.atan2(b.y, b.x); let d = th - b.prev; if (d > Math.PI) d -= 2 * Math.PI; if (d < -Math.PI) d += 2 * Math.PI; b.ang += d; b.prev = th;
+      const rr = Math.hypot(b.x, b.y);
+      if (rr < E.R) { b.path.push([E.x + b.x, E.y + b.y]); return finish({ kind: 'fall', ang: b.ang * 180 / Math.PI }); }
+      if (Math.abs(b.ang) >= 2 * Math.PI) { b.path.push([E.x + b.x, E.y + b.y]); return finish({ kind: 'orbit' }); }
+      if (rr > 300) return finish({ kind: 'escape' });
+    }
+    if (b.path.length === 0 || Math.hypot(b.path[b.path.length - 1][0] - (E.x + b.x), b.path[b.path.length - 1][1] - (E.y + b.y)) > 4) b.path.push([E.x + b.x, E.y + b.y]);
+    setBall({ x: E.x + b.x, y: E.y + b.y });
+  }, phase === 'play');
+  const next = () => { if (rd + 1 < L6_ROUNDS.length) { setRd(rd + 1); setSolved(false); setNote(''); setTrails([]); setBall(null); } else setPhase('win'); };
+  const cityA = spRad(L6_CITY - 90), city = { x: E.x + E.R * Math.cos(cityA), y: E.y + E.R * Math.sin(cityA) };
+  return h(SpShell, { n: 6, title: 'Пушка на горе', step: rd, total: L6_ROUNDS.length, onHome },
+    phase === 'intro' && h(IntroModal, {
+      title: 'Пушка на горе', ask: 'Почему спутник не падает?',
+      task: 'Оттяни пушку назад и отпусти. Чем сильнее — тем дальше', tip: 'Тяни от пушки влево, считай деления силы', onStart: () => setPhase('play')
+    }),
+    phase === 'play' && h(SpBody, null,
+      h(TaskBadge, null, task.t),
+      h(SpScene, { H: 360, svgRef: svg, onPointerDown: down, onPointerMove: move, onPointerUp: up, onPointerCancel: up },
+        h(SpEarth, { x: E.x, y: E.y, R: E.R, rot: 10, id: 'l6e', lights: false }),
+        /* гора с пушкой */
+        h('path', { d: `M${gun.x - 26} ${E.y - E.R + 6} L${gun.x - 4} ${gun.y + 4} L${gun.x + 4} ${gun.y + 4} L${gun.x + 26} ${E.y - E.R + 6} Z`, fill: '#6B5B8A', stroke: '#4A3B63', strokeWidth: 1.5 }),
+        h('path', { d: `M${gun.x - 6} ${gun.y + 6} L${gun.x} ${gun.y - 2} L${gun.x + 6} ${gun.y + 6} Z`, fill: '#fff', opacity: 0.8 }),
+        rd === 0 && h('g', { transform: `translate(${city.x} ${city.y}) rotate(${L6_CITY})` },
+          h('rect', { x: -12, y: -14, width: 7, height: 14, fill: '#FFD84D' }), h('rect', { x: -4, y: -20, width: 8, height: 20, fill: '#FFB347' }), h('rect', { x: 5, y: -11, width: 7, height: 11, fill: '#FFD84D' })),
+        trails.map((tr, k) => h('polyline', { key: k, points: tr.pts.map(p => p.join(',')).join(' '), fill: 'none', stroke: tr.kind === 'orbit' ? '#06D6A0' : tr.kind === 'escape' ? '#A98BFF' : '#FFB347', strokeWidth: 2, strokeDasharray: '4 5', opacity: 0.4 + k * 0.2 })),
+        B.current && h('polyline', { points: B.current.path.map(p => p.join(',')).join(' '), fill: 'none', stroke: '#FFE58A', strokeWidth: 2, strokeDasharray: '4 5' }),
+        /* пушка и оттяжка */
+        h('g', { transform: `translate(${gun.x} ${gun.y})` },
+          pull > 0 && h('line', { x1: 0, y1: 0, x2: -pull * 11, y2: 0, stroke: '#FFD84D', strokeWidth: 2, strokeDasharray: '3 4' }),
+          h('rect', { x: -10 - pull * 1.2, y: -6, width: 26, height: 12, rx: 4, fill: '#8296B4', stroke: '#C4D4EE', strokeWidth: 1.2 }),
+          h('circle', { cx: -4, cy: 6, r: 6, fill: '#5B5470' })),
+        ball && h('circle', { cx: ball.x, cy: ball.y, r: ball.hit ? 6 : 4.5, fill: ball.hit ? '#FF6B6B' : '#FFE58A', stroke: '#fff', strokeWidth: 1 }),
+        /* деления силы */
+        h('g', { transform: 'translate(20 340)' }, Array.from({ length: 10 }, (_, i) => h('rect', {
+          key: i, x: i * 14, y: -10, width: 10, height: 10, rx: 2, fill: i < pull ? (i >= 8 ? '#A98BFF' : i >= 5 ? '#06D6A0' : '#FFD84D') : 'rgba(255,255,255,.12)'
+        })), h('text', { x: 146, y: -1, fontSize: 11, fontWeight: 900, fill: '#C4D4EE', fontFamily: 'var(--ak-body)' }, pull ? `сила ${pull}` : 'сила')),
+        !touched && h('g', { transform: `translate(${gun.x - 60} ${gun.y + 20})` }, h('text', { className: 'sp-hint', fontSize: 24 }, '👆'))),
+      h(SpNote, { ok: solved }, note),
+      solved && h(SpNext, { last: rd + 1 === L6_ROUNDS.length, onClick: next })),
+    phase === 'win' && h(WinModal, {
+      title: 'Свой спутник!',
+      law: 'Эту пушку на горе придумал Ньютон в 1687 году — за 270 лет до первого спутника',
+      fact: 'Космическая станция облетает Землю за полтора часа: космонавты видят 16 рассветов в сутки.',
+      onNext: onWin, onHome
+    }));
+}
+
+/* ══════════════════════════════════════════════════════════════
+   МИССИЯ 7 — Где искать жизнь
+   Вид сверху: Солнце, Земля бежит по своему кругу. Ребёнок двигает
+   свою планету ближе и дальше. Близко — вода выкипает, далеко —
+   замерзает, посередине — моря (на экране 80 точек = расстояние Земли,
+   полоса морей 72–108 — примерно как настоящая «зона жизни»).
+   Скорость по кругу честная: чем дальше, тем медленнее (закон Кеплера).
+   Второй раунд — гонка: год вдвое длиннее земного (радиус ≈ 127).
+   ══════════════════════════════════════════════════════════════ */
+const L7_S = { x: 170, y: 160 }, L7_RE = 80, L7_PE = 6;   // Земля обегает Солнце за 6 секунд
+const l7Zone = r => r < 72 ? 'hot' : r > 108 ? 'ice' : 'sea';
+const L7_ZONE = {
+  hot: { name: 'Пустыня — вода выкипела', c1: '#FFB36B', c2: '#C2502E' },
+  sea: { name: 'Моря и реки!', c1: '#6FB4FF', c2: '#2F6BD8' },
+  ice: { name: 'Ледяная пустыня', c1: '#F2F8FF', c2: '#9CC3E6' }
+};
+function L7Planet({ x, y, r, zone, id }) {
+  const Z = L7_ZONE[zone];
+  return h('g', { pointerEvents: 'none' },
+    h('defs', null, h('radialGradient', { id, cx: 0.35, cy: 0.35 }, h('stop', { offset: 0, stopColor: Z.c1 }), h('stop', { offset: 1, stopColor: Z.c2 }))),
+    h('circle', { cx: x, cy: y, r: r + 4, fill: Z.c1, opacity: 0.18 }),
+    h('circle', { cx: x, cy: y, r, fill: `url(#${id})` }),
+    zone === 'sea' && h('path', { d: `M${x - r * 0.5} ${y - r * 0.2} q${r * 0.3} -${r * 0.4} ${r * 0.6} -${r * 0.1} q-${r * 0.1} ${r * 0.4} -${r * 0.6} ${r * 0.1} Z`, fill: '#4CC27A' }),
+    zone === 'hot' && h('g', { opacity: 0.7 }, [0, 1, 2].map(i => h('circle', { key: i, cx: x - r * 0.4 + i * r * 0.4, cy: y - r - 4 - i * 2, r: 3 + i, fill: '#fff', opacity: 0.5 }))),
+    zone === 'ice' && h('path', { d: `M${x - r * 0.6} ${y + r * 0.2} l${r * 0.4} -${r * 0.3} l${r * 0.4} ${r * 0.25}`, stroke: '#fff', strokeWidth: 1.5, fill: 'none' }));
+}
+const L7_TASKS = [
+  { t: 'Поставь планету туда, где на ней будут моря', race: false },
+  { t: 'Сделай планете год вдвое длиннее земного: пока Земля бежит 2 круга, она — 1', race: true }
+];
+function Level7Water({ onWin, onHome }) {
+  const [phase, setPhase] = useState('intro');
+  const [rd, setRd] = useState(0);
+  const [r, setR] = useState(46);
+  const [ang, setAng] = useState({ e: 0, p: 0 });
+  const [race, setRace] = useState(null);              // { e, p } — пройдено кругов в гонке
+  const [note, setNote] = useState('');
+  const [solved, setSolved] = useState(false);
+  const [touched, setTouched] = useState(false);
+  const svg = useRef(null), drag = useRef(false), rRef = useRef(46), A = useRef({ e: 0, p: 0 }), RC = useRef(null);
+  const task = L7_TASKS[rd], zone = l7Zone(r);
+  const w = rr => 2 * Math.PI / L7_PE * Math.pow(L7_RE / rr, 1.5);
+  useLoop(dt => {
+    if (RC.current) {
+      const g = RC.current;
+      g.e += w(L7_RE) * dt / (2 * Math.PI); g.p += w(rRef.current) * dt / (2 * Math.PI);
+      A.current = { e: g.e * 2 * Math.PI, p: g.p * 2 * Math.PI };
+      if (g.e >= 2) {
+        RC.current = null;
+        const laps = g.p, ok = Math.abs(laps - 1) <= 0.12;
+        setRace({ e: 2, p: laps, done: true });
+        if (ok) { setSolved(true); SFX.ok(); setNote('Ровно круг, пока Земля сделала два! Год вдвое длиннее — почти как у Марса. И там уже холодно.'); }
+        else setNote(laps > 1 ? `Твоя планета пробежала больше круга — отодвинь её дальше от Солнца.` : `Твоя планета не успела пробежать круг — подвинь её ближе.`);
+      } else setRace({ e: g.e, p: g.p });
+    } else if (!(task.race && race)) {
+      A.current = { e: A.current.e + w(L7_RE) * dt, p: A.current.p + w(rRef.current) * dt };
+    }
+    setAng({ ...A.current });
+  }, phase === 'play');
+  const put = e => { const p = spPt(svg.current, e); const rr = spClamp(Math.hypot(p.x - L7_S.x, p.y - L7_S.y), 40, 150); rRef.current = rr; setR(rr); };
+  const down = e => { if (RC.current) return; drag.current = true; setTouched(true); setRace(null); setNote(''); e.currentTarget.setPointerCapture(e.pointerId); put(e); };
+  const move = e => { if (drag.current) put(e); };
+  const up = () => {
+    if (!drag.current) return; drag.current = false;
+    if (!task.race && !solved) {
+      if (l7Zone(rRef.current) === 'sea') { setSolved(true); SFX.ok(); setNote('Моря! Не слишком близко и не слишком далеко — как наша Земля.'); }
+      else setNote(l7Zone(rRef.current) === 'hot' ? 'Слишком близко к Солнцу: вода выкипела.' : 'Слишком далеко: вода замёрзла.');
+    }
+  };
+  const startRace = () => { SFX.pop(); setNote(''); A.current = { e: 0, p: 0 }; RC.current = { e: 0, p: 0 }; setRace({ e: 0, p: 0 }); };
+  const next = () => { if (rd + 1 < L7_TASKS.length) { setRd(rd + 1); setSolved(false); setNote(''); setRace(null); } else setPhase('win'); };
+  const P = { x: L7_S.x + r * Math.cos(ang.p), y: L7_S.y + r * Math.sin(ang.p) };
+  const Ep = { x: L7_S.x + L7_RE * Math.cos(ang.e), y: L7_S.y + L7_RE * Math.sin(ang.e) };
+  return h(SpShell, { n: 7, title: 'Где искать жизнь', step: rd, total: L7_TASKS.length, onHome },
+    phase === 'intro' && h(IntroModal, {
+      title: 'Где искать жизнь', ask: 'Есть ли инопланетяне?',
+      task: 'Двигай свою планету ближе и дальше от Солнца. Где появятся моря?', tip: 'Тяни планету к Солнцу или от него', onStart: () => setPhase('play')
+    }),
+    phase === 'play' && h(SpBody, null,
+      h(TaskBadge, null, task.t),
+      h(SpScene, { H: 320, svgRef: svg, onPointerDown: down, onPointerMove: move, onPointerUp: up, onPointerCancel: up },
+        (solved || rd > 0) && h('circle', { cx: L7_S.x, cy: L7_S.y, r: 90, fill: 'none', stroke: '#06D6A0', strokeWidth: 36, opacity: 0.1 }),
+        (solved || rd > 0) && h('text', { x: L7_S.x, y: L7_S.y - 100, textAnchor: 'middle', fontSize: 11, fontWeight: 900, fill: '#2FE0AE', fontFamily: 'var(--ak-body)' }, 'полоса морей'),
+        h('circle', { cx: L7_S.x, cy: L7_S.y, r: L7_RE, fill: 'none', stroke: '#6FB4FF', strokeWidth: 1.2, strokeDasharray: '3 6', opacity: 0.5 }),
+        h('circle', { cx: L7_S.x, cy: L7_S.y, r, fill: 'none', stroke: '#A98BFF', strokeWidth: 1.5, strokeDasharray: '5 6', opacity: 0.7 }),
+        h(SpSun, { x: L7_S.x, y: L7_S.y, r: 20, id: 'l7s' }),
+        h(SpEarth, { x: Ep.x, y: Ep.y, R: 9, rot: 0, id: 'l7e', lights: false }),
+        h('text', { x: Ep.x, y: Ep.y + 22, textAnchor: 'middle', fontSize: 10, fontWeight: 900, fill: '#C4D4EE', fontFamily: 'var(--ak-body)' }, 'Земля'),
+        h(L7Planet, { x: P.x, y: P.y, r: 13, zone, id: 'l7p' }),
+        !touched && h('circle', { cx: P.x, cy: P.y, r: 20, fill: 'none', stroke: '#FFD84D', strokeWidth: 2.5, className: 'ak-pulse' }),
+        !touched && h('g', { transform: `translate(${P.x + 12} ${P.y + 24})` }, h('text', { className: 'sp-hint', fontSize: 24 }, '👆')),
+        race && h('g', null,
+          h('text', { x: 12, y: 300, fontSize: 12, fontWeight: 900, fill: '#6FB4FF', fontFamily: 'var(--ak-body)' }, `Земля: ${Math.min(2, race.e).toFixed(1).replace('.', ',')} круга`),
+          h('text', { x: 200, y: 300, fontSize: 12, fontWeight: 900, fill: '#C9B6FF', fontFamily: 'var(--ak-body)' }, `Твоя: ${race.p.toFixed(1).replace('.', ',')} круга`))),
+      h(SpReadout, { label: 'Твоя планета', value: L7_ZONE[zone].name },
+        h('svg', { viewBox: '0 0 60 60', style: { width: 60, height: 60, flexShrink: 0 } }, h(L7Planet, { x: 30, y: 32, r: 20, zone, id: 'l7pr' }))),
+      h(SpNote, { ok: solved }, note),
+      solved ? h(SpNext, { last: rd + 1 === L7_TASKS.length, onClick: next })
+        : task.race && h('button', { className: 'nk-btn nk-btn--pri', style: { width: '100%', maxWidth: 360 }, disabled: !!(race && !race.done), onClick: startRace }, race && !race.done ? 'Бегут…' : 'Запустить гонку ▶')),
+    phase === 'win' && h(WinModal, {
+      title: 'Планета с морями!',
+      law: 'Чем дальше планета от Солнца, тем медленнее она его обходит. Это открыл Кеплер в 1619 году',
+      fact: 'На Нептуне год длится 165 наших лет: с тех пор как его открыли, он обошёл Солнце всего один раз.',
+      onNext: onWin, onHome
+    }));
+}
+
+/* ══════════════════════════════════════════════════════════════
+   МИССИЯ 8 — Ковш
+   Сначала ребёнок соединяет яркие звёзды в Большой Ковш. Потом тянет
+   небо и смотрит на него сбоку: звёзды расходятся по глубине — рисунок
+   складывается только с Земли. Расстояния настоящие, в годах полёта света:
+   Дубхе 123, Алькаид 104, остальные около 80.
+   ══════════════════════════════════════════════════════════════ */
+const L8_STARS = [
+  { id: 'dub', x: 292, y: 92, d: 123, name: 'Дубхе' }, { id: 'mer', x: 298, y: 160, d: 79, name: 'Мерак' },
+  { id: 'phe', x: 226, y: 176, d: 83, name: 'Фекда' }, { id: 'meg', x: 214, y: 118, d: 81, name: 'Мегрец' },
+  { id: 'ali', x: 158, y: 110, d: 83, name: 'Алиот' }, { id: 'miz', x: 106, y: 122, d: 83, name: 'Мицар' },
+  { id: 'alk', x: 48, y: 160, d: 104, name: 'Алькаид' }
+];
+const L8_EDGES = [['dub', 'mer'], ['mer', 'phe'], ['phe', 'meg'], ['meg', 'dub'], ['meg', 'ali'], ['ali', 'miz'], ['miz', 'alk']];
+const l8Key = (a, b) => [a, b].sort().join('-');
+const l8Years = d => d + ' ' + (window.nooka ? window.nooka.plural(d, 'год', 'года', 'лет') : 'лет');
+function Level8Stars({ onWin, onHome }) {
+  const [phase, setPhase] = useState('intro');
+  const [rd, setRd] = useState(0);
+  const [lines, setLines] = useState([]);
+  const [sel, setSel] = useState(null);
+  const [rubber, setRubber] = useState(null);
+  const [psi, setPsi] = useState(0);
+  const [note, setNote] = useState('');
+  const [solved, setSolved] = useState(false);
+  const svg = useRef(null), dragSky = useRef(null);
+  const proj = s => ({ x: 170 + (s.x - 170) * Math.cos(spRad(psi)) + (s.d - 95) * 4.2 * Math.sin(spRad(psi)), y: s.y });
+  const hit = p => L8_STARS.find(s => { const q = proj(s); return Math.hypot(q.x - p.x, q.y - p.y) < 20; });
+  const connect = (a, b) => {
+    if (a.id === b.id) return;
+    const k = l8Key(a.id, b.id);
+    if (!L8_EDGES.some(e => l8Key(e[0], e[1]) === k)) { SFX.no(); setNote('Эти звёзды в ковше не соседние. Посмотри на подсказку справа вверху.'); return; }
+    if (lines.includes(k)) return;
+    const nl = lines.concat(k); setLines(nl); SFX.pop(); setNote('');
+    if (nl.length === L8_EDGES.length) { setSolved(true); SFX.ok(); setNote('Ковш! Так эти звёзды видят с Земли уже тысячи лет.'); }
+  };
+  const down = e => {
+    const p = spPt(svg.current, e);
+    e.currentTarget.setPointerCapture(e.pointerId);
+    if (rd === 0) {
+      const s = hit(p); if (!s) return;
+      if (sel && sel.id !== s.id) { connect(sel, s); setSel(null); return; }
+      setSel(s); setRubber(p);
+    } else if (!solved) {
+      const s = psi >= 80 && hit(p);
+      if (s) {
+        if (s.id === 'dub') { setSolved(true); SFX.ok(); setNote('Дубхе! Свет от неё летит к нам 123 года — дальше всех в ковше.'); }
+        else { SFX.no(); setNote(`${s.name}: свет летит ${l8Years(s.d)}. Есть звезда ещё дальше.`); }
+        return;
+      }
+      dragSky.current = { x: p.x, psi };
+    }
+  };
+  const move = e => {
+    const p = spPt(svg.current, e);
+    if (rd === 0 && sel) setRubber(p);
+    if (rd === 1 && dragSky.current) {
+      const v = spClamp(dragSky.current.psi + (p.x - dragSky.current.x) * 0.5, 0, 90);
+      setPsi(v);
+      if (v >= 80 && !note) setNote('Сбоку ковш рассыпался! Какая звезда дальше всех? Коснись её.');
+    }
+  };
+  const up = e => {
+    if (rd === 0 && sel) { const s = hit(spPt(svg.current, e)); if (s && s.id !== sel.id) { connect(sel, s); setSel(null); } setRubber(null); }
+    dragSky.current = null;
+  };
+  const next = () => { if (rd + 1 < 2) { setRd(1); setSolved(false); setNote(''); } else setPhase('win'); };
+  const P = Object.fromEntries(L8_STARS.map(s => [s.id, proj(s)]));
+  return h(SpShell, { n: 8, title: 'Ковш', step: rd, total: 2, onHome },
+    phase === 'intro' && h(IntroModal, {
+      title: 'Ковш', ask: 'Можно ли дотронуться до звезды?',
+      task: 'Соедини звёзды в ковш, а потом посмотри на него сбоку', tip: 'Веди пальцем от звезды к звезде', onStart: () => setPhase('play')
+    }),
+    phase === 'play' && h(SpBody, null,
+      h(TaskBadge, null, rd === 0 ? 'Соедини яркие звёзды в ковш' : psi < 80 ? 'Поверни небо: тяни вправо, чтобы посмотреть сбоку' : 'Какая звезда дальше всех от Земли?'),
+      h(SpScene, { H: 300, svgRef: svg, onPointerDown: down, onPointerMove: move, onPointerUp: up, onPointerCancel: up },
+        /* подсказка-рисунок ковша */
+        rd === 0 && h('g', { transform: 'translate(262 228) scale(0.22)', opacity: 0.6 },
+          L8_EDGES.map(([a, b], i) => { const A = L8_STARS.find(s => s.id === a), B = L8_STARS.find(s => s.id === b); return h('line', { key: i, x1: A.x - 170, y1: A.y - 130, x2: B.x - 170, y2: B.y - 130, stroke: '#A98BFF', strokeWidth: 8 }); }),
+          h('rect', { x: -150, y: -70, width: 300, height: 150, rx: 20, fill: 'none', stroke: '#A98BFF', strokeWidth: 4, opacity: 0.5 })),
+        rd === 1 && psi > 30 && h('g', null,
+          h('text', { x: 10, y: 284, fontSize: 12, fontWeight: 900, fill: '#6FB4FF', fontFamily: 'var(--ak-body)' }, '← до Земли'),
+          h('text', { x: 330, y: 284, textAnchor: 'end', fontSize: 12, fontWeight: 900, fill: '#C4D4EE', fontFamily: 'var(--ak-body)' }, 'дальше от нас →')),
+        lines.map(k => { const [a, b] = k.split('-'); return h('line', { key: k, x1: P[a].x, y1: P[a].y, x2: P[b].x, y2: P[b].y, stroke: '#A98BFF', strokeWidth: 2.5, opacity: 0.85 }); }),
+        sel && rubber && h('line', { x1: P[sel.id].x, y1: P[sel.id].y, x2: rubber.x, y2: rubber.y, stroke: '#FFD84D', strokeWidth: 2, strokeDasharray: '4 4' }),
+        L8_STARS.map(s => h('g', { key: s.id, transform: `translate(${P[s.id].x} ${P[s.id].y})` },
+          h('circle', { r: 13, fill: '#FFE9A8', opacity: 0.16 }),
+          h('circle', { r: sel && sel.id === s.id ? 7 : 5, fill: '#FFF6DC', stroke: sel && sel.id === s.id ? '#FFD84D' : 'none', strokeWidth: 3 }),
+          /* подписи только у дальних: ближние стоят кучкой, у них одна общая */
+          rd === 1 && psi > 60 && (s.id === 'dub' || s.id === 'alk') && h('text', { y: -14, textAnchor: 'middle', fontSize: 11, fontWeight: 900, fill: '#C4D4EE', fontFamily: 'var(--ak-body)' }, l8Years(s.d)))),
+        rd === 1 && psi > 60 && h('text', { x: 120, y: 86, textAnchor: 'middle', fontSize: 11, fontWeight: 900, fill: '#C4D4EE', fontFamily: 'var(--ak-body)' }, 'около 80 лет')),
+      rd === 1 && h('div', { style: { width: '100%', maxWidth: 360, fontSize: 12.5, fontWeight: 700, color: 'var(--ak-ink-3)', textAlign: 'center' } }, 'Число у звезды — сколько лет летит к нам её свет'),
+      h(SpNote, { ok: solved }, note),
+      solved && h(SpNext, { last: rd === 1, onClick: next })),
+    phase === 'win' && h(WinModal, {
+      title: 'Ковш на небе!',
+      law: 'Созвездия — рисунки, которые люди придумали тысячи лет назад. Сейчас их на небе 88',
+      fact: 'Свет от дальней звезды ковша летит к нам 123 года. Мы видим её такой, какой она была при прапрадедушках.',
+      onNext: onWin, onHome
+    }));
+}
+
+/* ══════════════════════════════════════════════════════════════
+   МИССИЯ 9 — Марсоход
+   Команда летит с Земли к марсоходу не сразу (на самом деле 3–22
+   минуты, в игре — 2 и 4 секунды). Видно, как сигнал летит. Надо
+   нажать «Стоп» заранее, иначе марсоход проедет камень и скатится
+   в кратер. Не доехал — можно ещё раз «Вперёд».
+   ══════════════════════════════════════════════════════════════ */
+const L9_V = 26, L9_GROUND = 214;
+const L9_ROUNDS = [
+  { t: 'Останови марсоход у камня. Команда летит 2 секунды', D: 2, sx: 220 },
+  { t: 'Марс улетел дальше: теперь команда летит 4 секунды', D: 4, sx: 238 }
+];
+function SpRover({ x, y, tilt }) {
+  return h('g', { transform: `translate(${x} ${y}) rotate(${tilt || 0})` },
+    h('rect', { x: -20, y: -22, width: 40, height: 12, rx: 3, fill: '#E4E1EE', stroke: '#8296B4', strokeWidth: 1.2 }),
+    h('rect', { x: -24, y: -28, width: 48, height: 5, rx: 2, fill: '#4B5BD6' }),
+    h('rect', { x: 8, y: -40, width: 3, height: 13, fill: '#C4D4EE' }), h('rect', { x: 4, y: -46, width: 12, height: 7, rx: 2, fill: '#E4E1EE' }), h('circle', { cx: 13, cy: -42.5, r: 2, fill: '#06D6A0' }),
+    [-14, 0, 14].map(wx => h('circle', { key: wx, cx: wx, cy: -4, r: 6, fill: '#3A3550', stroke: '#8296B4', strokeWidth: 1.5 })));
+}
+function Level9Rover({ onWin, onHome }) {
+  const [phase, setPhase] = useState('intro');
+  const [rd, setRd] = useState(0);
+  const R = L9_ROUNDS[rd];
+  const [s, setS] = useState({ x: 40, moving: false, sig: [], t: 0, fell: 0 });
+  const [note, setNote] = useState('');
+  const [solved, setSolved] = useState(false);
+  const [over, setOver] = useState(false);
+  const S = useRef({ x: 40, moving: false, sig: [], t: 0, fell: 0 });
+  const crater = R.sx + 24;
+  const reset = () => { S.current = { x: 40, moving: false, sig: [], t: 0, fell: 0 }; setS({ ...S.current }); setNote(''); setOver(false); };
+  const send = kind => { if (over || solved) return; SFX.tick(); S.current.sig.push({ kind, t0: S.current.t }); setNote(kind === 'go' ? 'Команда «Вперёд» летит к Марсу…' : 'Команда «Стоп» летит к Марсу…'); };
+  useLoop(dt => {
+    const g = S.current; g.t += dt;
+    const arrived = g.sig.filter(q => g.t - q.t0 >= R.D);
+    if (arrived.length) {
+      arrived.forEach(q => { g.moving = q.kind === 'go'; });
+      g.sig = g.sig.filter(q => g.t - q.t0 < R.D);
+      if (!g.moving && !g.fell) {
+        const dx = g.x - R.sx;
+        if (dx >= -16 && dx <= 8) { setSolved(true); SFX.ok(); setNote(rd === 0 ? 'Точно у камня! Стоп нажали заранее — пока команда летела, марсоход ещё ехал.' : 'Приехали! Чем дальше Марс, тем раньше надо командовать.'); }
+        else if (dx < -16) setNote('Не доехал. Можно ещё раз «Вперёд» — и снова «Стоп» заранее.');
+      }
+    }
+    if (g.moving && !g.fell) {
+      g.x += L9_V * dt;
+      if (g.x > crater) { g.fell = 0.01; g.moving = false; SFX.boom(); setOver(true); setNote(`Проехал камень и скатился в кратер! Команда летит ${R.D} ${R.D === 2 ? 'секунды' : 'секунды'} — «Стоп» надо раньше.`); }
+    }
+    if (g.fell && g.fell < 1) g.fell = Math.min(1, g.fell + dt * 1.5);
+    setS({ x: g.x, moving: g.moving, sig: g.sig.slice(), t: g.t, fell: g.fell });
+  }, phase === 'play' && !solved);
+  const next = () => { if (rd + 1 < L9_ROUNDS.length) { setRd(rd + 1); setSolved(false); reset(); } else setPhase('win'); };
+  const ant = { x: 34, y: 40 };
+  return h(SpShell, { n: 9, title: 'Марсоход', step: rd, total: L9_ROUNDS.length, onHome },
+    phase === 'intro' && h(IntroModal, {
+      title: 'Марсоход', ask: 'Как рулить на другой планете?',
+      task: 'Доведи марсоход до камня. Но команда летит с Земли не сразу!', tip: 'Жми «Стоп» заранее — пока сигнал в пути', onStart: () => setPhase('play')
+    }),
+    phase === 'play' && h(SpBody, null,
+      h(TaskBadge, null, R.t),
+      h(SpScene, { H: 260, sky: '#E39A72' },
+        h('defs', null, h('linearGradient', { id: 'l9sky', x1: 0, y1: 0, x2: 0, y2: 1 }, h('stop', { offset: 0, stopColor: '#2A1E3A' }), h('stop', { offset: 1, stopColor: '#D98A62' }))),
+        h('rect', { x: 0, y: 0, width: 340, height: 260, fill: 'url(#l9sky)' }),
+        h('g', { opacity: 0.5 }, h(SpStars, { H: 90 })),
+        /* Земля с антенной */
+        h(SpEarth, { x: ant.x, y: ant.y, R: 18, rot: 0, id: 'l9e', lights: false }),
+        h('text', { x: ant.x + 26, y: ant.y + 4, fontSize: 11, fontWeight: 900, fill: '#C4D4EE', fontFamily: 'var(--ak-body)' }, 'Земля'),
+        /* горы и грунт */
+        h('path', { d: `M0 ${L9_GROUND} L40 170 L90 ${L9_GROUND - 20} L150 160 L220 ${L9_GROUND - 14} L290 176 L340 ${L9_GROUND - 6} L340 260 L0 260 Z`, fill: '#B5583A', opacity: 0.55 }),
+        h('rect', { x: 0, y: L9_GROUND, width: 340, height: 46, fill: '#A04A2E' }),
+        h('ellipse', { cx: crater + 30, cy: L9_GROUND + 6, rx: 32, ry: 9, fill: '#5E2618' }),
+        h('text', { x: crater + 30, y: L9_GROUND + 32, textAnchor: 'middle', fontSize: 10, fontWeight: 900, fill: '#FFD6C2', fontFamily: 'var(--ak-body)' }, 'кратер'),
+        /* камень-образец */
+        h('g', { transform: `translate(${R.sx} ${L9_GROUND})` },
+          h('path', { d: 'M-9 0 L-6 -10 L3 -13 L9 -4 L8 0 Z', fill: '#8A93B8', stroke: '#C4D4EE', strokeWidth: 1 }),
+          h('circle', { cx: 0, cy: -20, r: 4, fill: solved ? '#06D6A0' : '#FFD84D', className: 'ak-pulse' })),
+        /* сигналы в пути */
+        s.sig.map((q, i) => {
+          const k = spClamp((s.t - q.t0) / R.D, 0, 1), x = ant.x + (s.x - ant.x) * k, y = ant.y + (L9_GROUND - 40 - ant.y) * k;
+          return h('g', { key: i },
+            h('line', { x1: ant.x, y1: ant.y, x2: x, y2: y, stroke: q.kind === 'go' ? '#06D6A0' : '#FF6B6B', strokeWidth: 1.5, strokeDasharray: '3 5', opacity: 0.5 }),
+            h('circle', { cx: x, cy: y, r: 6, fill: q.kind === 'go' ? '#06D6A0' : '#FF6B6B', stroke: '#fff', strokeWidth: 1.5 }),
+            h('text', { x: x + 10, y: y + 4, fontSize: 10, fontWeight: 900, fill: '#fff', fontFamily: 'var(--ak-body)' }, `${Math.max(0, R.D - (s.t - q.t0)).toFixed(1)} с`));
+        }),
+        h(SpRover, { x: s.x, y: L9_GROUND + s.fell * 14, tilt: s.fell * 28 })),
+      h(SpNote, { ok: solved }, note),
+      solved ? h(SpNext, { last: rd + 1 === L9_ROUNDS.length, onClick: next })
+        : over ? h('button', { className: 'nk-btn nk-btn--pri', style: { width: '100%', maxWidth: 360 }, onClick: () => { SFX.pop(); reset(); } }, 'Ещё раз')
+        : h('div', { style: { display: 'flex', gap: 10, width: '100%', maxWidth: 360 } },
+          h('button', { className: 'nk-btn nk-btn--ok', style: { flex: 1 }, onClick: () => send('go') }, 'Вперёд ▶'),
+          h('button', { className: 'nk-btn nk-btn--go', style: { flex: 1 }, onClick: () => send('stop') }, 'Стоп ■'))),
+    phase === 'win' && h(WinModal, {
+      title: 'Марсоход на месте!',
+      law: 'Сигнал летит быстрее всего на свете, но до Марса и ему нужно от 3 до 22 минут',
+      fact: 'Поэтому марсоходы умеют сами объезжать камни: ждать команды с Земли слишком долго.',
+      onNext: onWin, onHome
+    }));
+}
+
+/* ══════════════════════════════════════════════════════════════
+   МИССИЯ 10 — Посадка на Марс (финал)
+   Своя ракета садится. Держишь кнопку — двигатель тормозит, отпустил —
+   падаешь. Топливо кончается. На Луне воздуха нет: парашют висит
+   тряпочкой (секрет). На Марсе воздух есть, но топлива мало: без
+   парашюта у земли будет 100, а топлива хватит сбросить только до 40; с парашютом —
+   падение не быстрее 30, остаётся чуть притормозить. Мягко — быстрее 20 нельзя.
+   Подбор: на Луне начинать тормозить не ниже ~100 точек.
+   ══════════════════════════════════════════════════════════════ */
+const L10_GROUND = 300, L10_TOP = 50, L10_SAFE = 20;
+const L10_ROUNDS = [
+  { t: 'Посади ракету на Луну мягко', world: 'moon', g: 12, thrust: 30, fuel: 6, air: false, v0: 22 },
+  { t: 'Финал: посади ракету на Марс. Там есть воздух', world: 'mars', g: 20, thrust: 30, fuel: 6, air: true, v0: 22, vt: 30 }
+];
+function Level10Land({ onWin, onHome }) {
+  const [phase, setPhase] = useState('intro');
+  const [rd, setRd] = useState(0);
+  const R = L10_ROUNDS[rd];
+  const rocket = spRocketLoad(), color = rocket ? rocket.color : 'blue';
+  const init = () => ({ alt: L10_GROUND - L10_TOP, v: R.v0, fuel: R.fuel, burn: false, chute: false, st: 'ready', boom: 0, t: 0 });
+  const [s, setS] = useState(init);
+  const [note, setNote] = useState('');
+  const [solved, setSolved] = useState(false);
+  const S = useRef(null), hold = useRef(false);
+  const reset = () => { S.current = null; hold.current = false; SFX.engine(false); setS(init()); setNote(''); };
+  useEffect(() => { reset(); }, [rd]);
+  useEffect(() => () => SFX.engine(false), []);
+  const start = () => { S.current = { ...init(), st: 'fly' }; setS({ ...S.current }); setNote(''); };
+  const engine = on => {
+    hold.current = on;
+    const g = S.current;
+    SFX.engine(on && !!g && g.st === 'fly' && g.fuel > 0);
+  };
+  const chute = () => {
+    const g = S.current; if (!g || g.st !== 'fly' || g.chute) return;
+    if (!R.air) { SFX.no(); setNote('Парашют повис тряпочкой: на Луне нет воздуха, ему не за что зацепиться!'); return; }
+    g.chute = true; SFX.pop(); setNote('Парашют раскрылся — воздух тормозит!');
+  };
+  useLoop(dt => {
+    const g = S.current; if (!g) return;
+    g.t += dt;
+    if (g.st === 'fly') {
+      let a = R.g;
+      g.burn = hold.current && g.fuel > 0;
+      if (g.burn) { a -= R.thrust; g.fuel = Math.max(0, g.fuel - dt); if (!g.fuel) { SFX.engine(false); setNote('Топливо кончилось!'); } }
+      if (g.chute && R.air) a -= R.g * (g.v * Math.abs(g.v)) / (R.vt * R.vt);   // с парашютом скорость не выше vt
+      g.v += a * dt; g.alt -= g.v * dt;
+      if (g.alt > L10_GROUND - 20) { g.alt = L10_GROUND - 20; g.v = Math.max(0, g.v); }
+      if (g.alt <= 0) {
+        g.alt = 0; SFX.engine(false);
+        if (g.v <= L10_SAFE) { g.st = 'landed'; SFX.ok(); setSolved(true); setNote(rd === 0 ? 'Мягкая посадка! Без воздуха тормозит только двигатель.' : (rocket ? `«${rocket.name}» на Марсе!` : 'Ракета на Марсе!') + ' Сначала парашют, потом двигатель.'); }
+        else { g.st = 'crash'; SFX.boom(); setNote(g.v > 60 ? 'Бабах! Слишком быстро. Тормози раньше — держи кнопку заранее.' : 'Жёстко! Чуть-чуть не хватило — притормози у самой земли.'); }
+      }
+    } else if (g.st === 'crash') g.boom = Math.min(1, g.boom + dt * 1.2);
+    setS({ ...g });
+    if (g.st !== 'fly' && (g.st === 'landed' || g.boom >= 1)) S.current = null;
+  }, phase === 'play' && !!S.current);
+  const next = () => { if (rd + 1 < L10_ROUNDS.length) { setRd(rd + 1); setSolved(false); } else setPhase('win'); };
+  const y = L10_GROUND - s.alt, mars = R.world === 'mars';
+  const spd = Math.max(0, s.v), danger = spd > L10_SAFE;
+  return h(SpShell, { n: 10, title: 'Посадка на Марс', step: rd, total: L10_ROUNDS.length, onHome },
+    phase === 'intro' && h(IntroModal, {
+      title: 'Посадка', ask: rocket ? `«${rocket.name}» идёт на посадку` : 'Своя ракета садится',
+      task: 'Держи кнопку, чтобы тормозить двигателем. Сядь мягко!', tip: 'Держишь — тормозишь, отпустил — падаешь', onStart: () => setPhase('play')
+    }),
+    phase === 'play' && h(SpBody, null,
+      h(TaskBadge, null, R.t),
+      h(SpScene, { H: 340, sky: mars ? '#C97A58' : '#070A18' },
+        mars && h('defs', null, h('linearGradient', { id: 'l10sky', x1: 0, y1: 0, x2: 0, y2: 1 }, h('stop', { offset: 0, stopColor: '#3A2240' }), h('stop', { offset: 1, stopColor: '#E39A72' }))),
+        mars ? h('rect', { width: 340, height: 340, fill: 'url(#l10sky)' }) : h(SpStars, { H: 300 }),
+        !mars && h(SpEarth, { x: 286, y: 54, R: 16, rot: 0, id: 'l10e', lights: false }),
+        h('rect', { x: 0, y: L10_GROUND, width: 340, height: 40, fill: mars ? '#A04A2E' : '#8E89A6' }),
+        !mars && [[60, 318, 20], [250, 324, 28]].map(([cx, cy, r], i) => h('ellipse', { key: i, cx, cy, rx: r, ry: r / 4, fill: '#6E6987' })),
+        h('rect', { x: 130, y: L10_GROUND - 3, width: 80, height: 5, rx: 2, fill: '#FFD84D' }),
+        /* ракета: нос вверх, огонь вниз — тормозит */
+        s.st !== 'crash' && h('g', { transform: `translate(170 ${y - 12})` },
+          s.chute && R.air && h('g', null,
+            h('path', { d: 'M-34 -118 Q0 -158 34 -118 Z', fill: '#FF6B6B', stroke: '#fff', strokeWidth: 1.5 }),
+            h('line', { x1: -32, y1: -118, x2: -8, y2: -70, stroke: '#fff', strokeWidth: 1 }), h('line', { x1: 32, y1: -118, x2: 8, y2: -70, stroke: '#fff', strokeWidth: 1 })),
+          h('path', { d: 'M-12 -4 L-22 10 M12 -4 L22 10', stroke: '#C4D4EE', strokeWidth: 2.5, strokeLinecap: 'round' }),
+          h(SpRocket, { color, tanks: 1, engines: 1, flame: s.burn })),
+        s.st === 'crash' && h(SpBoom, { x: 170, y: L10_GROUND - 20, t: s.boom }),
+        /* скорость и топливо */
+        h('g', { transform: 'translate(14 20)' },
+          h('text', { x: 0, y: 0, fontSize: 11, fontWeight: 900, fill: '#C4D4EE', fontFamily: 'var(--ak-body)' }, 'скорость'),
+          h('rect', { x: 0, y: 6, width: 100, height: 10, rx: 5, fill: 'rgba(255,255,255,.12)' }),
+          h('rect', { x: 0, y: 6, width: spClamp(spd, 0, 100), height: 10, rx: 5, fill: danger ? '#FF6B6B' : '#06D6A0' }),
+          h('line', { x1: L10_SAFE, y1: 3, x2: L10_SAFE, y2: 19, stroke: '#fff', strokeWidth: 2 }),
+          h('text', { x: 0, y: 36, fontSize: 11, fontWeight: 900, fill: '#C4D4EE', fontFamily: 'var(--ak-body)' }, 'топливо'),
+          h('rect', { x: 0, y: 42, width: 100, height: 10, rx: 5, fill: 'rgba(255,255,255,.12)' }),
+          h('rect', { x: 0, y: 42, width: 100 * s.fuel / R.fuel, height: 10, rx: 5, fill: '#FFB347' }))),
+      h(SpNote, { ok: solved }, note),
+      solved ? h(SpNext, { last: rd + 1 === L10_ROUNDS.length, onClick: next })
+        : s.st === 'ready' ? h('button', { className: 'nk-btn nk-btn--pri', style: { width: '100%', maxWidth: 360 }, onClick: () => { SFX.pop(); start(); } }, 'Начать спуск ▼')
+        : s.st === 'crash' || s.st === 'landed' ? h('button', { className: 'nk-btn nk-btn--pri', style: { width: '100%', maxWidth: 360 }, onClick: () => { SFX.pop(); reset(); } }, 'Ещё раз')
+        : h('div', { style: { display: 'flex', gap: 10, width: '100%', maxWidth: 360 } },
+          h('button', {
+            className: 'nk-btn nk-btn--go', style: { flex: 2, touchAction: 'none' },
+            onPointerDown: e => { e.preventDefault(); e.currentTarget.setPointerCapture(e.pointerId); engine(true); },
+            onPointerUp: () => engine(false), onPointerCancel: () => engine(false), onContextMenu: e => e.preventDefault()
+          }, s.burn ? '🔥 Тормозим…' : 'Держи: двигатель'),
+          h('button', { className: 'nk-btn nk-btn--sm nk-back', style: { flex: 1 }, onClick: chute, disabled: s.chute && R.air }, 'Парашют'))),
+    phase === 'win' && h(WinModal, {
+      title: rocket ? `«${rocket.name}» на Марсе!` : 'Мягкая посадка!',
+      law: 'На Луну люди сели в 1969 году: «Аполлон-11» тормозил двигателем — воздуха там нет',
+      fact: 'Марсоход «Персеверанс» в 2021 году сел сам: парашют, потом двигатели, а в конце его опустили на тросах, как подъёмным краном.',
+      onNext: onWin, onHome
+    }));
+}
+
 /* ── проверка связи: два вопроса, ошибку можно поправить ─── */
 const SP_QUIZ = {
   1: [{ q: 'Почему наступает ночь?',
@@ -1313,7 +2165,7 @@ function App() {
       setS('home');
       if (st.offline) return setS('off');
       A.paywall({
-        title: 'Дальше — по доступу',
+        title: 'Миссии 3–10 — в платной части',
         sub: 'Бесплатно открыты первые две миссии КосмоПорта. Дальше — своя ракета, орбита и посадка на Марс.'
       });
     });
