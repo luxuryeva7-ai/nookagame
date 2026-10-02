@@ -1193,7 +1193,7 @@ const L1_MISSIONS = [{
   targetMax: -1,
   result: 'solid',
   reward: '🧊 Готово! Лёд!',
-  fact: 'При 0°C вода замерзает. Молекулы замедляются и выстраиваются в кристаллическую решётку.'
+  fact: 'При 0°C вода замерзает. Частички замедляются и встают ровными рядами — получается лёд.'
 }, {
   goal: 'Растопи лёд — сделай жидкой водой',
   substance: 'Лёд 🧊',
@@ -1404,7 +1404,8 @@ function MoleculeCanvas({
   });
 }
 function Level1TempMachine({
-  onDone
+  onDone,
+  onExit
 }) {
   const [missionIdx, setMissionIdx] = React.useState(0);
   const tempRef = React.useRef(20); // for canvas — no re-renders
@@ -1473,7 +1474,7 @@ function Level1TempMachine({
   }, /*#__PURE__*/React.createElement(AKLessonHeader, {
     progress: missionIdx / total,
     stars: completedCount * 60,
-    onClose: onDone
+    onClose: onExit
   }), /*#__PURE__*/React.createElement("div", {
     style: {
       textAlign: 'center'
@@ -1783,7 +1784,8 @@ function getObjectCy(density) {
   return boundary(4) + OBJ_R;                          // всплывает на поверхность
 }
 function Level2Density({
-  onDone
+  onDone,
+  onExit
 }) {
   const [phase, setPhase] = React.useState(1); // 1=tower, 2=objects
   const [poured, setPoured] = React.useState([]);
@@ -1856,7 +1858,7 @@ function Level2Density({
   }, /*#__PURE__*/React.createElement(AKLessonHeader, {
     progress: phase === 1 ? poured.length / AK_ORDER.length : (4 + droppedObjs.length) / (AK_ORDER.length + PHASE2_OBJECTS.length),
     stars: 240,
-    onClose: onDone
+    onClose: onExit
   }), phase === 1 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     style: {
       textAlign: 'center'
@@ -2170,9 +2172,9 @@ const L3_EXPERIMENTS = [{
   },
   effect: 'bubbles',
   resultEmoji: '💨',
-  resultLabel: 'Выделяется газ CO₂!',
+  resultLabel: 'Выделяется углекислый газ!',
   answer: 'chemical',
-  explanation: 'Уксусная кислота реагирует с содой. Появляется новое вещество — углекислый газ CO₂. Это химическая реакция!'
+  explanation: 'Уксус реагирует с содой. Появляется новое вещество — углекислый газ. Это химическая реакция!'
 }, {
   a: {
     emoji: '🔵',
@@ -2252,7 +2254,7 @@ const L3_EXPERIMENTS = [{
   resultEmoji: '💧',
   resultLabel: 'Лёд растаял',
   answer: 'physical',
-  explanation: 'Лёд стал водой, но H₂O не изменился. Заморозь снова — лёд вернётся. Физическое изменение!'
+  explanation: 'Лёд стал водой, но вещество осталось тем же. Заморозь снова — лёд вернётся. Физическое изменение!'
 }];
 function BubbleEffect() {
   const bubbles = Array.from({
@@ -2461,7 +2463,8 @@ function EffectDisplay({
   return null;
 }
 function Level3Lab({
-  onDone
+  onDone,
+  onExit
 }) {
   const [idx, setIdx] = React.useState(0);
   const [score, setScore] = React.useState(0);
@@ -2516,7 +2519,7 @@ function Level3Lab({
   }, /*#__PURE__*/React.createElement(AKLessonHeader, {
     progress: idx / total,
     stars: score * 50,
-    onClose: onDone
+    onClose: onExit
   }), /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
@@ -2851,7 +2854,8 @@ function l4PhWord(ph) {
   return 'Щёлочь!';
 }
 function Level4Potion({
-  onDone
+  onDone,
+  onExit
 }) {
   const [phase, setPhase] = React.useState('intro'); // intro | sandbox | challenge | done
   const [sel, setSel] = React.useState(null);
@@ -2894,7 +2898,7 @@ function Level4Potion({
   }, /*#__PURE__*/React.createElement(AKLessonHeader, {
     progress: phase === 'sandbox' ? tested.size / 6 : phase === 'intro' ? 0 : 1,
     stars: tested.size * 30,
-    onClose: onDone
+    onClose: onExit
   }), phase === 'intro' && /*#__PURE__*/React.createElement("div", {
     style: {
       position: 'fixed',
@@ -3204,7 +3208,8 @@ function Level4Potion({
    LEVEL 5 — Ферма кристаллов (растворы, насыщение)
    ============================================================ */
 function Level5Crystal({
-  onDone
+  onDone,
+  onExit
 }) {
   const [phase, setPhase] = React.useState('intro'); // intro | lab | cooling | result | done
   const [salt, setSalt] = React.useState(20);
@@ -3237,7 +3242,7 @@ function Level5Crystal({
   }, /*#__PURE__*/React.createElement(AKLessonHeader, {
     progress: phase === 'intro' ? 0 : phase === 'lab' ? .4 : 1,
     stars: attempts ? 60 : 0,
-    onClose: onDone
+    onClose: onExit
   }), phase === 'intro' && /*#__PURE__*/React.createElement("div", {
     style: {
       position: 'fixed',
@@ -3516,12 +3521,13 @@ const L6_METHODS = [{
   why: 'кислород кончился'
 }, {
   id: 'co2',
-  name: 'Перелить CO₂',
+  name: 'Перелить углекислый газ',
   emoji: '🥤',
   why: 'газ-призрак вытеснил кислород'
 }];
 function Level6Candle({
-  onDone
+  onDone,
+  onExit
 }) {
   const [phase, setPhase] = React.useState('intro'); // intro | jars | challenge | done
   const [covered, setCovered] = React.useState(null); // jar id
@@ -3573,7 +3579,7 @@ function Level6Candle({
   }, /*#__PURE__*/React.createElement(AKLessonHeader, {
     progress: phase === 'intro' ? 0 : phase === 'jars' ? triedJars.size / 3 : 1,
     stars: triedJars.size * 40,
-    onClose: onDone
+    onClose: onExit
   }), phase === 'intro' && /*#__PURE__*/React.createElement("div", {
     style: {
       position: 'fixed',
@@ -3630,7 +3636,7 @@ function Level6Candle({
       margin: '0 auto',
       width: '100%'
     }
-  }, /*#__PURE__*/React.createElement(AKTaskBadge, null, triedJars.size >= 2 ? 'Заметил закономерность? Больше банка — дольше огонёк!' : 'Накрой свечу разными банками и следи за временем'), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement(AKTaskBadge, null, triedJars.size >= 2 ? 'Видна закономерность? Больше банка — дольше огонёк!' : 'Накрой свечу разными банками и следи за временем'), /*#__PURE__*/React.createElement("div", {
     style: {
       flex: 1,
       display: 'flex',
@@ -3856,6 +3862,480 @@ function Level6Candle({
     ctaLabel: "Забрать награду →"
   })));
 }
+/* ============================================================
+   УРОВНИ 7–10 (02.10.2026) и проверка связи для всех уровней.
+   Тот же стиль, что у 1–6: карточка-вход, заголовок с прогрессом,
+   плашка задачи, живая сцена, карточка успеха с фактом. После
+   успеха — два вопроса проверки связи (GAME_SYSTEM_METHOD, п. 7).
+   ============================================================ */
+function ChemPage({ bg, progress, stars, onExit, children }) {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "ak",
+    style: {
+      minHeight: '100vh', display: 'flex', flexDirection: 'column', padding: '14px 16px 24px', boxSizing: 'border-box',
+      background: `radial-gradient(80% 50% at 50% 0%,${bg || '#DCF7E7'} 0%,transparent 55%),linear-gradient(180deg,#FFF8EA,#FFF3E2)`
+    }
+  }, /*#__PURE__*/React.createElement(AKLessonHeader, { progress: progress, stars: stars || 0, onClose: onExit }), children);
+}
+function ChemIntro({ emoji, title, text, cta, onGo }) {
+  return /*#__PURE__*/React.createElement("div", {
+    style: { position: 'fixed', inset: 0, background: 'rgba(45,27,69,.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: '0 24px' }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "ak-pop",
+    style: { width: 320, background: '#fff', borderRadius: 32, padding: '28px 24px 24px', textAlign: 'center', fontFamily: 'var(--ak-body)' }
+  }, /*#__PURE__*/React.createElement("div", { style: { fontSize: 56 } }, emoji),
+  /*#__PURE__*/React.createElement("div", { style: { fontFamily: 'var(--ak-display)', fontWeight: 700, fontSize: 22, color: 'var(--ak-ink)', margin: '10px 0 8px' } }, title),
+  /*#__PURE__*/React.createElement("div", { style: { fontSize: 15, color: 'var(--ak-ink-2)', lineHeight: 1.55, marginBottom: 18 } }, text),
+  /*#__PURE__*/React.createElement("button", { className: "ak-btn ak-btn--ok", style: { width: '100%' }, onClick: onGo }, cta)));
+}
+function ChemPlay({ children }) {
+  return /*#__PURE__*/React.createElement("div", {
+    style: { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, paddingTop: 12 }
+  }, children);
+}
+function ChemScene({ h, children }) {
+  return /*#__PURE__*/React.createElement("svg", {
+    viewBox: `0 0 340 ${h || 210}`,
+    style: { width: '100%', maxWidth: 360, flexShrink: 0, borderRadius: 24, background: 'linear-gradient(180deg,#FFFFFF,#F4FBF6)', boxShadow: '0 6px 0 rgba(45,27,69,.07)' }
+  }, children);
+}
+function ChemNote({ ok, children }) {
+  return /*#__PURE__*/React.createElement("div", {
+    style: { fontFamily: 'var(--ak-display)', fontWeight: 700, fontSize: 14, textAlign: 'center', maxWidth: 330, lineHeight: 1.45, minHeight: 40, color: ok ? 'var(--ak-ok-3)' : 'var(--ak-ink-2)' }
+  }, children);
+}
+function ChemBtns({ items, onPick, value, disabled, cols }) {
+  return /*#__PURE__*/React.createElement("div", {
+    style: { display: 'grid', gridTemplateColumns: `repeat(${cols || items.length},1fr)`, gap: 8, width: '100%', maxWidth: 360 }
+  }, items.map(it => /*#__PURE__*/React.createElement("button", {
+    key: it.id, className: "ak-tap", disabled: disabled || it.off, onClick: () => onPick(it.id),
+    style: {
+      border: value === it.id ? '3px solid #3CA876' : '3px solid transparent', cursor: 'pointer', borderRadius: 16, padding: '8px 4px',
+      fontFamily: 'var(--ak-body)', background: '#fff', boxShadow: '0 4px 0 rgba(45,27,69,.08)', opacity: disabled || it.off ? .55 : 1
+    }
+  }, /*#__PURE__*/React.createElement("div", { style: { fontSize: 22 } }, it.emoji),
+  /*#__PURE__*/React.createElement("div", { style: { fontSize: 12, fontWeight: 800, color: 'var(--ak-ink)', marginTop: 2, lineHeight: 1.2 } }, it.name))));
+}
+function ChemDone({ title, fact, onNext }) {
+  return /*#__PURE__*/React.createElement("div", {
+    style: { position: 'fixed', inset: 0, background: 'rgba(45,27,69,.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }
+  }, /*#__PURE__*/React.createElement(AKSuccessCard, { title: title, fact: fact, onNext: onNext }));
+}
+
+/* ── проверка связи ──────────────────────────────────────── */
+const CHEM_QUIZ = {
+  1: [{ q: 'Чем лёд отличается от пара?', opts: [{ t: 'Это одна и та же вода, только частички двигаются по-разному', ok: true }, { t: 'Это разные вещества' }, { t: 'Пар — это дым' }],
+    yes: 'Да. В льду частички стоят, в воде скользят, в паре разлетаются.', no: 'Лёд, вода и пар — одно вещество. Разница в том, как двигаются частички.' },
+  { q: 'Что нужно, чтобы лёд стал водой?', opts: [{ t: 'Нагреть', ok: true }, { t: 'Охладить' }, { t: 'Посолить' }],
+    yes: 'Верно. Тепло расшевеливает частички.', no: 'От холода лёд не растает. Нужно тепло — оно расшевелит частички.' }],
+  2: [{ q: 'Почему масло всплывает над водой?', opts: [{ t: 'Масло легче, чем столько же воды', ok: true }, { t: 'Масло липкое' }, { t: 'Вода его не любит' }],
+    yes: 'Да. Что легче — поднимается, что тяжелее — опускается.', no: 'Дело в весе: стакан масла легче стакана воды, поэтому масло наверху.' },
+  { q: 'Шарик тонет в воде, но плавает в мёде. Почему?', opts: [{ t: 'Мёд тяжелее воды и сильнее выталкивает', ok: true }, { t: 'Мёд тёплый' }, { t: 'Шарик испугался' }],
+    yes: 'Верно. Тяжёлая жидкость держит то, что в лёгкой тонет.', no: 'Мёд тяжелее воды — он выталкивает сильнее и удерживает шарик.' }],
+  3: [{ q: 'Чем химическая реакция отличается от растворения краски?', opts: [{ t: 'В реакции появляется новое вещество', ok: true }, { t: 'Реакция всегда громкая' }, { t: 'Ничем' }],
+    yes: 'Да. Краску можно вернуть, выпарив воду, а новое вещество — уже не то, что было.', no: 'Главное — появилось ли новое вещество. В реакции появляется, при растворении — нет.' },
+  { q: 'Сода и уксус зашипели. Что появилось?', opts: [{ t: 'Новое вещество — газ', ok: true }, { t: 'Ничего, просто шум' }, { t: 'Больше уксуса' }],
+    yes: 'Верно. Пузырьки — это газ, которого раньше не было.', no: 'Шипение — это пузырьки нового газа. Его не было ни в соде, ни в уксусе.' }],
+  4: [{ q: 'Почему капустный сок меняет цвет?', opts: [{ t: 'Он по-разному окрашивается в кислом и в мыльном', ok: true }, { t: 'Он портится' }, { t: 'От света' }],
+    yes: 'Да. Он подсказывает, какая жидкость перед ним.', no: 'Сок не портится. Он меняет цвет в зависимости от того, кислая жидкость или мыльная.' },
+  { q: 'Что покажет капустный сок в лимонном соке?', opts: [{ t: 'Цвет кислого', ok: true }, { t: 'Цвет мыльного' }, { t: 'Ничего не изменится' }],
+    yes: 'Верно. Лимон кислый — сок это покажет.', no: 'Лимон кислый. Сок окрасится так же, как в уксусе.' }],
+  5: [{ q: 'Откуда в стакане взялся кристалл?', opts: [{ t: 'Вода испарилась, а соль собралась в фигурки', ok: true }, { t: 'Вырос из семечка' }, { t: 'Его подбросили' }],
+    yes: 'Да. Соль никуда не делась — она просто снова собралась вместе.', no: 'Соль была растворена в воде. Вода ушла — соль собралась обратно, ровными фигурками.' },
+  { q: 'Почему соль в конце перестаёт растворяться?', opts: [{ t: 'Вода уже взяла столько, сколько может', ok: true }, { t: 'Соль закончилась' }, { t: 'Вода замёрзла' }],
+    yes: 'Верно. У воды есть предел, сколько соли она удержит.', no: 'Соль есть, но вода уже полная: больше она не возьмёт.' }],
+  6: [{ q: 'Почему свеча под банкой гаснет?', opts: [{ t: 'Кончается воздух, нужный огню', ok: true }, { t: 'Банка давит на огонь' }, { t: 'Свеча устала' }],
+    yes: 'Да. Огню нужен воздух, а под банкой его мало.', no: 'Банка не касается огня. Просто воздуха под ней мало, и огонь его быстро тратит.' },
+  { q: 'Под какой банкой свеча горит дольше?', opts: [{ t: 'Под большой', ok: true }, { t: 'Под маленькой' }, { t: 'Одинаково' }],
+    yes: 'Верно. В большой банке больше воздуха.', no: 'В большой банке больше воздуха — огню его хватит надольше.' }],
+  7: [{ q: 'Почему в горячем чае сахар растворяется быстрее?', opts: [{ t: 'Частички горячей воды быстрее растаскивают сахар', ok: true }, { t: 'Сахар боится жары' }, { t: 'В горячем чае меньше воды' }],
+    yes: 'Да. Чем горячее, тем быстрее двигаются частички воды.', no: 'Воды столько же. Просто в горячей частички носятся быстрее и быстрее растаскивают сахар.' },
+  { q: 'Как быстрее растворить сахар в холодном компоте?', opts: [{ t: 'Помешать ложкой', ok: true }, { t: 'Подождать молча' }, { t: 'Положить ещё сахара' }],
+    yes: 'Верно. Ложка помогает воде растаскивать сахар.', no: 'Ждать долго, а лишний сахар не поможет. Быстрее — помешать ложкой.' }],
+  8: [{ q: 'Почему соль прошла через фильтр, а песок остался?', opts: [{ t: 'Соль растворилась в воде, а песок нет', ok: true }, { t: 'Соль мельче' }, { t: 'Песок тяжелее' }],
+    yes: 'Да. Растворённая соль проходит вместе с водой.', no: 'Дело не в размере: соль растворилась и ушла с водой, а песок не растворяется.' },
+  { q: 'Как достать соль из солёной воды?', opts: [{ t: 'Выпарить воду', ok: true }, { t: 'Процедить через фильтр' }, { t: 'Подуть на воду' }],
+    yes: 'Верно. Вода уйдёт паром, а соль останется.', no: 'Через фильтр солёная вода пройдёт целиком. Нужно выпарить воду — соль останется на дне.' }],
+  9: [{ q: 'Добавили ещё соды, а шарик больше не растёт. Почему?', opts: [{ t: 'Кончился уксус — соде не с кем реагировать', ok: true }, { t: 'Шарик лопнул' }, { t: 'Сода испортилась' }],
+    yes: 'Да. Реакция идёт, пока есть оба вещества.', no: 'Посмотри на дно: сода осталась нетронутой, потому что уксус уже закончился.' },
+  { q: 'Что надувает шарик?', opts: [{ t: 'Газ, который появился в реакции', ok: true }, { t: 'Воздух из бутылки' }, { t: 'Уксус' }],
+    yes: 'Верно. Этого газа не было, пока сода и уксус не встретились.', no: 'Воздуха в бутылке мало. Шарик надувает новый газ, который получился в реакции.' }],
+  10: [{ q: 'Из чего состоит капля воды?', opts: [{ t: 'Из крошечных частичек: в каждой два водорода и кислород', ok: true }, { t: 'Из одной большой частицы' }, { t: 'Ни из чего, вода сплошная' }],
+    yes: 'Да. Их так много, что вода кажется сплошной.', no: 'Вода только кажется сплошной. Она собрана из крошечных частичек — два водорода и кислород.' },
+  { q: 'Чем кислород отличается от углекислого газа?', opts: [{ t: 'Разным набором деталек', ok: true }, { t: 'Цветом' }, { t: 'Ничем' }],
+    yes: 'Верно. Поменяй детальки — получится другое вещество.', no: 'Оба невидимые. Отличаются тем, из каких деталек собраны.' }]
+};
+function ChemQuiz({ n, onDone, onExit }) {
+  const qs = React.useMemo(() => CHEM_QUIZ[n].map(q => ({ ...q, opts: window.nooka && window.nooka.shuffled ? window.nooka.shuffled(q.opts) : q.opts })), [n]);
+  const [pick, setPick] = React.useState([null, null]);
+  const both = qs.every((q, i) => pick[i] != null && q.opts[pick[i]].ok);
+  return /*#__PURE__*/React.createElement(ChemPage, { progress: 1, stars: 0, onExit: onExit },
+    /*#__PURE__*/React.createElement(ChemPlay, null,
+      /*#__PURE__*/React.createElement(AKTaskBadge, null, 'Проверка связи: два вопроса'),
+      qs.map((q, qi) => /*#__PURE__*/React.createElement("div", {
+        key: qi, style: { width: '100%', maxWidth: 360, background: '#fff', borderRadius: 22, padding: '14px 14px 10px', boxShadow: '0 6px 0 rgba(45,27,69,.06)', boxSizing: 'border-box' }
+      }, /*#__PURE__*/React.createElement("div", {
+        style: { fontFamily: 'var(--ak-display)', fontWeight: 700, fontSize: 15, color: 'var(--ak-ink)', lineHeight: 1.35, marginBottom: 10 }
+      }, q.q), q.opts.map((o, oi) => {
+        const on = pick[qi] === oi;
+        return /*#__PURE__*/React.createElement("button", {
+          key: oi, onClick: () => setPick(p => { const c = p.slice(); c[qi] = oi; return c; }),
+          style: {
+            display: 'block', width: '100%', marginBottom: 7, padding: '11px 13px', border: 'none', borderRadius: 14, cursor: 'pointer', textAlign: 'left',
+            fontFamily: 'var(--ak-body)', fontWeight: 700, fontSize: 13.5, color: 'var(--ak-ink)',
+            background: on ? (o.ok ? 'rgba(93,217,160,.28)' : 'rgba(255,122,100,.22)') : 'rgba(220,247,231,.6)',
+            boxShadow: on ? `inset 0 0 0 2px ${o.ok ? '#3CA876' : '#FF7A64'}` : 'none'
+          }
+        }, o.t);
+      }), pick[qi] != null && /*#__PURE__*/React.createElement("div", {
+        style: { fontSize: 13, lineHeight: 1.45, color: 'var(--ak-ink-2)', padding: '2px 4px 4px' }
+      }, q.opts[pick[qi]].ok ? q.yes : q.no))),
+      /*#__PURE__*/React.createElement("button", { className: "ak-btn ak-btn--ok", style: { width: '100%', maxWidth: 360 }, disabled: !both, onClick: onDone }, both ? 'Дальше' : 'Ответь на оба')));
+}
+
+/* ============================================================
+   LEVEL 7 — Сахар в чае (скорость растворения)
+   Ребёнок выбирает воду (холодная, тёплая, горячая) и мешать ли
+   ложкой, бросает кубик — и засекает, за сколько он растворится.
+   Три задания на время. «Ага»: горячее и помешивание — быстрее.
+   ============================================================ */
+const L7_WATER = [
+  { id: 'cold', name: 'Холодная', emoji: '🧊', t: 8, col: '#BFE7FB' },
+  { id: 'warm', name: 'Тёплая', emoji: '🌤️', t: 4, col: '#FFE3B0' },
+  { id: 'hot', name: 'Горячая', emoji: '🔥', t: 2, col: '#FFC7A8' }
+];
+const L7_TASKS = [
+  { text: 'Растворить быстрее, чем за 3 секунды', ok: s => s <= 3 },
+  { text: 'Только холодная вода — уложись в 5 секунд', only: 'cold', ok: s => s <= 5 },
+  { text: 'Рекорд: быстрее, чем за 1,5 секунды', ok: s => s <= 1.5 }
+];
+function Level7Sugar({ onDone, onExit }) {
+  const [phase, setPhase] = React.useState('intro');
+  const [ti, setTi] = React.useState(0);
+  const [water, setWater] = React.useState(null);
+  const [stir, setStir] = React.useState(false);
+  const [left, setLeft] = React.useState(1);        // сколько кубика осталось
+  const [time, setTime] = React.useState(0);
+  const [state, setState] = React.useState('ready');
+  const [note, setNote] = React.useState('');
+  const raf = React.useRef(null);
+  React.useEffect(() => () => cancelAnimationFrame(raf.current), []);
+  const T = L7_TASKS[ti];
+  const reset = () => { cancelAnimationFrame(raf.current); setLeft(1); setTime(0); setState('ready'); setNote(''); };
+  const drop = () => {
+    if (!water || state !== 'ready') return;
+    if (T.only && water !== T.only) { setNote('В этом задании — только холодная вода'); return; }
+    setState('go');
+    const W = L7_WATER.find(w => w.id === water), total = W.t * (stir ? .5 : 1) * 1000, t0 = performance.now();
+    const tick = now => {
+      const t = now - t0, k = Math.min(1, t / total);
+      setLeft(1 - k); setTime(t / 1000);
+      if (k < 1) { raf.current = requestAnimationFrame(tick); return; }
+      setState('done');
+      const s = total / 1000;
+      if (T.ok(s)) {
+        setNote(`Растворился за ${String(s).replace('.', ',')} с — получилось!`);
+        setTimeout(() => { if (ti + 1 < L7_TASKS.length) { setTi(ti + 1); setWater(null); setStir(false); reset(); } else setPhase('done'); }, 1500);
+      } else setNote(`Растворился за ${String(s).replace('.', ',')} с — долго. Что поменять: воду или ложку?`);
+    };
+    raf.current = requestAnimationFrame(tick);
+  };
+  const W = L7_WATER.find(w => w.id === water);
+  const dots = Array.from({ length: 26 }, (_, i) => [130 + (i * 37) % 80, 120 + (i * 53) % 56]);
+  return /*#__PURE__*/React.createElement(ChemPage, { bg: '#FFE3B0', progress: phase === 'intro' ? 0 : (ti + (state === 'done' && note.includes('получилось') ? 1 : 0)) / L7_TASKS.length, stars: ti * 40, onExit: onExit },
+    phase === 'intro' && /*#__PURE__*/React.createElement(ChemIntro, {
+      emoji: '🍵', title: 'Сахар в чае', cta: 'Начать! 🍵', onGo: () => setPhase('play'),
+      text: 'Нейро любит сладкий чай. Растворяй сахар быстрее — меняй воду и мешай ложкой.'
+    }),
+    phase !== 'intro' && /*#__PURE__*/React.createElement(ChemPlay, null,
+      /*#__PURE__*/React.createElement(AKTaskBadge, null, `${ti + 1} из ${L7_TASKS.length}: ${T.text}`),
+      /*#__PURE__*/React.createElement(ChemScene, { h: 210 },
+        /*#__PURE__*/React.createElement("path", { d: 'M110 70 L230 70 L220 190 Q170 200 120 190 Z', fill: W ? W.col : '#E7F3FB', stroke: '#9BB7C9', strokeWidth: 3 }),
+        /*#__PURE__*/React.createElement("path", { d: 'M230 95 Q262 100 256 130 Q250 158 224 156', fill: 'none', stroke: '#9BB7C9', strokeWidth: 6 }),
+        water === 'hot' && [0, 1, 2].map(i => /*#__PURE__*/React.createElement("path", { key: i, d: `M${140 + i * 30} 60 q-8 -14 0 -26 q8 -12 0 -24`, fill: 'none', stroke: 'rgba(160,160,180,.5)', strokeWidth: 3, strokeLinecap: 'round' })),
+        /* растворённый сахар — точки расходятся по всей чашке */
+        state !== 'ready' && dots.slice(0, Math.round((1 - left) * dots.length)).map((d, i) => /*#__PURE__*/React.createElement("circle", { key: i, cx: d[0], cy: d[1], r: 2.4, fill: 'rgba(255,255,255,.95)' })),
+        left > 0.02 && /*#__PURE__*/React.createElement("rect", {
+          x: 170 - 16 * left, y: (state === 'ready' ? 30 : 166) - 16 * left, width: 32 * left, height: 32 * left, rx: 4,
+          fill: '#FFFFFF', stroke: '#D6D0E6', strokeWidth: 2, style: { transition: state === 'go' && left > .97 ? 'y .3s' : 'none' }
+        }),
+        stir && /*#__PURE__*/React.createElement("g", { style: { transformOrigin: '170px 130px', animation: state === 'go' ? 'akSpin .8s linear infinite' : 'none' } },
+          /*#__PURE__*/React.createElement("line", { x1: 196, y1: 40, x2: 176, y2: 160, stroke: '#B7B0C9', strokeWidth: 6, strokeLinecap: 'round' })),
+        /*#__PURE__*/React.createElement("text", { x: 290, y: 36, textAnchor: 'middle', fontSize: 22, fontWeight: 800, fill: '#2D1B45', fontFamily: 'Nunito,sans-serif' }, time.toFixed(1).replace('.', ',') + ' с'),
+        /*#__PURE__*/React.createElement("style", null, '@keyframes akSpin{to{transform:rotate(360deg)}}')),
+      /*#__PURE__*/React.createElement(ChemBtns, { items: L7_WATER.map(w => ({ ...w, off: T.only && w.id !== T.only })), value: water, disabled: state === 'go', onPick: id => { setWater(id); reset(); } }),
+      /*#__PURE__*/React.createElement("button", {
+        className: 'ak-btn ' + (stir ? 'ak-btn--ok' : 'ak-btn--soft'), style: { width: '100%', maxWidth: 360 }, disabled: state === 'go',
+        onClick: () => { setStir(s => !s); reset(); }
+      }, stir ? '🥄 Мешаю ложкой' : '🥄 Мешать ложкой'),
+      /*#__PURE__*/React.createElement(ChemNote, { ok: note.includes('получилось') }, note),
+      /*#__PURE__*/React.createElement("button", {
+        className: 'ak-btn ak-btn--ok', style: { width: '100%', maxWidth: 360 }, disabled: !water || state === 'go', onClick: state === 'done' ? reset : drop
+      }, state === 'done' ? 'Ещё раз 🔄' : 'Бросить сахар 🧊')),
+    phase === 'done' && /*#__PURE__*/React.createElement(ChemDone, {
+      title: 'Сахар растворён! 🍵', onNext: onDone,
+      fact: 'В горячей воде частички двигаются быстрее и растаскивают сахар, а ложка им помогает. Поэтому чай сладкий сразу, а холодный компот — нет.'
+    }));
+}
+
+/* ============================================================
+   LEVEL 8 — Песок и соль (разделение смеси)
+   Смесь в стакане. Инструменты: вода, фильтр, огонь, магнит.
+   Порядок решает: процедил сухую — ничего не разделилось, выпарил
+   всё сразу — снова каша. «Ага»: смесь разделяют по тому, чем
+   вещества отличаются (растворяется ли, тянется ли к магниту).
+   ============================================================ */
+const L8_TOOLS = [
+  { id: 'water', name: 'Налить воду', emoji: '💧' },
+  { id: 'filter', name: 'Процедить', emoji: '🧻' },
+  { id: 'heat', name: 'Выпарить', emoji: '🔥' },
+  { id: 'magnet', name: 'Магнит', emoji: '🧲' }
+];
+const L8_ROUNDS = [
+  { mix: ['sand', 'salt'], text: 'Раздели песок и соль' },
+  { mix: ['sand', 'iron'], text: 'Раздели песок и железные опилки' },
+  { mix: ['sand', 'salt', 'iron'], text: 'Раздели все три: песок, соль и опилки' }
+];
+const L8_NAMES = { sand: 'песок', salt: 'соль', iron: 'опилки' };
+function Level8Separate({ onDone, onExit }) {
+  const [phase, setPhase] = React.useState('intro');
+  const [ri, setRi] = React.useState(0);
+  const [glass, setGlass] = React.useState(L8_ROUNDS[0].mix);   // что в стакане
+  const [wet, setWet] = React.useState(false);
+  const [dish, setDish] = React.useState(false);                 // в чашке солёная вода
+  const [piles, setPiles] = React.useState([]);                  // отдельные кучки: [['iron'], ['sand'], ['salt']]
+  const [log, setLog] = React.useState([]);
+  const [note, setNote] = React.useState('');
+  const [bad, setBad] = React.useState(false);
+  const R = L8_ROUNDS[ri];
+  const reset = (k) => { const M = L8_ROUNDS[k == null ? ri : k].mix; setGlass(M); setWet(false); setDish(false); setPiles([]); setLog([]); setNote(''); setBad(false); };
+  const fail = t => { setNote(t); setBad(true); };
+  const use = id => {
+    if (bad) return;
+    setLog(l => l.concat(L8_TOOLS.find(t => t.id === id).emoji));
+    if (id === 'water') {
+      if (!glass.length) return setNote('Стакан пуст');
+      setWet(true);
+      setNote(glass.includes('salt') ? 'Соль растворилась — её больше не видно' : 'Вода налита — но ничего не растворилось');
+    } else if (id === 'magnet') {
+      if (!glass.includes('iron')) return setNote('Магнит ничего не нашёл');
+      setGlass(g => g.filter(x => x !== 'iron')); setPiles(p => p.concat([['iron']]));
+      setNote('Опилки прилипли к магниту!');
+    } else if (id === 'filter') {
+      if (!wet) return fail('Сухая смесь просто высыпалась на фильтр — ничего не разделилось');
+      const solid = glass.filter(x => x !== 'salt');
+      setPiles(p => p.concat([solid]));
+      if (glass.includes('salt')) setDish(true);
+      setGlass([]); setWet(false);
+      setNote(solid.length > 1 ? 'На фильтре остались песок и опилки вместе' : glass.includes('salt') ? 'Песок остался на фильтре, солёная вода ушла в чашку' : 'Песок остался на фильтре');
+    } else if (id === 'heat') {
+      if (dish) { setDish(false); setPiles(p => p.concat([['salt']])); setNote('Вода ушла паром — в чашке осталась соль!'); }
+      else if (wet) fail('Выпарили всё прямо в стакане — песок и соль снова вместе');
+      else setNote('Греть пока нечего');
+    }
+  };
+  /* разделено — каждая кучка из одного вещества и все вещества врозь.
+     Одно вещество, оставшееся в стакане (песок после магнита), — тоже отдельно;
+     соль, растворённая в воде, — нет */
+  React.useEffect(() => {
+    if (phase !== 'play' || bad) return;
+    const pure = piles.every(p => p.length === 1), got = piles.map(p => p[0]);
+    if (glass.length === 1 && !(glass[0] === 'salt' && wet)) got.push(glass[0]);
+    if (pure && glass.length <= 1 && R.mix.every(m => got.includes(m))) {
+      setNote('Всё разделено!');
+      const t = setTimeout(() => { if (ri + 1 < L8_ROUNDS.length) { setRi(ri + 1); reset(ri + 1); } else setPhase('done'); }, 1400);
+      return () => clearTimeout(t);
+    }
+    if (!pure) fail('На фильтре смесь, а не одно вещество. Начни заново и подумай, что убрать раньше');
+  }, [piles, glass, wet]);
+  const grain = (kind, cx, cy, n, spread) => Array.from({ length: n }, (_, i) => /*#__PURE__*/React.createElement(kind === 'salt' ? 'rect' : 'circle', kind === 'salt'
+    ? { key: kind + i, x: cx + ((i * 29) % spread) - spread / 2, y: cy + ((i * 17) % 18), width: 5, height: 5, fill: '#FFFFFF', stroke: '#C9C3D9', strokeWidth: 1 }
+    : { key: kind + i, cx: cx + ((i * 31) % spread) - spread / 2, cy: cy + ((i * 13) % 18), r: kind === 'iron' ? 2.2 : 3, fill: kind === 'iron' ? '#5B5B6B' : '#D9A85B' }));
+  const pileX = [190, 245, 300];
+  return /*#__PURE__*/React.createElement(ChemPage, { bg: '#FFF1C9', progress: phase === 'intro' ? 0 : ri / L8_ROUNDS.length, stars: ri * 40, onExit: onExit },
+    phase === 'intro' && /*#__PURE__*/React.createElement(ChemIntro, {
+      emoji: '🧂', title: 'Песок и соль', cta: 'Разделить! 🧪', onGo: () => setPhase('play'),
+      text: 'Нейро смешал песок и соль. Верни их по отдельности — порядок решает.'
+    }),
+    phase !== 'intro' && /*#__PURE__*/React.createElement(ChemPlay, null,
+      /*#__PURE__*/React.createElement(AKTaskBadge, null, `${ri + 1} из ${L8_ROUNDS.length}: ${R.text}`),
+      /*#__PURE__*/React.createElement(ChemScene, { h: 200 },
+        /*#__PURE__*/React.createElement("path", { d: 'M30 60 L120 60 L114 170 L36 170 Z', fill: wet ? 'rgba(173,216,240,.55)' : 'rgba(240,240,248,.6)', stroke: '#9BB7C9', strokeWidth: 3 }),
+        glass.filter(x => x !== 'salt' || !wet).map((k, i) => /*#__PURE__*/React.createElement("g", { key: k }, grain(k, 75, 140 - i * 6, 14, 60))),
+        /*#__PURE__*/React.createElement("text", { x: 75, y: 190, textAnchor: 'middle', fontSize: 11, fontWeight: 800, fill: '#6B5680', fontFamily: 'Nunito,sans-serif' }, 'стакан'),
+        /*#__PURE__*/React.createElement("ellipse", { cx: 75, cy: 40, rx: 34, ry: 9, fill: dish ? 'rgba(173,216,240,.8)' : '#EFEAF7', stroke: '#C9C3D9', strokeWidth: 2, transform: 'translate(0 0)' }),
+        dish && /*#__PURE__*/React.createElement("text", { x: 75, y: 22, textAnchor: 'middle', fontSize: 11, fontWeight: 800, fill: '#4A93C9', fontFamily: 'Nunito,sans-serif' }, 'солёная вода в чашке'),
+        piles.map((p, i) => /*#__PURE__*/React.createElement("g", { key: i },
+          /*#__PURE__*/React.createElement("ellipse", { cx: pileX[i], cy: 160, rx: 24, ry: 8, fill: '#F4F1FA', stroke: '#D9D2EE' }),
+          p.map((k, j) => /*#__PURE__*/React.createElement("g", { key: k }, grain(k, pileX[i], 136 - j * 6, 12, 34))),
+          /*#__PURE__*/React.createElement("text", { x: pileX[i], y: 186, textAnchor: 'middle', fontSize: 11, fontWeight: 800, fill: p.length === 1 ? '#3CA876' : '#D9523F', fontFamily: 'Nunito,sans-serif' }, p.map(k => L8_NAMES[k]).join(' + '))))),
+      /*#__PURE__*/React.createElement(ChemBtns, { items: L8_TOOLS, onPick: use, disabled: bad, cols: 4 }),
+      /*#__PURE__*/React.createElement("div", { style: { fontSize: 13, color: 'var(--ak-ink-3)', minHeight: 18, fontFamily: 'var(--ak-display)' } }, log.length ? 'Шаги: ' + log.join(' → ') : 'Выбирай шаги по порядку'),
+      /*#__PURE__*/React.createElement(ChemNote, { ok: note === 'Всё разделено!' }, note),
+      /*#__PURE__*/React.createElement("button", { className: 'ak-btn ak-btn--soft', style: { width: '100%', maxWidth: 360 }, onClick: () => reset() }, 'Начать заново 🔄')),
+    phase === 'done' && /*#__PURE__*/React.createElement(ChemDone, {
+      title: 'Смесь разделена! 🧂', onNext: onDone,
+      fact: 'Так добывают соль из морской воды: её разливают в мелкие бассейны и ждут, пока солнце выпарит воду.'
+    }));
+}
+
+/* ============================================================
+   LEVEL 9 — Шарик на бутылке (реакция идёт, пока есть оба)
+   Ложки соды и порции уксуса. Газа получается столько, сколько
+   пар «сода + уксус»; лишнее остаётся нетронутым на дне. Шарик
+   должен надуться ровно до метки.
+   ============================================================ */
+const L9_ROUNDS = [
+  { target: 2, soda: null, vin: 3, text: 'Надуй шарик до метки: подбери соду' },
+  { target: 3, soda: 4, vin: null, text: 'Соды уже 4 ложки. Подбери уксус' },
+  { target: 4, soda: null, vin: null, text: 'Сам подбери и соду, и уксус' }
+];
+function Level9Balloon({ onDone, onExit }) {
+  const [phase, setPhase] = React.useState('intro');
+  const [ri, setRi] = React.useState(0);
+  const R = L9_ROUNDS[ri];
+  const [soda, setSoda] = React.useState(R.soda || 0);
+  const [vin, setVin] = React.useState(R.vin || 0);
+  const [gas, setGas] = React.useState(0);
+  const [state, setState] = React.useState('ready');
+  const [note, setNote] = React.useState('');
+  const start = k => { const r = L9_ROUNDS[k]; setSoda(r.soda || 0); setVin(r.vin || 0); setGas(0); setState('ready'); setNote(''); };
+  const go = () => {
+    if (state !== 'ready' || !soda || !vin) return;
+    setState('go');
+    const g = Math.min(soda, vin);
+    let k = 0;
+    const id = setInterval(() => {
+      k++;
+      setGas(Math.min(g, k * .25));
+      if (k * .25 >= g) {
+        clearInterval(id);
+        setState('done');
+        const leftS = soda - g, leftV = vin - g;
+        if (g === R.target) {
+          setNote('Ровно до метки!');
+          setTimeout(() => { if (ri + 1 < L9_ROUNDS.length) { setRi(ri + 1); start(ri + 1); } else setPhase('done'); }, 1500);
+        } else if (g < R.target) setNote(leftS ? 'Шарик мал. На дне осталась сода — значит, кончился уксус' : leftV ? 'Шарик мал. Уксус остался — значит, кончилась сода' : 'Шарик мал — газа не хватило');
+        else setNote('Шарик больше метки — газа слишком много');
+      }
+    }, 140);
+  };
+  const r = 16 + gas * 12, tgt = 16 + R.target * 12;
+  const g = state === 'done' ? Math.min(soda, vin) : 0;
+  const counter = (label, val, set, fixed, emoji) => /*#__PURE__*/React.createElement("div", {
+    style: { flex: 1, background: '#fff', borderRadius: 18, padding: '8px 6px', textAlign: 'center', boxShadow: '0 4px 0 rgba(45,27,69,.08)' }
+  }, /*#__PURE__*/React.createElement("div", { style: { fontSize: 12, fontWeight: 800, color: 'var(--ak-ink-2)', fontFamily: 'var(--ak-display)' } }, label),
+  /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 4 } },
+    /*#__PURE__*/React.createElement("button", { className: 'ak-btn ak-btn--soft ak-btn--sm', disabled: fixed || state !== 'ready' || val <= 0, onClick: () => set(val - 1) }, '−'),
+    /*#__PURE__*/React.createElement("b", { style: { fontSize: 18, minWidth: 44, whiteSpace: 'nowrap' } }, val + ' ' + emoji),
+    /*#__PURE__*/React.createElement("button", { className: 'ak-btn ak-btn--soft ak-btn--sm', disabled: fixed || state !== 'ready' || val >= 5, onClick: () => set(val + 1) }, '+')),
+  /*#__PURE__*/React.createElement("div", { style: { fontSize: 12, color: 'var(--ak-ink-3)', marginTop: 2 } }, fixed ? 'уже налито' : val + ' ' + (window.nooka ? window.nooka.plural(val, 'порция', 'порции', 'порций') : 'порций')));
+  return /*#__PURE__*/React.createElement(ChemPage, { bg: '#E7E0FF', progress: phase === 'intro' ? 0 : ri / L9_ROUNDS.length, stars: ri * 40, onExit: onExit },
+    phase === 'intro' && /*#__PURE__*/React.createElement(ChemIntro, {
+      emoji: '🎈', title: 'Шарик на бутылке', cta: 'Надувать! 🎈', onGo: () => setPhase('play'),
+      text: 'Надуй шарик ровно до метки. Сода и уксус вместе дают газ.'
+    }),
+    phase !== 'intro' && /*#__PURE__*/React.createElement(ChemPlay, null,
+      /*#__PURE__*/React.createElement(AKTaskBadge, null, `${ri + 1} из ${L9_ROUNDS.length}: ${R.text}`),
+      /*#__PURE__*/React.createElement(ChemScene, { h: 220 },
+        /*#__PURE__*/React.createElement("circle", { cx: 170, cy: 70 - tgt + 16, r: tgt, fill: 'none', stroke: '#FF6FA6', strokeWidth: 2.5, strokeDasharray: '6 5' }),
+        /*#__PURE__*/React.createElement("circle", { cx: 170, cy: 70 - r + 16, r: r, fill: state === 'ready' ? 'rgba(255,111,166,.35)' : 'rgba(255,111,166,.75)', stroke: '#E0457F', strokeWidth: 2, style: { transition: 'all .14s' } }),
+        /*#__PURE__*/React.createElement("path", { d: 'M160 84 L180 84 L184 108 Q214 118 214 150 L214 200 Q170 210 126 200 L126 150 Q126 118 156 108 Z', fill: 'rgba(200,236,255,.55)', stroke: '#9BB7C9', strokeWidth: 3 }),
+        /*#__PURE__*/React.createElement("rect", { x: 128, y: 200 - vin * 9, width: 84, height: vin * 9, fill: 'rgba(255,236,170,.75)' }),
+        state === 'go' && [0, 1, 2, 3, 4].map(i => /*#__PURE__*/React.createElement("circle", { key: i, cx: 140 + i * 15, cy: 160 + (i % 2) * 14, r: 3, fill: '#fff' })),
+        state === 'done' && soda - g > 0 && /*#__PURE__*/React.createElement("ellipse", { cx: 170, cy: 196, rx: 10 + (soda - g) * 6, ry: 5, fill: '#FFFFFF', stroke: '#D6D0E6' }),
+        state === 'done' && /*#__PURE__*/React.createElement("text", { x: 280, y: 200, textAnchor: 'middle', fontSize: 11, fontWeight: 800, fill: '#6B5680', fontFamily: 'Nunito,sans-serif' },
+          soda - g > 0 ? 'сода осталась' : vin - g > 0 ? 'уксус остался' : 'всё вступило'),
+        /*#__PURE__*/React.createElement("text", { x: 280, y: 40, textAnchor: 'middle', fontSize: 11, fontWeight: 800, fill: '#E0457F', fontFamily: 'Nunito,sans-serif' }, '— метка')),
+      /*#__PURE__*/React.createElement("div", { style: { display: 'flex', gap: 10, width: '100%', maxWidth: 360 } },
+        counter('Сода, ложки', soda, setSoda, R.soda != null, '🥄'),
+        counter('Уксус, порции', vin, setVin, R.vin != null, '🧴')),
+      /*#__PURE__*/React.createElement(ChemNote, { ok: note === 'Ровно до метки!' }, note),
+      /*#__PURE__*/React.createElement("button", {
+        className: 'ak-btn ak-btn--ok', style: { width: '100%', maxWidth: 360 }, disabled: state === 'go' || (state === 'ready' && (!soda || !vin)),
+        onClick: state === 'done' ? () => { setGas(0); setState('ready'); setNote(''); if (R.soda == null) setSoda(soda); } : go
+      }, state === 'done' ? 'Ещё раз 🔄' : 'Смешать! 🧪')),
+    phase === 'done' && /*#__PURE__*/React.createElement(ChemDone, {
+      title: 'Шарик ровно по метке! 🎈', onNext: onDone,
+      fact: 'Пекари пользуются той же реакцией: сода встречает кислое в тесте, получается газ, и пузырьки делают пирог пышным.'
+    }));
+}
+
+/* ============================================================
+   LEVEL 10 — Конструктор молекул
+   Шарики-детальки: водород, кислород, углерод. Ребёнок собирает
+   воду, углекислый газ и кислород. Формул на экране нет — только
+   детальки и их названия.
+   ============================================================ */
+const L10_ATOMS = [
+  { id: 'H', name: 'Водород', emoji: '⚪', col: '#FFFFFF', r: 13 },
+  { id: 'O', name: 'Кислород', emoji: '🔴', col: '#FF6B6B', r: 18 },
+  { id: 'C', name: 'Углерод', emoji: '⚫', col: '#4A4458', r: 17 }
+];
+const L10_ROUNDS = [
+  { name: 'вода', need: { H: 2, O: 1 }, text: 'Собери воду: два водорода и один кислород', center: 'O' },
+  { name: 'углекислый газ', need: { O: 2, C: 1 }, text: 'Собери углекислый газ: углерод и два кислорода', center: 'C' },
+  { name: 'кислород', need: { O: 2 }, text: 'Собери кислород, которым мы дышим: два кислорода', center: 'O' }
+];
+function Level10Molecules({ onDone, onExit }) {
+  const [phase, setPhase] = React.useState('intro');
+  const [ri, setRi] = React.useState(0);
+  const [parts, setParts] = React.useState([]);
+  const [note, setNote] = React.useState('');
+  const [ok, setOk] = React.useState(false);
+  const R = L10_ROUNDS[ri];
+  const add = id => { if (ok || parts.length >= 4) return; setParts(p => p.concat(id)); setNote(''); };
+  const check = () => {
+    const cnt = {}; parts.forEach(p => cnt[p] = (cnt[p] || 0) + 1);
+    const keys = new Set(Object.keys(cnt).concat(Object.keys(R.need)));
+    const good = [...keys].every(k => (cnt[k] || 0) === (R.need[k] || 0));
+    if (good) {
+      setOk(true); setNote(`Это ${R.name}!`);
+      setTimeout(() => { if (ri + 1 < L10_ROUNDS.length) { setRi(ri + 1); setParts([]); setOk(false); setNote(''); } else setPhase('done'); }, 1600);
+    } else {
+      const extra = [...keys].filter(k => (cnt[k] || 0) > (R.need[k] || 0)), miss = [...keys].filter(k => (cnt[k] || 0) < (R.need[k] || 0));
+      const nm = k => L10_ATOMS.find(a => a.id === k).name.toLowerCase();
+      setNote(extra.length ? `Лишний ${nm(extra[0])}. Коснись детальки, чтобы убрать` : `Не хватает: ${miss.map(nm).join(', ')}`);
+    }
+  };
+  /* раскладка: центральная деталька посередине, остальные вокруг.
+     Вода — уголком (водороды снизу), углекислый газ — в линию */
+  const ci = parts.indexOf(R.center) >= 0 ? parts.indexOf(R.center) : 0;
+  const others = parts.map((p, i) => i).filter(i => i !== ci);
+  const bent = R.center === 'O' && parts.length === 3 && parts.filter(x => x === 'H').length === 2;
+  const angFor = k => others.length === 1 ? 0 : others.length === 2 ? (bent ? [Math.PI * 5 / 6, Math.PI / 6][k] : [Math.PI, 0][k]) : -Math.PI / 2 + 2 * Math.PI * k / others.length;
+  const pos = parts.map((p, i) => {
+    if (i === ci) return [170, 105];
+    const a = angFor(others.indexOf(i));
+    return [170 + Math.cos(a) * 48, 105 + Math.sin(a) * 34];
+  });
+  return /*#__PURE__*/React.createElement(ChemPage, { bg: '#FFD6D6', progress: phase === 'intro' ? 0 : ri / L10_ROUNDS.length, stars: ri * 40, onExit: onExit },
+    phase === 'intro' && /*#__PURE__*/React.createElement(ChemIntro, {
+      emoji: '⚛️', title: 'Конструктор молекул', cta: 'Собирать! ⚛️', onGo: () => setPhase('play'),
+      text: 'Всё вокруг собрано из крошечных деталек. Собери из них воду и газы.'
+    }),
+    phase !== 'intro' && /*#__PURE__*/React.createElement(ChemPlay, null,
+      /*#__PURE__*/React.createElement(AKTaskBadge, null, `${ri + 1} из ${L10_ROUNDS.length}: ${R.text}`),
+      /*#__PURE__*/React.createElement(ChemScene, { h: 200 },
+        parts.map((p, i) => i !== ci && /*#__PURE__*/React.createElement("line", { key: 'l' + i, x1: 170, y1: 105, x2: pos[i][0], y2: pos[i][1], stroke: '#C9C3D9', strokeWidth: 7, strokeLinecap: 'round' })),
+        parts.map((p, i) => {
+          const A = L10_ATOMS.find(a => a.id === p);
+          return /*#__PURE__*/React.createElement("circle", {
+            key: i, cx: pos[i][0], cy: pos[i][1], r: A.r, fill: A.col, stroke: 'rgba(45,27,69,.35)', strokeWidth: 2, style: { cursor: ok ? 'default' : 'pointer' },
+            onClick: () => !ok && setParts(ps => ps.filter((_, j) => j !== i))
+          });
+        }),
+        !parts.length && /*#__PURE__*/React.createElement("text", { x: 170, y: 110, textAnchor: 'middle', fontSize: 13, fontWeight: 700, fill: '#A797B8', fontFamily: 'Nunito,sans-serif' }, 'бери детальки снизу'),
+        ok && /*#__PURE__*/React.createElement("text", { x: 170, y: 188, textAnchor: 'middle', fontSize: 15, fontWeight: 800, fill: '#3CA876', fontFamily: 'Nunito,sans-serif' }, R.name)),
+      /*#__PURE__*/React.createElement(ChemBtns, { items: L10_ATOMS, onPick: add, disabled: ok }),
+      /*#__PURE__*/React.createElement(ChemNote, { ok: ok }, note),
+      /*#__PURE__*/React.createElement("button", { className: 'ak-btn ak-btn--ok', style: { width: '100%', maxWidth: 360 }, disabled: !parts.length || ok, onClick: check }, 'Проверить ✓')),
+    phase === 'done' && /*#__PURE__*/React.createElement(ChemDone, {
+      title: 'Молекулы собраны! ⚛️', onNext: onDone,
+      fact: 'В одной капле воды столько таких частичек, что если считать по одной в секунду, не хватило бы и миллиарда лет.'
+    }));
+}
+
 const LEVEL_DATA = [{
   n: 1,
   title: 'Машина температур',
@@ -3865,7 +4345,7 @@ const LEVEL_DATA = [{
     tone: "chem",
     fillLevel: 0.5
   }),
-  desc: 'Управляй слайдером и наблюдай, как молекулы меняют поведение'
+  desc: 'Двигай ползунок и смотри, как частички меняют поведение'
 }, {
   n: 2,
   title: 'Башня плотностей',
@@ -3918,6 +4398,30 @@ const LEVEL_DATA = [{
     bubbles: false
   }),
   desc: 'Почему огонёк засыпает под банкой? День рождения Nooka!'
+}, {
+  n: 7,
+  title: 'Сахар в чае',
+  sub: 'Грей · Мешай · Засекай',
+  icon: /*#__PURE__*/React.createElement(AKFlask, { size: 80, tone: "ok", fillLevel: 0.55 }),
+  desc: 'Как растворить сахар быстрее всего?'
+}, {
+  n: 8,
+  title: 'Песок и соль',
+  sub: 'Залей · Процеди · Выпари',
+  icon: /*#__PURE__*/React.createElement(AKFlask, { size: 80, tone: "geo", fillLevel: 0.45 }),
+  desc: 'Раздели смесь обратно — порядок решает'
+}, {
+  n: 9,
+  title: 'Шарик на бутылке',
+  sub: 'Сыпь · Лей · Надувай',
+  icon: /*#__PURE__*/React.createElement(AKFlask, { size: 80, tone: "cta", fillLevel: 0.35 }),
+  desc: 'Надуй шарик газом ровно до метки'
+}, {
+  n: 10,
+  title: 'Конструктор молекул',
+  sub: 'Собирай · Сравнивай · Называй',
+  icon: /*#__PURE__*/React.createElement(AKFlask, { size: 80, tone: "phys", fillLevel: 0.6 }),
+  desc: 'Собери воду и газы из крошечных деталек'
 }];
 function LevelSelect({
   onStart,
@@ -3997,7 +4501,7 @@ function LevelSelect({
       margin: '16px auto 0'
     }
   }, /*#__PURE__*/React.createElement(AKProgress, {
-    value: completed.size / 6,
+    value: completed.size / LEVEL_DATA.length,
     tone: "ok",
     height: 14,
     label: "Прогресс"
@@ -4010,7 +4514,7 @@ function LevelSelect({
       margin: '0 auto'
     }
   }, LEVEL_DATA.map((lv, li) => {
-    const tone = ['chem','chem','ok','phys','geo','cta'][lv.n - 1] || 'chem';
+    const tone = ['chem','chem','ok','phys','geo','cta','ok','geo','cta','phys'][lv.n - 1] || 'chem';
     const [l, m, d] = AK_TONES[tone];
     const isDone = completed.has(lv.n);
     const isLocked = lv.n <= 2 ? false : !completed.has(lv.n - 1);
@@ -4117,36 +4621,23 @@ function LevelSelect({
 /* ============================================================
    APP
    ============================================================ */
+const CHEM_LEVELS = [Level1TempMachine, Level2Density, Level3Lab, Level4Potion, Level5Crystal, Level6Candle, Level7Sugar, Level8Separate, Level9Balloon, Level10Molecules];
+/* Уровень → (успех) → проверка связи → миссия. Крестик в уровне больше не
+   засчитывает миссию (раньше onClose звал тот же onDone, что и победа). ?n=7 — сразу уровень. */
 function App() {
-  const [screen, setScreen] = React.useState('select');
+  const q = new URLSearchParams(location.search), first = +q.get('n');
+  const [screen, setScreen] = React.useState(first >= 1 && first <= CHEM_LEVELS.length ? 'l' + first : 'select');
   const [completed, setCompleted] = React.useState(() => new Set(window.nooka ? window.nooka.getCompleted('chem') : []));
-  const done = n => {
-    if (window.nooka) window.nooka.missionWin('chem' + n, 60, { nextLabel: 'К выбору миссий →', onNext: function () {} });
+  const n = +screen.slice(1), L = CHEM_LEVELS[n - 1];
+  const exit = () => setScreen('select');
+  const done = () => {
+    if (window.nooka) window.nooka.missionWin('chem' + n, n > 6 ? 80 : 60, { nextLabel: 'К выбору миссий →', onNext: function () {} });
     setCompleted(s => new Set([...s, n]));
     setScreen('select');
   };
-  if (screen === 'select') return /*#__PURE__*/React.createElement(LevelSelect, {
-    onStart: n => setScreen('l' + n),
-    completed: completed
-  });
-  if (screen === 'l1') return /*#__PURE__*/React.createElement(Level1TempMachine, {
-    onDone: () => done(1)
-  });
-  if (screen === 'l2') return /*#__PURE__*/React.createElement(Level2Density, {
-    onDone: () => done(2)
-  });
-  if (screen === 'l3') return /*#__PURE__*/React.createElement(Level3Lab, {
-    onDone: () => done(3)
-  });
-  if (screen === 'l4') return /*#__PURE__*/React.createElement(Level4Potion, {
-    onDone: () => done(4)
-  });
-  if (screen === 'l5') return /*#__PURE__*/React.createElement(Level5Crystal, {
-    onDone: () => done(5)
-  });
-  if (screen === 'l6') return /*#__PURE__*/React.createElement(Level6Candle, {
-    onDone: () => done(6)
-  });
+  if (screen === 'select') return /*#__PURE__*/React.createElement(LevelSelect, { onStart: k => setScreen('l' + k), completed: completed });
+  if (screen[0] === 'l' && L) return /*#__PURE__*/React.createElement(L, { key: screen, onDone: () => setScreen('q' + n), onExit: exit });
+  if (screen[0] === 'q' && L) return /*#__PURE__*/React.createElement(ChemQuiz, { key: screen, n: n, onDone: done, onExit: exit });
   return null;
 }
 ReactDOM.createRoot(document.getElementById('root')).render(/*#__PURE__*/React.createElement(App, null));
