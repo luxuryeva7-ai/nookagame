@@ -44,6 +44,32 @@ body{margin:0;font-family:var(--ak-body);color:var(--ak-ink);}
 input[type=range]{-webkit-appearance:none;width:100%;height:20px;border-radius:999px;background:transparent;cursor:pointer;outline:none;}
 input[type=range]::-webkit-slider-runnable-track{height:20px;border-radius:999px;background:linear-gradient(180deg,var(--ak-phys-1),var(--ak-phys-2));}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:38px;height:38px;border-radius:50%;margin-top:-9px;cursor:pointer;background:linear-gradient(180deg,#fff,#FFF7E8);box-shadow:0 4px 0 rgba(45,27,69,.15),0 8px 16px -6px rgba(45,27,69,.2);}
+
+/* ==== ТЁМНАЯ ТЕМА — палитра Нейро Академии, как у ИИ-курса (nooka-ui.css, «NOOKA DARK»).
+   Переопределяет светлые токены выше: всё, что завязано на --ak-*, темнеет само. ==== */
+:root{
+  --ak-bg:#080C18;--ak-bg-2:#0D1427;--ak-surface:#101C32;
+  --ak-ink:#F0F4FF;--ak-ink-2:#C4D4EE;--ak-ink-3:#8296B4;
+  --ak-phys-1:#1A2D48;--ak-phys-2:#7B4FF2;--ak-phys-3:#B98CFF;
+  --ak-chem-1:#0E2A24;--ak-chem-2:#06D6A0;--ak-chem-3:#2FE0AE;
+  --ak-cta-1:#2A2410;--ak-cta-2:#FFD60A;--ak-cta-3:#B89A07;
+  --ak-ok-1:#0E2A24;--ak-ok-2:#06D6A0;--ak-ok-3:#2FE0AE;
+  --ak-warn-1:#33161A;--ak-warn-2:#FF6B6B;--ak-warn-3:#FF8B8B;
+  --ak-star-1:#332B08;--ak-star-2:#FFD60A;--ak-star-3:#B89A07;
+  --ak-display:'Nunito',system-ui,sans-serif;
+}
+html,body{background:#080C18;}
+.ak-btn{font-weight:900;}
+.ak-clay{background:#101C32;color:var(--ak-ink);box-shadow:0 0 0 1.5px #1A2D48,0 30px 60px -20px rgba(0,0,0,.9);}
+.ak-btn--soft{color:#D8E3F6;background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 1px rgba(255,255,255,.17);}
+.ak-btn--soft:active{transform:translateY(1px);}
+.ak-btn--cta{color:#2A2108;box-shadow:0 6px 0 #8F7A06,0 0 26px rgba(255,214,10,.3),inset 0 2px 0 rgba(255,255,255,.4);}
+.ak-btn--phys{color:#fff;background:linear-gradient(180deg,#9B78FF,#7B4FF2 60%,#6E41E4);box-shadow:0 6px 0 #3D2688,0 0 26px rgba(123,79,242,.4),inset 0 2px 0 rgba(255,255,255,.25);}
+.ak-btn--phys:active{box-shadow:0 2px 0 #3D2688;}
+.ak-btn--ok{color:#04281F;background:linear-gradient(180deg,#5FF0C6,#06D6A0 60%,#05BF8F);box-shadow:0 6px 0 #04725A,0 0 26px rgba(6,214,160,.35),inset 0 2px 0 rgba(255,255,255,.35);}
+.ak-btn--warn{box-shadow:0 6px 0 #A83636,0 0 26px rgba(255,107,107,.3),inset 0 2px 0 rgba(255,255,255,.3);}
+input[type=range]::-webkit-slider-runnable-track{background:linear-gradient(90deg,#1A2D48,#7B4FF2);}
+input[type=range]::-webkit-slider-thumb{background:linear-gradient(180deg,#fff,#E4DCFF);box-shadow:0 4px 0 #3D2688,0 0 16px rgba(123,79,242,.5);}
 </style>
 <script src="/metrika.js" defer></script>
 </head>
@@ -482,30 +508,32 @@ function TopBar({
 function TaskBadge({
   children
 }) {
+  /* Плашка задачи — как «Что делать» в ИИ-курсе: золотая рамка, без мигания всего текста */
   return /*#__PURE__*/React.createElement("div", {
-    className: "ak-pulse",
     style: {
       margin: '0 16px 10px',
       display: 'inline-flex',
       alignItems: 'center',
       gap: 10,
-      padding: '11px 18px 11px 14px',
-      borderRadius: 999,
-      background: '#fff',
+      padding: '11px 16px 11px 14px',
+      borderRadius: 16,
+      background: 'rgba(255,216,77,.08)',
       fontFamily: 'var(--ak-display)',
-      fontSize: 14,
-      fontWeight: 600,
-      color: 'var(--ak-ink)',
-      boxShadow: '0 4px 0 rgba(45,27,69,.08),0 10px 22px -6px rgba(45,27,69,.14),inset 0 1px 0 rgba(255,255,255,1)'
+      fontSize: 14.5,
+      fontWeight: 800,
+      lineHeight: 1.3,
+      color: '#FFF6DC',
+      boxShadow: 'inset 0 0 0 1.5px rgba(255,216,77,.38)'
     }
   }, /*#__PURE__*/React.createElement("div", {
+    className: "ak-pulse",
     style: {
-      width: 10,
-      height: 10,
+      width: 9,
+      height: 9,
       borderRadius: '50%',
-      background: '#B5A1FF',
+      background: '#FFD84D',
       flexShrink: 0,
-      boxShadow: '0 0 0 4px rgba(181,161,255,.33),inset 0 -1px 0 #7C5FE0'
+      boxShadow: '0 0 10px rgba(255,216,77,.8)'
     }
   }), /*#__PURE__*/React.createElement("span", null, children));
 }
@@ -681,14 +709,14 @@ function IntroModal({
     style: {
       width: '100%',
       borderRadius: 18,
-      background: 'rgba(255,255,255,.7)',
+      background: 'rgba(16,28,50,.92)',
       display: 'block'
     }
   })), /*#__PURE__*/React.createElement("div", {
     style: {
       width: '100%',
       maxWidth: 320,
-      background: 'rgba(255,255,255,.8)',
+      background: 'rgba(16,28,50,.92)',
       borderRadius: 20,
       padding: '14px 18px',
       marginBottom: 12,
@@ -1056,8 +1084,8 @@ function CBGrid({ lvl, bot, got, crashed, trail, onCell, guess, mark, max }) {
   return /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'grid', gridTemplateColumns: `repeat(${size},1fr)`, gridTemplateRows: `repeat(${size},1fr)`, gap: 4, width: '100%', maxWidth: max || 320,
-      aspectRatio: '1', background: 'rgba(255,255,255,.55)', borderRadius: 20, padding: 8,
-      boxSizing: 'border-box', boxShadow: '0 6px 0 rgba(45,27,69,.08)', flexShrink: 0
+      aspectRatio: '1', background: 'rgba(16,28,50,.92)', borderRadius: 20, padding: 8,
+      boxSizing: 'border-box', boxShadow: '0 0 0 1.5px #1A2D48', flexShrink: 0
     }
   }, Array.from({ length: size * size }, (_, i) => {
     const x = i % size, y = i / size | 0, k = x + ',' + y;
@@ -1071,7 +1099,7 @@ function CBGrid({ lvl, bot, got, crashed, trail, onCell, guess, mark, max }) {
       onClick: onCell && !isWall ? () => onCell(x, y) : undefined,
       style: {
         borderRadius: 8,
-        background: isWall ? '#4A3B63' : isMark ? 'rgba(93,217,160,.55)' : trail && trail.has(k) ? 'rgba(181,161,255,.5)' : 'rgba(229,220,255,.55)',
+        background: isWall ? '#3A2C5E' : isMark ? 'rgba(6,214,160,.45)' : trail && trail.has(k) ? 'rgba(123,79,242,.45)' : 'rgba(169,139,255,.1)',
         boxShadow: isGuess ? 'inset 0 0 0 3px #FFB020' : 'none',
         cursor: onCell && !isWall ? 'pointer' : 'default',
         display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: size > 5 ? 20 : 24, lineHeight: 1,
@@ -1108,7 +1136,7 @@ function CBChip({ id, on, onClick, small }) {
       border: 'none', cursor: onClick ? 'pointer' : 'default', borderRadius: 10,
       padding: small ? '6px 8px' : '7px 9px', fontSize: small ? 12 : 12.5, fontWeight: 800,
       fontFamily: 'var(--ak-body)', color: '#2D1B45', background: B.c,
-      boxShadow: on ? '0 0 0 3px #2D1B45' : `0 3px 0 ${B.d}`, transition: 'box-shadow .15s'
+      boxShadow: on ? '0 0 0 3px #FFD84D' : `0 3px 0 ${B.d}`, transition: 'box-shadow .15s'
     }
   }, B.label);
 }
@@ -1118,7 +1146,7 @@ function CBRow({ label, count, children, hint }) {
       style: { display: 'flex', justifyContent: 'space-between', fontSize: 12, fontWeight: 700, color: 'var(--ak-ink-2)', fontFamily: 'var(--ak-display)', marginBottom: 4 }
     }, /*#__PURE__*/React.createElement("span", null, label), count != null && /*#__PURE__*/React.createElement("span", null, count)),
     /*#__PURE__*/React.createElement("div", {
-      style: { minHeight: 44, background: 'rgba(255,255,255,.75)', borderRadius: 14, padding: 6, display: 'flex', gap: 5, flexWrap: 'wrap', alignItems: 'center', boxShadow: 'inset 0 2px 6px rgba(45,27,69,.08)' }
+      style: { minHeight: 44, background: 'rgba(16,28,50,.92)', borderRadius: 14, padding: 6, display: 'flex', gap: 5, flexWrap: 'wrap', alignItems: 'center', boxShadow: 'inset 0 2px 6px rgba(45,27,69,.08)' }
     }, children, hint && /*#__PURE__*/React.createElement("span", {
       style: { fontSize: 12.5, color: 'var(--ak-ink-3)', padding: '8px 6px', fontFamily: 'var(--ak-display)' }
     }, hint)));
@@ -1147,7 +1175,7 @@ function CBQuiz({ lvl, onDone }) {
   }, /*#__PURE__*/React.createElement(TaskBadge, null, 'Проверка связи: два вопроса'),
   qs.map((q, qi) => /*#__PURE__*/React.createElement("div", {
     key: qi,
-    style: { width: '100%', maxWidth: 340, background: 'rgba(255,255,255,.85)', borderRadius: 20, padding: '14px 14px 10px', boxShadow: '0 6px 0 rgba(45,27,69,.06)' }
+    style: { width: '100%', maxWidth: 340, background: 'rgba(16,28,50,.92)', borderRadius: 20, padding: '14px 14px 10px', boxShadow: '0 6px 0 rgba(45,27,69,.06)' }
   }, /*#__PURE__*/React.createElement("div", {
     style: { fontFamily: 'var(--ak-display)', fontWeight: 700, fontSize: 15, color: 'var(--ak-ink)', lineHeight: 1.35, marginBottom: 10 }
   }, q.q), q.opts.map((o, oi) => {
@@ -1159,8 +1187,8 @@ function CBQuiz({ lvl, onDone }) {
         display: 'block', width: '100%', marginBottom: 7, padding: '11px 13px', border: 'none', borderRadius: 14,
         cursor: 'pointer', textAlign: 'left', fontFamily: 'var(--ak-body)', fontWeight: 700, fontSize: 13.5,
         color: 'var(--ak-ink)',
-        background: on ? (o.ok ? 'rgba(93,217,160,.28)' : 'rgba(255,122,100,.22)') : 'rgba(229,220,255,.45)',
-        boxShadow: on ? `inset 0 0 0 2px ${o.ok ? '#3FC685' : '#FF7A64'}` : 'none'
+        background: on ? (o.ok ? 'rgba(93,217,160,.28)' : 'rgba(255,122,100,.22)') : 'rgba(255,255,255,.05)',
+        boxShadow: on ? `inset 0 0 0 2px ${o.ok ? '#06D6A0' : '#FF6B6B'}` : 'inset 0 0 0 1.5px #1A2D48'
       }
     }, o.t);
   }), pick[qi] != null && /*#__PURE__*/React.createElement("div", {
@@ -1297,7 +1325,7 @@ function CBLevel({ lvl, onWin, onHome }) {
     className: "ak",
     style: {
       minHeight: '100vh', height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden',
-      background: 'radial-gradient(120% 60% at 50% -10%,#E5DCFF 0%,transparent 60%),linear-gradient(180deg,var(--ak-bg-2),var(--ak-bg))'
+      background: 'radial-gradient(120% 60% at 50% -10%,#1B1747 0%,transparent 60%),linear-gradient(180deg,var(--ak-bg-2),var(--ak-bg))'
     }
   }, kids);
 
@@ -1333,7 +1361,7 @@ function CBLevel({ lvl, onWin, onHome }) {
     editor = [
       /*#__PURE__*/React.createElement(CBRow, { key: 'p', label: 'Программа' },
         /*#__PURE__*/React.createElement("div", {
-          style: { display: 'flex', flexWrap: 'wrap', gap: 5, alignItems: 'center', padding: '6px 8px', borderRadius: 12, background: 'rgba(255,210,98,.35)', boxShadow: phase === 'run' ? '0 0 0 3px #2D1B45' : 'inset 0 0 0 2px #D4A22B', width: '100%', boxSizing: 'border-box' }
+          style: { display: 'flex', flexWrap: 'wrap', gap: 5, alignItems: 'center', padding: '6px 8px', borderRadius: 12, background: 'rgba(255,216,77,.12)', boxShadow: phase === 'run' ? '0 0 0 3px #FFD84D' : 'inset 0 0 0 2px rgba(255,216,77,.55)', width: '100%', boxSizing: 'border-box' }
         }, /*#__PURE__*/React.createElement("button", {
           onClick: () => editing && setRep(r => r >= lvl.repMax ? 2 : r + 1),
           style: { border: 'none', cursor: 'pointer', borderRadius: 10, padding: '7px 10px', fontWeight: 900, fontSize: 13, fontFamily: 'var(--ak-body)', color: '#5A3A08', background: '#FFD262', boxShadow: '0 3px 0 #D4A22B' }
@@ -1369,8 +1397,8 @@ function CBLevel({ lvl, onWin, onHome }) {
         board.prog.map((t, i) => typeof t === 'string'
           ? /*#__PURE__*/React.createElement(CBChip, { key: i, id: t, on: lit(i) })
           : /*#__PURE__*/React.createElement("div", {
-            key: i, style: { display: 'flex', gap: 5, alignItems: 'center', padding: '5px 7px', borderRadius: 12, background: 'rgba(255,210,98,.35)', boxShadow: lit(i) ? '0 0 0 3px #2D1B45' : 'inset 0 0 0 2px #D4A22B' }
-          }, /*#__PURE__*/React.createElement("b", { style: { fontSize: 12.5, color: '#5A3A08', padding: '0 4px' } }, '↻ Повтори ' + t.rep + ' раза'),
+            key: i, style: { display: 'flex', gap: 5, alignItems: 'center', padding: '5px 7px', borderRadius: 12, background: 'rgba(255,216,77,.12)', boxShadow: lit(i) ? '0 0 0 3px #FFD84D' : 'inset 0 0 0 2px rgba(255,216,77,.55)' }
+          }, /*#__PURE__*/React.createElement("b", { style: { fontSize: 12.5, color: '#FFE58A', padding: '0 4px' } }, '↻ Повтори ' + t.rep + ' раза'),
           t.body.map((id, j) => /*#__PURE__*/React.createElement(CBChip, { key: j, id: id, small: true }))))),
       mark && /*#__PURE__*/React.createElement("div", {
         key: 'r', style: { fontFamily: 'var(--ak-display)', fontWeight: 700, fontSize: 15, color: guess && mark.x === guess.x && mark.y === guess.y ? 'var(--ak-ok-3)' : 'var(--ak-ink-2)' }
@@ -1400,7 +1428,7 @@ function CBLevel({ lvl, onWin, onHome }) {
       }, /*#__PURE__*/React.createElement("button", {
         className: "ak-btn ak-btn--ok", style: { flex: 1 }, disabled: phase === 'run' || !canRun, onClick: run
       }, "▶ Запуск!"), lvl.kind !== 'fix' && lvl.kind !== 'rule' && /*#__PURE__*/React.createElement("button", {
-        className: "ak-btn", style: { background: 'rgba(255,255,255,.9)', boxShadow: '0 6px 0 rgba(45,27,69,.12)' },
+        className: "ak-btn", style: { background: 'rgba(255,255,255,.08)', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.17)' },
         onClick: () => { setRoom(0); reset(lvl.kind === 'rooms' ? lvl.rooms[0] : null); setProg([]); setFn([]); }
       }, "🗑"))),
     fail && /*#__PURE__*/React.createElement(FailModal, {
@@ -1435,13 +1463,13 @@ function CBHome({ onSelect }) {
   }, CB_LEVELS.map(l => /*#__PURE__*/React.createElement("button", {
     key: l.n, onClick: () => onSelect(l.n),
     style: {
-      display: 'flex', alignItems: 'center', gap: 14, background: 'rgba(255,255,255,.88)', borderRadius: 22,
+      display: 'flex', alignItems: 'center', gap: 14, background: 'rgba(16,28,50,.92)', borderRadius: 22,
       padding: '15px 18px', border: 'none', cursor: 'pointer', textAlign: 'left', flexShrink: 0,
-      boxShadow: '0 6px 0 rgba(45,27,69,.08),0 12px 24px -8px rgba(45,27,69,.12),inset 0 2px 0 #fff'
+      boxShadow: '0 0 0 1.5px #1A2D48,0 10px 24px -12px rgba(0,0,0,.8)'
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      width: 52, height: 52, borderRadius: '50%', flexShrink: 0, background: `radial-gradient(circle at 35% 30%,#fff,var(--ak-phys-1) 70%)`,
+      width: 52, height: 52, borderRadius: 15, flexShrink: 0, background: 'linear-gradient(160deg,#9B78FF,#6E41E4)',
       display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, boxShadow: '0 4px 0 rgba(45,27,69,.08)'
     }
   }, l.intro.emoji), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
@@ -1452,7 +1480,7 @@ function CBHome({ onSelect }) {
     style: { marginLeft: 'auto', fontSize: 18, color: 'var(--ak-ink-3)' }
   }, doneSet.has(l.n) ? '✅' : '→')))), /*#__PURE__*/React.createElement("div", {
     style: {
-      marginTop: 24, padding: '14px 18px', background: 'rgba(255,255,255,.65)', borderRadius: 18, maxWidth: 340,
+      marginTop: 24, padding: '14px 18px', background: 'rgba(16,28,50,.92)', borderRadius: 18, maxWidth: 340,
       fontFamily: 'var(--ak-display)', fontSize: 13.5, color: 'var(--ak-ink-2)', textAlign: 'center', lineHeight: 1.5
     }
   }, "Каждый уровень: составь программу — и робот выполнит её сам!"));
