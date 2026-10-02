@@ -204,7 +204,7 @@
   /* бонусные игры — вне курса ИИ-грамотности, идут вторым рядом */
   var EXTRA = [
     { key: 'chem',   name: 'Хемо Лаб', sub: 'Химия',            total: 6, href: '../games/chemistry.html' },
-    { key: 'phys',   name: 'КвантУм',  sub: 'Физика',           total: 6, href: '../games/physics.html' },
+    { key: 'phys',   name: 'КвантУм',  sub: 'Физика',           total: 10, href: '../games/physics.html' },
     { key: 'code',   name: 'КодБот',   sub: 'Программирование', total: 3, href: '../games/code.html' }
   ];
 

@@ -637,6 +637,8 @@ function IntroModal({
   title,
   law,
   diagram,
+  sketch,
+  label,
   tip,
   onStart
 }) {
@@ -667,7 +669,7 @@ function IntroModal({
       marginBottom: 16,
       textAlign: 'center'
     }
-  }, title), /*#__PURE__*/React.createElement("div", {
+  }, title), sketch && /*#__PURE__*/React.createElement("div", {
     style: {
       width: '100%',
       maxWidth: 320,
@@ -700,7 +702,7 @@ function IntroModal({
       color: 'var(--ak-phys-3)',
       marginBottom: 6
     }
-  }, "📐 Закон физики:"), /*#__PURE__*/React.createElement("div", {
+  }, label || "📐 Закон физики:"), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 14,
       color: 'var(--ak-ink)',
@@ -1140,20 +1142,20 @@ function Level1({
   }, "💥 Выстрел!"))), phase === 'intro' && /*#__PURE__*/React.createElement(IntroModal, {
     emoji: "🧑‍🔬",
     title: "Как летит снаряд?",
-    law: 'Горизонтальная скорость НЕ меняется.\nСила тяжести тянет вниз всё сильнее.\n→ Путь становится дугой — параболой!\n\nУгол 45° = максимальная дальность',
-    diagram: null,
-    tip: "Выбери угол ползунком и жми «Выстрел». Смотри на красную и синюю стрелки!",
+    law: 'Снаряд летит вперёд, а земля тянет его вниз. Поэтому путь — дуга.',
+    diagram: null, sketch: true,
+    tip: "Выбери угол ползунком и жми «Выстрел». Следи за стрелками!",
     onStart: () => setPhase('play')
   }), phase === 'win' && /*#__PURE__*/React.createElement(WinModal, {
     emoji: "🎯",
     title: "Все звёзды поражены!",
-    law: "Закон движения тел — Ньютон",
-    fact: "Горизонтальная скорость постоянна, вертикальная нарастает под действием гравитации. Вместе они дают параболу. При 45° дальность максимальна!",
+    law: "Законы движения — Исаак Ньютон, XVII век",
+    fact: "Вперёд снаряд летит ровно, а вниз падает всё быстрее — так и получается дуга. Дальше всего он летит, если стрелять посередине между «вверх» и «прямо»: под 45°.",
     cta: "Уровень 2 →",
     onNext: onWin,
     onHome: onHome
   }), phase === 'fail' && /*#__PURE__*/React.createElement(FailModal, {
-    tip: "Видел стрелки? Красная → постоянная, синяя ↓ нарастает. Попробуй угол 45°!",
+    tip: "Посмотри на стрелки: красная не меняется, синяя растёт. Попробуй угол 45°!",
     onRetry: retry
   }));
 }
@@ -1228,14 +1230,15 @@ function Level2({
     ctx.closePath();
     ctx.fill();
     // distance arrows
-    arrowLine(ctx, cx, cy - 16, cx - 55, cy - 16, '#FF6B35', 1.5);
-    arrowLine(ctx, cx, cy - 16, cx + 110, cy - 16, '#4A9EFF', 1.5);
+    /* стрелки и подписи — над зверями: раньше подписи налезали друг на друга и на эмодзи */
+    arrowLine(ctx, cx - 4, cy - 38, cx - 55, cy - 38, '#FF6B35', 1.5);
+    arrowLine(ctx, cx + 4, cy - 38, cx + 110, cy - 38, '#4A9EFF', 1.5);
     ctx.fillStyle = '#FF6B35';
     ctx.font = 'bold 11px Nunito,sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('близко к опоре', cx - 28, cy - 20);
+    ctx.fillText('близко', cx - 32, cy - 44);
     ctx.fillStyle = '#4A9EFF';
-    ctx.fillText('далеко от опоры', cx + 54, cy - 20);
+    ctx.fillText('далеко от опоры', cx + 60, cy - 44);
     ctx.font = '30px serif';
     ctx.textBaseline = 'bottom';
     ctx.fillText('🐘', cx - 55, cy);
@@ -1245,7 +1248,7 @@ function Level2({
     ctx.fillStyle = '#2BA873';
     ctx.font = 'bold 12px Nunito,sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('80 × 55 = 20 × 220 ← это равновесие!', cx, H - 6);
+    ctx.fillText('лёгкий далеко = тяжёлый близко', cx, H - 6);
     ctx.textAlign = 'left';
   }, [phase]);
   useEffect(() => {
@@ -1543,9 +1546,9 @@ function Level2({
   })), phase === 'intro' && /*#__PURE__*/React.createElement(IntroModal, {
     emoji: "⚖️",
     title: "Как работает рычаг?",
-    law: 'Чем дальше от опоры — тем сильнее тянет.\n\nЛёгкий далеко перевешивает\nтяжёлого близко к опоре.\n\nЭто открыл Архимед 2200 лет назад!',
-    diagram: null,
-    tip: "Двигай ползунок — гиря поедет по рычагу. Смотри, как меняются числа.",
+    law: 'Чем дальше от опоры, тем сильнее тянет. Лёгкий далеко перевесит тяжёлого близко.',
+    diagram: null, sketch: true,
+    tip: "Двигай ползунок — гиря поедет по рычагу",
     onStart: () => {
       setPhase('play');
       setRDist(50);
@@ -1645,7 +1648,7 @@ function Level3({
     ctx.fillStyle = '#2BA873';
     ctx.font = 'bold 13px Nunito,sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('угол падения = угол отражения', W / 2, H - 6);
+    ctx.fillText('как влетел — так и вылетел', W / 2, H - 6);
     ctx.textAlign = 'left';
   }, [phase]);
   useEffect(() => {
@@ -1949,16 +1952,16 @@ function Level3({
         ctx.textAlign = 'center';
         ctx.fillStyle = '#FF6B35';
         ctx.font = 'bold 14px Nunito,sans-serif';
-        ctx.fillText(`угол падения: ${info.incAng}°`, W / 2 - 70, eqY + 20);
+        ctx.fillText(`влетел под ${info.incAng}°`, W / 2 - 70, eqY + 20);
         ctx.fillStyle = hits ? '#3CA876' : '#A797B8';
         ctx.font = 'bold 18px Nunito,sans-serif';
         ctx.fillText(hits ? '=' : '≠', W / 2, eqY + 20);
         ctx.fillStyle = hits ? '#3CA876' : '#7C5FE0';
         ctx.font = 'bold 14px Nunito,sans-serif';
-        ctx.fillText(`угол отражения: ${info.incAng}°`, W / 2 + 70, eqY + 20);
+        ctx.fillText(`вылетел под ${info.incAng}°`, W / 2 + 70, eqY + 20);
         ctx.fillStyle = hits ? '#3CA876' : '#A797B8';
         ctx.font = 'bold 13px Nunito,sans-serif';
-        ctx.fillText(hits ? '✓ Закон отражения работает!' : 'вращай зеркало → найди цель', W / 2, eqY + 44);
+        ctx.fillText(hits ? '✓ Как влетел — так и вылетел!' : 'вращай зеркало → найди цель', W / 2, eqY + 44);
         ctx.textAlign = 'left';
       } else {
         ctx.fillStyle = '#A797B8';
@@ -2052,8 +2055,8 @@ function Level3({
   })), phase === 'intro' && /*#__PURE__*/React.createElement(IntroModal, {
     emoji: "🔦",
     title: "Как работает зеркало?",
-    law: 'Угол падения = Угол отражения\n\nЛуч ударяет в зеркало под 30° —\nи улетает тоже под 30°!\n\nЭто работает для любого зеркала,\nлюбого угла, всегда!',
-    diagram: null,
+    law: 'Луч отскакивает от зеркала под тем же углом, под каким прилетел.',
+    diagram: null, sketch: true,
     tip: "Двигай ползунок, чтобы повернуть зеркало. Направь луч прямо в звезду!",
     onStart: () => {
       setPhase('play');
@@ -2063,7 +2066,7 @@ function Level3({
     emoji: "🔦",
     title: "Мастер отражений!",
     law: "Закон отражения — Евклид, III век до н. э.",
-    fact: "Угол падения = угол отражения. Это работает для света, звука и мяча об стену! Так устроены зеркала, перископы, телескопы и лазеры.",
+    fact: "Как влетел — так и вылетел: так отскакивают свет, звук и мяч от стены. На этом устроены зеркала, перископы и телескопы.",
     cta: "Отлично! 🎉",
     onNext: onWin,
     onHome: onHome
@@ -2179,7 +2182,7 @@ function Level4Magnet({
   }), phase === 'intro' && /*#__PURE__*/React.createElement(IntroModal, {
     emoji: "🧲",
     title: "Магнит-детектив",
-    law: 'Магнит притягивает железо, никель и кобальт.\nНе всякий металл! Алюминиевая ложка\nостанется на месте.\n\nПроверь всё — и найди закономерность',
+    law: 'Магнит тянет не всякий металл. Проверь предметы и найди, какие притянутся.',
     diagram: null,
     tip: "Тапай предметы — Nooka поднесёт к ним магнит",
     onStart: () => setPhase('sandbox')
@@ -2410,9 +2413,9 @@ function Level5Circuit({
   }), phase === 'intro' && /*#__PURE__*/React.createElement(IntroModal, {
     emoji: "🔦",
     title: "Замкни цепь",
-    law: 'Ток бежит только по замкнутому кругу:\nбатарейка → провод → лампа → назад.\n\nМеталлы пропускают ток (проводники),\nрезина и пластик — нет (изоляторы)',
+    law: 'Лампа горит, только когда круг замкнут: батарейка, провод, лампа и обратно.',
     diagram: null,
-    tip: "В цепи фонарика разрыв. Попробуй закрыть его разными предметами и смотри, загорится ли лампа.",
+    tip: "В цепи разрыв. Закрой его разными предметами — загорится ли лампа?",
     onStart: () => setPhase('sandbox')
   }), phase === 'sandbox' && /*#__PURE__*/React.createElement("div", {
     style: {
@@ -2733,7 +2736,7 @@ function Level6Sound({
   }), phase === 'intro' && /*#__PURE__*/React.createElement(IntroModal, {
     emoji: "🎵",
     title: "Фабрика звука",
-    law: 'Звук — это колебания воздуха.\nЧем ЧАЩЕ колебания — тем ВЫШЕ звук.\n\nКомар машет крыльями ~1000 раз в секунду,\nшмель — всего ~150. Вот и вся разница!',
+    law: 'Звук — это дрожание воздуха. Чем чаще дрожит, тем выше звук.',
     diagram: null,
     tip: "Двигай слайдер и жми «Сыграть» — телефон зазвучит по-настоящему! (включи звук 🔊)",
     onStart: () => setPhase('sandbox')
@@ -2819,13 +2822,501 @@ function Level6Sound({
   }, "Задание ", taskIdx + 1, " из 2")), phase === 'win' && /*#__PURE__*/React.createElement(WinModal, {
     emoji: "🎼",
     title: "Дирижёр частот!",
-    law: "Звук — колебания воздуха. Частота колебаний = высота звука",
+    law: "Звук — дрожание воздуха. Чем чаще дрожит, тем выше звук",
     fact: "Слон общается инфразвуком — таким низким, что человек его не слышит. А слон слышит… ногами, через землю!",
     cta: "На главную →",
     onNext: onWin,
     onHome: onHome
   }));
 }
+/* ══════════════════════════════════════════════════════════════
+   УРОВНИ 7–10 (02.10.2026) и проверка связи для всех уровней.
+   Тот же стиль, что у уровней 1–6: заставка, плашка задачи, живая
+   сцена, окно победы с законом и фактом. После победы — два вопроса
+   проверки связи (GAME_SYSTEM_METHOD, п. 7): ошибку можно поправить,
+   на каждый ответ есть объяснение.
+   ══════════════════════════════════════════════════════════════ */
+function PhysShell({ n, title, step, total, onHome, children }) {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "ak",
+    style: {
+      minHeight: '100vh', height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden',
+      background: 'radial-gradient(120% 60% at 50% -10%,#E5DCFF 0%,transparent 60%),linear-gradient(180deg,var(--ak-bg-2),var(--ak-bg))'
+    }
+  }, /*#__PURE__*/React.createElement(TopBar, { level: n, title: title, onHome: onHome, step: step || 0, total: total || 1 }), children);
+}
+function PhysBody({ children }) {
+  return /*#__PURE__*/React.createElement("div", {
+    style: { flex: 1, display: 'flex', flexDirection: 'column', gap: 12, padding: '6px 18px 22px', alignItems: 'center', overflowY: 'auto' }
+  }, children);
+}
+function PhysScene({ children, h }) {
+  return /*#__PURE__*/React.createElement("svg", {
+    viewBox: `0 0 340 ${h || 220}`,
+    style: { width: '100%', maxWidth: 360, flexShrink: 0, borderRadius: 22, background: 'linear-gradient(180deg,#F4EFFF,#FFFDF8)', boxShadow: '0 6px 0 rgba(45,27,69,.08)' }
+  }, children);
+}
+function PhysNote({ children, ok }) {
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 14, fontWeight: 700, textAlign: 'center', maxWidth: 320, lineHeight: 1.45, minHeight: 40,
+      fontFamily: 'var(--ak-display)', color: ok ? 'var(--ak-ok-3)' : 'var(--ak-ink-2)'
+    }
+  }, children);
+}
+function PhysChoice({ items, value, onPick, disabled }) {
+  return /*#__PURE__*/React.createElement("div", {
+    style: { display: 'grid', gridTemplateColumns: `repeat(${items.length},1fr)`, gap: 8, width: '100%', maxWidth: 360 }
+  }, items.map(it => /*#__PURE__*/React.createElement("button", {
+    key: it.id, className: "ak-tap", disabled: disabled, onClick: () => onPick(it.id),
+    style: {
+      border: value === it.id ? '3px solid #7C5FE0' : '3px solid transparent', cursor: 'pointer', borderRadius: 16,
+      padding: '8px 4px', fontFamily: 'var(--ak-body)', background: 'rgba(255,255,255,.92)', boxShadow: '0 4px 0 rgba(45,27,69,.08)',
+      opacity: disabled ? .6 : 1
+    }
+  }, /*#__PURE__*/React.createElement("div", { style: { fontSize: 24 } }, it.emoji),
+  /*#__PURE__*/React.createElement("div", { style: { fontSize: 12, fontWeight: 800, color: 'var(--ak-ink)', marginTop: 2 } }, it.name))));
+}
+
+/* ── проверка связи ──────────────────────────────────────── */
+const PHYS_QUIZ = {
+  1: [{ q: 'Почему снаряд летит дугой, а не по прямой?',
+    opts: [{ t: 'Земля всё время тянет его вниз', ok: true }, { t: 'Его сдувает ветер' }, { t: 'Пушка кривая' }],
+    yes: 'Да. Вперёд он летит ровно, а вниз падает всё быстрее — вот и дуга.',
+    no: 'Ветер тут ни при чём. Снаряд всё время тянет к земле, поэтому путь загибается вниз.' },
+  { q: 'Под каким углом снаряд улетит дальше всего?',
+    opts: [{ t: 'Посередине, около 45°', ok: true }, { t: 'Прямо вверх' }, { t: 'Почти над самой землёй' }],
+    yes: 'Верно. Вверх — упадёт рядом, над землёй — быстро упадёт. Середина — дальше всего.',
+    no: 'Вверх снаряд упадёт рядом, а над землёй — почти сразу. Дальше всего — посередине.' }],
+  2: [{ q: 'Как уравновесить качели, если на другом конце сидит взрослый?',
+    opts: [{ t: 'Сесть дальше от середины, чем он', ok: true }, { t: 'Сесть ближе к середине' }, { t: 'Никак, взрослый тяжелее' }],
+    yes: 'Да. Чем дальше от опоры, тем сильнее тянешь.',
+    no: 'Можно! Лёгкий далеко от опоры тянет так же, как тяжёлый близко.' },
+  { q: 'Почему тяжёлый камень легче поднять длинной палкой?',
+    opts: [{ t: 'Чем дальше от опоры давишь, тем сильнее палка поднимает', ok: true }, { t: 'Длинная палка тяжелее' }, { t: 'Камень становится легче' }],
+    yes: 'Верно. Это и есть рычаг.',
+    no: 'Камень не меняется. Помогает длина: давишь далеко от опоры — и сила получается больше.' }],
+  3: [{ q: 'Луч прилетел к зеркалу под углом 40°. Под каким он улетит?',
+    opts: [{ t: 'Тоже под 40°', ok: true }, { t: 'Под 90°' }, { t: 'Как получится' }],
+    yes: 'Да. Как влетел — так и вылетел.',
+    no: 'Зеркало не путает: луч улетает ровно под тем же углом, под каким прилетел.' },
+  { q: 'Что ещё отскакивает так же: как влетел — так и вылетел?',
+    opts: [{ t: 'Мяч от стены', ok: true }, { t: 'Пластилин от стены' }, { t: 'Вода в стакане' }],
+    yes: 'Верно. По этому правилу играют в бильярд.',
+    no: 'Пластилин прилипнет. А мяч отскочит от стены под тем же углом, как луч от зеркала.' }],
+  4: [{ q: 'Почему магнит не поднял алюминиевую ложку?',
+    opts: [{ t: 'Магнит тянет железо, а не любой металл', ok: true }, { t: 'Ложка слишком тяжёлая' }, { t: 'Магнит устал' }],
+    yes: 'Да. Алюминий — металл, но не железо.',
+    no: 'Ложка лёгкая. Просто магнит тянет только железо (и пару похожих металлов), а не любой.' },
+  { q: 'Как найти иголку в стоге сена?',
+    opts: [{ t: 'Провести по сену магнитом', ok: true }, { t: 'Перебрать каждую травинку' }, { t: 'Подуть на сено' }],
+    yes: 'Верно. Иголка железная — она сама прыгнет к магниту.',
+    no: 'Можно быстрее: иголка железная, магнит её притянет.' }],
+  5: [{ q: 'Почему лампа не горит, если провод разорван?',
+    opts: [{ t: 'Ток бежит только по замкнутому кругу', ok: true }, { t: 'Лампа сломалась' }, { t: 'Батарейка села' }],
+    yes: 'Да. Есть разрыв — нет круга, и ток стоит.',
+    no: 'С лампой и батарейкой всё в порядке. Току нужен целый круг, а он разорван.' },
+  { q: 'Чем закрыть разрыв, чтобы лампа загорелась?',
+    opts: [{ t: 'Металлической скрепкой', ok: true }, { t: 'Резинкой' }, { t: 'Деревянной палочкой' }],
+    yes: 'Верно. Металл пропускает ток.',
+    no: 'Резина и дерево ток не пропускают. Нужен металл — например, скрепка.' }],
+  6: [{ q: 'Комар пищит тонко, а шмель гудит низко. Почему?',
+    opts: [{ t: 'Комар машет крыльями намного чаще', ok: true }, { t: 'Комар громче' }, { t: 'Шмель больше злится' }],
+    yes: 'Да. Чаще дрожит воздух — выше звук.',
+    no: 'Дело в том, как часто машут крылья: комар — в разы чаще, поэтому и пищит тонко.' },
+  { q: 'Как сделать звук гитарной струны выше?',
+    opts: [{ t: 'Прижать её, чтобы она стала короче', ok: true }, { t: 'Дёрнуть слабее' }, { t: 'Отойти подальше' }],
+    yes: 'Верно. Короткая струна дрожит чаще и поёт выше.',
+    no: 'Слабее — будет тише, а не выше. Выше станет, если струна короче: она дрожит чаще.' }],
+  7: [{ q: 'Почему на льду санки едут дальше, чем на песке?',
+    opts: [{ t: 'Лёд гладкий и тормозит слабее', ok: true }, { t: 'Лёд холодный' }, { t: 'На песке санки тяжелее' }],
+    yes: 'Да. Чем глаже дорожка, тем меньше она тормозит.',
+    no: 'Санки весят одинаково. Разница в дорожке: шершавая тормозит сильнее гладкой.' },
+  { q: 'Зачем зимой посыпают дорожки песком?',
+    opts: [{ t: 'Чтобы ноги не скользили', ok: true }, { t: 'Чтобы растопить лёд' }, { t: 'Для красоты' }],
+    yes: 'Верно. Песок шершавый — подошвы цепляются за него.',
+    no: 'Песок лёд не растопит. Он делает дорожку шершавой — и ноги не скользят.' }],
+  8: [{ q: 'Как сделать, чтобы качели качались медленнее?',
+    opts: [{ t: 'Сделать верёвку длиннее', ok: true }, { t: 'Сделать верёвку короче' }, { t: 'Сесть потяжелее' }],
+    yes: 'Да. Длинные качели качаются медленнее.',
+    no: 'Короткая верёвка — быстрее, вес не важен. Медленнее качается длинная.' },
+  { q: 'На верёвку повесили мяч тяжелее. Что будет с темпом?',
+    opts: [{ t: 'Останется таким же', ok: true }, { t: 'Станет медленнее' }, { t: 'Станет быстрее' }],
+    yes: 'Верно. Темп зависит от длины, а не от веса.',
+    no: 'Удивительно, но нет: темп задаёт только длина верёвки, вес не важен.' }],
+  9: [{ q: 'Как сделать тень от руки на стене огромной?',
+    opts: [{ t: 'Поднести руку ближе к лампе', ok: true }, { t: 'Поднести руку ближе к стене' }, { t: 'Выключить свет' }],
+    yes: 'Да. Ближе к свету — тень больше.',
+    no: 'У стены тень станет как сама рука. Огромной она будет, если руку поднести к лампе.' },
+  { q: 'Фонарик отодвинули от игрушки подальше. Тень стала…',
+    opts: [{ t: 'Меньше', ok: true }, { t: 'Больше' }, { t: 'Такой же' }],
+    yes: 'Верно. Дальше от света — тень меньше.',
+    no: 'Вспомни рамку на стене: чем дальше фонарик, тем меньше тень.' }],
+  10: [{ q: 'Большая шестерёнка сделала один оборот. Сколько сделает сцепленная с ней маленькая, в два раза меньше?',
+    opts: [{ t: 'Два', ok: true }, { t: 'Один' }, { t: 'Пол-оборота' }],
+    yes: 'Да. У маленькой зубцов вдвое меньше — она успевает два раза.',
+    no: 'Зубцы цепляются один за другой. У маленькой их вдвое меньше — значит, она обернётся дважды.' },
+  { q: 'Где шестерёнки помогают крутить быстрее?',
+    opts: [{ t: 'Велосипед: спереди звезда большая, сзади маленькая', ok: true }, { t: 'Подушка' }, { t: 'Карандаш' }],
+    yes: 'Верно. Один оборот педалей — и колесо крутится несколько раз.',
+    no: 'Ищи, где есть зубчатые колёса. У велосипеда большая звезда у педалей крутит маленькую у колеса.' }]
+};
+function PhysQuiz({ n, title, onDone, onHome }) {
+  const qs = React.useMemo(() => PHYS_QUIZ[n].map(q => ({ ...q, opts: window.nooka && window.nooka.shuffled ? window.nooka.shuffled(q.opts) : q.opts })), [n]);
+  const [pick, setPick] = useState([null, null]);
+  const both = qs.every((q, i) => pick[i] != null && q.opts[pick[i]].ok);
+  return /*#__PURE__*/React.createElement(PhysShell, { n: n, title: title, onHome: onHome },
+    /*#__PURE__*/React.createElement(PhysBody, null,
+      /*#__PURE__*/React.createElement(TaskBadge, null, 'Проверка связи: два вопроса'),
+      qs.map((q, qi) => /*#__PURE__*/React.createElement("div", {
+        key: qi, style: { width: '100%', maxWidth: 360, background: 'rgba(255,255,255,.88)', borderRadius: 20, padding: '14px 14px 10px', boxShadow: '0 6px 0 rgba(45,27,69,.06)', flexShrink: 0 }
+      }, /*#__PURE__*/React.createElement("div", {
+        style: { fontFamily: 'var(--ak-display)', fontWeight: 700, fontSize: 15, color: 'var(--ak-ink)', lineHeight: 1.35, marginBottom: 10 }
+      }, q.q), q.opts.map((o, oi) => {
+        const on = pick[qi] === oi;
+        return /*#__PURE__*/React.createElement("button", {
+          key: oi, onClick: () => setPick(p => { const c = p.slice(); c[qi] = oi; return c; }),
+          style: {
+            display: 'block', width: '100%', marginBottom: 7, padding: '11px 13px', border: 'none', borderRadius: 14, cursor: 'pointer',
+            textAlign: 'left', fontFamily: 'var(--ak-body)', fontWeight: 700, fontSize: 13.5, color: 'var(--ak-ink)',
+            background: on ? (o.ok ? 'rgba(93,217,160,.28)' : 'rgba(255,122,100,.22)') : 'rgba(229,220,255,.45)',
+            boxShadow: on ? `inset 0 0 0 2px ${o.ok ? '#3FC685' : '#FF7A64'}` : 'none'
+          }
+        }, o.t);
+      }), pick[qi] != null && /*#__PURE__*/React.createElement("div", {
+        style: { fontSize: 13, lineHeight: 1.45, color: 'var(--ak-ink-2)', padding: '2px 4px 4px' }
+      }, q.opts[pick[qi]].ok ? q.yes : q.no))),
+      /*#__PURE__*/React.createElement("button", {
+        className: "ak-btn ak-btn--ok", style: { width: '100%', maxWidth: 360, flexShrink: 0 }, disabled: !both, onClick: onDone
+      }, both ? 'Дальше' : 'Ответь на оба')));
+}
+
+/* ══════════════════════════════════════════════════════════════
+   УРОВЕНЬ 7 — Горка (трение)
+   Санки съезжают с горки на дорожку. Ребёнок выбирает, из чего она:
+   лёд, снег, ковёр, песок — и санки останавливаются в разных местах.
+   Три флажка — три дорожки. «Ага»: шершавое тормозит сильнее гладкого.
+   ══════════════════════════════════════════════════════════════ */
+const L7_SURF = [
+  { id: 'ice', name: 'Лёд', emoji: '🧊', col: '#BFE7FB', stop: 300 },
+  { id: 'snow', name: 'Снег', emoji: '❄️', col: '#EEF3FF', stop: 245 },
+  { id: 'carpet', name: 'Ковёр', emoji: '🧶', col: '#E9B7C8', stop: 195 },
+  { id: 'sand', name: 'Песок', emoji: '🏖️', col: '#F2D59B', stop: 155 }
+];
+const L7_ROUNDS = [{ flag: 300 }, { flag: 155 }, { flag: 245 }];
+const L7_TOP = [18, 82], L7_FOOT = [120, 160];
+function Level7Slide({ onWin, onHome }) {
+  const [phase, setPhase] = useState('intro');
+  const [rd, setRd] = useState(0);
+  const [surf, setSurf] = useState(null);
+  const [pos, setPos] = useState({ x: L7_TOP[0], y: L7_TOP[1], a: 0 });
+  const [state, setState] = useState('ready');   // ready | go | done
+  const [note, setNote] = useState('');
+  const raf = useRef(null);
+  useEffect(() => () => cancelAnimationFrame(raf.current), []);
+  const slope = Math.atan2(L7_FOOT[1] - L7_TOP[1], L7_FOOT[0] - L7_TOP[0]) * 180 / Math.PI;
+  const flag = L7_ROUNDS[rd].flag;
+  const reset = () => { cancelAnimationFrame(raf.current); setPos({ x: L7_TOP[0], y: L7_TOP[1], a: slope }); setState('ready'); setNote(''); };
+  useEffect(() => { setPos({ x: L7_TOP[0], y: L7_TOP[1], a: slope }); }, []);
+  const go = () => {
+    if (!surf || state !== 'ready') return;
+    setState('go');
+    const S = L7_SURF.find(s => s.id === surf), dist = S.stop - L7_FOOT[0];
+    const t1 = 700, t2 = 600 + dist * 6, t0 = performance.now();
+    const tick = now => {
+      const t = now - t0;
+      if (t < t1) {
+        const k = Math.pow(t / t1, 2);
+        setPos({ x: L7_TOP[0] + (L7_FOOT[0] - L7_TOP[0]) * k, y: L7_TOP[1] + (L7_FOOT[1] - L7_TOP[1]) * k, a: slope });
+      } else {
+        const k = Math.min(1, (t - t1) / t2), e = 1 - Math.pow(1 - k, 2.2);
+        setPos({ x: L7_FOOT[0] + dist * e, y: L7_FOOT[1], a: 0 });
+        if (k >= 1) {
+          setState('done');
+          const off = S.stop - flag;
+          if (Math.abs(off) <= 12) {
+            setNote('Ровно у флажка!');
+            setTimeout(() => { if (rd + 1 < L7_ROUNDS.length) { setRd(rd + 1); setSurf(null); reset(); } else setPhase('win'); }, 1300);
+          } else setNote(off > 0 ? 'Укатились дальше флажка — нужна дорожка, которая тормозит сильнее' : 'Не доехали — нужна дорожка глаже');
+          return;
+        }
+      }
+      raf.current = requestAnimationFrame(tick);
+    };
+    raf.current = requestAnimationFrame(tick);
+  };
+  const S = L7_SURF.find(s => s.id === surf);
+  return /*#__PURE__*/React.createElement(PhysShell, { n: 7, title: 'Горка', step: rd, total: L7_ROUNDS.length, onHome: onHome },
+    phase === 'intro' && /*#__PURE__*/React.createElement(IntroModal, {
+      emoji: '🛷', title: 'Горка', diagram: null, label: '🎯 Задача:',
+      law: 'Санки съезжают с горки. Выбери дорожку внизу, чтобы они остановились у флажка.',
+      tip: 'Выбери дорожку и отпусти санки', onStart: () => setPhase('play')
+    }),
+    phase !== 'intro' && /*#__PURE__*/React.createElement(PhysBody, null,
+      /*#__PURE__*/React.createElement(TaskBadge, null, `Флажок ${rd + 1} из ${L7_ROUNDS.length}: останови санки у флажка`),
+      /*#__PURE__*/React.createElement(PhysScene, { h: 200 },
+        /*#__PURE__*/React.createElement("path", { d: `M0 ${L7_TOP[1] + 14} L${L7_TOP[0] + 6} ${L7_TOP[1] + 14} L${L7_FOOT[0]} ${L7_FOOT[1] + 14} L0 ${L7_FOOT[1] + 14} Z`, fill: '#FFFFFF', stroke: '#D9D2EE', strokeWidth: 2 }),
+        /*#__PURE__*/React.createElement("rect", { x: L7_FOOT[0], y: L7_FOOT[1] + 14, width: 340 - L7_FOOT[0], height: 12, rx: 3, fill: S ? S.col : '#E4DDF5', stroke: 'rgba(45,27,69,.15)' }),
+        /*#__PURE__*/React.createElement("rect", { x: 0, y: L7_FOOT[1] + 26, width: 340, height: 20, fill: '#CFC6E6' }),
+        /*#__PURE__*/React.createElement("g", { transform: `translate(${flag} ${L7_FOOT[1] + 14})` },
+          /*#__PURE__*/React.createElement("line", { x1: 0, y1: 0, x2: 0, y2: -36, stroke: '#7C5FE0', strokeWidth: 3 }),
+          /*#__PURE__*/React.createElement("path", { d: 'M0 -36 L18 -30 L0 -24 Z', fill: '#FF6FA6' })),
+        /*#__PURE__*/React.createElement("g", { transform: `translate(${pos.x} ${pos.y}) rotate(${pos.a})` },
+          /*#__PURE__*/React.createElement("rect", { x: -16, y: -6, width: 32, height: 12, rx: 5, fill: '#FF7A64' }),
+          /*#__PURE__*/React.createElement("path", { d: 'M-18 10 L18 10 Q24 10 22 4', fill: 'none', stroke: '#4A3B63', strokeWidth: 3, strokeLinecap: 'round' }),
+          /*#__PURE__*/React.createElement("circle", { cx: 0, cy: -16, r: 9, fill: '#FFD262' }))),
+      /*#__PURE__*/React.createElement(PhysChoice, { items: L7_SURF, value: surf, onPick: id => { if (state !== 'go') { setSurf(id); reset(); } }, disabled: state === 'go' }),
+      /*#__PURE__*/React.createElement(PhysNote, { ok: note === 'Ровно у флажка!' }, note),
+      /*#__PURE__*/React.createElement("button", {
+        className: "ak-btn ak-btn--ok", style: { width: '100%', maxWidth: 360, flexShrink: 0 }, disabled: !surf || state === 'go',
+        onClick: state === 'done' ? reset : go
+      }, state === 'done' ? 'Ещё раз 🔄' : 'Отпустить санки 🛷')),
+    phase === 'win' && /*#__PURE__*/React.createElement(WinModal, {
+      emoji: '🛷', title: 'Мастер торможения!',
+      law: 'Трение тормозит движение: шершавое тормозит сильнее гладкого — его изучал ещё Леонардо да Винчи',
+      fact: 'Без трения нельзя было бы ходить: ноги проскальзывали бы, как на идеальном льду.',
+      cta: 'Дальше →', onNext: onWin, onHome: onHome
+    }));
+}
+
+/* ══════════════════════════════════════════════════════════════
+   УРОВЕНЬ 8 — Маятник (темп качания)
+   Качели должны качаться в такт барабану. Ребёнок меняет длину верёвки
+   и видит: длинные качаются медленнее. В третьем раунде можно повесить
+   тяжёлый мяч — темп не меняется (секрет для исследователя).
+   ══════════════════════════════════════════════════════════════ */
+const L8_G = 1950;                              // подобрано: верёвка 40 → 0,9 с, 170 → 1,86 с
+const L8_ROUNDS = [{ T: 1.1 }, { T: 1.7 }, { T: 1.4, weight: true }];
+const l8Period = L => 2 * Math.PI * Math.sqrt(L / L8_G);
+function Level8Pendulum({ onWin, onHome }) {
+  const [phase, setPhase] = useState('intro');
+  const [rd, setRd] = useState(0);
+  const [len, setLen] = useState(120);
+  const [heavy, setHeavy] = useState(false);
+  const [th, setTh] = useState(0.45);
+  const [beat, setBeat] = useState(false);
+  const [sync, setSync] = useState(0);
+  const [done, setDone] = useState(false);
+  const raf = useRef(null), t0 = useRef(performance.now()), lenRef = useRef(120), okFrom = useRef(null);
+  const T = l8Period(len), Tt = L8_ROUNDS[rd].T, ratio = T / Tt, inTune = Math.abs(ratio - 1) < .06;
+  useEffect(() => {
+    if (phase !== 'play') return;
+    const tick = now => {
+      const t = (now - t0.current) / 1000, Tc = l8Period(lenRef.current);
+      setTh(0.45 * Math.cos(2 * Math.PI * t / Tc));
+      setBeat((t % Tt) < 0.14);
+      raf.current = requestAnimationFrame(tick);
+    };
+    raf.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf.current);
+  }, [phase, rd]);
+  /* в такт держится полторы секунды — раунд пройден */
+  useEffect(() => {
+    if (phase !== 'play' || done) return;
+    if (!inTune) { okFrom.current = null; setSync(0); return; }
+    if (!okFrom.current) okFrom.current = performance.now();
+    const id = setInterval(() => {
+      const k = Math.min(1, (performance.now() - okFrom.current) / 1500);
+      setSync(k);
+      if (k >= 1) {
+        clearInterval(id);
+        setDone(true);
+        setTimeout(() => {
+          if (rd + 1 < L8_ROUNDS.length) { setRd(rd + 1); setDone(false); setSync(0); okFrom.current = null; t0.current = performance.now(); }
+          else setPhase('win');
+        }, 1200);
+      }
+    }, 100);
+    return () => clearInterval(id);
+  }, [inTune, phase, rd, done]);
+  const change = v => { setLen(v); lenRef.current = v; t0.current = performance.now(); okFrom.current = null; };
+  const bx = 170 + Math.sin(th) * len, by = 26 + Math.cos(th) * len, r = heavy ? 17 : 12;
+  return /*#__PURE__*/React.createElement(PhysShell, { n: 8, title: 'Маятник', step: rd, total: L8_ROUNDS.length, onHome: onHome },
+    phase === 'intro' && /*#__PURE__*/React.createElement(IntroModal, {
+      emoji: '🎐', title: 'Маятник', diagram: null, label: '🎯 Задача:',
+      law: 'Качели должны качаться в такт барабану. Меняй длину верёвки.',
+      tip: 'Двигай ползунок и смотри на барабан', onStart: () => { t0.current = performance.now(); setPhase('play'); }
+    }),
+    phase !== 'intro' && /*#__PURE__*/React.createElement(PhysBody, null,
+      /*#__PURE__*/React.createElement(TaskBadge, null, `Раунд ${rd + 1} из ${L8_ROUNDS.length}: качели — в такт барабану`),
+      /*#__PURE__*/React.createElement(PhysScene, { h: 220 },
+        /*#__PURE__*/React.createElement("rect", { x: 120, y: 14, width: 100, height: 10, rx: 5, fill: '#4A3B63' }),
+        /*#__PURE__*/React.createElement("line", { x1: 170, y1: 24, x2: bx, y2: by, stroke: '#7C5FE0', strokeWidth: 3 }),
+        /*#__PURE__*/React.createElement("circle", { cx: bx, cy: by, r: r, fill: heavy ? '#5B4A86' : '#FF9F6B', stroke: 'rgba(45,27,69,.25)', strokeWidth: 2 }),
+        /*#__PURE__*/React.createElement("g", { transform: 'translate(52 180)' },
+          /*#__PURE__*/React.createElement("g", { style: { transform: beat ? 'scale(1.18)' : 'scale(1)', transformOrigin: '0px 0px', transition: 'transform .08s' } },
+            /*#__PURE__*/React.createElement("ellipse", { cx: 0, cy: 0, rx: 26, ry: 9, fill: beat ? '#FFD262' : '#FFE9A8' }),
+            /*#__PURE__*/React.createElement("rect", { x: -26, y: 0, width: 52, height: 22, fill: beat ? '#FF7A64' : '#FFA17A' }),
+            /*#__PURE__*/React.createElement("ellipse", { cx: 0, cy: 22, rx: 26, ry: 9, fill: '#D96D49' }))),
+        /*#__PURE__*/React.createElement("rect", { x: 230, y: 196, width: 90, height: 10, rx: 5, fill: '#E4DDF5' }),
+        /*#__PURE__*/React.createElement("rect", { x: 230, y: 196, width: 90 * sync, height: 10, rx: 5, fill: '#5DD9A0' }),
+        /*#__PURE__*/React.createElement("text", { x: 275, y: 188, textAnchor: 'middle', fontSize: 11, fontWeight: 800, fill: '#6B5680', fontFamily: 'Nunito,sans-serif' }, 'в такт')),
+      /*#__PURE__*/React.createElement("div", { style: { width: '100%', maxWidth: 340 } },
+        /*#__PURE__*/React.createElement("div", { style: { display: 'flex', justifyContent: 'space-between', fontSize: 12, fontWeight: 800, color: 'var(--ak-ink-2)', fontFamily: 'var(--ak-display)' } },
+          /*#__PURE__*/React.createElement("span", null, 'короткая'), /*#__PURE__*/React.createElement("span", null, 'длина верёвки'), /*#__PURE__*/React.createElement("span", null, 'длинная')),
+        /*#__PURE__*/React.createElement("input", { type: 'range', min: 40, max: 170, value: len, disabled: done, onChange: e => change(+e.target.value), style: { width: '100%' } })),
+      L8_ROUNDS[rd].weight && /*#__PURE__*/React.createElement("button", {
+        className: "ak-btn ak-btn--soft", style: { flexShrink: 0 }, onClick: () => setHeavy(h => !h)
+      }, heavy ? 'Повесить лёгкий мяч' : 'Повесить тяжёлый мяч'),
+      /*#__PURE__*/React.createElement(PhysNote, { ok: done }, done ? 'В такт! Отлично держится' :
+        ratio < .94 ? 'Качели спешат — сделай верёвку длиннее' : ratio > 1.06 ? 'Качели отстают — сделай верёвку короче' : 'Почти! Держи так')),
+    phase === 'win' && /*#__PURE__*/React.createElement(WinModal, {
+      emoji: '🎐', title: 'Дирижёр качелей!',
+      law: 'Темп качания задаёт длина верёвки, а не вес — Галилео Галилей, XVII век',
+      fact: 'Галилей заметил это в соборе, глядя на качающуюся люстру, и засекал время по собственному пульсу.',
+      cta: 'Дальше →', onNext: onWin, onHome: onHome
+    }));
+}
+
+/* ══════════════════════════════════════════════════════════════
+   УРОВЕНЬ 9 — Тень
+   Фонарик, игрушка, стена. На стене — рамка, тень должна встать ровно
+   в неё. Ребёнок двигает фонарик: ближе к игрушке — тень растёт.
+   ══════════════════════════════════════════════════════════════ */
+const L9_ROUNDS = [{ H: 120 }, { H: 60 }, { H: 90 }];
+const L9_TOY = 240, L9_WALL = 318, L9_MID = 112, L9_SIZE = 40;
+function Level9Shadow({ onWin, onHome }) {
+  const [phase, setPhase] = useState('intro');
+  const [rd, setRd] = useState(0);
+  const [lx, setLx] = useState(120);
+  const [done, setDone] = useState(false);
+  const holdT = useRef(null);
+  const H = L9_ROUNDS[rd].H;
+  const sh = L9_SIZE * (L9_WALL - lx) / (L9_TOY - lx);
+  const hit = Math.abs(sh - H) <= 6;
+  useEffect(() => {
+    clearTimeout(holdT.current);
+    if (phase !== 'play' || !hit || done) return;
+    holdT.current = setTimeout(() => {
+      setDone(true);
+      setTimeout(() => { if (rd + 1 < L9_ROUNDS.length) { setRd(rd + 1); setDone(false); } else setPhase('win'); }, 1200);
+    }, 700);
+    return () => clearTimeout(holdT.current);
+  }, [hit, phase, rd, done]);
+  const top = L9_MID - sh / 2, bot = L9_MID + sh / 2;
+  return /*#__PURE__*/React.createElement(PhysShell, { n: 9, title: 'Тень', step: rd, total: L9_ROUNDS.length, onHome: onHome },
+    phase === 'intro' && /*#__PURE__*/React.createElement(IntroModal, {
+      emoji: '🌗', title: 'Тень', diagram: null, label: '🎯 Задача:',
+      law: 'Сделай тень ровно по рамке на стене. Двигай фонарик.',
+      tip: 'Ближе или дальше — проверь сам', onStart: () => setPhase('play')
+    }),
+    phase !== 'intro' && /*#__PURE__*/React.createElement(PhysBody, null,
+      /*#__PURE__*/React.createElement(TaskBadge, null, `Рамка ${rd + 1} из ${L9_ROUNDS.length}: тень — ровно по рамке`),
+      /*#__PURE__*/React.createElement(PhysScene, { h: 220 },
+        /*#__PURE__*/React.createElement("rect", { x: L9_WALL, y: 20, width: 22, height: 190, fill: '#E4DDF5' }),
+        /*#__PURE__*/React.createElement("polygon", { points: `${lx + 14},${L9_MID} ${L9_WALL},${top} ${L9_WALL},${bot}`, fill: 'rgba(255,216,77,.28)' }),
+        /*#__PURE__*/React.createElement("rect", { x: L9_WALL, y: top, width: 22, height: sh, rx: 4, fill: '#4A3B63', opacity: .85 }),
+        /*#__PURE__*/React.createElement("rect", { x: L9_WALL - 2, y: L9_MID - H / 2, width: 26, height: H, rx: 4, fill: 'none', stroke: done ? '#3FC685' : '#FF6FA6', strokeWidth: 3, strokeDasharray: '6 4' }),
+        /*#__PURE__*/React.createElement("g", { transform: `translate(${L9_TOY} ${L9_MID})` },
+          /*#__PURE__*/React.createElement("path", { d: 'M-12 20 L-12 -6 L-16 -20 L-6 -12 L6 -12 L16 -20 L12 -6 L12 20 Z', fill: '#FFA17A', stroke: '#D96D49', strokeWidth: 2 }),
+          /*#__PURE__*/React.createElement("circle", { cx: -5, cy: -2, r: 2, fill: '#2D1B45' }), /*#__PURE__*/React.createElement("circle", { cx: 5, cy: -2, r: 2, fill: '#2D1B45' })),
+        /*#__PURE__*/React.createElement("g", { transform: `translate(${lx} ${L9_MID})` },
+          /*#__PURE__*/React.createElement("rect", { x: -22, y: -8, width: 26, height: 16, rx: 4, fill: '#7C5FE0' }),
+          /*#__PURE__*/React.createElement("path", { d: 'M4 -11 L16 -14 L16 14 L4 11 Z', fill: '#B5A1FF' }),
+          /*#__PURE__*/React.createElement("circle", { cx: 16, cy: 0, r: 5, fill: '#FFD84D' })),
+        /*#__PURE__*/React.createElement("rect", { x: 0, y: 206, width: 340, height: 14, fill: '#CFC6E6' })),
+      /*#__PURE__*/React.createElement("div", { style: { width: '100%', maxWidth: 340 } },
+        /*#__PURE__*/React.createElement("div", { style: { display: 'flex', justifyContent: 'space-between', fontSize: 12, fontWeight: 800, color: 'var(--ak-ink-2)', fontFamily: 'var(--ak-display)' } },
+          /*#__PURE__*/React.createElement("span", null, '← дальше от игрушки'), /*#__PURE__*/React.createElement("span", null, 'ближе →')),
+        /*#__PURE__*/React.createElement("input", { type: 'range', min: 30, max: 212, value: lx, disabled: done, onChange: e => setLx(+e.target.value), style: { width: '100%' } })),
+      /*#__PURE__*/React.createElement(PhysNote, { ok: done }, done ? 'Ровно по рамке!' : sh > H + 6 ? 'Тень больше рамки' : sh < H - 6 ? 'Тень меньше рамки' : 'Почти! Держи так')),
+    phase === 'win' && /*#__PURE__*/React.createElement(WinModal, {
+      emoji: '🌗', title: 'Хозяин теней!',
+      law: 'Чем ближе предмет к свету, тем больше его тень',
+      fact: 'Театру теней больше двух тысяч лет: огромного дракона на экране делает маленькая кукла у самой лампы.',
+      cta: 'Дальше →', onNext: onWin, onHome: onHome
+    }));
+}
+
+/* ══════════════════════════════════════════════════════════════
+   УРОВЕНЬ 10 — Шестерёнки
+   Мотор крутит шестерёнку. Ребёнок подбирает вторую: маленькую, такую
+   же или большую — и видит счётчик оборотов у обеих. Три машины:
+   вентилятор быстрее мотора, мельница медленнее, колесо так же.
+   ══════════════════════════════════════════════════════════════ */
+const L10_GEARS = [
+  { id: 12, name: 'Маленькая', emoji: '🔩' },
+  { id: 24, name: 'Такая же', emoji: '⚙️' },
+  { id: 48, name: 'Большая', emoji: '🛞' }
+];
+const L10_ROUNDS = [
+  { task: 'Вентилятор должен крутиться быстрее мотора', ok: 12, what: 'вентилятор' },
+  { task: 'Мельница должна крутиться медленнее мотора', ok: 48, what: 'мельница' },
+  { task: 'Колесо должно крутиться так же, как мотор', ok: 24, what: 'колесо' }
+];
+function l10Gear(N, r) {
+  const pts = [];
+  for (let i = 0; i < N * 2; i++) {
+    const a = i / (N * 2) * Math.PI * 2, rr = i % 2 ? r - 3.5 : r + 3.5;
+    pts.push((Math.cos(a) * rr).toFixed(1) + ',' + (Math.sin(a) * rr).toFixed(1));
+  }
+  return pts.join(' ');
+}
+function Level10Gears({ onWin, onHome }) {
+  const [phase, setPhase] = useState('intro');
+  const [rd, setRd] = useState(0);
+  const [g2, setG2] = useState(null);
+  const [ang, setAng] = useState(0);
+  const [run, setRun] = useState(false);
+  const [note, setNote] = useState('');
+  const raf = useRef(null);
+  useEffect(() => () => cancelAnimationFrame(raf.current), []);
+  const N1 = 24, r1 = 1.6 * N1, c1 = [100, 110];
+  const r2 = g2 ? 1.6 * g2 : 0, c2 = [c1[0] + r1 + r2 + 3, 110];
+  const R = L10_ROUNDS[rd];
+  const start = () => {
+    if (!g2 || run) return;
+    setRun(true); setNote('');
+    const t0 = performance.now();
+    const tick = now => {
+      const t = now - t0, a = t / 1000 * 120;   // мотор: треть оборота в секунду
+      setAng(a);
+      if (t < 3000) { raf.current = requestAnimationFrame(tick); return; }
+      setRun(false);
+      const ok = g2 === R.ok;
+      const speed = g2 < N1 ? 'быстрее' : g2 > N1 ? 'медленнее' : 'так же, как';
+      if (ok) {
+        setNote(`Получилось: ${R.what} крутится ${speed} мотор${g2 === N1 ? '' : 'а'}`);
+        setTimeout(() => { if (rd + 1 < L10_ROUNDS.length) { setRd(rd + 1); setG2(null); setAng(0); setNote(''); } else setPhase('win'); }, 1400);
+      } else setNote(`Сейчас ${R.what} крутится ${speed} мотор${g2 === N1 ? '' : 'а'}. Попробуй другую шестерёнку`);
+    };
+    raf.current = requestAnimationFrame(tick);
+  };
+  const turns1 = Math.floor(ang / 360), turns2 = g2 ? Math.floor(ang * N1 / g2 / 360) : 0;
+  const a2 = g2 ? -ang * N1 / g2 + 180 / g2 : 0;
+  return /*#__PURE__*/React.createElement(PhysShell, { n: 10, title: 'Шестерёнки', step: rd, total: L10_ROUNDS.length, onHome: onHome },
+    phase === 'intro' && /*#__PURE__*/React.createElement(IntroModal, {
+      emoji: '⚙️', title: 'Шестерёнки', diagram: null, label: '🎯 Задача:',
+      law: 'Мотор крутит шестерёнку. Подбери вторую, чтобы машина крутилась как нужно.',
+      tip: 'Выбери шестерёнку и включи мотор', onStart: () => setPhase('play')
+    }),
+    phase !== 'intro' && /*#__PURE__*/React.createElement(PhysBody, null,
+      /*#__PURE__*/React.createElement(TaskBadge, null, R.task),
+      /*#__PURE__*/React.createElement(PhysScene, { h: 220 },
+        /*#__PURE__*/React.createElement("g", { transform: `translate(${c1[0]} ${c1[1]}) rotate(${ang})` },
+          /*#__PURE__*/React.createElement("polygon", { points: l10Gear(N1, r1), fill: '#B5A1FF', stroke: '#7C5FE0', strokeWidth: 2 }),
+          /*#__PURE__*/React.createElement("circle", { r: 8, fill: '#7C5FE0' }),
+          /*#__PURE__*/React.createElement("circle", { cx: 0, cy: -r1 + 12, r: 5, fill: '#FFD84D' })),
+        /*#__PURE__*/React.createElement("text", { x: c1[0], y: 206, textAnchor: 'middle', fontSize: 12, fontWeight: 800, fill: '#6B5680', fontFamily: 'Nunito,sans-serif' }, `мотор: ${turns1} об.`),
+        g2 && /*#__PURE__*/React.createElement("g", { transform: `translate(${c2[0]} ${c2[1]}) rotate(${a2})` },
+          /*#__PURE__*/React.createElement("polygon", { points: l10Gear(g2, r2), fill: '#FFD262', stroke: '#D4A22B', strokeWidth: 2 }),
+          /*#__PURE__*/React.createElement("circle", { r: 7, fill: '#D4A22B' }),
+          [0, 120, 240].map(b => /*#__PURE__*/React.createElement("rect", { key: b, x: -3, y: -r2 + 8, width: 6, height: Math.max(6, r2 - 16), rx: 3, fill: 'rgba(255,255,255,.75)', transform: `rotate(${b})` })),
+          /*#__PURE__*/React.createElement("circle", { cx: 0, cy: -r2 + 9, r: 4.5, fill: '#FF6FA6' })),
+        g2 && /*#__PURE__*/React.createElement("text", { x: c2[0], y: 206, textAnchor: 'middle', fontSize: 12, fontWeight: 800, fill: '#6B5680', fontFamily: 'Nunito,sans-serif' }, `${R.what}: ${turns2} об.`)),
+      /*#__PURE__*/React.createElement(PhysChoice, { items: L10_GEARS, value: g2, onPick: id => { if (!run) { setG2(id); setAng(0); setNote(''); } }, disabled: run }),
+      /*#__PURE__*/React.createElement(PhysNote, { ok: /^Получилось/.test(note) }, note),
+      /*#__PURE__*/React.createElement("button", {
+        className: "ak-btn ak-btn--ok", style: { width: '100%', maxWidth: 360, flexShrink: 0 }, disabled: !g2 || run, onClick: start
+      }, run ? 'Крутится…' : 'Включить мотор ⚡')),
+    phase === 'win' && /*#__PURE__*/React.createElement(WinModal, {
+      emoji: '⚙️', title: 'Инженер передач!',
+      law: 'Маленькая шестерёнка крутится быстрее большой — так передают и меняют скорость',
+      fact: 'В механических часах десятки шестерёнок: одна пружина крутит и быструю секундную стрелку, и медленную часовую.',
+      cta: 'Дальше →', onNext: onWin, onHome: onHome
+    }));
+}
+
 function HomeScreen({
   onSelect
 }) {
@@ -2834,19 +3325,19 @@ function HomeScreen({
     n: 1,
     emoji: '💥',
     title: 'Траектория',
-    sub: 'Гравитация и парабола',
+    sub: 'Почему снаряд летит дугой',
     c: 'var(--ak-phys-1)'
   }, {
     n: 2,
     emoji: '⚖️',
     title: 'Рычаг Архимеда',
-    sub: 'Сила × расстояние',
+    sub: 'Лёгкий далеко перевесит тяжёлого',
     c: 'var(--ak-cta-1)'
   }, {
     n: 3,
     emoji: '🔦',
     title: 'Закон отражения',
-    sub: 'Угол падения = отражения',
+    sub: 'Как луч отскакивает от зеркала',
     c: 'var(--ak-ok-1)'
   }, {
     n: 4,
@@ -2866,6 +3357,30 @@ function HomeScreen({
     title: 'Фабрика звука',
     sub: 'Комар против шмеля',
     c: 'var(--ak-ok-1)'
+  }, {
+    n: 7,
+    emoji: '🛷',
+    title: 'Горка',
+    sub: 'Почему санки тормозят',
+    c: 'var(--ak-phys-1)'
+  }, {
+    n: 8,
+    emoji: '🎐',
+    title: 'Маятник',
+    sub: 'Что задаёт темп качелей',
+    c: 'var(--ak-cta-1)'
+  }, {
+    n: 9,
+    emoji: '🌗',
+    title: 'Тень',
+    sub: 'Когда тень растёт',
+    c: 'var(--ak-ok-1)'
+  }, {
+    n: 10,
+    emoji: '⚙️',
+    title: 'Шестерёнки',
+    sub: 'Быстрее или медленнее',
+    c: 'var(--ak-phys-1)'
   }];
   return /*#__PURE__*/React.createElement("div", {
     className: "ak",
@@ -2908,7 +3423,7 @@ function HomeScreen({
       color: 'var(--ak-ink-2)',
       marginBottom: 32
     }
-  }, "Физика · 6 уроков"), /*#__PURE__*/React.createElement("div", {
+  }, "Физика · ", lvls.length, " ", window.nooka ? window.nooka.plural(lvls.length, 'урок', 'урока', 'уроков') : 'уроков'), /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
       flexDirection: 'column',
@@ -2980,37 +3495,29 @@ function HomeScreen({
     }
   }, "Каждый уровень: мини-урок + игра +", /*#__PURE__*/React.createElement("br", null), "физика показана прямо в игре!"));
 }
+const PHYS_LEVELS = [
+  { C: Level1, t: 'Траектория' }, { C: Level2, t: 'Рычаг Архимеда' }, { C: Level3, t: 'Закон отражения' },
+  { C: Level4Magnet, t: 'Магнит-детектив' }, { C: Level5Circuit, t: 'Замкни цепь' }, { C: Level6Sound, t: 'Фабрика звука' },
+  { C: Level7Slide, t: 'Горка' }, { C: Level8Pendulum, t: 'Маятник' }, { C: Level9Shadow, t: 'Тень' }, { C: Level10Gears, t: 'Шестерёнки' }
+];
+/* Уровень → (победа) → проверка связи → миссия и следующий уровень.
+   ?n=7 открывает уровень сразу. */
 function App() {
-  const [s, setS] = useState('home');
+  const q = new URLSearchParams(location.search), first = +q.get('n');
+  const [s, setS] = useState(first >= 1 && first <= PHYS_LEVELS.length ? 'l' + first : 'home');
+  const n = +s.slice(1), L = PHYS_LEVELS[n - 1];
+  const home = () => setS('home');
   return /*#__PURE__*/React.createElement("div", {
-    style: {
-      width: '100%',
-      height: '100vh',
-      maxWidth: 480,
-      margin: '0 auto',
-      position: 'relative',
-      overflow: 'hidden'
+    style: { width: '100%', height: '100vh', maxWidth: 480, margin: '0 auto', position: 'relative', overflow: 'hidden' }
+  }, s === 'home' && /*#__PURE__*/React.createElement(HomeScreen, { onSelect: k => setS('l' + k) }),
+  s[0] === 'l' && L && /*#__PURE__*/React.createElement(L.C, { key: s, onWin: () => setS('q' + n), onHome: home }),
+  s[0] === 'q' && L && /*#__PURE__*/React.createElement(PhysQuiz, {
+    key: s, n: n, title: L.t, onHome: home,
+    onDone: () => {
+      const last = n >= PHYS_LEVELS.length;
+      setS(last ? 'home' : 'l' + (n + 1));
+      if (window.nooka) window.nooka.missionWin('phys' + n, n > 6 ? 80 : 60, { nextLabel: last ? 'На главную →' : 'Дальше →', onNext: function () {} });
     }
-  }, s === 'home' && /*#__PURE__*/React.createElement(HomeScreen, {
-    onSelect: n => setS(`l${n}`)
-  }), s === 'l1' && /*#__PURE__*/React.createElement(Level1, {
-    onWin: () => { setS('l2'); if (window.nooka) window.nooka.missionWin('phys1', 60, { nextLabel: 'Дальше →', onNext: function () {} }); },
-    onHome: () => setS('home')
-  }), s === 'l2' && /*#__PURE__*/React.createElement(Level2, {
-    onWin: () => { setS('l3'); if (window.nooka) window.nooka.missionWin('phys2', 60, { nextLabel: 'Дальше →', onNext: function () {} }); },
-    onHome: () => setS('home')
-  }), s === 'l3' && /*#__PURE__*/React.createElement(Level3, {
-    onWin: () => { setS('l4'); if (window.nooka) window.nooka.missionWin('phys3', 60, { nextLabel: 'Дальше →', onNext: function () {} }); },
-    onHome: () => setS('home')
-  }), s === 'l4' && /*#__PURE__*/React.createElement(Level4Magnet, {
-    onWin: () => { setS('l5'); if (window.nooka) window.nooka.missionWin('phys4', 60, { nextLabel: 'Дальше →', onNext: function () {} }); },
-    onHome: () => setS('home')
-  }), s === 'l5' && /*#__PURE__*/React.createElement(Level5Circuit, {
-    onWin: () => { setS('l6'); if (window.nooka) window.nooka.missionWin('phys5', 60, { nextLabel: 'Дальше →', onNext: function () {} }); },
-    onHome: () => setS('home')
-  }), s === 'l6' && /*#__PURE__*/React.createElement(Level6Sound, {
-    onWin: () => { setS('home'); if (window.nooka) window.nooka.missionWin('phys6', 60, { nextLabel: 'Дальше →', onNext: function () {} }); },
-    onHome: () => setS('home')
   }));
 }
 ReactDOM.createRoot(document.getElementById('root')).render(/*#__PURE__*/React.createElement(App, null));
