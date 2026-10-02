@@ -896,9 +896,7 @@ function Level1({
       ctx.fillStyle = '#2BA873';
       ctx.fillRect(0, H - 44, W, 5);
       drawCannon(a);
-      ctx.font = '30px serif';
       ctx.textBaseline = 'alphabetic';
-      ctx.fillText('🧑‍🔬', g.cannon.x - 52, g.cannon.y + 46);
 
       // targets
       g.targets.forEach(t => {
@@ -958,11 +956,12 @@ function Level1({
         ctx.fillStyle = '#7C5FE0';
         ctx.font = 'bold 14px Nunito,sans-serif';
         ctx.textAlign = 'left';
-        ctx.fillText(`${a}°`, g.cannon.x + 44, g.cannon.y - 32);
+        /* подпись — справа от пушки у земли: на стволе она пряталась под ним */
+        ctx.fillText(`${a}°`, g.cannon.x + 58, g.cannon.y - 4);
         if (Math.abs(a - 45) < 6) {
           ctx.fillStyle = '#D4A22B';
           ctx.font = 'bold 12px Nunito,sans-serif';
-          ctx.fillText('⭐ 45° — MAX дальность!', g.cannon.x + 44, g.cannon.y - 50);
+          ctx.fillText('⭐ дальше всего!', g.cannon.x + 92, g.cannon.y - 4);
         }
       }
 
@@ -1203,6 +1202,7 @@ function Level2({
   const canRef = useRef(null);
   const raf = useRef(null);
   const wonRef = useRef(false);
+  const [solved, setSolved] = useState(false);
   useEffect(() => {
     if (phase !== 'intro') return;
     const el = document.getElementById('intro-canvas');
@@ -1403,7 +1403,7 @@ function Level2({
       ctx.textBaseline = 'alphabetic';
 
       // EQUATION BOX (HTML-style in canvas)
-      const eqY = H - 92;
+      const eqY = H - 108;   // над полосой земли (H − 44): раньше земля перечёркивала табличку
       ctx.fillStyle = balanced ? 'rgba(93,217,160,.22)' : 'rgba(229,220,255,.5)';
       rrect(ctx, 18, eqY, W - 36, 58, 14);
       ctx.fill();
@@ -1439,16 +1439,11 @@ function Level2({
       ctx.font = '12px Nunito,sans-serif';
       ctx.fillText('', W / 2 + 96, eqY + 46);
       ctx.textAlign = 'left';
-      if (balanced && !wonRef.current) {
-        wonRef.current = true;
-        setTimeout(() => {
-          if (pIdx < LVL2_PUZZLES.length - 1) {
-            setPIdx(p => p + 1);
-            setRDist(50);
-            rDistRef.current = 50;
-            wonRef.current = false;
-          } else setPhase('win');
-        }, 900);
+      /* Раньше через 0,9 с после равновесия игра сама переключала задачу — ползунок
+         проскакивал равновесие на ходу, и задачи мелькали. Теперь появляется кнопка. */
+      if (balanced !== wonRef.current) {
+        wonRef.current = balanced;
+        setSolved(balanced);
       }
 
       // hint
@@ -1543,7 +1538,19 @@ function Level2({
     style: {
       width: '100%'
     }
-  })), phase === 'intro' && /*#__PURE__*/React.createElement(IntroModal, {
+  }), solved && /*#__PURE__*/React.createElement("button", {
+    className: "ak-btn ak-btn--ok",
+    style: { width: '100%', marginTop: 10 },
+    onClick: () => {
+      if (pIdx < LVL2_PUZZLES.length - 1) {
+        setPIdx(p => p + 1);
+        setRDist(50);
+        rDistRef.current = 50;
+        wonRef.current = false;
+        setSolved(false);
+      } else setPhase('win');
+    }
+  }, pIdx < LVL2_PUZZLES.length - 1 ? 'Равновесие! Следующая задача →' : 'Равновесие! Готово ✓')), phase === 'intro' && /*#__PURE__*/React.createElement(IntroModal, {
     emoji: "⚖️",
     title: "Как работает рычаг?",
     law: 'Чем дальше от опоры, тем сильнее тянет. Лёгкий далеко перевесит тяжёлого близко.',
@@ -1608,6 +1615,7 @@ function Level3({
   const canRef = useRef(null);
   const raf = useRef(null);
   const wonRef = useRef(false);
+  const [solved, setSolved] = useState(false);
   useEffect(() => {
     if (phase !== 'intro') return;
     const el = document.getElementById('intro-canvas');
@@ -1827,17 +1835,20 @@ function Level3({
         ctx.save();
         ctx.translate(mx, my);
         ctx.rotate(ma);
-        const mg = ctx.createLinearGradient(0, -mirLen, 0, mirLen);
+        /* Зеркало вытянуто вдоль своей линии — направления (cos ma, sin ma), как в traceRay.
+           Раньше прямоугольник был вытянут по оси Y и выходил перпендикулярным настоящему
+           зеркалу: луч отлетал назад от «горизонтальной планки». */
+        const mg = ctx.createLinearGradient(-mirLen, 0, mirLen, 0);
         mg.addColorStop(0, 'rgba(181,161,255,.2)');
         mg.addColorStop(.5, 'rgba(181,161,255,.9)');
         mg.addColorStop(1, 'rgba(181,161,255,.2)');
         ctx.fillStyle = mg;
-        ctx.fillRect(-5, -mirLen, 10, mirLen * 2);
+        ctx.fillRect(-mirLen, -5, mirLen * 2, 10);
         ctx.strokeStyle = '#B5A1FF';
         ctx.lineWidth = 2;
-        ctx.strokeRect(-5, -mirLen, 10, mirLen * 2);
+        ctx.strokeRect(-mirLen, -5, mirLen * 2, 10);
         ctx.fillStyle = 'rgba(255,255,255,.4)';
-        ctx.fillRect(-1, -mirLen, 4, mirLen * 2);
+        ctx.fillRect(-mirLen, -1, mirLen * 2, 4);
         ctx.restore();
 
         // NORMAL dashed line
@@ -1886,27 +1897,34 @@ function Level3({
         const _nx = _dx * _n1x >= 0 ? _n1x : -_n1x;
         const _ny = _dx * _n1x >= 0 ? _n1y : -_n1y;
         const incDir = Math.atan2(-_dy, -_dx); // pointing back toward source
-        const normDir = Math.atan2(_ny, _nx);
+        const normDir = Math.atan2(-_ny, -_nx);   // перпендикуляр со стороны лазера: от него и меряют углы
+        /* Углы считаем как направления: полусумма atan2 ломалась на стыке −180°/180° —
+           дуга рисовалась полукругом, а обе подписи уезжали в одну точку. */
+        const dAng = (a, b) => Math.atan2(Math.sin(a - b), Math.cos(a - b));            // a − b в пределах ±180°
+        const bis = (a, b) => Math.atan2(Math.sin(a) + Math.sin(b), Math.cos(a) + Math.cos(b));
+        const arcTo = (a, b) => { const d = dAng(b, a); ctx.arc(hx, hy, RARC, a, a + d, d < 0); };
+        const refDir = Math.atan2(ry, rx);
+        /* при маленьком угле подписи стояли друг на друге — разводим их по разные стороны перпендикуляра */
+        const spread = (a, other) => { const d = dAng(a, normDir), o = dAng(other, normDir); return Math.abs(d) >= .45 ? a : normDir + (d ? Math.sign(d) : -Math.sign(o || 1)) * .45; };
         ctx.save();
         ctx.strokeStyle = '#FF6B35';
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.arc(hx, hy, RARC, Math.min(incDir, normDir), Math.max(incDir, normDir));
+        arcTo(normDir, incDir);
         ctx.stroke();
         ctx.fillStyle = '#FF6B35';
         ctx.font = 'bold 13px Nunito,sans-serif';
-        const ia = (incDir + normDir) / 2;
-        ctx.fillText(`${incAng}°`, hx + Math.cos(ia) * 52 - 8, hy + Math.sin(ia) * 52 + 4);
+        const ia = spread(bis(incDir, normDir), bis(refDir, normDir));
+        ctx.fillText(`${incAng}°`, hx + Math.cos(ia) * 54 - 8, hy + Math.sin(ia) * 54 + 4);
         // reflected angle arc
-        const refDir = Math.atan2(ry, rx);
         ctx.strokeStyle = hits ? '#3CA876' : '#7C5FE0';
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.arc(hx, hy, RARC, Math.min(normDir, refDir), Math.max(normDir, refDir));
+        arcTo(normDir, refDir);
         ctx.stroke();
         ctx.fillStyle = hits ? '#3CA876' : '#7C5FE0';
-        const ra = (normDir + refDir) / 2;
-        ctx.fillText(`${incAng}°`, hx + Math.cos(ra) * 52 - 8, hy + Math.sin(ra) * 52 + 4);
+        const ra = spread(bis(normDir, refDir), bis(incDir, normDir));
+        ctx.fillText(`${incAng}°`, hx + Math.cos(ra) * 54 - 8, hy + Math.sin(ra) * 54 + 4);
         ctx.restore();
       } else {
         // draw mirror anyway (same position as traceRay)
@@ -1916,15 +1934,15 @@ function Level3({
         ctx.save();
         ctx.translate(mx2, my2);
         ctx.rotate(ma2);
-        const mg2 = ctx.createLinearGradient(0, -52, 0, 52);
+        const mg2 = ctx.createLinearGradient(-52, 0, 52, 0);
         mg2.addColorStop(0, 'rgba(181,161,255,.2)');
         mg2.addColorStop(.5, 'rgba(181,161,255,.9)');
         mg2.addColorStop(1, 'rgba(181,161,255,.2)');
         ctx.fillStyle = mg2;
-        ctx.fillRect(-5, -52, 10, 104);
+        ctx.fillRect(-52, -5, 104, 10);
         ctx.strokeStyle = '#B5A1FF';
         ctx.lineWidth = 2;
-        ctx.strokeRect(-5, -52, 10, 104);
+        ctx.strokeRect(-52, -5, 104, 10);
         ctx.restore();
         // draw dashed line from source (no hit)
         ctx.save();
@@ -1955,7 +1973,7 @@ function Level3({
         ctx.fillText(`влетел под ${info.incAng}°`, W / 2 - 70, eqY + 20);
         ctx.fillStyle = hits ? '#3CA876' : '#A797B8';
         ctx.font = 'bold 18px Nunito,sans-serif';
-        ctx.fillText(hits ? '=' : '≠', W / 2, eqY + 20);
+        ctx.fillText('=', W / 2, eqY + 20);
         ctx.fillStyle = hits ? '#3CA876' : '#7C5FE0';
         ctx.font = 'bold 14px Nunito,sans-serif';
         ctx.fillText(`вылетел под ${info.incAng}°`, W / 2 + 70, eqY + 20);
@@ -1970,16 +1988,10 @@ function Level3({
         ctx.fillText('Луч не попадает на зеркало — измени угол', W / 2, eqY + 30);
         ctx.textAlign = 'left';
       }
-      if (hits && !wonRef.current) {
-        wonRef.current = true;
-        setTimeout(() => {
-          if (pIdx < LVL3_PUZZLES.length - 1) {
-            setPIdx(p => p + 1);
-            setMAng(100);
-            mAngRef.current = 100;
-            wonRef.current = false;
-          } else setPhase('win');
-        }, 900);
+      /* как в рычаге: не перелистывать задачу саму — показать кнопку */
+      if (hits !== wonRef.current) {
+        wonRef.current = hits;
+        setSolved(hits);
       }
       raf.current = requestAnimationFrame(loop);
     }
@@ -2052,7 +2064,19 @@ function Level3({
     style: {
       width: '100%'
     }
-  })), phase === 'intro' && /*#__PURE__*/React.createElement(IntroModal, {
+  }), solved && /*#__PURE__*/React.createElement("button", {
+    className: "ak-btn ak-btn--ok",
+    style: { width: '100%', marginTop: 10 },
+    onClick: () => {
+      if (pIdx < LVL3_PUZZLES.length - 1) {
+        setPIdx(p => p + 1);
+        setMAng(100);
+        mAngRef.current = 100;
+        wonRef.current = false;
+        setSolved(false);
+      } else setPhase('win');
+    }
+  }, pIdx < LVL3_PUZZLES.length - 1 ? 'Попал! Следующая задача →' : 'Попал! Готово ✓')), phase === 'intro' && /*#__PURE__*/React.createElement(IntroModal, {
     emoji: "🔦",
     title: "Как работает зеркало?",
     law: 'Луч отскакивает от зеркала под тем же углом, под каким прилетел.',
@@ -2714,7 +2738,7 @@ function Level6Sound({
       setTimeout(() => {
         setOkFlash(false);
         if (taskIdx === 0) setTaskIdx(1);else setPhase('win');
-      }, 900);
+      }, 1800);
     }
   };
   return /*#__PURE__*/React.createElement("div", {
@@ -2750,7 +2774,7 @@ function Level6Sound({
       alignItems: 'center',
       overflowY: 'auto'
     }
-  }, /*#__PURE__*/React.createElement(TaskBadge, null, phase === 'sandbox' ? 'Покрути частоту и послушай, как меняется звук' : `${t.emoji} Настрой звук как у: ${t.name} (${t.hint})`), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement(TaskBadge, null, phase === 'sandbox' ? 'Двигай ползунок и послушай, как меняется звук' : `${t.emoji} Настрой звук как у: ${t.name} (${t.hint})`), /*#__PURE__*/React.createElement("div", {
     style: {
       width: '100%',
       maxWidth: 340,
@@ -3036,7 +3060,7 @@ function Level7Slide({ onWin, onHome }) {
           const off = S.stop - flag;
           if (Math.abs(off) <= 12) {
             setNote('Ровно у флажка!');
-            setTimeout(() => { if (rd + 1 < L7_ROUNDS.length) { setRd(rd + 1); setSurf(null); reset(); } else setPhase('win'); }, 1300);
+            setTimeout(() => { if (rd + 1 < L7_ROUNDS.length) { setRd(rd + 1); setSurf(null); reset(); } else setPhase('win'); }, 1800);
           } else setNote(off > 0 ? 'Укатились дальше флажка — нужна дорожка, которая тормозит сильнее' : 'Не доехали — нужна дорожка глаже');
           return;
         }
@@ -3124,7 +3148,7 @@ function Level8Pendulum({ onWin, onHome }) {
         setTimeout(() => {
           if (rd + 1 < L8_ROUNDS.length) { setRd(rd + 1); setDone(false); setSync(0); okFrom.current = null; t0.current = performance.now(); }
           else setPhase('win');
-        }, 1200);
+        }, 1800);
       }
     }, 100);
     return () => clearInterval(id);
@@ -3189,8 +3213,8 @@ function Level9Shadow({ onWin, onHome }) {
     if (phase !== 'play' || !hit || done) return;
     holdT.current = setTimeout(() => {
       setDone(true);
-      setTimeout(() => { if (rd + 1 < L9_ROUNDS.length) { setRd(rd + 1); setDone(false); } else setPhase('win'); }, 1200);
-    }, 700);
+      setTimeout(() => { if (rd + 1 < L9_ROUNDS.length) { setRd(rd + 1); setDone(false); } else setPhase('win'); }, 1800);
+    }, 1200);   // тень должна постоять в рамке, а не проскочить её на ходу
     return () => clearTimeout(holdT.current);
   }, [hit, phase, rd, done]);
   const top = L9_MID - sh / 2, bot = L9_MID + sh / 2;
@@ -3277,7 +3301,7 @@ function Level10Gears({ onWin, onHome }) {
       const speed = g2 < N1 ? 'быстрее' : g2 > N1 ? 'медленнее' : 'так же, как';
       if (ok) {
         setNote(`Получилось: ${R.what} крутится ${speed} мотор${g2 === N1 ? '' : 'а'}`);
-        setTimeout(() => { if (rd + 1 < L10_ROUNDS.length) { setRd(rd + 1); setG2(null); setAng(0); setNote(''); } else setPhase('win'); }, 1400);
+        setTimeout(() => { if (rd + 1 < L10_ROUNDS.length) { setRd(rd + 1); setG2(null); setAng(0); setNote(''); } else setPhase('win'); }, 1800);
       } else setNote(`Сейчас ${R.what} крутится ${speed} мотор${g2 === N1 ? '' : 'а'}. Попробуй другую шестерёнку`);
     };
     raf.current = requestAnimationFrame(tick);
