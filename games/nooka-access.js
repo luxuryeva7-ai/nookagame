@@ -158,6 +158,7 @@
 
   /* ── экран оплаты ────────────────────────────────────── */
   var PW_CSS =
+    '.nkpw,.nkpw *{box-sizing:border-box}' +
     '.nkpw{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;' +
       'padding:20px;background:rgba(8,5,16,.86);backdrop-filter:blur(10px);' +
       "font-family:'Nunito',system-ui,sans-serif}" +
@@ -195,7 +196,6 @@
   function paywall(opts) {
     opts = opts || {};
     if (document.getElementById('nkpw')) return;
-    if (window.nkGoal) nkGoal('paywall_seen');   // упёрся в платный уровень
     if (window.nkGoal) nkGoal('paywall_seen');   // упёрся в платный уровень
     if (!document.getElementById('nkpw-css')) {
       var st = document.createElement('style');
