@@ -660,15 +660,15 @@ var WAITLIST_URL = 'https://t.me/NookaGame';
   /* Адрес на главной не нужен: он есть в оферте, а номер дома посторонним ни к чему */
   el.innerHTML = R.seller + ' · ИНН ' + R.inn + ' · ОГРНИП ' + R.ogrnip +
     (R.email ? ' · <a href="mailto:' + R.email + '">' + R.email + '</a>' : ''); })();
-var V = '?v=202610031300';
+var V = '?v=202610032300';
 
 var PLANETS = [
   {key:'phys',  icon:'phys', coin:'nk-coin--sun',  subject:'Физика',                  name:'КвантУм',        desc:'Рычаги, траектории, равновесие: физика, которую можно потрогать.', active:true,  levels:10,  img:'screenshots/phys.jpg',   src:'games/physics.html'},
   {key:'chem',  icon:'chem', coin:'nk-coin--ok',   subject:'Химия',                   name:'Хемо Лаб',       desc:'Реакции, плотность и опыты, которые дома никто не разрешит.', active:true,  levels:10,  img:'screenshots/chem.jpg',   src:'games/chemistry.html'},
   {key:'code',  icon:'code', coin:'',              subject:'Программирование',        name:'КодБот',         desc:'Составь программу из блоков — и робот дойдёт до звезды.', active:true,  levels:10,  img:'screenshots/code.jpg',   src:'games/code.html'},
   {key:'space', icon:'space', coin:'nk-coin--warn', subject:'Астрономия',              name:'КосмоПорт',      desc:'Собери ракету, рассчитай топливо и выйди на орбиту.', active:true,  levels:10,  free:2, img:'screenshots/space.jpg',   src:'games/space.html'},
-  {key:'robo',  icon:'robo', coin:'',              subject:'Инженерия',               name:'РобоЛаб',        desc:'Шестерёнки, рычаги и моторы: собери машину, которая едет сама.', active:false, levels:6,  img:'screenshots/robo.svg'},
-  {key:'bio',   icon:'bio', coin:'nk-coin--ok',   subject:'Биология',                name:'БиоМир',         desc:'Клетки, ДНК, экосистемы: собери живой мир своими руками.', active:false, levels:8,  img:'screenshots/bio.svg'},
+  {key:'robo',  icon:'robo', coin:'',              subject:'Робототехника',           name:'РобоЛаб',        desc:'Моторы, датчики и плата-мозг: собери своего робота и придумай ему правила.', active:true,  levels:10, free:2, img:'screenshots/robo.jpg',  src:'games/robo.html'},
+  {key:'bio',   icon:'bio', coin:'nk-coin--ok',   subject:'Биология',                name:'БиоМир',         desc:'Микроскоп, остров с лисами, сердце-насос и бабочки, которые меняют цвет.', active:true,  levels:10, free:2, img:'screenshots/bio.jpg',   src:'games/bio.html'},
   {key:'eco',   icon:'eco', coin:'nk-coin--ok',   subject:'Экология и энергия',      name:'ЭкоСфера',       desc:'Запитай целый город чистой энергией — и не устрой блэкаут.', active:false, levels:6,  img:'screenshots/eco.svg'},
   {key:'math',  icon:'math', coin:'nk-coin--warn', subject:'Математика',              name:'Цифрариум',      desc:'Числа, фигуры и шифры: головоломки, за которые берёшься сам.', active:false, levels:10, img:'screenshots/math.svg'},
   {key:'geo',   icon:'geo', coin:'',              subject:'География',               name:'ГеоАтлас',       desc:'Материки, климаты, страны: квесты по всей планете.', active:false, levels:7,  img:'screenshots/geo.svg'}
