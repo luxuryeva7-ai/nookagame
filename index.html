@@ -82,7 +82,6 @@ img{max-width:100%}
 .nk-coin--sun .ic{color:var(--nk-sun-3)}
 .nk-coin--ok .ic{color:var(--nk-ok-3)}
 .nk-coin--warn .ic{color:var(--nk-warn-3)}
-.band-feat .nk-coin .ic{color:var(--nk-pri-4)}
 
 .nk-chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--nk-display);font-weight:900;font-size:18px;
   color:var(--nk-ink);background:linear-gradient(180deg,#FFF1B4,#FFD84D);border-radius:999px;padding:9px 20px;
@@ -126,6 +125,7 @@ h1 .p{color:var(--nk-pri-3)} h1 .s{color:var(--nk-sun-3)}
 .hero-ctas{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:28px}
 .hero-safe{display:flex;align-items:center;gap:14px 22px;flex-wrap:wrap;color:var(--nk-ink-2);font-weight:800;font-size:14px}
 .hs-i{display:inline-flex;align-items:center;gap:11px}
+.hs-i .nk-coin{flex:none}
 .hero-visual{flex:1 1 380px;min-width:300px;position:relative}
 .hero-deco{position:absolute;inset:-24px;pointer-events:none;z-index:2}
 .hero-deco .nk-coin{position:absolute}
@@ -145,18 +145,6 @@ h1 .p{color:var(--nk-pri-3)} h1 .s{color:var(--nk-sun-3)}
 .sec-h{font-size:clamp(30px,3.8vw,48px);margin:0 0 10px}
 .sec-h span{color:var(--nk-pri-3)}
 .sec-sub{color:var(--nk-ink-2);max-width:540px;margin:0 0 38px}
-
-.band{border-radius:var(--nk-r-xl);padding:clamp(28px,4vw,48px);color:#fff;
-  background:linear-gradient(160deg,#8A63FF,var(--nk-pri-3) 55%,var(--nk-pri-4));
-  box-shadow:0 18px 40px -18px rgba(88,54,189,.7),inset 0 2px 0 rgba(255,255,255,.25)}
-.band h2{font-size:clamp(24px,3vw,40px);line-height:1.1;margin:0 0 6px}
-.band h2 span{color:var(--nk-sun-2)}
-.band p{font-weight:700;color:rgba(255,255,255,.8);max-width:560px;margin:0 0 30px;font-size:16px}
-.band-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
-.band-feat{background:rgba(255,255,255,.12);border-radius:var(--nk-r-l);padding:22px;display:flex;gap:14px;align-items:flex-start}
-.band-feat .nk-coin{flex-shrink:0}
-.band-feat h3{font-family:var(--nk-display);font-weight:900;font-size:18px;margin:0 0 4px}
-.band-feat p{font-weight:700;font-size:14px;color:rgba(255,255,255,.82);line-height:1.5;margin:0;max-width:none}
 
 .grid-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
 .planet{border:none;cursor:pointer;padding:14px 14px 0;font-family:var(--nk-body);text-align:left;transition:transform .12s;display:block;width:100%}
@@ -435,7 +423,8 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
         <a class="nk-btn nk-btn--soft nk-btn--lg" href="buy/">Купить доступ</a>
       </div>
       <div class="hero-safe">
-        <span class="hs-i"><span class="nk-coin nk-coin--ok" style="width:38px;height:38px"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-check"></use></svg></span>Без рекламы и чужих ссылок · с любого устройства</span>
+        <span class="hs-i"><span class="nk-coin nk-coin--ok" style="width:38px;height:38px"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-check"></use></svg></span>Без рекламы, чатов и чужих ссылок</span>
+        <span class="hs-i"><span class="nk-coin" style="width:38px;height:38px"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-progress"></use></svg></span>Вы видите, что ребёнок прошёл</span>
       </div>
     </div>
     <div class="hero-visual">
@@ -448,18 +437,6 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
       </div>
       <div class="nk-clay hero-frame">
         <div class="hero-frame-inner"><img src="mascot/hello.webp" alt="Маскот Nooka"></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="wrap">
-    <div class="band">
-      <h2 class="nk-t-brand">Внутри каждой игры<br><span>своя механика</span></h2>
-      <p>Где-то он рисует пальцем, где-то двигает ползунки, где-то спорит с роботом. Параграф из учебника он бы просто пролистал.</p>
-      <div class="band-grid">
-        <div class="band-feat"><span class="nk-coin nk-coin--sun"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-method"></use></svg></span><div><h3>Каждый уровень объясняет одно правило</h3><p>И ребёнок доходит до него сам: попробовал, ошибся, увидел, как это работает.</p></div></div>
-        <div class="band-feat"><span class="nk-coin nk-coin--ok"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-shield"></use></svg></span><div><h3>Безопасно</h3><p>Без рекламы, чатов и внешних ссылок.</p></div></div>
-        <div class="band-feat"><span class="nk-coin"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-progress"></use></svg></span><div><h3>Виден прогресс</h3><p>Опыт, звания и дни подряд. Вы видите, чем ребёнок занят и что уже прошёл.</p></div></div>
       </div>
     </div>
   </section>
