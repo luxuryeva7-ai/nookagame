@@ -438,12 +438,12 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
   <section class="wrap section" id="course">
     <div class="nk-chip sec-head-chip">Курс из трёх игр</div>
     <h2 class="nk-t-h1 sec-h">Игры про ИИ-грамотность <span>для детей 8–12</span></h2>
-    <p class="nk-t-body sec-sub">ИИ уже рядом с ребёнком — в поиске, в переводчике, в чатах. Здесь он разбирается, откуда программа берёт ответы, почему она уверенно ошибается и чего ей нельзя о себе рассказывать. <span id="courseVol">Тридцать три уровня и три мастерские</span> — и ни одного места, где надо просто читать.</p>
+    <p class="nk-t-body sec-sub">Ребёнок разбирается, откуда ИИ берёт ответы, почему он уверенно ошибается и чего ему нельзя о себе рассказывать.</p>
 
     <div class="course-grid" id="courseGrid"></div>
     <div class="course-note">Первые <span id="freeCnt">3 уровня</span> — бесплатно, без регистрации и без карты.
       Весь курс открывается <a href="/buy/">одним доступом на всю семью</a>.</div>
-    <p class="course-frame">Программа собрана по международной рамке <b>«Пять больших идей об ИИ»</b> — по ней выстроен весь курс: каждый уровень закрывает свою идею.</p>
+    <p class="course-frame">Программа собрана по международной рамке <b>«Пять больших идей об ИИ»</b>.</p>
   </section>
 
 
@@ -765,7 +765,6 @@ renderCourse();
 (function(){
   if (!window.nookaLevels) return;
   function put(id, text) { var el = document.getElementById(id); if (el) el.textContent = text; }
-  put('courseVol', nookaLevels.volume('all').text);
   put('pfFree', nookaLevels.volume('free').text);
   put('freeCnt', nookaLevels.volume('free').short);
   put('pfPaid', nookaLevels.volume('paid').text);
