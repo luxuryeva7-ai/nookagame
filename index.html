@@ -178,22 +178,16 @@ h1 .p{color:var(--nk-pri-3)} h1 .s{color:var(--nk-sun-3)}
 .p-name{margin:3px 0 8px}
 .p-desc{font-size:14px;color:var(--nk-ink-2);line-height:1.55}
 
-/* ── что ребёнок умеет после курса: результат, за который платят ── */
-.skills{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:6px}
-.skill{padding:22px 24px;display:flex;gap:16px;align-items:flex-start}
-.skill .ic{width:22px;height:22px}
-.skill-txt b{display:block;font-family:var(--nk-display);font-weight:900;font-size:16.5px;
-  line-height:1.25;margin-bottom:6px}
-.skill-txt span{display:block;font-size:14px;line-height:1.55;color:var(--nk-ink-2)}
-.skill-txt em{display:block;margin-top:8px;font-style:normal;font-size:12px;font-weight:800;
-  color:var(--nk-ink-3)}
-/* Четыре умения: рамка курса, по ней же собран отчёт родителю и школьная дека */
-.skgroup{margin-top:26px}
-.skgroup__h{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px;padding-left:2px}
-.skgroup__n{font-family:var(--nk-display);font-weight:900;font-size:13px;color:var(--nk-pri-2);
-  letter-spacing:.04em}
-.skgroup__h b{font-family:var(--nk-display);font-weight:900;font-size:21px;line-height:1.1}
-.skgroup__h>span:last-child{font-size:14px;font-weight:700;color:var(--nk-ink-2)}
+/* ── Четыре умения: рамка курса, по ней же собран отчёт родителю и школьная дека.
+   На главной — одной строкой, этап = одно-два слова: карточки съедали полэкрана,
+   а родителю хватает самих этапов. Номер этапа рисует счётчик, линия — ::after. ── */
+.skline{list-style:none;margin:22px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);counter-reset:sk}
+.skline li{position:relative;padding-top:48px;text-align:center;counter-increment:sk;
+  font-family:var(--nk-display);font-weight:900;font-size:clamp(13px,2.2vw,21px);line-height:1.15}
+.skline li::before{content:'0' counter(sk);position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:1;
+  width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:13px;color:var(--nk-pri-3);background:var(--nk-surface);box-shadow:inset 0 0 0 2px var(--nk-pri-2)}
+.skline li+li::after{content:'';position:absolute;top:18px;right:50%;width:100%;height:2px;background:var(--nk-pri-1)}
 .skills-note{margin:22px auto 0;max-width:640px;text-align:center;font-size:15px;
   font-weight:700;line-height:1.55;color:var(--nk-ink)}
 .skills-note b{color:var(--nk-pri-3)}
@@ -483,38 +477,13 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
 
 
   <section class="wrap section" id="skills">
-    <div class="nk-chip sec-head-chip">Результат</div>
     <h2 class="nk-t-h1 sec-h">Четыре умения, <span>которые остаются</span></h2>
-    <p class="nk-t-body sec-sub">Не «познакомится с темой». Каждое умение ребёнок проходит руками — и может показать вам, как это работает.</p>
-    <div class="skgroup">
-      <div class="skgroup__h"><span class="skgroup__n">01</span><b>Понимает</b></div>
-      <div class="skills">
-      <div class="nk-clay skill"><span class="nk-coin"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-ai"></use></svg></span><div class="skill-txt"><b>Знает, как ИИ обучается и выдаёт ответы</b><em>Игра 1 · уровни 2, 5, 7</em></div></div>
-      <div class="nk-clay skill"><span class="nk-coin"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-method"></use></svg></span><div class="skill-txt"><b>Понимает, как ИИ принимает решения</b><em>Игра 3 · уровни 2 и 4</em></div></div>
-      </div>
-    </div>
-    <div class="skgroup">
-      <div class="skgroup__h"><span class="skgroup__n">02</span><b>Управляет</b></div>
-      <div class="skills">
-      <div class="nk-clay skill"><span class="nk-coin nk-coin--sun"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-prompt"></use></svg></span><div class="skill-txt"><b>Умеет объяснить ИИ, что именно нужно</b><em>Игра 2 · уровни 1–3</em></div></div>
-      <div class="nk-clay skill"><span class="nk-coin nk-coin--sun"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-code"></use></svg></span><div class="skill-txt"><b>Разбивает задачу на шаги</b><em>Игра 2 · уровень 8</em></div></div>
-      </div>
-    </div>
-    <div class="skgroup">
-      <div class="skgroup__h"><span class="skgroup__n">03</span><b>Проверяет</b></div>
-      <div class="skills">
-      <div class="nk-clay skill"><span class="nk-coin nk-coin--warn"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-check"></use></svg></span><div class="skill-txt"><b>Знает, как перепроверять ответы ИИ</b><em>Игра 1 · уровень 9</em></div></div>
-      <div class="nk-clay skill"><span class="nk-coin nk-coin--ok"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-progress"></use></svg></span><div class="skill-txt"><b>Знает, что ИИ может уверенно ошибаться</b><em>Игра 3 · уровень 7</em></div></div>
-      <div class="nk-clay skill"><span class="nk-coin nk-coin--warn"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-shield"></use></svg></span><div class="skill-txt"><b>Не рассказывает о себе лишнего</b><em>Игра 3 · уровень 10</em></div></div>
-      </div>
-    </div>
-    <div class="skgroup">
-      <div class="skgroup__h"><span class="skgroup__n">04</span><b>Создаёт и решает сам</b></div>
-      <div class="skills">
-      <div class="nk-clay skill"><span class="nk-coin nk-coin--ok"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-rocket"></use></svg></span><div class="skill-txt"><b>Обучает программу с нуля и проверяет её</b><em>Игра 1 · уровень 10</em></div></div>
-      <div class="nk-clay skill"><span class="nk-coin"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-shield"></use></svg></span><div class="skill-txt"><b>Знает, какие решения нельзя отдавать ИИ</b><em>Игра 2 · уровень 10</em></div></div>
-      </div>
-    </div>
+    <ol class="skline">
+      <li>Понимает</li>
+      <li>Управляет</li>
+      <li>Проверяет</li>
+      <li>Решает сам</li>
+    </ol>
     <p class="skills-note">Проверить просто: через месяц спросите за ужином, <b>почему программа может уверенно ошибаться</b>. Ребёнок ответит своими словами.</p>
   </section>
 
