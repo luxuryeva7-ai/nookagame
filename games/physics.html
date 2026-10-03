@@ -44,32 +44,6 @@ body{margin:0;font-family:var(--ak-body);color:var(--ak-ink);}
 input[type=range]{-webkit-appearance:none;width:100%;height:20px;border-radius:999px;background:transparent;cursor:pointer;outline:none;}
 input[type=range]::-webkit-slider-runnable-track{height:20px;border-radius:999px;background:linear-gradient(180deg,var(--ak-phys-1),var(--ak-phys-2));}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:38px;height:38px;border-radius:50%;margin-top:-9px;cursor:pointer;background:linear-gradient(180deg,#fff,#FFF7E8);box-shadow:0 4px 0 rgba(45,27,69,.15),0 8px 16px -6px rgba(45,27,69,.2);}
-
-/* ==== ТЁМНАЯ ТЕМА — палитра Нейро Академии, как у ИИ-курса (nooka-ui.css, «NOOKA DARK»).
-   Переопределяет светлые токены выше: всё, что завязано на --ak-*, темнеет само. ==== */
-:root{
-  --ak-bg:#080C18;--ak-bg-2:#0D1427;--ak-surface:#101C32;
-  --ak-ink:#F0F4FF;--ak-ink-2:#C4D4EE;--ak-ink-3:#8296B4;
-  --ak-phys-1:#1A2D48;--ak-phys-2:#7B4FF2;--ak-phys-3:#B98CFF;
-  --ak-chem-1:#0E2A24;--ak-chem-2:#06D6A0;--ak-chem-3:#2FE0AE;
-  --ak-cta-1:#2A2410;--ak-cta-2:#FFD60A;--ak-cta-3:#B89A07;
-  --ak-ok-1:#0E2A24;--ak-ok-2:#06D6A0;--ak-ok-3:#2FE0AE;
-  --ak-warn-1:#33161A;--ak-warn-2:#FF6B6B;--ak-warn-3:#FF8B8B;
-  --ak-star-1:#332B08;--ak-star-2:#FFD60A;--ak-star-3:#B89A07;
-  --ak-display:'Nunito',system-ui,sans-serif;
-}
-html,body{background:#080C18;}
-.ak-btn{font-weight:900;}
-.ak-clay{background:#101C32;color:var(--ak-ink);box-shadow:0 0 0 1.5px #1A2D48,0 30px 60px -20px rgba(0,0,0,.9);}
-.ak-btn--soft{color:#D8E3F6;background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 1px rgba(255,255,255,.17);}
-.ak-btn--soft:active{transform:translateY(1px);}
-.ak-btn--cta{color:#2A2108;box-shadow:0 6px 0 #8F7A06,0 0 26px rgba(255,214,10,.3),inset 0 2px 0 rgba(255,255,255,.4);}
-.ak-btn--phys{color:#fff;background:linear-gradient(180deg,#9B78FF,#7B4FF2 60%,#6E41E4);box-shadow:0 6px 0 #3D2688,0 0 26px rgba(123,79,242,.4),inset 0 2px 0 rgba(255,255,255,.25);}
-.ak-btn--phys:active{box-shadow:0 2px 0 #3D2688;}
-.ak-btn--ok{color:#04281F;background:linear-gradient(180deg,#5FF0C6,#06D6A0 60%,#05BF8F);box-shadow:0 6px 0 #04725A,0 0 26px rgba(6,214,160,.35),inset 0 2px 0 rgba(255,255,255,.35);}
-.ak-btn--warn{box-shadow:0 6px 0 #A83636,0 0 26px rgba(255,107,107,.3),inset 0 2px 0 rgba(255,255,255,.3);}
-input[type=range]::-webkit-slider-runnable-track{background:linear-gradient(90deg,#1A2D48,#7B4FF2);}
-input[type=range]::-webkit-slider-thumb{background:linear-gradient(180deg,#fff,#E4DCFF);box-shadow:0 4px 0 #3D2688,0 0 16px rgba(123,79,242,.5);}
 </style>
 <script src="/metrika.js" defer></script>
 </head>
@@ -430,7 +404,7 @@ function gBall(ctx, x, y, r, c1, c2) {
   ctx.arc(x, y, r, 0, Math.PI * 2);
   ctx.fillStyle = g;
   ctx.fill();
-  ctx.strokeStyle = 'rgba(255,255,255,.14)';
+  ctx.strokeStyle = 'rgba(45,27,69,.2)';
   ctx.lineWidth = 1.5;
   ctx.stroke();
 }
@@ -507,32 +481,30 @@ function TopBar({
 function TaskBadge({
   children
 }) {
-  /* Плашка задачи — как «Что делать» в ИИ-курсе: золотая рамка, без мигания всего текста */
   return /*#__PURE__*/React.createElement("div", {
+    className: "ak-pulse",
     style: {
       margin: '0 16px 10px',
       display: 'inline-flex',
       alignItems: 'center',
       gap: 10,
-      padding: '11px 16px 11px 14px',
-      borderRadius: 16,
-      background: 'rgba(255,216,77,.08)',
+      padding: '11px 18px 11px 14px',
+      borderRadius: 999,
+      background: '#fff',
       fontFamily: 'var(--ak-display)',
-      fontSize: 14.5,
-      fontWeight: 800,
-      lineHeight: 1.3,
-      color: '#FFF6DC',
-      boxShadow: 'inset 0 0 0 1.5px rgba(255,216,77,.38)'
+      fontSize: 14,
+      fontWeight: 600,
+      color: 'var(--ak-ink)',
+      boxShadow: '0 4px 0 rgba(45,27,69,.08),0 10px 22px -6px rgba(45,27,69,.14),inset 0 1px 0 rgba(255,255,255,1)'
     }
   }, /*#__PURE__*/React.createElement("div", {
-    className: "ak-pulse",
     style: {
-      width: 9,
-      height: 9,
+      width: 10,
+      height: 10,
       borderRadius: '50%',
-      background: '#FFD84D',
+      background: '#B5A1FF',
       flexShrink: 0,
-      boxShadow: '0 0 10px rgba(255,216,77,.8)'
+      boxShadow: '0 0 0 4px rgba(181,161,255,.33),inset 0 -1px 0 #7C5FE0'
     }
   }), /*#__PURE__*/React.createElement("span", null, children));
 }
@@ -710,14 +682,14 @@ function IntroModal({
     style: {
       width: '100%',
       borderRadius: 18,
-      background: 'rgba(16,28,50,.92)',
+      background: 'rgba(255,255,255,.7)',
       display: 'block'
     }
   })), /*#__PURE__*/React.createElement("div", {
     style: {
       width: '100%',
       maxWidth: 320,
-      background: 'rgba(16,28,50,.92)',
+      background: 'rgba(255,255,255,.8)',
       borderRadius: 20,
       padding: '14px 18px',
       marginBottom: 12,
@@ -907,8 +879,8 @@ function Level1({
       ctx.clearRect(0, 0, W, H);
       // sky bg
       const sky = ctx.createLinearGradient(0, 0, 0, H);
-      sky.addColorStop(0, '#1B1747');
-      sky.addColorStop(1, '#0D1427');
+      sky.addColorStop(0, '#EEE8FF');
+      sky.addColorStop(1, '#FFF3E2');
       ctx.fillStyle = sky;
       ctx.fillRect(0, 0, W, H);
       // stars decoration
@@ -919,7 +891,7 @@ function Level1({
         ctx.fill();
       });
       // ground
-      ctx.fillStyle = '#16304A';
+      ctx.fillStyle = '#C8F2DD';
       ctx.fillRect(0, H - 44, W, 44);
       ctx.fillStyle = '#2BA873';
       ctx.fillRect(0, H - 44, W, 5);
@@ -1019,10 +991,10 @@ function Level1({
         ctx.fillStyle = '#FF6B35';
         ctx.font = 'bold 11px Nunito,sans-serif';
         ctx.textAlign = 'left';
-        ctx.fillText('вперёд', b.x + VXL + 4, b.y - 2);
+        ctx.fillText('vx', b.x + VXL + 4, b.y - 2);
         arrowLine(ctx, b.x, b.y, b.x, b.y + VYL, '#4A9EFF', 2.5);
         ctx.fillStyle = '#4A9EFF';
-        ctx.fillText('вниз', b.x + 5, b.y + VYL + 13);
+        ctx.fillText('g↓', b.x + 5, b.y + VYL + 13);
         // pop label at frame 18
         if (b.frame === 18) {
           ctx.fillStyle = 'rgba(255,255,255,.93)';
@@ -1034,8 +1006,8 @@ function Level1({
           ctx.stroke();
           ctx.fillStyle = '#2D1B45';
           ctx.font = 'bold 11px Nunito,sans-serif';
-          ctx.fillText('→ вперёд — ровно', b.x - 85, b.y - 38);
-          ctx.fillText('↓ вниз — всё быстрее', b.x - 85, b.y - 20);
+          ctx.fillText('→ vx не меняется!', b.x - 85, b.y - 38);
+          ctx.fillText('↓ g нарастает!', b.x - 85, b.y - 20);
         }
         // collision
         g.targets.forEach(t => {
@@ -1050,7 +1022,7 @@ function Level1({
 
       // HUD
       const alive = g.targets.filter(t => t.alive).length;
-      ctx.fillStyle = '#C4D4EE';
+      ctx.fillStyle = '#6B5680';
       ctx.font = 'bold 13px Nunito,sans-serif';
       ctx.textAlign = 'right';
       ctx.fillText(`⭐ ${3 - alive}/3  ·  💥 выстрелов: ${g.maxShots - g.shots}`, W - 12, 26);
@@ -1096,7 +1068,7 @@ function Level1({
       display: 'flex',
       flexDirection: 'column',
       overflow: 'hidden',
-      background: 'radial-gradient(80% 40% at 50% 0%,var(--ak-phys-1) 0%,transparent 65%),linear-gradient(180deg,#0D1427,var(--ak-bg) 60%)'
+      background: 'radial-gradient(80% 40% at 50% 0%,var(--ak-phys-1) 0%,transparent 65%),linear-gradient(180deg,#FFF8EA,var(--ak-bg) 60%)'
     }
   }, /*#__PURE__*/React.createElement(TopBar, {
     level: 1,
@@ -1124,7 +1096,7 @@ function Level1({
   }), /*#__PURE__*/React.createElement("div", {
     style: {
       padding: '10px 20px 16px',
-      background: 'rgba(16,28,50,.92)',
+      background: 'rgba(255,255,255,.75)',
       backdropFilter: 'blur(8px)',
       flexShrink: 0
     }
@@ -1250,7 +1222,7 @@ function Level2({
     ctx.lineTo(cx + 125, cy);
     ctx.stroke();
     // fulcrum
-    ctx.fillStyle = '#C4D4EE';
+    ctx.fillStyle = '#6B5680';
     ctx.beginPath();
     ctx.moveTo(cx - 15, cy + 2);
     ctx.lineTo(cx + 15, cy + 2);
@@ -1300,9 +1272,9 @@ function Level2({
       ctx.clearRect(0, 0, W, H);
       // bg
       const bg = ctx.createLinearGradient(0, 0, 0, H);
-      bg.addColorStop(0, '#121633');
-      bg.addColorStop(1, '#0D1427');
-      ctx.fillStyle = '#121633';
+      bg.addColorStop(0, '#FFF8EA');
+      bg.addColorStop(1, '#FFF3E2');
+      ctx.fillStyle = '#FFF8EA';
       ctx.fillRect(0, 0, W, H);
       // sky dots
       [[30, 50], [160, 30], [290, 45], [340, 80]].forEach(([sx, sy]) => {
@@ -1312,7 +1284,7 @@ function Level2({
         ctx.fill();
       });
       // ground
-      ctx.fillStyle = '#16304A';
+      ctx.fillStyle = '#C8F2DD';
       ctx.fillRect(0, H - 44, W, 44);
       ctx.fillStyle = '#2BA873';
       ctx.fillRect(0, H - 44, W, 5);
@@ -1360,7 +1332,7 @@ function Level2({
         ctx.stroke();
       }
       // fulcrum
-      ctx.fillStyle = '#C4D4EE';
+      ctx.fillStyle = '#6B5680';
       ctx.beginPath();
       ctx.moveTo(cx - 20, cy + 2);
       ctx.lineTo(cx + 20, cy + 2);
@@ -1432,7 +1404,7 @@ function Level2({
 
       // EQUATION BOX (HTML-style in canvas)
       const eqY = H - 108;   // над полосой земли (H − 44): раньше земля перечёркивала табличку
-      ctx.fillStyle = balanced ? 'rgba(93,217,160,.22)' : 'rgba(26,45,72,.85)';
+      ctx.fillStyle = balanced ? 'rgba(93,217,160,.22)' : 'rgba(229,220,255,.5)';
       rrect(ctx, 18, eqY, W - 36, 58, 14);
       ctx.fill();
       ctx.strokeStyle = balanced ? '#3CA876' : 'rgba(181,161,255,.6)';
@@ -1444,7 +1416,7 @@ function Level2({
       ctx.fillStyle = '#FF6B35';
       ctx.font = 'bold 13px Nunito,sans-serif';
       ctx.fillText(`${pz.e1} тянет`, W / 2 - 72, eqY + 20);
-      ctx.fillStyle = balanced ? '#3CA876' : '#8296B4';
+      ctx.fillStyle = balanced ? '#3CA876' : '#A797B8';
       ctx.font = 'bold 18px Nunito,sans-serif';
       ctx.fillText(balanced ? '=' : '≠', W / 2, eqY + 20);
       ctx.fillStyle = '#4A9EFF';
@@ -1454,16 +1426,16 @@ function Level2({
       ctx.fillStyle = '#FF6B35';
       ctx.font = 'bold 17px Nunito,sans-serif';
       ctx.fillText(`${tL}`, W / 2 - 80, eqY + 46);
-      ctx.fillStyle = '#8296B4';
+      ctx.fillStyle = '#A797B8';
       ctx.font = '12px Nunito,sans-serif';
       ctx.fillText('', W / 2 - 52, eqY + 46);
-      ctx.fillStyle = balanced ? '#3CA876' : '#8296B4';
+      ctx.fillStyle = balanced ? '#3CA876' : '#A797B8';
       ctx.font = 'bold 18px Nunito,sans-serif';
       ctx.fillText(balanced ? '✓ =' : '≠', W / 2, eqY + 46);
       ctx.fillStyle = balanced ? '#3CA876' : tR > tL ? '#D9523F' : '#4A9EFF';
       ctx.font = 'bold 17px Nunito,sans-serif';
       ctx.fillText(`${tR}`, W / 2 + 72, eqY + 46);
-      ctx.fillStyle = '#8296B4';
+      ctx.fillStyle = '#A797B8';
       ctx.font = '12px Nunito,sans-serif';
       ctx.fillText('', W / 2 + 96, eqY + 46);
       ctx.textAlign = 'left';
@@ -1477,7 +1449,7 @@ function Level2({
       // hint
       if (!balanced) {
         const diff = tL - tR;
-        ctx.fillStyle = '#8296B4';
+        ctx.fillStyle = '#A797B8';
         ctx.font = '13px Nunito,sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(diff > 0 ? 'отодвинь дальше от опоры →' : '← придвинь ближе к опоре', W / 2, eqY - 8);
@@ -1503,7 +1475,7 @@ function Level2({
       display: 'flex',
       flexDirection: 'column',
       overflow: 'hidden',
-      background: 'radial-gradient(70% 40% at 50% 0%,var(--ak-cta-1) 0%,transparent 70%),linear-gradient(180deg,#0D1427,var(--ak-bg))'
+      background: 'radial-gradient(70% 40% at 50% 0%,var(--ak-cta-1) 0%,transparent 70%),linear-gradient(180deg,#FFF8EA,var(--ak-bg))'
     }
   }, /*#__PURE__*/React.createElement(TopBar, {
     level: 2,
@@ -1533,7 +1505,7 @@ function Level2({
   }), /*#__PURE__*/React.createElement("div", {
     style: {
       padding: '10px 20px 14px',
-      background: 'rgba(16,28,50,.92)',
+      background: 'rgba(255,255,255,.75)',
       backdropFilter: 'blur(8px)',
       flexShrink: 0
     }
@@ -1663,7 +1635,7 @@ function Level3({
     ctx.fillRect(-4, -44, 8, 88);
     ctx.restore();
     // normal dashed
-    ctx.strokeStyle = 'rgba(255,255,255,.14)';
+    ctx.strokeStyle = 'rgba(45,27,69,.2)';
     ctx.lineWidth = 1.5;
     ctx.setLineDash([4, 4]);
     ctx.beginPath();
@@ -1770,12 +1742,12 @@ function Level3({
       ctx.clearRect(0, 0, W, H);
       // warm bg (matching chemistry)
       const bg = ctx.createLinearGradient(0, 0, 0, H);
-      bg.addColorStop(0, '#1B1747');
-      bg.addColorStop(1, '#0D1427');
+      bg.addColorStop(0, '#EEE8FF');
+      bg.addColorStop(1, '#FFF3E2');
       ctx.fillStyle = bg;
       ctx.fillRect(0, 0, W, H);
       // subtle grid
-      ctx.strokeStyle = 'rgba(169,139,255,.09)';
+      ctx.strokeStyle = 'rgba(124,95,224,.06)';
       ctx.lineWidth = 1;
       for (let x = 0; x < W; x += 36) {
         ctx.beginPath();
@@ -1891,7 +1863,7 @@ function Level3({
           ny: -Math.cos(ma)
         };
         ctx.save();
-        ctx.strokeStyle = 'rgba(255,255,255,.14)';
+        ctx.strokeStyle = 'rgba(45,27,69,.2)';
         ctx.lineWidth = 1.5;
         ctx.setLineDash([5, 5]);
         ctx.beginPath();
@@ -1987,7 +1959,7 @@ function Level3({
 
       // BOTTOM EQUATION BOX
       const eqY = H - 86;
-      ctx.fillStyle = hits ? 'rgba(93,217,160,.2)' : 'rgba(26,45,72,.85)';
+      ctx.fillStyle = hits ? 'rgba(93,217,160,.2)' : 'rgba(229,220,255,.55)';
       rrect(ctx, 18, eqY, W - 36, 56, 14);
       ctx.fill();
       ctx.strokeStyle = hits ? '#3CA876' : 'rgba(181,161,255,.5)';
@@ -1999,18 +1971,18 @@ function Level3({
         ctx.fillStyle = '#FF6B35';
         ctx.font = 'bold 14px Nunito,sans-serif';
         ctx.fillText(`влетел под ${info.incAng}°`, W / 2 - 70, eqY + 20);
-        ctx.fillStyle = hits ? '#3CA876' : '#8296B4';
+        ctx.fillStyle = hits ? '#3CA876' : '#A797B8';
         ctx.font = 'bold 18px Nunito,sans-serif';
         ctx.fillText('=', W / 2, eqY + 20);
         ctx.fillStyle = hits ? '#3CA876' : '#7C5FE0';
         ctx.font = 'bold 14px Nunito,sans-serif';
         ctx.fillText(`вылетел под ${info.incAng}°`, W / 2 + 70, eqY + 20);
-        ctx.fillStyle = hits ? '#3CA876' : '#8296B4';
+        ctx.fillStyle = hits ? '#3CA876' : '#A797B8';
         ctx.font = 'bold 13px Nunito,sans-serif';
         ctx.fillText(hits ? '✓ Как влетел — так и вылетел!' : 'вращай зеркало → найди цель', W / 2, eqY + 44);
         ctx.textAlign = 'left';
       } else {
-        ctx.fillStyle = '#8296B4';
+        ctx.fillStyle = '#A797B8';
         ctx.font = '13px Nunito,sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText('Луч не попадает на зеркало — измени угол', W / 2, eqY + 30);
@@ -2035,7 +2007,7 @@ function Level3({
       display: 'flex',
       flexDirection: 'column',
       overflow: 'hidden',
-      background: 'radial-gradient(70% 40% at 50% 0%,var(--ak-ok-1) 0%,transparent 65%),linear-gradient(180deg,#0D1427,var(--ak-bg))'
+      background: 'radial-gradient(70% 40% at 50% 0%,var(--ak-ok-1) 0%,transparent 65%),linear-gradient(180deg,#FFF8EA,var(--ak-bg))'
     }
   }, /*#__PURE__*/React.createElement(TopBar, {
     level: 3,
@@ -2063,7 +2035,7 @@ function Level3({
   }), /*#__PURE__*/React.createElement("div", {
     style: {
       padding: '10px 20px 14px',
-      background: 'rgba(16,28,50,.92)',
+      background: 'rgba(255,255,255,.75)',
       backdropFilter: 'blur(8px)',
       flexShrink: 0
     }
@@ -2222,7 +2194,7 @@ function Level4Magnet({
       height: '100vh',
       display: 'flex',
       flexDirection: 'column',
-      background: 'radial-gradient(120% 60% at 50% -10%,#1B1747 0%,transparent 60%),linear-gradient(180deg,var(--ak-bg-2),var(--ak-bg))',
+      background: 'radial-gradient(120% 60% at 50% -10%,#E5DCFF 0%,transparent 60%),linear-gradient(180deg,var(--ak-bg-2),var(--ak-bg))',
       overflow: 'hidden'
     }
   }, /*#__PURE__*/React.createElement(TopBar, {
@@ -2273,7 +2245,7 @@ function Level4Magnet({
       borderRadius: 18,
       padding: '12px 6px',
       fontFamily: 'var(--ak-body)',
-      background: 'rgba(16,28,50,.92)',
+      background: 'rgba(255,255,255,.9)',
       boxShadow: '0 5px 0 rgba(45,27,69,.1)',
       position: 'relative',
       transform: cur === it.id && it.mag ? 'translateY(-16px)' : 'none',
@@ -2483,7 +2455,7 @@ function Level5Circuit({
     style: {
       width: '100%',
       maxWidth: 340,
-      background: 'rgba(16,28,50,.92)',
+      background: 'rgba(255,255,255,.85)',
       borderRadius: 24,
       padding: 18,
       boxShadow: '0 6px 0 rgba(45,27,69,.08)'
@@ -2657,7 +2629,7 @@ function Level5Circuit({
   }, "Включаем! ⚡"), /*#__PURE__*/React.createElement("button", {
     className: "ak-btn",
     style: {
-      background: 'rgba(16,28,50,.92)',
+      background: 'rgba(255,255,255,.9)',
       boxShadow: '0 6px 0 rgba(45,27,69,.12)'
     },
     onClick: () => setSlots([null, null, null])
@@ -2806,7 +2778,7 @@ function Level6Sound({
     style: {
       width: '100%',
       maxWidth: 340,
-      background: okFlash ? 'linear-gradient(160deg,#0E3A30,#06A57C)' : 'rgba(16,28,50,.92)',
+      background: okFlash ? 'linear-gradient(160deg,#C8F2DD,#5DD9A0)' : 'rgba(255,255,255,.9)',
       borderRadius: 24,
       padding: 18,
       boxShadow: '0 6px 0 rgba(45,27,69,.08)',
@@ -2893,7 +2865,7 @@ function PhysShell({ n, title, step, total, onHome, children }) {
     className: "ak",
     style: {
       minHeight: '100vh', height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden',
-      background: 'radial-gradient(120% 60% at 50% -10%,#1B1747 0%,transparent 60%),linear-gradient(180deg,var(--ak-bg-2),var(--ak-bg))'
+      background: 'radial-gradient(120% 60% at 50% -10%,#E5DCFF 0%,transparent 60%),linear-gradient(180deg,var(--ak-bg-2),var(--ak-bg))'
     }
   }, /*#__PURE__*/React.createElement(TopBar, { level: n, title: title, onHome: onHome, step: step || 0, total: total || 1 }), children);
 }
@@ -2905,7 +2877,7 @@ function PhysBody({ children }) {
 function PhysScene({ children, h }) {
   return /*#__PURE__*/React.createElement("svg", {
     viewBox: `0 0 340 ${h || 220}`,
-    style: { width: '100%', maxWidth: 360, flexShrink: 0, borderRadius: 22, background: 'radial-gradient(130% 90% at 30% 20%,#1E1A4D 0%,#0F1430 55%,#070A18 100%)', boxShadow: '0 0 0 1.5px #1A2D48,0 18px 40px -18px rgba(0,0,0,.9)' }
+    style: { width: '100%', maxWidth: 360, flexShrink: 0, borderRadius: 22, background: 'linear-gradient(180deg,#F4EFFF,#FFFDF8)', boxShadow: '0 6px 0 rgba(45,27,69,.08)' }
   }, children);
 }
 function PhysNote({ children, ok }) {
@@ -2923,7 +2895,7 @@ function PhysChoice({ items, value, onPick, disabled }) {
     key: it.id, className: "ak-tap", disabled: disabled, onClick: () => onPick(it.id),
     style: {
       border: value === it.id ? '3px solid #7C5FE0' : '3px solid transparent', cursor: 'pointer', borderRadius: 16,
-      padding: '8px 4px', fontFamily: 'var(--ak-body)', background: 'rgba(16,28,50,.92)', boxShadow: '0 4px 0 rgba(45,27,69,.08)',
+      padding: '8px 4px', fontFamily: 'var(--ak-body)', background: 'rgba(255,255,255,.92)', boxShadow: '0 4px 0 rgba(45,27,69,.08)',
       opacity: disabled ? .6 : 1
     }
   }, /*#__PURE__*/React.createElement("div", { style: { fontSize: 24 } }, it.emoji),
@@ -3021,7 +2993,7 @@ function PhysQuiz({ n, title, onDone, onHome }) {
     /*#__PURE__*/React.createElement(PhysBody, null,
       /*#__PURE__*/React.createElement(TaskBadge, null, 'Проверка связи: два вопроса'),
       qs.map((q, qi) => /*#__PURE__*/React.createElement("div", {
-        key: qi, style: { width: '100%', maxWidth: 360, background: 'rgba(16,28,50,.92)', borderRadius: 20, padding: '14px 14px 10px', boxShadow: '0 6px 0 rgba(45,27,69,.06)', flexShrink: 0 }
+        key: qi, style: { width: '100%', maxWidth: 360, background: 'rgba(255,255,255,.88)', borderRadius: 20, padding: '14px 14px 10px', boxShadow: '0 6px 0 rgba(45,27,69,.06)', flexShrink: 0 }
       }, /*#__PURE__*/React.createElement("div", {
         style: { fontFamily: 'var(--ak-display)', fontWeight: 700, fontSize: 15, color: 'var(--ak-ink)', lineHeight: 1.35, marginBottom: 10 }
       }, q.q), q.opts.map((o, oi) => {
@@ -3031,8 +3003,8 @@ function PhysQuiz({ n, title, onDone, onHome }) {
           style: {
             display: 'block', width: '100%', marginBottom: 7, padding: '11px 13px', border: 'none', borderRadius: 14, cursor: 'pointer',
             textAlign: 'left', fontFamily: 'var(--ak-body)', fontWeight: 700, fontSize: 13.5, color: 'var(--ak-ink)',
-            background: on ? (o.ok ? 'rgba(93,217,160,.28)' : 'rgba(255,122,100,.22)') : 'rgba(255,255,255,.05)',
-            boxShadow: on ? `inset 0 0 0 2px ${o.ok ? '#06D6A0' : '#FF6B6B'}` : 'inset 0 0 0 1.5px #1A2D48'
+            background: on ? (o.ok ? 'rgba(93,217,160,.28)' : 'rgba(255,122,100,.22)') : 'rgba(229,220,255,.45)',
+            boxShadow: on ? `inset 0 0 0 2px ${o.ok ? '#3FC685' : '#FF7A64'}` : 'none'
           }
         }, o.t);
       }), pick[qi] != null && /*#__PURE__*/React.createElement("div", {
@@ -3109,13 +3081,13 @@ function Level7Slide({ onWin, onHome }) {
       /*#__PURE__*/React.createElement(PhysScene, { h: 200 },
         /*#__PURE__*/React.createElement("path", { d: `M0 ${L7_TOP[1] + 14} L${L7_TOP[0] + 6} ${L7_TOP[1] + 14} L${L7_FOOT[0]} ${L7_FOOT[1] + 14} L0 ${L7_FOOT[1] + 14} Z`, fill: '#FFFFFF', stroke: '#D9D2EE', strokeWidth: 2 }),
         /*#__PURE__*/React.createElement("rect", { x: L7_FOOT[0], y: L7_FOOT[1] + 14, width: 340 - L7_FOOT[0], height: 12, rx: 3, fill: S ? S.col : '#E4DDF5', stroke: 'rgba(45,27,69,.15)' }),
-        /*#__PURE__*/React.createElement("rect", { x: 0, y: L7_FOOT[1] + 26, width: 340, height: 20, fill: '#2A3556' }),
+        /*#__PURE__*/React.createElement("rect", { x: 0, y: L7_FOOT[1] + 26, width: 340, height: 20, fill: '#CFC6E6' }),
         /*#__PURE__*/React.createElement("g", { transform: `translate(${flag} ${L7_FOOT[1] + 14})` },
           /*#__PURE__*/React.createElement("line", { x1: 0, y1: 0, x2: 0, y2: -36, stroke: '#7C5FE0', strokeWidth: 3 }),
           /*#__PURE__*/React.createElement("path", { d: 'M0 -36 L18 -30 L0 -24 Z', fill: '#FF6FA6' })),
         /*#__PURE__*/React.createElement("g", { transform: `translate(${pos.x} ${pos.y}) rotate(${pos.a})` },
           /*#__PURE__*/React.createElement("rect", { x: -16, y: -6, width: 32, height: 12, rx: 5, fill: '#FF7A64' }),
-          /*#__PURE__*/React.createElement("path", { d: 'M-18 10 L18 10 Q24 10 22 4', fill: 'none', stroke: '#C4D4EE', strokeWidth: 3, strokeLinecap: 'round' }),
+          /*#__PURE__*/React.createElement("path", { d: 'M-18 10 L18 10 Q24 10 22 4', fill: 'none', stroke: '#4A3B63', strokeWidth: 3, strokeLinecap: 'round' }),
           /*#__PURE__*/React.createElement("circle", { cx: 0, cy: -16, r: 9, fill: '#FFD262' }))),
       /*#__PURE__*/React.createElement(PhysChoice, { items: L7_SURF, value: surf, onPick: id => { if (state !== 'go') { setSurf(id); reset(); } }, disabled: state === 'go' }),
       /*#__PURE__*/React.createElement(PhysNote, { ok: note === 'Ровно у флажка!' }, note),
@@ -3192,7 +3164,7 @@ function Level8Pendulum({ onWin, onHome }) {
     phase !== 'intro' && /*#__PURE__*/React.createElement(PhysBody, null,
       /*#__PURE__*/React.createElement(TaskBadge, null, `Раунд ${rd + 1} из ${L8_ROUNDS.length}: качели — в такт барабану`),
       /*#__PURE__*/React.createElement(PhysScene, { h: 220 },
-        /*#__PURE__*/React.createElement("rect", { x: 120, y: 14, width: 100, height: 10, rx: 5, fill: '#8296B4' }),
+        /*#__PURE__*/React.createElement("rect", { x: 120, y: 14, width: 100, height: 10, rx: 5, fill: '#4A3B63' }),
         /*#__PURE__*/React.createElement("line", { x1: 170, y1: 24, x2: bx, y2: by, stroke: '#7C5FE0', strokeWidth: 3 }),
         /*#__PURE__*/React.createElement("circle", { cx: bx, cy: by, r: r, fill: heavy ? '#5B4A86' : '#FF9F6B', stroke: 'rgba(45,27,69,.25)', strokeWidth: 2 }),
         /*#__PURE__*/React.createElement("g", { transform: 'translate(52 180)' },
@@ -3266,7 +3238,7 @@ function Level9Shadow({ onWin, onHome }) {
           /*#__PURE__*/React.createElement("rect", { x: -22, y: -8, width: 26, height: 16, rx: 4, fill: '#7C5FE0' }),
           /*#__PURE__*/React.createElement("path", { d: 'M4 -11 L16 -14 L16 14 L4 11 Z', fill: '#B5A1FF' }),
           /*#__PURE__*/React.createElement("circle", { cx: 16, cy: 0, r: 5, fill: '#FFD84D' })),
-        /*#__PURE__*/React.createElement("rect", { x: 0, y: 206, width: 340, height: 14, fill: '#2A3556' })),
+        /*#__PURE__*/React.createElement("rect", { x: 0, y: 206, width: 340, height: 14, fill: '#CFC6E6' })),
       /*#__PURE__*/React.createElement("div", { style: { width: '100%', maxWidth: 340 } },
         /*#__PURE__*/React.createElement("div", { style: { display: 'flex', justifyContent: 'space-between', fontSize: 12, fontWeight: 800, color: 'var(--ak-ink-2)', fontFamily: 'var(--ak-display)' } },
           /*#__PURE__*/React.createElement("span", null, '← дальше от игрушки'), /*#__PURE__*/React.createElement("span", null, 'ближе →')),
@@ -3490,21 +3462,21 @@ function HomeScreen({
       display: 'flex',
       alignItems: 'center',
       gap: 14,
-      background: 'rgba(16,28,50,.92)',
+      background: 'rgba(255,255,255,.88)',
       borderRadius: 22,
       padding: '15px 18px',
       border: 'none',
       cursor: 'pointer',
       textAlign: 'left',
-      boxShadow: '0 0 0 1.5px #1A2D48,0 10px 24px -12px rgba(0,0,0,.8)'
+      boxShadow: '0 6px 0 rgba(45,27,69,.08),0 12px 24px -8px rgba(45,27,69,.12),inset 0 2px 0 #fff'
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       width: 52,
       height: 52,
-      borderRadius: 15,
+      borderRadius: '50%',
       flexShrink: 0,
-      background: 'linear-gradient(160deg,#9B78FF,#6E41E4)',
+      background: `radial-gradient(circle at 35% 30%,#fff,${l.c} 70%)`,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -3535,7 +3507,7 @@ function HomeScreen({
     style: {
       marginTop: 24,
       padding: '14px 18px',
-      background: 'rgba(16,28,50,.92)',
+      background: 'rgba(255,255,255,.65)',
       borderRadius: 18,
       maxWidth: 340,
       width: '100%',
