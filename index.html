@@ -239,26 +239,13 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
   transition:transform .34s cubic-bezier(.34,1.56,.64,1);max-width:90vw;text-align:center}
 .toast.show{transform:translateX(-50%) translateY(0)}
 
-/* «Час с ИИ» — вход для учителя прямо с главной */
-.hour{display:flex;align-items:center;gap:34px;padding:38px 40px;border-radius:32px;
-  background:linear-gradient(140deg,#2A1B52,#1B1236 62%,#150E2A);color:#F6F1FF;
-  box-shadow:0 26px 54px -24px rgba(45,27,69,.6)}
-.hour-txt{flex:1 1 420px;min-width:0}
-.hour-kick{display:inline-block;padding:6px 14px;border-radius:999px;background:rgba(255,216,77,.16);
-  color:var(--nk-sun-1);font-weight:900;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase}
-.hour h2{font-family:var(--nk-display);font-weight:900;font-size:clamp(26px,4vw,38px);
-  line-height:1.1;margin:14px 0 10px;color:#fff}
-.hour p{font-size:16px;line-height:1.6;color:#C9BAE6;margin:0 0 20px;max-width:640px}
-.hour p b{color:#fff}
-.hour-cta{display:flex;flex-wrap:wrap;align-items:center;gap:14px}
-.hour-note{font-size:13px;font-weight:700;color:#9C8CBE}
-.hour-num{flex:none;width:132px;height:132px;border-radius:50%;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;background:rgba(255,216,77,.13);
-  box-shadow:inset 0 0 0 2px rgba(255,216,77,.42)}
-.hour-num b{font-family:var(--nk-display);font-weight:900;font-size:44px;line-height:1;color:var(--nk-sun-1)}
-.hour-num span{font-weight:800;font-size:12.5px;color:#C9BAE6;margin-top:4px}
-@media(max-width:860px){.hour{flex-wrap:wrap;padding:30px 26px;gap:22px}.hour-num{width:96px;height:96px}
-  .hour-num b{font-size:34px}}
+/* «Час с ИИ» — вход для учителя одной строкой. Главная говорит с родителем,
+   большой тёмный блок для учителя его отвлекал. На телефоне кнопки «Школам»
+   в шапке нет, поэтому строка остаётся видна на любой ширине. */
+.hour-line{display:block;margin-top:44px;padding:14px 20px;border-radius:18px;text-align:center;
+  font-size:14px;font-weight:700;line-height:1.5;color:var(--nk-ink-2);background:rgba(123,79,242,.07)}
+.hour-line b{color:var(--nk-ink);font-weight:900}
+.hour-line:hover{color:var(--nk-pri-4);background:rgba(123,79,242,.11)}
 /* Подпись под логотипом стала длиннее и в полосе 640–700 px начинала
    поджимать кнопки шапки. Прячем её раньше: короткий вариант читается
    так же, а «Личный кабинет» и «Играть» не сжимаются. */
@@ -458,21 +445,8 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
     <p class="skills-note">Проверить просто: через месяц спросите за ужином, <b>почему программа может уверенно ошибаться</b>. Ребёнок ответит своими словами.</p>
   </section>
 
-  <section class="wrap section" id="hour">
-    <div class="hour">
-      <div class="hour-txt">
-        <span class="hour-kick">Учителям, школам и лагерям</span>
-        <h2>Час с ИИ</h2>
-        <p>Готовый урок на 45 минут. Дети не слушают про искусственный интеллект — они его обучают
-        с собственных телефонов. Вы получаете план с таймингом, три вопроса для обсуждения
-        и ответы на детские «а ИИ живой?». <b>Готовиться не нужно.</b></p>
-        <div class="hour-cta">
-          <a class="nk-btn nk-btn--cta" href="teacher/">Открыть готовый урок →</a>
-          <span class="hour-note">Бесплатно · без регистрации · урок идёт на бесплатных уровнях</span>
-        </div>
-      </div>
-      <div class="hour-num"><b>45</b><span>минут</span></div>
-    </div>
+  <section class="wrap" id="hour">
+    <a class="hour-line" href="teacher/"><b>Учителям, школам и лагерям:</b> готовый урок «Час с ИИ» на 45 минут. Бесплатно, готовиться не нужно →</a>
   </section>
 
   <section class="wrap section" id="subjects">
