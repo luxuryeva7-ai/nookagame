@@ -600,11 +600,12 @@ function SpIcon({ name, size, color }) {
   return h('svg', { viewBox: '0 0 24 24', width: size || 24, height: size || 24, style: { display: 'block' } },
     h('path', { d: SP_ICON[name], fill: 'none', stroke: color || '#fff', strokeWidth: 1.9, strokeLinecap: 'round', strokeLinejoin: 'round' }));
 }
-/* Нейро — тот же робот, что ведёт ИИ-курс */
+/* Нейро — тот же робот, что ведёт ИИ-курс, здесь в скафандре (mascot/space-*.webp,
+   Higgsfield по образцу mascot/hello.png). Высота по картинке — иначе робот сплющится. */
 function SpMascot({ kind, size }) {
   return h('img', {
-    src: `../mascot/${kind || 'hello'}.webp`, alt: 'Нейро', width: size, height: size,
-    style: { width: size, height: size, display: 'block', filter: 'drop-shadow(0 8px 16px rgba(0,0,0,.35)) drop-shadow(0 0 20px rgba(196,77,255,.3))' }
+    src: `../mascot/space-${kind || 'hello'}.webp`, alt: 'Нейро в скафандре', width: size,
+    style: { width: size, height: 'auto', display: 'block', filter: 'drop-shadow(0 8px 16px rgba(0,0,0,.35)) drop-shadow(0 0 20px rgba(196,77,255,.3))' }
   });
 }
 
