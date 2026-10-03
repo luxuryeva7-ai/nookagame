@@ -666,7 +666,7 @@ var PLANETS = [
   {key:'phys',  icon:'phys', coin:'nk-coin--sun',  subject:'Физика',                  name:'КвантУм',        desc:'Рычаги, траектории, равновесие: физика, которую можно потрогать.', active:true,  levels:10,  img:'screenshots/phys.jpg',   src:'games/physics.html'},
   {key:'chem',  icon:'chem', coin:'nk-coin--ok',   subject:'Химия',                   name:'Хемо Лаб',       desc:'Реакции, плотность и опыты, которые дома никто не разрешит.', active:true,  levels:10,  img:'screenshots/chem.jpg',   src:'games/chemistry.html'},
   {key:'code',  icon:'code', coin:'',              subject:'Программирование',        name:'КодБот',         desc:'Составь программу из блоков — и робот дойдёт до звезды.', active:true,  levels:10,  img:'screenshots/code.jpg',   src:'games/code.html'},
-  {key:'space', icon:'space', coin:'nk-coin--warn', subject:'Астрономия',              name:'КосмоПорт',      desc:'Собери ракету, рассчитай топливо и выйди на орбиту.', active:true,  levels:10,  img:'screenshots/space.jpg',   src:'games/space.html'},
+  {key:'space', icon:'space', coin:'nk-coin--warn', subject:'Астрономия',              name:'КосмоПорт',      desc:'Собери ракету, рассчитай топливо и выйди на орбиту.', active:true,  levels:10,  free:2, img:'screenshots/space.jpg',   src:'games/space.html'},
   {key:'robo',  icon:'robo', coin:'',              subject:'Инженерия',               name:'РобоЛаб',        desc:'Шестерёнки, рычаги и моторы: собери машину, которая едет сама.', active:false, levels:6,  img:'screenshots/robo.svg'},
   {key:'bio',   icon:'bio', coin:'nk-coin--ok',   subject:'Биология',                name:'БиоМир',         desc:'Клетки, ДНК, экосистемы: собери живой мир своими руками.', active:false, levels:8,  img:'screenshots/bio.svg'},
   {key:'eco',   icon:'eco', coin:'nk-coin--ok',   subject:'Экология и энергия',      name:'ЭкоСфера',       desc:'Запитай целый город чистой энергией — и не устрой блэкаут.', active:false, levels:6,  img:'screenshots/eco.svg'},
@@ -676,7 +676,7 @@ var PLANETS = [
 
 var grid = document.getElementById('planets');
 PLANETS.forEach(function(p){
-  var status = p.active ? ('Открыто · '+p.levels+' ур.') : ('Скоро · '+p.levels+' ур.');
+  var status = !p.active ? ('Скоро · '+p.levels+' ур.') : p.free ? (p.free+' бесплатно · '+p.levels+' ур.') : ('Открыто · '+p.levels+' ур.');
   var card = document.createElement(p.active ? 'button' : 'div');
   card.className = 'nk-clay planet' + (p.active ? '' : ' locked');
   card.innerHTML =
