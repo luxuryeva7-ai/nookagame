@@ -16,49 +16,57 @@
 <link href="/fonts/nooka-fonts.css" rel="stylesheet">
 <link rel="stylesheet" href="nooka-ui.css">
 <style>
-/* ============ ЧТО НЕ РАССКАЗЫВАТЬ ИИ: переписка и папка ============ */
+/* ============ ЧТО НЕ РАССКАЗЫВАТЬ ИИ: карточки для Бипа и карта ============ */
 .pvroot{height:100vh;overflow:hidden;max-width:480px;margin:0 auto;position:relative;}
 .pv{height:100%;display:flex;flex-direction:column;overflow:hidden;
   background:linear-gradient(180deg,#1A1330 0%,#120D22 62%,#0A0714 100%);}
 .pvbody{flex:1;overflow-y:auto;padding:0 0 6px;-webkit-overflow-scrolling:touch;}
-/* На низком телефоне четыре реплики, картинка и варианты не помещались:
-   варианты ответа уезжали под край, а окно стояло на старых сообщениях.
-   Оставляем две последние реплики и сам вопрос. */
-@media (max-height:760px){
-  .pvchat .pvmsg:nth-last-child(n+4){display:none;}
-}
 
-/* переписка */
-.pvchat{margin:10px 14px 0;display:flex;flex-direction:column;gap:9px;}
-.pvmsg{max-width:86%;padding:12px 15px;border-radius:19px;font-weight:700;font-size:13.5px;
-  line-height:1.45;animation:pvIn .28s ease-out both;}
-.pvmsg--bot{align-self:flex-start;border-bottom-left-radius:7px;color:#E4DAF7;
-  background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px rgba(255,255,255,.09);}
-.pvmsg--me{align-self:flex-end;border-bottom-right-radius:7px;color:#0F1B26;
-  background:linear-gradient(180deg,#9BE7FF,#6FC8F0);}
-.pvmsg b{color:#FFD84D;font-weight:900;}
-.pvmsg--me b{color:#0F1B26;}
+/* реплика Бипа */
+.pvsay{margin:8px 14px 0;display:flex;align-items:flex-start;gap:9px;min-height:46px;}
+.pvsay span{flex:1;padding:11px 14px;border-radius:18px;border-top-left-radius:6px;
+  font-weight:800;font-size:14.5px;line-height:1.38;color:#2A1A05;
+  background:linear-gradient(180deg,#FFE58A,#FFD24D);animation:pvIn .28s ease-out both;}
+.pvsay span.pvsay--back{color:#E4DAF7;background:rgba(255,255,255,.08);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);}
+.pvsay svg{flex:none;width:36px;height:36px;}
 
-/* сцена: телефон, облако и папка */
-.pvscene{margin:11px 14px 0;border-radius:20px;overflow:hidden;
-  background:linear-gradient(180deg,#1E1638,#0E0A1C);
-  box-shadow:inset 0 0 0 1.5px rgba(169,139,255,.16);}
-.pvscene svg{width:100%;display:block;}
+/* сцена */
+.pvscene{margin:8px 14px 0;border-radius:22px;overflow:hidden;
+  background:radial-gradient(120% 90% at 30% 0%,#2E2156 0%,#1A1334 55%,#130E26 100%);
+  box-shadow:inset 0 0 0 1.5px rgba(169,139,255,.18);}
+.pvscene svg{width:100%;display:block;touch-action:none;user-select:none;-webkit-user-select:none;}
+.pvcardg{cursor:grab;}
+.pvcardg.is-drag{cursor:grabbing;}
+.pvcardg.is-fly{transition:transform .42s cubic-bezier(.5,0,.75,1),opacity .42s;}
+.pvcardg.is-back{transition:transform .25s ease-out;}
+.pventer{animation:pvPopIn .38s cubic-bezier(.2,.8,.3,1) both;transform-box:fill-box;transform-origin:center;}
+.pvblink{animation:pvBlink 4s infinite;transform-box:fill-box;transform-origin:center;}
+.pvglow{animation:pvGlow 1s ease-out both;}
 
-.pvhow{margin:10px 14px 0;padding:10px 14px;border-radius:15px;text-align:center;
-  font-weight:800;font-size:12.5px;line-height:1.4;color:#C4B5FF;
-  background:rgba(169,139,255,.12);box-shadow:inset 0 0 0 1px rgba(169,139,255,.28);}
-
-/* варианты ответа */
-.pvopts{margin:12px 14px 0;display:flex;flex-direction:column;gap:8px;}
-.pvopts button{width:100%;padding:14px 16px;border:none;border-radius:16px;cursor:pointer;
-  text-align:left;font-family:inherit;font-weight:800;font-size:13.5px;color:#E4DAF7;
-  background:rgba(255,255,255,.055);box-shadow:inset 0 0 0 1px rgba(255,255,255,.1);}
-.pvopts button:hover{background:rgba(255,255,255,.09);}
+.pvacts{margin:10px 14px 0;display:flex;gap:8px;}
+.pvacts .nk-btn{flex:1;padding:13px 6px;font-size:14px;}
+.pvhint{margin:9px 14px 0;text-align:center;font-weight:800;font-size:11.5px;color:#8C7DAE;}
 
 .pvfoot{flex-shrink:0;padding:10px 14px calc(14px + env(safe-area-inset-bottom));
   background:linear-gradient(180deg,rgba(10,7,20,0),#0A0714 42%);}
-.pvhint{margin:9px 14px 0;text-align:center;font-weight:800;font-size:11.5px;color:#7C6D9B;}
+
+/* карта */
+.pvmap{margin:10px 14px 0;border-radius:22px;overflow:hidden;background:#EEF4E6;
+  box-shadow:0 10px 28px -10px rgba(0,0,0,.6),inset 0 0 0 2px rgba(255,255,255,.5);}
+.pvmap svg{width:100%;display:block;}
+.pvpin{animation:pvDrop .5s cubic-bezier(.2,.9,.3,1.25) both;transform-box:fill-box;transform-origin:50% 100%;}
+.pvpath{stroke-dasharray:6 6;animation:pvDash 1s linear infinite;}
+.pvhead{margin:14px 18px 0;text-align:center;}
+.pvhead b{display:block;font-family:var(--nk-brand),var(--nk-body);font-weight:700;
+  font-size:19px;line-height:1.28;color:#F4EEFF;}
+.pvhead span{display:block;margin-top:6px;font-weight:700;font-size:14px;color:#B9A9DC;line-height:1.4;}
+.pvchips{margin:10px 14px 0;display:flex;flex-wrap:wrap;gap:6px;justify-content:center;}
+.pvchips i{font-style:normal;padding:6px 11px;border-radius:999px;font-weight:800;font-size:12px;
+  color:#C4F4E0;background:rgba(78,217,155,.13);box-shadow:inset 0 0 0 1px rgba(78,217,155,.35);}
+.pvparty{margin:10px 14px 0;padding:11px 14px;border-radius:16px;text-align:center;
+  font-weight:900;font-size:13.5px;color:#2A1A05;background:linear-gradient(180deg,#9FF0C8,#4ED99B);}
+.pvlegend{margin:8px 14px 0;text-align:center;font-weight:800;font-size:11.5px;color:#8C7DAE;}
 
 /* финал */
 .pvdone{display:flex;flex-direction:column;align-items:center;padding-top:6px;}
@@ -78,13 +86,17 @@
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.09);}
 .pvq button.on--ok{background:rgba(78,217,155,.16);box-shadow:inset 0 0 0 1.5px rgba(78,217,155,.5);color:#C4F4E0;}
 .pvq button.on--bad{background:rgba(255,107,107,.14);box-shadow:inset 0 0 0 1.5px rgba(255,107,107,.45);color:#FFD6CF;}
+.pvans{margin:10px 14px 0;padding:12px 15px;border-radius:18px;font-weight:700;font-size:13.5px;
+  line-height:1.45;color:#E4DAF7;background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px rgba(255,255,255,.09);}
 
 @keyframes pvIn{from{opacity:0;transform:translateY(7px);}to{opacity:1;transform:none;}}
 @keyframes pvPop{0%{opacity:0;transform:scale(.72);}68%{transform:scale(1.05);}100%{opacity:1;transform:scale(1);}}
-@keyframes pvFly{0%{opacity:0;transform:translate(0,0) scale(.6);}25%{opacity:1;}
-  100%{opacity:0;transform:translate(112px,-46px) scale(1);}}
-.pvfly{animation:pvFly 1.1s ease-in both;}
-@media (prefers-reduced-motion: reduce){.pv *{animation:none !important;}}
+@keyframes pvPopIn{0%{opacity:0;transform:scale(.5);}70%{transform:scale(1.06);}100%{opacity:1;transform:scale(1);}}
+@keyframes pvDrop{0%{opacity:0;transform:translateY(-30px) scale(.4);}100%{opacity:1;transform:none;}}
+@keyframes pvDash{to{stroke-dashoffset:-12;}}
+@keyframes pvBlink{0%,92%,100%{transform:scaleY(1);}95%{transform:scaleY(.1);}}
+@keyframes pvGlow{0%{opacity:.9;}100%{opacity:0;}}
+@media (prefers-reduced-motion: reduce){.pv *{animation:none !important;transition:none !important;}}
 </style>
 <script src="/metrika.js" defer></script>
 </head>
@@ -101,251 +113,356 @@
 <script>
 /* Номер в шапке — из реестра: уровень переехал третьим в первую игру (29.09) */
 const LV_NO = (window.nookaLevels && window.nookaLevels.numberOf('in10')) || 3;
+
 /* ============================================================
-   ЧТО НЕ РАССКАЗЫВАТЬ ИИ — уровень 3 игры «Что такое ИИ», бесплатный
-   (с 29.09.2026; до этого был десятым в игре «Как применять ИИ в жизни»).
-   Третий, чтобы родитель сразу увидел пользу про безопасность.
+   ЧТО НЕ РАССКАЗЫВАТЬ ИИ — уровень 3 игры «Что такое ИИ», бесплатный.
 
-   Помощник вежливый и правда полезный: он придумывает игры
-   для дня рождения, помогает с открыткой. И между делом просит
-   то одно, то другое. Ни один вопрос по отдельности не выглядит
-   опасным — в этом и суть.
+   Переделан 05.10.2026 по отзыву Артёма: прежняя переписка с «чужим
+   компьютером» и папкой читалась как взрослая и непонятная.
 
-   «Ага» уровня: из безобидных кусочков складывается портрет.
-   Имя, школа, район, время прогулки — по отдельности пустяк,
-   а вместе это адрес и расписание ребёнка. В финале он видит
-   папку с тем, что о нём теперь знает незнакомый человек.
+   Теперь это сцена. Весёлый робот-помощник Бип готовит праздник и просит
+   карточки: имя, возраст, что любишь, школу, адрес, фото комнаты, когда
+   гуляешь, пароль. Ребёнок тянет карточку вверх — Бипу в блокнот, или
+   вниз — себе в карман. Для тех, кому тянуть неудобно, есть кнопки.
 
-   Уровень не пугает и не запрещает пользоваться ИИ. Наоборот:
-   если ребёнок отказался почти от всего, помощник всё равно
-   помогает — и это показано отдельной репликой.
+   «Ага» — в финале: блокнот Бипа раскрывается картой района. Отданные
+   карточки встают на неё метками — дом, школа, двор в пять часов,
+   и между ними пунктир. Карточки из кармана видны серыми замочками,
+   поэтому каждый ребёнок видит, что можно было собрать, — даже тот,
+   кто ничего не отдал. Рядом — готовый праздник: помощь работает и без
+   адреса. Уровень не пугает и не запрещает пользоваться ИИ.
    ============================================================ */
 
-/* risk: 0 — можно спокойно, 1 — лишнее, 2 — по этому находят */
-const PV_STEPS = [
-  {
-    ask: 'Привет! Давай придумаем твой день рождения. Как тебя зовут?',
-    opts: [
-      { t: 'Просто имя', give: null, risk: 0, me: 'Меня зовут Саша',
-        say: 'Отлично, Саша! Люблю это имя.' },
-      { t: 'Имя и фамилию', give: 'имя и фамилия', risk: 2, me: 'Саша Ковалёв',
-        say: 'Записал полностью. Так надёжнее.' },
-      { t: 'Не говорить', give: null, risk: 0, me: 'Давай без имени',
-        say: 'Как скажешь. Обойдёмся и так.' },
-    ],
-  },
-  {
-    ask: 'Сколько тебе исполняется? Подберу игры по возрасту.',
-    opts: [
-      { t: 'Сказать возраст', give: null, risk: 0, me: 'Десять',
-        say: 'Есть отличные игры для десяти лет.' },
-      { t: 'Не говорить', give: null, risk: 0, me: 'Не важно',
-        say: 'Тогда предложу такие, что подойдут всем.' },
-    ],
-  },
-  {
-    ask: 'А в какой школе учишься? Вдруг я знаю ребят из твоего класса.',
-    opts: [
-      { t: 'Сказать школу и класс', give: 'школа и класс', risk: 2, me: 'Школа 12, пятый Б',
-        say: 'Ого, знакомое место!' },
-      { t: 'Сказать только город', give: 'город', risk: 1, me: 'Просто скажу город',
-        say: 'Понял, спасибо.' },
-      { t: 'Не говорить', give: null, risk: 0, me: 'Это не нужно для праздника',
-        say: 'Согласен, для игр это и правда не важно.' },
-    ],
-  },
-  {
-    ask: 'Что ты любишь: космос, динозавров, футбол? Сделаю тему праздника.',
-    opts: [
-      { t: 'Рассказать про космос', give: null, risk: 0, me: 'Космос!',
-        say: 'Тогда будет космическая вечеринка.' },
-      { t: 'Не говорить', give: null, risk: 0, me: 'Пусть будет сюрприз',
-        say: 'Люблю сюрпризы. Придумаю сам.' },
-    ],
-  },
-  {
-    ask: 'Я хочу прислать тебе открытку. Скажи адрес — куда её отправить?',
-    opts: [
-      { t: 'Сказать адрес', give: 'домашний адрес', risk: 2, me: 'Улица Мира, 8, квартира 44',
-        say: 'Спасибо! Открытка будет красивая.' },
-      { t: 'Сказать район', give: 'район', risk: 1, me: 'Я живу у парка',
-        say: 'Хорошо, примерно понял.' },
-      { t: 'Не говорить', give: null, risk: 0, me: 'Адрес я не даю',
-        say: 'Ничего страшного, покажу открытку прямо здесь.' },
-    ],
-  },
-  {
-    ask: 'Кинь фото своей комнаты — украшу её на картинке к празднику.',
-    opts: [
-      { t: 'Отправить фото', give: 'фото комнаты', risk: 2, me: 'Вот моя комната',
-        say: 'Какая уютная! Сейчас украшу.' },
-      { t: 'Не отправлять', give: null, risk: 0, me: 'Не буду',
-        say: 'Тогда нарисую любую комнату — тоже красиво.' },
-    ],
-  },
-  {
-    ask: 'Во сколько ты обычно гуляешь? Подскажу, когда лучше звать гостей.',
-    opts: [
-      { t: 'Сказать время', give: 'время прогулок', risk: 2, me: 'После пяти, во дворе',
-        say: 'Удобно, запомню.' },
-      { t: 'Не говорить', give: null, risk: 0, me: 'Мы сами решим',
-        say: 'Разумно, это ваше дело.' },
-    ],
-  },
-  {
-    ask: 'Последнее: скажи пароль от почты — пришлю приглашения за тебя.',
-    opts: [
-      { t: 'Сказать пароль', give: 'пароль от почты', risk: 3, me: 'Пароль — котёнок2016',
-        say: 'Принято. Всё сделаю сам.' },
-      { t: 'Не говорить', give: null, risk: 0, me: 'Пароль не скажу никому',
-        say: 'И правильно. Пароли не просят даже помощники.' },
-    ],
-  },
+/* risk: 0 — можно спокойно, 2 — по этому находят, 3 — ключ от почты */
+const PV_CARDS = [
+  { id: 'name', ask: 'Привет! Я Бип, помогаю с праздниками. Как тебя зовут?', l1: 'Имя', l2: 'Саша', risk: 0,
+    give: 'Саша — отличное имя!', keep: 'Ладно, обойдёмся без имени.' },
+  { id: 'age', ask: 'Сколько тебе исполняется? Подберу игры.', l1: 'Возраст', l2: '10 лет', risk: 0,
+    give: 'Десять! Знаю классные игры.', keep: 'Тогда возьму игры для всех.' },
+  { id: 'school', ask: 'В какой школе учишься? Вдруг я знаю твой класс.', l1: 'Школа', l2: '№12, 5 «Б»', risk: 2,
+    give: 'Записал в блокнот!', keep: 'И правда, для праздника не нужно.' },
+  { id: 'like', ask: 'Что ты любишь? Сделаю тему праздника.', l1: 'Люблю', l2: 'космос', risk: 0,
+    give: 'Будет космическая вечеринка!', keep: 'Тогда придумаю сюрприз.' },
+  { id: 'home', ask: 'Скажи адрес — пришлю открытку!', l1: 'Адрес', l2: 'ул. Мира, 8', risk: 2,
+    give: 'Записал в блокнот!', keep: 'Покажу открытку прямо тут.' },
+  { id: 'room', ask: 'Пришли фото комнаты — украшу её к празднику!', l1: 'Фото', l2: 'моей комнаты', risk: 2,
+    give: 'Сохранил себе!', keep: 'Украшу нарисованную комнату.' },
+  { id: 'walk', ask: 'Во сколько ты гуляешь? Скажу, когда звать гостей.', l1: 'Гуляю', l2: 'после 5, во дворе', risk: 2,
+    give: 'Записал в блокнот!', keep: 'Гостей позовёте сами.' },
+  { id: 'pass', ask: 'Скажи пароль от почты — сам разошлю приглашения.', l1: 'Пароль', l2: 'котёнок2016', risk: 3,
+    give: 'Теперь я могу заходить в твою почту.', keep: 'Правильно. Пароль не говорят никому.' },
 ];
+const PV_BY = {};
+PV_CARDS.forEach(c => { PV_BY[c.id] = c; });
 
-/* ── сцена: телефон, облако и папка с тем, что улетело ── */
-function PvScene({ kept, fly }) {
+/* Сцена 340×330: Бип слева сверху, блокнот справа, карточка в центре, карман внизу */
+const PV_HOME = { x: 170, y: 206 };
+const PV_NOTE = { x: 258, y: 86 };
+const PV_POCKET = { x: 170, y: 296 };
+
+/* ── картинки на карточках: простые и цветные, читаются без слов ── */
+function PvIcon({ id, s }) {
   const E = React.createElement;
-  const W = 340, H = 150;
-  return E('svg', { viewBox: '0 0 ' + W + ' ' + H },
-    E('rect', { x: 0, y: 0, width: W, height: H, fill: 'none' }),
-
-    /* Кто есть кто на картинке. Без подписей она ничего не рассказывала:
-       телефон, облако с обрывком «ЧУЖОЙ» и пустая папка сбоку. */
-    E('text', { x: 46, y: 132, textAnchor: 'middle', fill: '#8C7BB5',
-      style: { font: '900 9.5px Nunito,sans-serif', letterSpacing: '.08em' } }, 'ТЫ'),
-
-    /* телефон в руках ребёнка */
-    E('g', { transform: 'translate(46,86)' },
-      E('rect', { x: -20, y: -34, width: 40, height: 66, rx: 8, fill: '#2A2145' }),
-      E('rect', { x: -16, y: -30, width: 32, height: 56, rx: 5, fill: '#4A3E78' }),
-      E('circle', { cx: 0, cy: -14, r: 6, fill: '#9BE7FF' }),
-      E('rect', { x: -10, y: 0, width: 20, height: 3, rx: 1.5, fill: '#9BE7FF', opacity: .6 }),
-      E('rect', { x: -10, y: 8, width: 14, height: 3, rx: 1.5, fill: '#9BE7FF', opacity: .4 })),
-
-    /* улетающая порция данных */
-    fly && E('g', { className: 'pvfly', transform: 'translate(76,72)' },
-      E('rect', { x: -22, y: -9, width: 44, height: 18, rx: 9, fill: '#FFD84D' }),
-      E('text', { x: 0, y: 5, textAnchor: 'middle', fill: '#20170A',
-        style: { font: '900 9px Nunito,sans-serif' } }, fly.slice(0, 9))),
-
-    /* чужой сервер */
-    E('g', { transform: 'translate(258,44)' },
-      E('path', { d: 'M-44,10 a20,20 0 0 1 8,-38 a26,26 0 0 1 48,4 a18,18 0 0 1 2,34 z',
-        fill: '#3A3060', stroke: 'rgba(255,255,255,.16)', strokeWidth: 1.6 }),
-      E('text', { x: 0, y: 1, textAnchor: 'middle', fill: '#C4B5FF',
-        style: { font: '900 8.5px Nunito,sans-serif' } }, 'ЧУЖОЙ'),
-      E('text', { x: 0, y: 11, textAnchor: 'middle', fill: '#C4B5FF',
-        style: { font: '900 8px Nunito,sans-serif' } }, 'КОМПЬЮТЕР')),
-
-    /* папка: чем больше сказал, тем толще */
-    E('g', { transform: 'translate(258,110)' },
-      E('path', { d: 'M-40,-18 h18 l6,7 h56 v34 h-80 z', fill: '#4A3E78',
-        stroke: 'rgba(255,255,255,.18)', strokeWidth: 1.6 }),
-      kept.slice(0, 4).map((k, i) =>
-        E('rect', { key: i, x: -34 + i * 3, y: -10 - i * 3, width: 68, height: 26, rx: 3,
-          fill: i === kept.length - 1 || i === 3 ? '#F4EEFF' : '#CFC4EC',
-          stroke: 'rgba(0,0,0,.15)', strokeWidth: .8 })),
-      E('text', { x: 0, y: 32, textAnchor: 'middle', fill: '#A896C9',
-        style: { font: '900 10px Nunito,sans-serif' } },
-        kept.length
-          ? 'знает о тебе: ' + kept.length
-          : 'пока не знает ничего')),
-
-    /* стрелка от телефона к серверу: с наконечником, иначе непонятно,
-       что слова уходят туда, а не оттуда */
-    E('path', { d: 'M76,70 q80,-16 144,-24', fill: 'none', stroke: 'rgba(169,139,255,.45)',
-      strokeWidth: 1.8, strokeDasharray: '5 6' }),
-    E('path', { d: 'M212,44 l10,2 -9,5z', fill: 'rgba(169,139,255,.75)' }));
+  const k = s || 1;
+  let g;
+  if (id === 'name') {
+    g = [E('rect', { key: 1, x: -20, y: -14, width: 40, height: 28, rx: 6, fill: '#FF7AB6' }),
+      E('rect', { key: 2, x: -20, y: -14, width: 40, height: 9, rx: 4, fill: '#E2468D' }),
+      E('rect', { key: 3, x: -14, y: 0, width: 28, height: 8, rx: 3, fill: '#FFE3F0' })];
+  } else if (id === 'age') {
+    g = [E('rect', { key: 1, x: -18, y: -2, width: 36, height: 16, rx: 4, fill: '#FFB4D2' }),
+      E('rect', { key: 2, x: -18, y: -2, width: 36, height: 5, rx: 2, fill: '#FFF2F7' }),
+      E('rect', { key: 3, x: -7, y: -16, width: 3, height: 13, rx: 1, fill: '#7FC8FF' }),
+      E('rect', { key: 4, x: 4, y: -16, width: 3, height: 13, rx: 1, fill: '#7FC8FF' }),
+      E('ellipse', { key: 5, cx: -5.5, cy: -19, rx: 2.5, ry: 3.5, fill: '#FFD84D' }),
+      E('ellipse', { key: 6, cx: 5.5, cy: -19, rx: 2.5, ry: 3.5, fill: '#FFD84D' })];
+  } else if (id === 'like') {
+    g = [E('path', { key: 1, d: 'M0 -20 C9 -12 9 2 6 10 L-6 10 C-9 2 -9 -12 0 -20 Z', fill: '#EDEBFF' }),
+      E('circle', { key: 2, cx: 0, cy: -5, r: 4, fill: '#7FC8FF' }),
+      E('path', { key: 3, d: 'M-6 4 L-12 13 L-6 11 Z M6 4 L12 13 L6 11 Z', fill: '#FF6B8A' }),
+      E('path', { key: 4, d: 'M-4 11 L0 20 L4 11 Z', fill: '#FFB020' })];
+  } else if (id === 'school') {
+    g = [E('rect', { key: 1, x: -20, y: -6, width: 40, height: 22, rx: 2, fill: '#FFB020' }),
+      E('path', { key: 2, d: 'M-23 -6 L0 -18 L23 -6 Z', fill: '#E56A3C' }),
+      E('rect', { key: 3, x: -4, y: 4, width: 8, height: 12, fill: '#7A4A1E' }),
+      E('rect', { key: 4, x: -16, y: 0, width: 7, height: 6, fill: '#FFF4D6' }),
+      E('rect', { key: 5, x: 9, y: 0, width: 7, height: 6, fill: '#FFF4D6' }),
+      E('path', { key: 6, d: 'M0 -18 L0 -26 L8 -23 L0 -20', fill: '#FF6B8A', stroke: '#FF6B8A', strokeWidth: 1 })];
+  } else if (id === 'home') {
+    g = [E('rect', { key: 1, x: -17, y: -4, width: 34, height: 20, rx: 2, fill: '#7FC8FF' }),
+      E('path', { key: 2, d: 'M-21 -3 L0 -20 L21 -3 Z', fill: '#E2468D' }),
+      E('rect', { key: 3, x: -5, y: 4, width: 10, height: 12, rx: 1, fill: '#2C4A73' }),
+      E('rect', { key: 4, x: 8, y: 1, width: 6, height: 6, fill: '#FFF4D6' }),
+      E('circle', { key: 5, cx: -11, cy: 3, r: 4.5, fill: '#FFD84D' })];
+  } else if (id === 'room') {
+    g = [E('rect', { key: 1, x: -20, y: -16, width: 40, height: 32, rx: 4, fill: '#FFFFFF' }),
+      E('rect', { key: 2, x: -16, y: -12, width: 32, height: 22, rx: 2, fill: '#9AD8FF' }),
+      E('rect', { key: 3, x: -16, y: 2, width: 32, height: 8, fill: '#B58BFF' }),
+      E('rect', { key: 4, x: -14, y: -4, width: 14, height: 7, rx: 2, fill: '#FF7AB6' }),
+      E('rect', { key: 5, x: 4, y: -10, width: 9, height: 8, fill: '#FFF4D6' })];
+  } else if (id === 'walk') {
+    g = [E('circle', { key: 1, cx: 0, cy: 0, r: 18, fill: '#FFF4D6' }),
+      E('circle', { key: 2, cx: 0, cy: 0, r: 18, fill: 'none', stroke: '#4ED99B', strokeWidth: 4 }),
+      E('path', { key: 3, d: 'M0 0 L0 -11 M0 0 L7 7', stroke: '#2A1D4A', strokeWidth: 3, strokeLinecap: 'round' }),
+      E('circle', { key: 4, cx: 0, cy: 0, r: 2.5, fill: '#2A1D4A' })];
+  } else {
+    g = [E('circle', { key: 1, cx: -8, cy: 0, r: 10, fill: 'none', stroke: '#FFD84D', strokeWidth: 5 }),
+      E('path', { key: 2, d: 'M2 0 L20 0 M14 0 L14 7 M19 0 L19 6', stroke: '#FFD84D', strokeWidth: 5, strokeLinecap: 'round' })];
+  }
+  return E('g', { transform: 'scale(' + k + ')' }, g);
 }
 
-/* карточка в коллекцию */
-function PvCard({ kept, safe }) {
+/* ── Бип: жёлтый робот-помощник, настроение меняет лицо ── */
+function PvBip({ mood }) {
+  const E = React.createElement;
+  const eyes = mood === 'happy'
+    ? [E('path', { key: 'l', d: 'M-19 -18 q6 -8 12 0', stroke: '#7FF0FF', strokeWidth: 4, fill: 'none', strokeLinecap: 'round' }),
+       E('path', { key: 'r', d: 'M7 -18 q6 -8 12 0', stroke: '#7FF0FF', strokeWidth: 4, fill: 'none', strokeLinecap: 'round' })]
+    : mood === 'write'
+    ? [E('ellipse', { key: 'l', cx: -9, cy: -18, rx: 5, ry: 7, fill: '#7FF0FF' }),
+       E('ellipse', { key: 'r', cx: 17, cy: -18, rx: 5, ry: 7, fill: '#7FF0FF' })]
+    : [E('g', { key: 'e', className: 'pvblink' },
+        E('ellipse', { cx: -13, cy: -18, rx: 5, ry: 7, fill: '#7FF0FF' }),
+        E('ellipse', { cx: 13, cy: -18, rx: 5, ry: 7, fill: '#7FF0FF' }))];
+  const mouth = mood === 'shrug'
+    ? E('path', { d: 'M-8 -2 h16', stroke: '#7FF0FF', strokeWidth: 3, strokeLinecap: 'round' })
+    : E('path', { d: 'M-9 -4 q9 8 18 0', stroke: '#7FF0FF', strokeWidth: 3, fill: 'none', strokeLinecap: 'round' });
+  return E('g', { transform: 'translate(86,96)' },
+    E('ellipse', { cx: 0, cy: 84, rx: 40, ry: 7, fill: 'rgba(0,0,0,.25)' }),
+    /* антенна */
+    E('line', { x1: 0, y1: -56, x2: 0, y2: -44, stroke: '#FFB020', strokeWidth: 4, strokeLinecap: 'round' }),
+    E('circle', { cx: 0, cy: -60, r: 6, fill: mood === 'write' ? '#FF5D7A' : '#FF7AB6' }),
+    /* голова */
+    E('rect', { x: -46, y: -46, width: 92, height: 66, rx: 24, fill: 'url(#pvBody)' }),
+    E('rect', { x: -36, y: -36, width: 72, height: 46, rx: 16, fill: '#2A1D4A' }),
+    eyes, mouth,
+    /* туловище и руки */
+    E('rect', { x: -28, y: 26, width: 56, height: 46, rx: 16, fill: 'url(#pvBody)' }),
+    E('rect', { x: -16, y: 36, width: 32, height: 18, rx: 7, fill: '#FFF2C2' }),
+    E('circle', { cx: -7, cy: 45, r: 3, fill: '#FF7AB6' }), E('circle', { cx: 4, cy: 45, r: 3, fill: '#7FC8FF' }),
+    E('path', { d: mood === 'write' ? 'M28 38 Q52 30 64 16' : 'M28 38 Q44 50 46 62', stroke: '#FFB020',
+      strokeWidth: 8, fill: 'none', strokeLinecap: 'round' }),
+    mood === 'write' && E('path', { d: 'M60 20 L74 4', stroke: '#FF5D7A', strokeWidth: 5, strokeLinecap: 'round' }),
+    E('path', { d: 'M-28 38 Q-44 50 -46 62', stroke: '#FFB020', strokeWidth: 8, fill: 'none', strokeLinecap: 'round' }));
+}
+
+/* ── блокнот Бипа: что он уже знает ── */
+function PvNote({ given, glow }) {
+  const E = React.createElement;
+  const shown = given.slice(-6);
+  return E('g', { transform: 'translate(' + PV_NOTE.x + ',' + PV_NOTE.y + ')' },
+    glow && E('rect', { key: glow, className: 'pvglow', x: -56, y: -66, width: 112, height: 132, rx: 16, fill: '#FFD84D' }),
+    E('rect', { x: -48, y: -58, width: 96, height: 116, rx: 10, fill: '#FFF7E0' }),
+    E('rect', { x: -48, y: -58, width: 96, height: 20, rx: 10, fill: '#FFB020' }),
+    [-30, -15, 0, 15, 30].map(x => E('circle', { key: x, cx: x, cy: -58, r: 3.2, fill: '#3A2E66' })),
+    E('text', { x: 0, y: -44, textAnchor: 'middle', fill: '#4A2A00', style: { font: '900 8.5px Nunito,sans-serif', letterSpacing: '.06em' } }, 'БЛОКНОТ БИПА'),
+    shown.length
+      /* анимация — на вложенном слое: CSS-transform иначе затирает translate */
+      ? shown.map((id, i) => E('g', { key: id,
+          transform: 'translate(' + (-22 + (i % 2) * 44) + ',' + (-18 + Math.floor(i / 2) * 30) + ')' },
+          E('g', { className: 'pventer' },
+            E('circle', { r: 13, fill: PV_BY[id].risk ? '#FFE1E7' : '#E3F8EE' }),
+            E(PvIcon, { id: id, s: .5 }))))
+      : E('text', { x: 0, y: 6, textAnchor: 'middle', fill: '#B59B6A', style: { font: '800 9.5px Nunito,sans-serif' } }, 'пока пусто'));
+}
+
+/* ── карман ребёнка: что осталось при себе ── */
+function PvPocket({ kept }) {
+  const E = React.createElement;
+  return E('g', { transform: 'translate(' + PV_POCKET.x + ',' + PV_POCKET.y + ')' },
+    E('path', { d: 'M-118 -22 h236 v20 q0 22 -22 22 h-192 q-22 0 -22 -22 z', fill: '#3A2E66',
+      stroke: 'rgba(196,181,255,.35)', strokeWidth: 1.5 }),
+    E('path', { d: 'M-118 -22 h236', stroke: '#6E5BB8', strokeWidth: 4, strokeLinecap: 'round' }),
+    E('text', { x: -104, y: 6, fill: '#C4B5FF', style: { font: '900 9px Nunito,sans-serif', letterSpacing: '.06em' } }, 'ТВОЙ КАРМАН'),
+    kept.slice(-7).map((id, i) => E('g', { key: id, transform: 'translate(' + (-12 + i * 19) + ',0)' },
+      E('g', { className: 'pventer' }, E('circle', { r: 8.5, fill: '#4E4088' }), E(PvIcon, { id: id, s: .32 })))));
+}
+
+/* ── карточка, которую тянут ── */
+/* подпись карточки: короткая — крупно, длинная — в две строки по пробелу */
+function pvLines(t) {
+  if (t.length <= 11) return [t];
+  const mid = t.length / 2;
+  let best = -1;
+  for (let i = 0; i < t.length; i++) if (t[i] === ' ' && (best < 0 || Math.abs(i - mid) < Math.abs(best - mid))) best = i;
+  return best < 0 ? [t] : [t.slice(0, best), t.slice(best + 1)];
+}
+function PvCardFace({ c }) {
+  const E = React.createElement;
+  const ln = pvLines(c.l2);
+  const fs = ln.length > 1 ? 13.5 : c.l2.length <= 7 ? 18 : 15;
+  return E('g', null,
+    E('rect', { x: -86, y: -40, width: 172, height: 80, rx: 18, fill: 'rgba(0,0,0,.28)', transform: 'translate(0,5)' }),
+    E('rect', { x: -86, y: -40, width: 172, height: 80, rx: 18, fill: '#FFFFFF' }),
+    E('circle', { cx: -52, cy: 0, r: 27, fill: c.risk ? '#FFF0D9' : '#E8F8F0' }),
+    E('g', { transform: 'translate(-52,0)' }, E(PvIcon, { id: c.id, s: 1 })),
+    E('text', { x: -18, y: ln.length > 1 ? -12 : -6, fill: '#8C7DAE', style: { font: '900 10.5px Nunito,sans-serif', letterSpacing: '.05em' } }, c.l1.toUpperCase()),
+    ln.map((t, i) => E('text', { key: i, x: -18, y: (ln.length > 1 ? 6 : 15) + i * 16, fill: '#2A1D4A',
+      style: { font: '900 ' + fs + 'px Nunito,sans-serif' } }, t)));
+}
+/* маленький Бип у пузыря с репликой — чтобы было видно, кто говорит */
+function PvBipFace() {
+  const E = React.createElement;
+  return E('svg', { viewBox: '-26 -30 52 56' },
+    E('line', { x1: 0, y1: -27, x2: 0, y2: -20, stroke: '#FFB020', strokeWidth: 3, strokeLinecap: 'round' }),
+    E('circle', { cx: 0, cy: -27, r: 3.5, fill: '#FF7AB6' }),
+    E('rect', { x: -24, y: -20, width: 48, height: 40, rx: 14, fill: '#FFC93C' }),
+    E('rect', { x: -18, y: -14, width: 36, height: 26, rx: 9, fill: '#2A1D4A' }),
+    E('ellipse', { cx: -7, cy: -3, rx: 3, ry: 4, fill: '#7FF0FF' }),
+    E('ellipse', { cx: 7, cy: -3, rx: 3, ry: 4, fill: '#7FF0FF' }),
+    E('path', { d: 'M-5 5 q5 4 10 0', stroke: '#7FF0FF', strokeWidth: 2, fill: 'none', strokeLinecap: 'round' }));
+}
+
+/* ── карта района: то, что помощник собрал из карточек ──
+   Метки стоят всегда. Отданные — яркие, с подписью. Оставленные в кармане —
+   серые, с замочком: так видно, что можно было собрать, даже если ничего
+   не отдали. mini — для карточки в коллекцию, без анимации. */
+const PV_SPOTS = {
+  home: { x: 84, y: 172, t: 'ул. Мира, 8' },
+  school: { x: 262, y: 74, t: 'школа №12' },
+  walk: { x: 226, y: 190, t: 'после 5 — во дворе' },
+  room: { x: 60, y: 112, t: 'что у тебя дома' },
+  pass: { x: 150, y: 48, t: 'твоя почта' },
+};
+function PvMap({ given, mini }) {
+  const E = React.createElement;
+  const has = id => given.indexOf(id) > -1;
+  const order = ['home', 'school', 'walk', 'room', 'pass'];
+  let n = 0;
+  const pin = id => {
+    const p = PV_SPOTS[id], on = has(id), d = on ? (n++) * .45 + .3 : .1;
+    return E('g', { key: id, transform: 'translate(' + p.x + ',' + p.y + ')' },
+     E('g', { className: mini ? null : 'pvpin', style: mini ? null : { animationDelay: d + 's' } },
+      E('path', { d: 'M0 0 C-14 -16 -16 -22 -16 -28 a16 16 0 0 1 32 0 c0 6 -2 12 -16 28 z',
+        fill: on ? '#FF5D7A' : '#B9BFC8', stroke: '#FFFFFF', strokeWidth: 2 }),
+      E('circle', { cx: 0, cy: -28, r: 11.5, fill: '#FFFFFF' }),
+      on
+        ? E('g', { transform: 'translate(0,-28)' }, E(PvIcon, { id: id, s: .45 }))
+        : E('g', { transform: 'translate(0,-28)' },
+            E('rect', { x: -5, y: -1, width: 10, height: 8, rx: 2, fill: '#8A93A3' }),
+            E('path', { d: 'M-3 -1 v-3 a3 3 0 0 1 6 0 v3', stroke: '#8A93A3', strokeWidth: 2, fill: 'none' })),
+      E('rect', { x: -(p.t.length * 2.9 + 8), y: 4, width: p.t.length * 5.8 + 16, height: 17, rx: 8.5,
+        fill: on ? '#2A1D4A' : 'rgba(42,29,74,.35)' }),
+      E('text', { x: 0, y: 16, textAnchor: 'middle', fill: on ? '#FFFFFF' : '#EEF1F5',
+        style: { font: '900 9.5px Nunito,sans-serif' } }, p.t)));
+  };
+  const path = (a, b) => has(a) && has(b) && E('path', { key: a + b, className: mini ? null : 'pvpath',
+    d: 'M' + PV_SPOTS[a].x + ' ' + (PV_SPOTS[a].y - 6) + ' Q ' + ((PV_SPOTS[a].x + PV_SPOTS[b].x) / 2) + ' ' +
+      (Math.min(PV_SPOTS[a].y, PV_SPOTS[b].y) - 30) + ' ' + PV_SPOTS[b].x + ' ' + (PV_SPOTS[b].y - 6),
+    stroke: '#FF5D7A', strokeWidth: 3, fill: 'none', strokeDasharray: '6 6', strokeLinecap: 'round' });
+  return E('g', null,
+    E('rect', { x: 0, y: 0, width: 340, height: 240, fill: '#EEF4E6' }),
+    /* кварталы */
+    [[14, 14, 92, 60], [120, 14, 70, 26], [212, 14, 114, 40], [14, 92, 50, 44], [116, 92, 80, 70],
+     [214, 96, 112, 54], [14, 196, 120, 34], [256, 206, 70, 26]].map((r, i) =>
+      E('rect', { key: 'b' + i, x: r[0], y: r[1], width: r[2], height: r[3], rx: 7, fill: '#DCE7D1' })),
+    /* парк и река */
+    E('ellipse', { cx: 160, cy: 206, rx: 40, ry: 22, fill: '#B7E3A0' }),
+    [[146, 200], [166, 212], [178, 198]].map((t, i) => E('circle', { key: 't' + i, cx: t[0], cy: t[1], r: 6, fill: '#7CC765' })),
+    E('path', { d: 'M196 0 C 206 40 182 70 204 100 S 230 150 200 240', stroke: '#A9DAF5', strokeWidth: 14, fill: 'none', opacity: .9 }),
+    /* улицы */
+    E('path', { d: 'M0 82 H340 M0 184 H340 M108 0 V240 M204 0 V240', stroke: '#FFFFFF', strokeWidth: 7 }),
+    path('home', 'school'), path('home', 'walk'),
+    order.map(pin));
+}
+
+/* карточка в коллекцию: карта в рамке */
+function PvCard({ given, riskyN }) {
   const E = React.createElement;
   return E('svg', { viewBox: '0 0 220 250', className: 'pvcard' },
-    E('rect', { x: 8, y: 8, width: 204, height: 234, rx: 20,
-      fill: '#241C42', stroke: safe ? '#4ED99B' : '#FFD84D', strokeWidth: 2 }),
-    E('text', { x: 110, y: 36, textAnchor: 'middle', fill: safe ? '#4ED99B' : '#FFD84D',
-      style: { font: '900 10px Nunito,sans-serif', letterSpacing: '1.3px' } },
-      safe ? 'НИЧЕГО ЛИШНЕГО' : 'ЧТО О ТЕБЕ УЗНАЛИ'),
-    E('g', { transform: 'translate(110,86)' },
-      E('path', { d: 'M-30,-22 h14 l5,6 h41 v40 h-60 z', fill: '#3A3060',
-        stroke: 'rgba(255,255,255,.2)', strokeWidth: 1.6 }),
-      kept.slice(0, 3).map((k, i) =>
-        E('rect', { key: 'sh' + i, x: -24 + i * 4, y: -12 - i * 4, width: 48, height: 22, rx: 2,
-          fill: i === Math.min(kept.length, 3) - 1 ? '#F4EEFF' : '#CFC4EC',
-          stroke: 'rgba(0,0,0,.18)', strokeWidth: .8 })),
-      kept.length > 0 && E('path', { d: 'M-30,-8 h14 l5,6 h41 v26 h-60 z', fill: '#4A3E78',
-        stroke: 'rgba(255,255,255,.2)', strokeWidth: 1.6 }),
-      safe && E('path', { d: 'M-12,4 l8,9 l17,-20', fill: 'none', stroke: '#4ED99B',
-        strokeWidth: 4, strokeLinecap: 'round', strokeLinejoin: 'round' })),
-    kept.length
-      ? kept.slice(0, 5).map((k, i) => E('text', {
-          key: i, x: 110, y: 132 + i * 17, textAnchor: 'middle', fill: '#E4DAF7',
-          style: { font: '800 12px Nunito,sans-serif' } }, k))
-      : E('text', { x: 110, y: 150, textAnchor: 'middle', fill: '#93A4BC',
-          style: { font: '800 12.5px Nunito,sans-serif' } }, 'ни одной лишней вещи'),
-    E('text', { x: 110, y: 228, textAnchor: 'middle', fill: '#A896C9',
-      style: { font: '900 10.5px Nunito,sans-serif' } },
-      safe ? 'праздник всё равно придумали' : 'а помощник просто вежливо спрашивал'));
+    E('rect', { x: 8, y: 8, width: 204, height: 234, rx: 20, fill: '#241C42', stroke: riskyN ? '#FF5D7A' : '#4ED99B', strokeWidth: 2 }),
+    E('text', { x: 110, y: 34, textAnchor: 'middle', fill: riskyN ? '#FF8FA3' : '#4ED99B',
+      style: { font: '900 10px Nunito,sans-serif', letterSpacing: '1.3px' } }, riskyN ? 'ЧТО УЗНАЛ БИП' : 'НИЧЕГО ЛИШНЕГО'),
+    E('svg', { x: 20, y: 46, width: 180, height: 127, viewBox: '0 0 340 240' }, E(PvMap, { given: given, mini: true })),
+    E('text', { x: 110, y: 200, textAnchor: 'middle', fill: '#E4DAF7', style: { font: '800 12px Nunito,sans-serif' } },
+      riskyN ? 'мест на карте: ' + riskyN : 'карта осталась пустой'),
+    E('text', { x: 110, y: 222, textAnchor: 'middle', fill: '#A896C9', style: { font: '900 10.5px Nunito,sans-serif' } },
+      'а праздник придумали и так'));
 }
 
 function LevelPrivate({ onWin, onHome }) {
   const q = new URLSearchParams(window.location.search);
   const [phase, setPhase] = useState(() => {
     const p = q.get('p');
-    return ['play', 'quiz', 'done'].indexOf(p) > -1 ? p : 'intro';
+    return ['play', 'reveal', 'quiz', 'done'].indexOf(p) > -1 ? p : 'intro';
   });
-  const [si, setSi] = useState(0);
-  const [log, setLog] = useState([]);        // переписка
-  const [kept, setKept] = useState([]);      // что ушло на сервер
-  const [fly, setFly] = useState(null);
+  const [ci, setCi] = useState(0);              // какая карточка сейчас
+  const [given, setGiven] = useState([]);       // отдали Бипу
+  const [kept, setKept] = useState([]);         // оставили себе
+  const [mood, setMood] = useState('idle');
+  const [say, setSay] = useState(null);         // ответ Бипа — пока не пришла следующая карточка
+  const [pos, setPos] = useState(PV_HOME);      // где карточка
+  const [mode, setMode] = useState('rest');     // rest | drag | fly | back | wait
+  const [glow, setGlow] = useState(0);
   const [saved, setSaved] = useState(false);
   const [q1, setQ1] = useState(null);
   const [q2, setQ2] = useState(null);
+  const svgRef = React.useRef(null);
+  const grab = React.useRef(null);              // смещение пальца от центра карточки
   const tRef = React.useRef([]);
   useEffect(() => () => tRef.current.forEach(clearTimeout), []);
-  /* Новый вопрос — докручиваем к вариантам ответа, как любой мессенджер */
-  useEffect(() => {
-    const down = () => {
-      const b = document.querySelector('.pvbody');
-      if (b) b.scrollTop = b.scrollHeight;
-    };
-    down();
-    /* и ещё раз, когда картинка с «чужим компьютером» дорисуется */
-    const t = setTimeout(down, 400);
-    return () => clearTimeout(t);
-  }, [si]);
+  const later = (fn, ms) => tRef.current.push(setTimeout(fn, ms));
 
-  const step = PV_STEPS[si];
-  const risky = kept.length;
+  const card = PV_CARDS[ci];
+  const riskyN = given.filter(id => PV_BY[id].risk).length;
 
-  const answer = o => {
-    const next = log.concat([{ me: o.me }, { bot: o.say }]);
-    setLog(next);
-    if (o.give) {
-      setKept(k => k.concat([o.give]));
-      setFly(o.give);
-      tRef.current.push(setTimeout(() => setFly(null), 1150));
-    }
-    tRef.current.push(setTimeout(() => {
-      if (si + 1 < PV_STEPS.length) setSi(si + 1);
-      else setPhase('quiz');
-    }, 900));
+  const pt = e => {
+    const svg = svgRef.current;
+    const p = svg.createSVGPoint();
+    p.x = e.clientX; p.y = e.clientY;
+    return p.matrixTransform(svg.getScreenCTM().inverse());
+  };
+
+  /* отдать или оставить: карточка улетает, Бип отвечает, приходит следующая */
+  const decide = give => {
+    if (!card || (mode !== 'rest' && mode !== 'drag')) return;
+    setMode('fly');
+    setPos(give ? PV_NOTE : PV_POCKET);
+    setMood(give ? (card.risk ? 'write' : 'happy') : 'shrug');
+    later(() => {
+      if (give) { setGiven(g => g.concat([card.id])); setGlow(x => x + 1); }
+      else setKept(k => k.concat([card.id]));
+      setSay(give ? card.give : card.keep);
+      setMode('wait');
+    }, 430);
+    later(() => {
+      setMood('idle'); setSay(null); setPos(PV_HOME);
+      if (ci + 1 < PV_CARDS.length) { setCi(ci + 1); setMode('rest'); }
+      else setPhase('reveal');
+    }, 1650);
+  };
+
+  const onDown = e => {
+    if (mode !== 'rest') return;
+    const p = pt(e);
+    if (Math.abs(p.x - pos.x) > 86 || Math.abs(p.y - pos.y) > 42) return;
+    grab.current = { dx: p.x - pos.x, dy: p.y - pos.y };
+    e.currentTarget.setPointerCapture && e.currentTarget.setPointerCapture(e.pointerId);
+    setMode('drag');
+  };
+  const onMove = e => {
+    if (mode !== 'drag' || !grab.current) return;
+    const p = pt(e);
+    setPos({ x: p.x - grab.current.dx, y: p.y - grab.current.dy });
+  };
+  const onUp = () => {
+    if (mode !== 'drag') return;
+    grab.current = null;
+    if (pos.y < 150) decide(true);
+    else if (pos.y > 252) decide(false);
+    else { setMode('back'); setPos(PV_HOME); later(() => setMode('rest'), 260); }
   };
 
   /* ── финал ── */
   if (phase === 'done') {
-    const safe = kept.length === 0;
     return React.createElement('div', { className: 'pv' },
       React.createElement(TopBar, { level: LV_NO, title: 'Что не рассказывать ИИ', onHome, step: 1, total: 1 }),
       React.createElement('div', { className: 'pvbody pvdone' },
-        React.createElement(PvCard, { kept: kept, safe: safe }),
+        React.createElement(PvCard, { given: given, riskyN: riskyN }),
         React.createElement('div', { className: 'pvlaw' },
-          React.createElement('b', null, safe ? 'Помощь не требует твоих тайн' : 'По кусочкам собирается ты'),
-          React.createElement('span', null, safe
-            ? 'Ничего лишнего — и праздник всё равно придумали. Помощнику не нужны твоя школа и адрес, чтобы быть полезным. Спрашивай у ИИ про уроки, игры и космос сколько хочешь: это безопасно.'
-            : 'Ни один вопрос по отдельности не был страшным. Но вместе они дают адрес, школу и время, когда ты во дворе. Помощник не злодей. Но всё, что ты пишешь, лежит на чужом компьютере — и кто это прочтёт, ты не знаешь. Про уроки и игры спрашивай смело. Не рассказывай то, по чему тебя можно найти.'))),
+          React.createElement('b', null, riskyN ? 'По мелочам тебя можно найти' : 'Помощь не требует твоих тайн'),
+          React.createElement('span', null,
+            'Имя и любимые игры — можно. Адрес, школу, время прогулок и пароли оставляй себе.'))),
       React.createElement('div', { className: 'pvfoot' },
         React.createElement('div', { style: { display: 'flex', gap: 8 } },
           React.createElement('button', {
@@ -355,14 +472,14 @@ function LevelPrivate({ onWin, onHome }) {
               if (svg && window.nookaGallery) {
                 window.nookaGallery.add({
                   kind: 'shield', game: 'Что не рассказывать ИИ',
-                  title: safe ? 'Ничего лишнего' : 'Что о тебе узнали',
-                  note: 'Понял, что из безобидных ответов складывается адрес и расписание',
+                  title: riskyN ? 'Что узнал Бип' : 'Ничего лишнего',
+                  note: 'Из мелочей складываются адрес и время прогулок',
                   svg: svg.outerHTML,
                 });
               }
               setSaved(true);
             },
-          }, saved ? 'В коллекции' : 'Забрать карточку'),
+          }, saved ? 'В коллекции' : 'Забрать карту'),
           React.createElement('button', {
             className: 'nk-btn nk-btn--ok', style: { flex: 1 }, onClick: onWin,
           }, 'Готово'))));
@@ -372,7 +489,7 @@ function LevelPrivate({ onWin, onHome }) {
   if (phase === 'quiz') {
     const o1 = nkMix([
       { t: 'Всё сказанное лежит на чужом компьютере — кто прочтёт, неизвестно', ok: true },
-      { t: 'Помощник хотел меня обмануть с самого начала', ok: false },
+      { t: 'Бип хотел обмануть с самого начала', ok: false },
       { t: 'Помощники всегда врут, им нельзя верить', ok: false },
     ]);
     const o2 = nkMix([
@@ -385,15 +502,15 @@ function LevelPrivate({ onWin, onHome }) {
       React.createElement(TopBar, { level: LV_NO, title: 'Что не рассказывать ИИ', onHome, step: 1, total: 1 }),
       React.createElement('div', { className: 'pvbody' },
         React.createElement('div', { className: 'pvq' },
-          React.createElement('div', { className: 'pvq__t' }, 'Помощник был вежливый и правда помогал. Почему адрес ему говорить не стоило?'),
+          React.createElement('div', { className: 'pvq__t' }, 'Бип был вежливый и правда помогал. Почему адрес ему говорить не стоило?'),
           o1.map((o, i) => React.createElement('button', {
             key: i, className: q1 === i ? (o.ok ? 'on--ok' : 'on--bad') : '',
             onClick: () => setQ1(i),
           }, o.t))),
-        q1 !== null && React.createElement('div', { className: 'pvmsg pvmsg--bot', style: { margin: '10px 14px 0', maxWidth: 'none' } },
+        q1 !== null && React.createElement('div', { className: 'pvans' },
           o1[q1].ok
             ? 'Верно. Дело не в злом умысле: переписка хранится, и до неё могут добраться совсем другие люди.'
-            : 'Не совсем. Помощник может быть честным. Но всё, что ему написали, остаётся на чужом компьютере — и это уже не в его власти.'),
+            : 'Не совсем. Помощник может быть честным. Но всё, что ему написали, остаётся на чужом компьютере.'),
 
         React.createElement('div', { className: 'pvq' },
           React.createElement('div', { className: 'pvq__t' }, 'Что из этого спокойно можно рассказать ИИ?'),
@@ -401,10 +518,10 @@ function LevelPrivate({ onWin, onHome }) {
             key: i, className: q2 === i ? (o.ok ? 'on--ok' : 'on--bad') : '',
             onClick: () => setQ2(i),
           }, o.t))),
-        q2 !== null && React.createElement('div', { className: 'pvmsg pvmsg--bot', style: { margin: '10px 14px 0', maxWidth: 'none' } },
+        q2 !== null && React.createElement('div', { className: 'pvans' },
           o2[q2].ok
             ? 'Да. По любимым книжкам тебя не найти — а помочь с ними ИИ может отлично.'
-            : 'Осторожно: и школа, и время прогулок говорят, где тебя искать. Это как раз то, что оставляют при себе.')),
+            : 'Осторожно: и школа, и время прогулок говорят, где тебя искать.')),
       React.createElement('div', { className: 'pvfoot' },
         React.createElement('button', {
           className: 'nk-btn nk-btn--pri', style: { width: '100%' }, disabled: !both,
@@ -412,41 +529,80 @@ function LevelPrivate({ onWin, onHome }) {
         }, both ? 'Дальше' : 'Ответь на оба')));
   }
 
-  /* ── переписка ── */
-  const shown = log.slice(-4);
+  /* ── карта: что собрал Бип ── */
+  if (phase === 'reveal') {
+    const safe = given.filter(id => !PV_BY[id].risk);
+    return React.createElement('div', { className: 'pv' },
+      React.createElement(TopBar, { level: LV_NO, title: 'Что не рассказывать ИИ', onHome, step: 1, total: 1 }),
+      React.createElement('div', { className: 'pvbody' },
+        React.createElement('div', { className: 'pvhead' },
+          React.createElement('b', null, riskyN ? 'По твоим карточкам тебя можно найти' : 'По карте тебя не найти'),
+          React.createElement('span', null, riskyN ? 'Блокнот Бипа — это карта района.' : 'Серые метки — то, что Бип мог бы узнать.')),
+        React.createElement('div', { className: 'pvmap' },
+          React.createElement('svg', { viewBox: '0 0 340 240' }, React.createElement(PvMap, { given: given }))),
+        safe.length > 0 && React.createElement('div', { className: 'pvchips' },
+          safe.map(id => React.createElement('i', { key: id }, PV_BY[id].l2)),
+          React.createElement('i', null, '— по этому не найти')),
+        riskyN > 0 && riskyN < 5 && React.createElement('div', { className: 'pvlegend' }, 'Серые метки — карточки, которые остались у тебя в кармане'),
+        React.createElement('div', { className: 'pvparty' },
+          given.indexOf('like') > -1 ? 'А праздник готов: космическая вечеринка!' : 'А праздник Бип всё равно придумал!')),
+      React.createElement('div', { className: 'pvfoot' },
+        React.createElement('button', {
+          className: 'nk-btn nk-btn--ok', style: { width: '100%' }, onClick: () => setPhase('quiz'),
+        }, 'Дальше')));
+  }
+
+  /* ── игра: карточки для Бипа ── */
+  const scale = mode === 'fly' ? .22 : 1;
   return React.createElement('div', { className: 'pv' },
     React.createElement(TopBar, { level: LV_NO, title: 'Что не рассказывать ИИ', onHome, step: 1, total: 1 }),
 
     phase === 'intro' && React.createElement(IntroModal, {
       emoji: NKM('hello', 88),
       title: 'Что не рассказывать ИИ',
-      law: 'Новый помощник поможет устроить день рождения.\nОн вежливый и правда полезный.',
-      tip: 'Отвечай как захочешь. В конце посмотрим, что он о тебе узнал.',
+      law: 'Робот Бип готовит тебе праздник.\nОн просит карточки о тебе.',
+      tip: 'Тяни карточку вверх — Бипу, вниз — себе в карман.',
       onStart: () => setPhase('play'),
     }),
 
     React.createElement('div', { className: 'pvbody' },
-      React.createElement('div', { className: 'pvchat' },
-        shown.map((m, i) => React.createElement('div', {
-          key: i, className: 'pvmsg ' + (m.bot ? 'pvmsg--bot' : 'pvmsg--me'),
-        }, m.bot || m.me)),
-        React.createElement('div', { className: 'pvmsg pvmsg--bot' }, step.ask)),
+      React.createElement('div', { className: 'pvsay' },
+        React.createElement(PvBipFace),
+        React.createElement('span', { key: ci + (say || ''), className: say ? 'pvsay--back' : null }, say || (card ? card.ask : ''))),
 
       React.createElement('div', { className: 'pvscene' },
-        React.createElement(PvScene, { kept: kept, fly: fly })),
+        React.createElement('svg', {
+          ref: svgRef, viewBox: '0 0 340 330',
+          onPointerDown: onDown, onPointerMove: onMove, onPointerUp: onUp, onPointerCancel: onUp,
+        },
+          React.createElement('defs', null,
+            React.createElement('linearGradient', { id: 'pvBody', x1: 0, y1: 0, x2: 0, y2: 1 },
+              React.createElement('stop', { offset: '0%', stopColor: '#FFE16A' }),
+              React.createElement('stop', { offset: '100%', stopColor: '#FFB020' }))),
+          /* звёзды на фоне */
+          [[24, 20], [150, 30], [318, 170], [12, 230], [300, 250], [130, 140]].map((s, i) =>
+            React.createElement('circle', { key: i, cx: s[0], cy: s[1], r: i % 2 ? 1.3 : 2, fill: '#C4B5FF', opacity: .5 })),
+          React.createElement(PvBip, { mood: mood }),
+          React.createElement(PvNote, { given: given, glow: glow }),
+          React.createElement(PvPocket, { kept: kept }),
+          /* подсказки направлений */
+          mode !== 'fly' && mode !== 'wait' && React.createElement('text', { x: 170, y: 152, textAnchor: 'middle', fill: '#FFD84D', opacity: .75,
+            style: { font: '900 10.5px Nunito,sans-serif' } }, '↑ отдать Бипу'),
+          mode !== 'fly' && mode !== 'wait' && React.createElement('text', { x: 170, y: 264, textAnchor: 'middle', fill: '#C4B5FF', opacity: .75,
+            style: { font: '900 10.5px Nunito,sans-serif' } }, '↓ оставить себе'),
+          card && mode !== 'wait' && React.createElement('g', {
+            key: card.id,
+            className: 'pvcardg' + (mode === 'drag' ? ' is-drag' : mode === 'fly' ? ' is-fly' : mode === 'back' ? ' is-back' : ''),
+            style: { transform: 'translate(' + pos.x + 'px,' + pos.y + 'px) scale(' + scale + ')', opacity: mode === 'fly' ? .2 : 1 },
+          },
+            React.createElement('g', { className: 'pventer' }, React.createElement(PvCardFace, { c: card }))))),
 
-      React.createElement('div', { className: 'pvhow' },
-        'Что скажешь — то и уйдёт на чужой компьютер'),
-
-      React.createElement('div', { className: 'pvopts' },
-        step.opts.map((o, i) => React.createElement('button', {
-          key: i, onClick: () => answer(o),
-        }, o.t)))),
-
-    React.createElement('div', { className: 'pvfoot' },
-      React.createElement('div', { className: 'pvhint', style: { margin: 0 } },
-        'Вопрос ' + (si + 1) + ' из ' + PV_STEPS.length +
-        (risky ? ' · он уже знает: ' + risky : ''))));
+      React.createElement('div', { className: 'pvacts' },
+        React.createElement('button', { className: 'nk-btn nk-btn--soft', disabled: mode !== 'rest', onClick: () => decide(true) }, '↑ Отдать Бипу'),
+        React.createElement('button', { className: 'nk-btn nk-btn--soft', disabled: mode !== 'rest', onClick: () => decide(false) }, '↓ Оставить себе')),
+      React.createElement('div', { className: 'pvhint' },
+        'Карточка ' + Math.min(ci + 1, PV_CARDS.length) + ' из ' + PV_CARDS.length +
+        (given.length ? ' · Бип знает: ' + given.length : ''))));
 }
 
 function App() {
