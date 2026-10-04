@@ -376,6 +376,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
      LAB       — ключ, название, предмет, бесплатные уровни, тексты;
      LB_LEVELS — уровни: компонент, название, подпись, «ага»;
      LB_QUIZ   — по два вопроса проверки связи на уровень.
+   У уровня может быть ставка: bet: { q, opts: [три ответа], ok: индекс }.
+   Тогда заставка не пускает в уровень без ставки, а экран победы
+   сверяет её с тем, что вышло на деле (КвантУм, 03.10.2026).
    ============================================================ */
 const { useState, useEffect, useRef, useMemo } = React;
 const h = React.createElement;
@@ -437,9 +440,43 @@ const SFX = (() => {
     bump: () => { noise(0.15, 0.25, 500); tone(140, 0.15, 'sine', 0.1, 70); },
     whir: () => tone(300, 0.25, 'sawtooth', 0.03, 520),
     beep: () => tone(1500, 0.06, 'sine', 0.05),
+    note: (f, d, vol) => tone(f, d || 0.5, 'triangle', vol || 0.09),
+    /* щипок струны: шум бежит по кольцу и гаснет (алгоритм Карплуса — Стронга) */
+    pluck: (f, vol, dur) => {
+      const c = ac(); if (!c) return;
+      const sr = c.sampleRate, n = Math.floor(sr * (dur || 1.8)), b = c.createBuffer(1, n, sr), a = b.getChannelData(0);
+      const N = Math.max(2, Math.round(sr / f - 0.5)), ring = new Float32Array(N);
+      for (let i = 0; i < N; i++) ring[i] = Math.random() * 2 - 1;
+      for (let i = 0, k = 0; i < n; i++) { const v = ring[k], w = ring[(k + 1) % N]; a[i] = v; ring[k] = 0.4985 * (v + w); k = (k + 1) % N; }
+      const s = c.createBufferSource(), g = c.createGain(), lp = c.createBiquadFilter(), t = c.currentTime;
+      s.buffer = b; lp.type = 'lowpass'; lp.frequency.value = Math.min(9000, f * 9);
+      g.gain.setValueAtTime(vol || 0.3, t);
+      s.connect(lp); lp.connect(g); g.connect(c.destination); s.start(t);
+    },
     ok: () => { tone(660, 0.12, 'triangle', 0.09); setTimeout(() => tone(880, 0.12, 'triangle', 0.09), 110); setTimeout(() => tone(1320, 0.26, 'triangle', 0.09), 220); }
   };
 })();
+
+/* ── ставка до опыта ─────────────────────────────────────── */
+let LB_CUR = 0;                                   // какой уровень открыт
+const LB_BET = {};                                // номер уровня → индекс ставки
+const lbBetOf = n => { const L = LB_LEVELS[n - 1]; return L && L.bet; };
+function lbBetSave(n, i) {
+  LB_BET[n] = i;
+  try { localStorage.setItem(`nooka_bet_${LAB.key}_${n}`, String(i)); } catch (e) {}
+}
+function lbBetGet(n) {
+  if (LB_BET[n] != null) return LB_BET[n];
+  try { const v = localStorage.getItem(`nooka_bet_${LAB.key}_${n}`); return v == null ? null : +v; } catch (e) { return null; }
+}
+function BetReveal() {
+  const B = lbBetOf(LB_CUR), i = lbBetGet(LB_CUR);
+  if (!B || i == null || !B.opts[i]) return null;
+  const hit = i === B.ok;
+  return h('div', { style: { background: hit ? 'var(--ak-ok-1)' : '#fff', border: '2px dashed ' + (hit ? 'var(--ak-ok-2)' : 'var(--ak-acc-2)'), borderRadius: 16, padding: '10px 14px', marginBottom: 12, textAlign: 'left', fontSize: 13.5, lineHeight: 1.45, color: 'var(--ak-ink)' } },
+    h('div', { style: { fontFamily: 'var(--ak-display)', color: hit ? 'var(--ak-ok-3)' : 'var(--ak-acc-3)', marginBottom: 2 } }, hit ? '🎯 Ставка сыграла!' : '🤔 Ставка и опыт'),
+    'Твоя ставка: «', B.opts[i], '».', hit ? ' Так и есть.' : h('span', null, ' На деле: «', h('b', null, B.opts[B.ok]), '».'));
+}
 
 /* ── общие окна, светлый стиль наук ──────────────────────── */
 function TopBar({ n, title, onHome, step, total }) {
@@ -479,6 +516,7 @@ function WinModal({ title, law, fact, onNext, onHome }) {
   }, h('div', { className: 'ak-clay ak-pop', style: { margin: 18, padding: '20px 22px 24px', textAlign: 'center', maxWidth: 330 } },
     h('div', { style: { display: 'flex', justifyContent: 'center', marginBottom: 2 } }, h(LbMascot, { kind: 'win', size: 120 })),
     h('div', { style: { fontFamily: 'var(--ak-display)', fontSize: 22, color: 'var(--ak-ink)', marginBottom: 12 } }, title),
+    h(BetReveal),
     h('div', { style: { background: 'var(--ak-acc-1)', borderRadius: 18, padding: '13px 16px', marginBottom: 18, textAlign: 'left' } },
       h('div', { style: { fontFamily: 'var(--ak-display)', fontSize: 13.5, color: 'var(--ak-acc-3)', marginBottom: 6, lineHeight: 1.4 } }, '💡 ', law),
       h('div', { style: { fontSize: 13, color: 'var(--ak-ink)', lineHeight: 1.55 } }, fact)),
@@ -487,19 +525,35 @@ function WinModal({ title, law, fact, onNext, onHome }) {
       h('button', { className: 'ak-btn ak-btn--cta', onClick: onNext }, 'Дальше →'))));
 }
 function IntroModal({ emoji, title, ask, task, tip, onStart }) {
+  const B = lbBetOf(LB_CUR);
+  const [pick, setPick] = useState(null);
+  const ready = !B || pick != null;
   return h('div', {
     style: {
-      position: 'absolute', inset: 0, zIndex: 100, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '28px 24px 28px', overflowY: 'auto', boxSizing: 'border-box',
+      position: 'absolute', inset: 0, zIndex: 100, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '24px 22px 26px', overflowY: 'auto', boxSizing: 'border-box',
       background: 'linear-gradient(160deg,var(--ak-acc-1) 0%,var(--ak-bg) 55%)'
     }
-  }, h('div', { className: 'ak-bob', style: { marginBottom: 4 } }, emoji ? h('div', { style: { fontSize: 62 } }, emoji) : h(LbMascot, { kind: 'hello', size: 100 })),
+  }, h('div', { className: 'ak-bob', style: { marginBottom: 4 } }, emoji ? h('div', { style: { fontSize: 58 } }, emoji) : h(LbMascot, { kind: 'hello', size: B ? 84 : 100 })),
   h('div', { style: { fontFamily: 'var(--ak-display)', fontSize: 26, color: 'var(--ak-ink)', marginBottom: 4, textAlign: 'center' } }, title),
-  ask && h('div', { style: { fontFamily: 'var(--ak-display)', fontSize: 16, color: 'var(--ak-acc-3)', marginBottom: 16, textAlign: 'center' } }, ask),
-  h('div', { style: { width: '100%', maxWidth: 320, background: 'rgba(255,255,255,.85)', borderRadius: 20, padding: '14px 18px', marginBottom: 12, boxSizing: 'border-box', boxShadow: 'inset 0 1px 0 #fff, 0 4px 12px -6px rgba(45,27,69,.1)' } },
-    h('div', { style: { fontFamily: 'var(--ak-display)', fontSize: 13, color: 'var(--ak-acc-3)', marginBottom: 6 } }, '🎯 Задача'),
-    h('div', { style: { fontSize: 15, color: 'var(--ak-ink)', lineHeight: 1.55, fontWeight: 700 } }, task)),
-  h('div', { style: { width: '100%', maxWidth: 320, background: 'rgba(255,210,98,.2)', borderRadius: 14, padding: '10px 16px', marginBottom: 24, fontSize: 13.5, color: 'var(--ak-ink-2)', lineHeight: 1.5, boxSizing: 'border-box' } }, '👆 ', tip),
-  h('button', { className: 'ak-btn ak-btn--acc', style: { minWidth: 200, fontSize: 18 }, onClick: () => { SFX.pop(); onStart(); } }, 'Начать!'));
+  B ? h('div', { style: { width: '100%', maxWidth: 320, marginBottom: 12 } },
+    h('div', { style: { fontFamily: 'var(--ak-display)', fontSize: 16, color: 'var(--ak-acc-3)', marginBottom: 8, textAlign: 'center', lineHeight: 1.35 } }, '🤔 Спорим? ', B.q),
+    B.opts.map((o, i) => h('button', {
+      key: i, onClick: () => { SFX.tick(); setPick(i); },
+      style: {
+        display: 'block', width: '100%', marginBottom: 7, padding: '11px 14px', borderRadius: 14, cursor: 'pointer', textAlign: 'left', fontFamily: 'var(--ak-body)', fontWeight: 800, fontSize: 14,
+        color: 'var(--ak-ink)', border: 'none', background: pick === i ? 'var(--ak-acc-1)' : 'rgba(255,255,255,.92)',
+        boxShadow: pick === i ? 'inset 0 0 0 3px var(--ak-acc-3)' : '0 3px 0 rgba(45,27,69,.07)'
+      }
+    }, pick === i ? '👉 ' : '', o)))
+    : ask && h('div', { style: { fontFamily: 'var(--ak-display)', fontSize: 16, color: 'var(--ak-acc-3)', marginBottom: 16, textAlign: 'center' } }, ask),
+  h('div', { style: { width: '100%', maxWidth: 320, background: 'rgba(255,255,255,.85)', borderRadius: 20, padding: '12px 18px', marginBottom: 10, boxSizing: 'border-box', boxShadow: 'inset 0 1px 0 #fff, 0 4px 12px -6px rgba(45,27,69,.1)' } },
+    h('div', { style: { fontFamily: 'var(--ak-display)', fontSize: 13, color: 'var(--ak-acc-3)', marginBottom: 4 } }, B ? '🎯 Проверь опытом' : '🎯 Задача'),
+    h('div', { style: { fontSize: 14.5, color: 'var(--ak-ink)', lineHeight: 1.5, fontWeight: 700 } }, task)),
+  h('div', { style: { width: '100%', maxWidth: 320, background: 'rgba(255,210,98,.2)', borderRadius: 14, padding: '9px 16px', marginBottom: 18, fontSize: 13.5, color: 'var(--ak-ink-2)', lineHeight: 1.5, boxSizing: 'border-box' } }, '👆 ', tip),
+  h('button', {
+    className: 'ak-btn ak-btn--acc', style: { minWidth: 200, fontSize: 18 }, disabled: !ready,
+    onClick: () => { SFX.pop(); if (B) lbBetSave(LB_CUR, pick); onStart(); }
+  }, ready ? 'Начать!' : 'Сначала ставка'));
 }
 function LbShell({ n, title, step, total, onHome, children }) {
   return h('div', {
@@ -659,6 +713,7 @@ function LbApp() {
     });
   }
   const n = +s.slice(1), L = LB_LEVELS[n - 1], home = () => setS('home');
+  if (n) LB_CUR = n;
   return h('div', { style: { width: '100%', height: '100vh', maxWidth: 480, margin: '0 auto', position: 'relative', overflow: 'hidden' } },
     s === 'home' && h(LbHome, { onSelect: open, paid }),
     s === 'off' && h(LbOffline, { onHome: home }),
@@ -1961,16 +2016,26 @@ const LAB = {
   sceneBg: '#F4F8FF', sceneDeco: rbGrid, homeCard: RbHomeCard
 };
 const LB_LEVELS = [
-  { C: Level1Parts, t: 'Из чего робот', emoji: '🔧', sub: 'Робот думает сам?', aga: 'У робота есть датчики — чувствует, плата — выполняет правила, моторы — делает. Всё от батареи.' },
-  { C: Level2Wires, t: 'Плюс и минус', emoji: '🔋', sub: 'Куда крутится мотор', aga: 'Ток бежит по кругу. Провода наоборот — мотор крутится в другую сторону.' },
-  { C: Level3Wheels, t: 'Два колеса', emoji: '🛞', sub: 'Как повернуть без руля', aga: 'Робот поворачивает, когда колёса крутятся по-разному.' },
-  { C: Level4Vacuum, t: 'Робот-пылесос', emoji: '🧹', sub: 'Убрать, не видя комнату', aga: 'Пылесос не думает: ударился — отъехал и повернул. Это правило «если — то».' },
-  { C: Level5Line, t: 'По линии', emoji: '〰️', sub: 'Как тележка находит дорогу', aga: 'Робот всё время проверяет «я на линии?» и поправляет руль в обе стороны.' },
-  { C: Level6Echo, t: 'Эхо', emoji: '🦇', sub: 'Как увидеть стену в темноте', aga: 'Датчик меряет расстояние эхом. Чем быстрее едешь, тем раньше тормози.' },
-  { C: Level7Gears, t: 'Сила или скорость', emoji: '⚙️', sub: 'Шестерёнки и горка', aga: 'Шестерёнки меняют быстроту на силу: медленнее — значит сильнее.' },
-  { C: Level8Arm, t: 'Рука робота', emoji: '🦾', sub: 'Как взять кубик', aga: 'Рука робота — моторы в суставах; каждый поворачивается на свой угол.' },
-  { C: Level9Sort, t: 'Сортировщик', emoji: '🎨', sub: 'Как раскладывают посылки', aga: 'Датчик видит, плата выбирает по правилу, рука делает.' },
-  { C: Level10Rescue, t: 'Робот-спасатель', emoji: '🚨', sub: 'Робот под задачу', aga: 'Робота собирают под задачу: какие нужны чувства и руки, такие и ставят.' }
+  { C: Level1Parts, t: 'Из чего робот', emoji: '🔧', sub: 'Робот думает сам?', aga: 'У робота есть датчики — чувствует, плата — выполняет правила, моторы — делает. Всё от батареи.',
+    bet: { q: 'Робот сам решает, куда ехать?', opts: ['Да, у него есть мозг', 'Нет, плата выполняет правила, которые написали люди', 'Решает батарейка'], ok: 1 } },
+  { C: Level2Wires, t: 'Плюс и минус', emoji: '🔋', sub: 'Куда крутится мотор', aga: 'Ток бежит по кругу. Провода наоборот — мотор крутится в другую сторону.',
+    bet: { q: 'Что будет, если поменять провода у мотора местами?', opts: ['Мотор сломается', 'Колесо закрутится в другую сторону', 'Ничего не изменится'], ok: 1 } },
+  { C: Level3Wheels, t: 'Два колеса', emoji: '🛞', sub: 'Как повернуть без руля', aga: 'Робот поворачивает, когда колёса крутятся по-разному.',
+    bet: { q: 'Как повернуть машинку, у которой нет руля?', opts: ['Никак, нужен руль', 'Крутить колёса с разной скоростью', 'Наклонить её набок'], ok: 1 } },
+  { C: Level4Vacuum, t: 'Робот-пылесос', emoji: '🧹', sub: 'Убрать, не видя комнату', aga: 'Пылесос не думает: ударился — отъехал и повернул. Это правило «если — то».',
+    bet: { q: 'Как пылесос убирает комнату, если не видит её целиком?', opts: ['У него в голове карта всего дома', 'Упёрся — повернул, и так много раз', 'Его водят пультом'], ok: 1 } },
+  { C: Level5Line, t: 'По линии', emoji: '〰️', sub: 'Как тележка находит дорогу', aga: 'Робот всё время проверяет «я на линии?» и поправляет руль в обе стороны.',
+    bet: { q: 'Как тележка едет по нарисованной линии?', opts: ['Видит всю дорогу, как мы', 'Датчик смотрит под колёса: линия есть или нет', 'Линия тянет её, как магнит'], ok: 1 } },
+  { C: Level6Echo, t: 'Эхо', emoji: '🦇', sub: 'Как увидеть стену в темноте', aga: 'Датчик меряет расстояние эхом. Чем быстрее едешь, тем раньше тормози.',
+    bet: { q: 'Как робот узнаёт в темноте, далеко ли стена?', opts: ['Видит её камерой', 'Пищит и ждёт, когда вернётся эхо', 'Трогает её рукой'], ok: 1 } },
+  { C: Level7Gears, t: 'Сила или скорость', emoji: '⚙️', sub: 'Шестерёнки и горка', aga: 'Шестерёнки меняют быстроту на силу: медленнее — значит сильнее.',
+    bet: { q: 'Как маленькому мотору затащить тяжёлый груз в горку?', opts: ['Никак — нужен мотор побольше', 'Через шестерёнки: медленнее, зато сильнее', 'Разогнаться посильнее'], ok: 1 } },
+  { C: Level8Arm, t: 'Рука робота', emoji: '🦾', sub: 'Как взять кубик', aga: 'Рука робота — моторы в суставах; каждый поворачивается на свой угол.',
+    bet: { q: 'Чем робот-рука сгибает локоть?', opts: ['Мышцей, как у человека', 'Мотором в суставе', 'Пружиной'], ok: 1 } },
+  { C: Level9Sort, t: 'Сортировщик', emoji: '🎨', sub: 'Как раскладывают посылки', aga: 'Датчик видит, плата выбирает по правилу, рука делает.',
+    bet: { q: 'Робот положил синий шарик не в ту коробку. Почему?', opts: ['Он ошибся сам', 'Ему дали неверное правило', 'Он не любит синий'], ok: 1 } },
+  { C: Level10Rescue, t: 'Робот-спасатель', emoji: '🚨', sub: 'Робот под задачу', aga: 'Робота собирают под задачу: какие нужны чувства и руки, такие и ставят.',
+    bet: { q: 'Робот без датчиков едет в тёмную пещеру. Что будет?', opts: ['Сам объедет стены', 'Врежется: без датчика он не знает о стене', 'Остановится перед стеной'], ok: 1 } }
 ];
 const LB_QUIZ = {
   1: [{ q: 'Робот едет и врезается в стену. Чего ему не хватает?',
