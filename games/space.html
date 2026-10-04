@@ -639,6 +639,21 @@ function TaskBadge({ children }) {
   }, h('div', { className: 'ak-pulse', style: { width: 9, height: 9, borderRadius: '50%', background: 'var(--ak-sun)', flexShrink: 0, boxShadow: '0 0 10px rgba(255,216,77,.8)' } }),
   h('span', null, children));
 }
+/* ── ставка до опыта (как в КвантУме и Хемо Лабе): вопрос заставки — со ставкой,
+   экран победы сверяет её с тем, что вышло на деле ── */
+let SP_CUR = 0;
+const SP_BET = {};
+const spBetOf = n => { const L = SP_LEVELS[n - 1]; return L && L.bet; };
+function spBetSave(n, i) { SP_BET[n] = i; try { localStorage.setItem('nooka_bet_space_' + n, String(i)); } catch (e) {} }
+function spBetGet(n) { if (SP_BET[n] != null) return SP_BET[n]; try { const v = localStorage.getItem('nooka_bet_space_' + n); return v == null ? null : +v; } catch (e) { return null; } }
+function SpBetReveal() {
+  const B = spBetOf(SP_CUR), i = spBetGet(SP_CUR);
+  if (!B || i == null || !B.opts[i]) return null;
+  const hit = i === B.ok;
+  return h('div', { style: { borderRadius: 16, padding: '10px 14px', marginBottom: 12, textAlign: 'left', fontSize: 13.5, lineHeight: 1.45, color: 'var(--ak-ink)', background: hit ? 'rgba(6,214,160,.12)' : 'rgba(255,216,77,.08)', boxShadow: `inset 0 0 0 1.5px ${hit ? 'rgba(6,214,160,.45)' : 'rgba(255,216,77,.38)'}` } },
+    h('div', { style: { fontSize: 11, fontWeight: 900, letterSpacing: '.08em', color: hit ? 'var(--ak-ok-2)' : '#FFD84D', marginBottom: 4 } }, hit ? 'СТАВКА СЫГРАЛА' : 'СТАВКА И ОПЫТ'),
+    'Твоя ставка: «', B.opts[i], '».', hit ? ' Так и есть.' : h('span', null, ' На деле: «', h('b', null, B.opts[B.ok]), '».'));
+}
 function WinModal({ title, law, fact, onNext, onHome }) {
   return h('div', {
     style: { position: 'absolute', inset: 0, background: 'rgba(4,6,16,.72)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200 }
@@ -650,6 +665,7 @@ function WinModal({ title, law, fact, onNext, onHome }) {
     }
   }, h('div', { style: { display: 'flex', justifyContent: 'center', marginBottom: 4 } }, h(SpMascot, { kind: 'win', size: 104 })),
   h('div', { style: { fontWeight: 900, fontSize: 23, color: 'var(--ak-ink)', marginBottom: 14 } }, title),
+  h(SpBetReveal),
   h('div', { style: { borderRadius: 18, padding: '13px 15px', marginBottom: 20, textAlign: 'left', background: 'rgba(123,79,242,.12)', boxShadow: 'inset 0 0 0 1.5px rgba(169,139,255,.3)' } },
     h('div', { style: { fontSize: 11, fontWeight: 900, letterSpacing: '.08em', color: '#C9B6FF', marginBottom: 6 } }, 'ОТКРЫТИЕ'),
     h('div', { style: { fontWeight: 800, fontSize: 14, color: 'var(--ak-ink)', lineHeight: 1.45, marginBottom: 8 } }, law),
@@ -659,26 +675,36 @@ function WinModal({ title, law, fact, onNext, onHome }) {
     h('button', { className: 'nk-btn nk-btn--pri', onClick: onNext }, 'Дальше →'))));
 }
 function IntroModal({ title, ask, task, tip, onStart }) {
+  const B = spBetOf(SP_CUR);
+  const [pick, setPick] = useState(null);
+  const ready = !B || pick != null;
   return h('div', {
     style: {
-      position: 'absolute', inset: 0, zIndex: 100, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '30px 22px 28px', overflowY: 'auto', boxSizing: 'border-box',
+      position: 'absolute', inset: 0, zIndex: 100, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '26px 22px 26px', overflowY: 'auto', boxSizing: 'border-box',
       background: 'radial-gradient(120% 60% at 50% 0%,#1B1747 0%,#0D1427 55%,#080C18 100%)'
     }
   }, h('svg', { viewBox: '0 0 340 600', preserveAspectRatio: 'xMidYMid slice', style: { position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' } }, h(SpStars, { H: 600, dim: 0.8 })),
-  h('div', { className: 'ak-bob', style: { position: 'relative', marginBottom: 6 } }, h(SpMascot, { kind: 'hello', size: 96 })),
+  h('div', { className: 'ak-bob', style: { position: 'relative', marginBottom: 4 } }, h(SpMascot, { kind: 'hello', size: B ? 80 : 96 })),
   h('div', { style: { fontWeight: 900, fontSize: 26, color: '#fff', marginBottom: 4, textAlign: 'center', position: 'relative' } }, title),
-  ask && h('div', { style: { fontWeight: 800, fontSize: 16, color: 'var(--ak-cyan)', marginBottom: 18, textAlign: 'center', position: 'relative' } }, ask),
+  B ? h('div', { style: { width: '100%', maxWidth: 330, marginBottom: 12, position: 'relative' } },
+    h('div', { style: { fontWeight: 800, fontSize: 16, color: 'var(--ak-cyan)', marginBottom: 8, textAlign: 'center', lineHeight: 1.35 } }, 'Спорим? ', B.q),
+    B.opts.map((o, i) => h('button', {
+      key: i, onClick: () => { SFX.tick(); setPick(i); },
+      style: { display: 'block', width: '100%', marginBottom: 7, padding: '11px 14px', borderRadius: 14, cursor: 'pointer', textAlign: 'left', fontFamily: 'var(--ak-body)', fontWeight: 800, fontSize: 14, color: '#fff', border: 'none',
+        background: pick === i ? 'rgba(123,79,242,.35)' : 'rgba(16,28,50,.92)', boxShadow: pick === i ? 'inset 0 0 0 2px #A98BFF' : 'inset 0 0 0 1.5px #1A2D48' }
+    }, pick === i ? '👉 ' : '', o)))
+    : ask && h('div', { style: { fontWeight: 800, fontSize: 16, color: 'var(--ak-cyan)', marginBottom: 18, textAlign: 'center', position: 'relative' } }, ask),
   h('div', {
     style: {
-      width: '100%', maxWidth: 330, marginBottom: 14, padding: '13px 18px 15px', borderRadius: 20, boxSizing: 'border-box', position: 'relative', textAlign: 'center',
+      width: '100%', maxWidth: 330, marginBottom: 12, padding: '12px 18px 13px', borderRadius: 20, boxSizing: 'border-box', position: 'relative', textAlign: 'center',
       background: 'rgba(255,216,77,.12)', boxShadow: 'inset 0 0 0 1.5px rgba(255,216,77,.45)'
     }
-  }, h('div', { style: { fontWeight: 800, fontSize: 11, letterSpacing: '.09em', color: '#FFD84D', marginBottom: 7 } }, 'ЧТО ДЕЛАТЬ'),
-  h('div', { style: { fontWeight: 800, fontSize: 19, lineHeight: 1.3, color: '#FFF6DC' } }, task)),
+  }, h('div', { style: { fontWeight: 800, fontSize: 11, letterSpacing: '.09em', color: '#FFD84D', marginBottom: 6 } }, B ? 'ПРОВЕРЬ ОПЫТОМ' : 'ЧТО ДЕЛАТЬ'),
+  h('div', { style: { fontWeight: 800, fontSize: B ? 16.5 : 19, lineHeight: 1.3, color: '#FFF6DC' } }, task)),
   h('div', {
-    style: { width: '100%', maxWidth: 330, borderRadius: 16, padding: '11px 16px', marginBottom: 24, fontSize: 14, fontWeight: 700, color: 'var(--ak-ink-2)', lineHeight: 1.45, boxSizing: 'border-box', position: 'relative', background: 'rgba(16,28,50,.92)', boxShadow: 'inset 0 0 0 1.5px #1A2D48' }
+    style: { width: '100%', maxWidth: 330, borderRadius: 16, padding: '10px 16px', marginBottom: 20, fontSize: 14, fontWeight: 700, color: 'var(--ak-ink-2)', lineHeight: 1.45, boxSizing: 'border-box', position: 'relative', background: 'rgba(16,28,50,.92)', boxShadow: 'inset 0 0 0 1.5px #1A2D48' }
   }, tip),
-  h('button', { className: 'nk-btn nk-btn--pri', style: { minWidth: 210, position: 'relative' }, onClick: () => { SFX.pop(); onStart(); } }, 'Начать!'));
+  h('button', { className: 'nk-btn nk-btn--pri', style: { minWidth: 210, position: 'relative' }, disabled: !ready, onClick: () => { SFX.pop(); if (B) spBetSave(SP_CUR, pick); onStart(); } }, ready ? 'Начать!' : 'Сначала ставка'));
 }
 
 function SpShell({ n, title, step, total, onHome, children }) {
@@ -1025,6 +1051,7 @@ function Level3Jump({ onWin, onHome }) {
   const [solved, setSolved] = useState(false);
   const [lamp, setLamp] = useState(0);
   const [touched, setTouched] = useState(false);
+  const [tries, setTries] = useState(0);
   const J = useRef(null);
   const P = L3_PLANETS.find(p => p.id === pid), task = L3_TASKS[rd];
   useLoop(dt => {
@@ -1039,7 +1066,7 @@ function Level3Jump({ onWin, onHome }) {
         setMarks(m => ({ ...m, [j.pid]: j.peak }));
         const ok = task.kind === 'star' ? j.peak >= task.need : task.kind === 'cave' ? j.peak >= task.need && !j.bonk : !j.bonk;
         const say = L3_PLANETS.find(p => p.id === j.pid).say;
-        if (ok) { setSolved(true); SFX.ok(); setNote(task.yes + ' ' + say); }
+        if (ok) { setSolved(true); SFX.ok(); setNote(task.yes + ' ' + say + (rd > 0 && j.first ? ' С первой попытки — по меткам!' : '')); }
         else setNote((j.bonk ? task.bonk : task.no) + ' ' + say);
         return;
       }
@@ -1050,10 +1077,12 @@ function Level3Jump({ onWin, onHome }) {
   const jump = () => {
     if (air || solved) return;
     setTouched(true); setNote(''); SFX.pop();
-    J.current = { y: 0, v: L3_V, g: L3_G * P.g, peak: 0, bonk: false, pid };
+    J.current = { y: 0, v: L3_V, g: L3_G * P.g, peak: 0, bonk: false, pid, first: tries === 0 };
+    setTries(t => t + 1);
     setAir(true);
   };
-  const next = () => { if (rd + 1 < L3_TASKS.length) { setRd(rd + 1); setSolved(false); setNote(''); setMarks({}); } else setPhase('win'); };
+  /* метки прыжков не стираем: по ним можно рассуждать и угадать планету с первой попытки */
+  const next = () => { if (rd + 1 < L3_TASKS.length) { setRd(rd + 1); setSolved(false); setTries(0); setNote('Метки прыжков остались на линейке. Подумай, где прыгать, — и с первой попытки!'); } else setPhase('win'); };
   const top = L3_FOOT - L3_TOP;                        // где макушка, когда стоим
   return h(SpShell, { n: 3, title: 'Прыжок на планетах', step: rd, total: L3_TASKS.length, onHome },
     phase === 'intro' && h(IntroModal, {
@@ -2056,17 +2085,47 @@ function SpQuiz({ n, title, onDone, onHome }) {
 
 /* ── миссии игры: компонент, название, подпись и «ага» для журнала ── */
 const SP_LEVELS = [
-  { C: Level1Day, t: 'День и ночь', icon: 'earth', emoji: '🌍', sub: 'Куда Солнце уходит ночью', aga: 'Ночь — это когда наш бок Земли отвернулся от Солнца.' },
-  { C: Level2Moon, t: 'Луна меняет форму', icon: 'moon', emoji: '🌙', sub: 'Кто откусывает Луну', aga: 'Солнце всегда освещает половину Луны — мы видим её с разных сторон.' },
-  { C: Level3Jump, t: 'Прыжок на планетах', icon: 'jump', emoji: '🧑‍🚀', sub: 'Где прыгнешь выше дома', aga: 'Маленькая планета тянет слабее: на Луне прыжок в 6 раз выше.' },
-  { C: typeof Level4Build !== 'undefined' ? Level4Build : null, t: 'Собери ракету', icon: 'rocket', emoji: '🚀', sub: 'Своя ракета — имя и цвет', aga: 'Топливо тоже тяжёлое: лишний бак не даст ракете взлететь.' },
-  { C: typeof Level5Stages !== 'undefined' ? Level5Stages : null, t: 'Ступени', icon: 'stages', emoji: '🔥', sub: 'Как полетел Гагарин', aga: 'Пустой бак — лишний груз: ракета бросает его и летит легче.' },
-  { C: typeof Level6Orbit !== 'undefined' ? Level6Orbit : null, t: 'Пушка на горе', icon: 'orbit', emoji: '🛰️', sub: 'Почему спутник не падает', aga: 'Спутник всё время падает, но летит вбок так быстро, что промахивается мимо Земли.' },
-  { C: typeof Level7Water !== 'undefined' ? Level7Water : null, t: 'Где искать жизнь', icon: 'drop', emoji: '💧', sub: 'Есть ли инопланетяне', aga: 'Жизнь возможна там, где вода не кипит и не мёрзнет. Дальше от Солнца — холоднее и длиннее год.' },
-  { C: typeof Level8Stars !== 'undefined' ? Level8Stars : null, t: 'Ковш', icon: 'stars', emoji: '✨', sub: 'Можно ли дотронуться до звезды', aga: 'Звёзды созвездия далеко друг от друга, а мы видим их такими, какими они были давно.' },
-  { C: typeof Level9Rover !== 'undefined' ? Level9Rover : null, t: 'Марсоход', icon: 'rover', emoji: '🤖', sub: 'Как рулить на другой планете', aga: 'До Марса сигнал летит минуты — марсоходу командуют заранее.' },
-  { C: typeof Level10Land !== 'undefined' ? Level10Land : null, t: 'Посадка на Марс', icon: 'land', emoji: '🛬', sub: 'Финал: своя ракета садится', aga: 'Где нет воздуха, парашют не поможет — тормозят только двигателем.' }
+  { C: Level1Day, t: 'День и ночь', icon: 'earth', emoji: '🌍', sub: 'Куда Солнце уходит ночью', aga: 'Ночь — это когда наш бок Земли отвернулся от Солнца.',
+    bet: { q: 'Куда Солнце уходит ночью?', opts: ['Прячется за горы и ложится спать', 'Никуда — это Земля поворачивается', 'Улетает за край неба и гаснет'], ok: 1 } },
+  { C: Level2Moon, t: 'Луна меняет форму', icon: 'moon', emoji: '🌙', sub: 'Кто откусывает Луну', aga: 'Солнце всегда освещает половину Луны — мы видим её с разных сторон.',
+    bet: { q: 'Почему Луна бывает тонкой, как долька?', opts: ['Её закрывает тень Земли', 'Солнце светит на неё сбоку — мы видим кусочек светлой стороны', 'Её закрывают облака'], ok: 1 } },
+  { C: Level3Jump, t: 'Прыжок на планетах', icon: 'jump', emoji: '🧑‍🚀', sub: 'Где прыгнешь выше дома', aga: 'Маленькая планета тянет слабее: на Луне прыжок в 6 раз выше.',
+    bet: { q: 'Где получится прыгнуть выше всего?', opts: ['На Юпитере — он самый большой', 'На Луне — она маленькая и тянет слабо', 'Везде одинаково'], ok: 1 } },
+  { C: typeof Level4Build !== 'undefined' ? Level4Build : null, t: 'Собери ракету', icon: 'rocket', emoji: '🚀', sub: 'Своя ракета — имя и цвет', aga: 'Топливо тоже тяжёлое: лишний бак не даст ракете взлететь.',
+    bet: { q: 'Чтобы улететь дальше, надо взять как можно больше топлива?', opts: ['Да: больше топлива — дальше', 'Нет: лишнее топливо — тоже тяжесть', 'Топливо ничего не весит'], ok: 1 } },
+  { C: typeof Level5Stages !== 'undefined' ? Level5Stages : null, t: 'Ступени', icon: 'stages', emoji: '🔥', sub: 'Как полетел Гагарин', aga: 'Пустой бак — лишний груз: ракета бросает его и летит легче.',
+    bet: { q: 'Зачем ракета бросает части по дороге?', opts: ['Они ломаются от тряски', 'Пустые баки — лишний груз', 'Чтобы было красиво'], ok: 1 } },
+  { C: typeof Level6Orbit !== 'undefined' ? Level6Orbit : null, t: 'Пушка на горе', icon: 'orbit', emoji: '🛰️', sub: 'Почему спутник не падает', aga: 'Спутник всё время падает, но летит вбок так быстро, что промахивается мимо Земли.',
+    bet: { q: 'Почему спутник не падает на Землю?', opts: ['Там, наверху, нет притяжения', 'Он падает, но летит вбок так быстро, что промахивается', 'Его держит воздух'], ok: 1 } },
+  { C: typeof Level7Water !== 'undefined' ? Level7Water : null, t: 'Где искать жизнь', icon: 'drop', emoji: '💧', sub: 'Есть ли инопланетяне', aga: 'Жизнь возможна там, где вода не кипит и не мёрзнет. Дальше от Солнца — холоднее и длиннее год.',
+    bet: { q: 'Где у планеты могут быть моря?', opts: ['Как можно ближе к Солнцу — там тепло', 'Не слишком близко и не слишком далеко', 'Как можно дальше — там спокойно'], ok: 1 } },
+  { C: typeof Level8Stars !== 'undefined' ? Level8Stars : null, t: 'Ковш', icon: 'stars', emoji: '✨', sub: 'Можно ли дотронуться до звезды', aga: 'Звёзды созвездия далеко друг от друга, а мы видим их такими, какими они были давно.',
+    bet: { q: 'Звёзды Ковша — соседи, висят рядом?', opts: ['Да, как бусинки на ниточке', 'Нет, они на разном расстоянии и только кажутся рядом', 'Это одна большая звезда'], ok: 1 } },
+  { C: typeof Level9Rover !== 'undefined' ? Level9Rover : null, t: 'Марсоход', icon: 'rover', emoji: '🤖', sub: 'Как рулить на другой планете', aga: 'До Марса сигнал летит минуты — марсоходу командуют заранее.',
+    bet: { q: 'Команда с Земли долетает до марсохода…', opts: ['Мгновенно', 'За несколько минут', 'За год'], ok: 1 } },
+  { C: typeof Level10Land !== 'undefined' ? Level10Land : null, t: 'Посадка на Марс', icon: 'land', emoji: '🛬', sub: 'Финал: своя ракета садится', aga: 'Где нет воздуха, парашют не поможет — тормозят только двигателем.',
+    bet: { q: 'Чем тормозить при посадке на Луну, где нет воздуха?', opts: ['Парашютом', 'Только двигателем', 'Ничем — сама мягко сядет'], ok: 1 } }
 ];
+
+/* ── путь своей ракеты: Земля → Луна → Марс. Где ракета — по самой
+   дальней пройденной миссии с 4-й (собрана) до 10-й (села на Марс) ── */
+const SP_ROUTE = { 4: [0.07, 'На стартовом столе'], 5: [0.17, 'Вышла на орбиту'], 6: [0.24, 'Кружит вокруг Земли'], 7: [0.47, 'Летит мимо Луны к Марсу'],
+  8: [0.64, 'В пути: сверяет курс по звёздам'], 9: [0.83, 'Подлетает к Марсу'], 10: [0.96, 'Села на Марс!'] };
+function SpRoute({ done, color }) {
+  const far = [10, 9, 8, 7, 6, 5, 4].find(n => done.has(n));
+  const [f, label] = far ? SP_ROUTE[far] : [0.07, 'Ракета ещё в чертежах'];
+  const X = 14 + f * 292, Y = 34 - Math.sin(f * Math.PI) * 18;
+  return h('div', { style: { marginTop: 12 } },
+    h('svg', { viewBox: '0 -10 320 64', style: { width: '100%', display: 'block' } },
+      h('path', { d: 'M14 34 Q160 -2 306 34', fill: 'none', stroke: '#2A3A5C', strokeWidth: 2, strokeDasharray: '4 5' }),
+      far && h('path', { d: `M14 34 Q160 -2 306 34`, fill: 'none', stroke: '#A98BFF', strokeWidth: 2.5, strokeDasharray: `${f * 330} 400` }),
+      h('circle', { cx: 14, cy: 36, r: 11, fill: '#3B7BE0' }), h('path', { d: 'M8 32 q4 -5 9 -1 q-1 5 -6 4 Z', fill: '#5DC27A' }),
+      h('circle', { cx: 132, cy: 18, r: 6, fill: '#D9D5E6' }),
+      h('circle', { cx: 306, cy: 36, r: 10, fill: '#D9703F' }),
+      [['Земля', 14], ['Луна', 132], ['Марс', 306]].map(([t, x], i) => h('text', { key: i, x, y: 51, textAnchor: 'middle', fontSize: 8.5, fontWeight: 800, fill: '#8FA2C2' }, t)),
+      far && h('g', { transform: `translate(${X} ${Y}) rotate(${far >= 10 ? 0 : 70}) scale(0.26)` }, h(SpRocket, { color, tanks: 1, flame: far > 4 && far < 10 }))),
+    h('div', { style: { fontSize: 12.5, fontWeight: 800, color: far ? '#C9B6FF' : 'var(--ak-ink-3)', marginTop: 2 } }, label));
+}
 
 /* ── главный экран игры: как хаб ИИ-курса ──────────────── */
 function SpHome({ onSelect, paid }) {
@@ -2103,7 +2162,8 @@ function SpHome({ onSelect, paid }) {
         h('div', { style: { fontSize: 12.5, color: 'var(--ak-ink-2)', fontWeight: 700, margin: '3px 0 10px', lineHeight: 1.35 } },
           rocket ? `Штампы за миссии: ${done.size} из ${SP_LEVELS.length}` : 'Соберёшь её в миссии 4 — и она полетит до Марса'),
         h('div', { style: { height: 10, borderRadius: 999, background: '#141B33', overflow: 'hidden' } },
-          h('div', { style: { height: '100%', width: `${done.size / SP_LEVELS.length * 100}%`, borderRadius: 999, background: 'linear-gradient(90deg,#A98BFF,#7B4FF2)' } })))),
+          h('div', { style: { height: '100%', width: `${done.size / SP_LEVELS.length * 100}%`, borderRadius: 999, background: 'linear-gradient(90deg,#A98BFF,#7B4FF2)' } })),
+        rocket && h(SpRoute, { done, color: rocket.color }))),
     h('div', { style: { display: 'flex', flexDirection: 'column', gap: 10 } }, SP_LEVELS.map((l, i) => {
       const n = i + 1, lock = n > SP_FREE && paid === false, ready = !!l.C, ok = done.has(n), up = n === nextUp && !lock;
       const tile = ok ? 'linear-gradient(160deg,#2FE0AE,#04A57A)' : lock || !ready ? '#1A2440' : 'linear-gradient(160deg,#9B78FF,#6E41E4)';
@@ -2172,6 +2232,7 @@ function App() {
     });
   }
   const n = +s.slice(1), L = SP_LEVELS[n - 1], home = () => setS('home');
+  if (n) SP_CUR = n;
   return h('div', { style: { width: '100%', height: '100vh', maxWidth: 480, margin: '0 auto', position: 'relative', overflow: 'hidden' } },
     s === 'home' && h(SpHome, { onSelect: open, paid }),
     s === 'off' && h(SpOffline, { onHome: home }),
