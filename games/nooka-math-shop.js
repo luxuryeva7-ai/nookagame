@@ -14,7 +14,11 @@
    Каждый найденный способ ложится в клеточку («5 + 2»). Тот же набор
    монет второй раз не засчитывается — клеточка с ним подмигивает.
 
-   Раунды: 3 и 6 одним способом → 7 двумя способами → 10 тремя.
+   Раунды: «Кто купит?» → 3 и 6 одним способом → 7 двумя способами → 10 тремя.
+   «Кто купит?» — ставка до опыта: два кошелька, яблоко за 5. В одном одна
+   монета 5, в другом три по 1 (потом — две по 2 против одной 5). Ребёнок
+   касается кошелька, который купит, — потом оба пробуют заплатить.
+   Частое заблуждение шестилеток: монет больше — значит денег больше.
    Графика — Higgsfield: лавка, монета (цифры — шрифтом), товары.
    ============================================================ */
 (function () {
@@ -24,6 +28,7 @@
   var SIZE = { 1: 14, 2: 15, 5: 16.5, 10: 18 };
 
   var ROUNDS = [
+    { kind: 'who', tasks: [{ price: 5, A: [5], B: [1, 1, 1], item: 'apple' }, { price: 5, A: [2, 2], B: [5], item: 'carrot' }] },
     { tasks: [{ price: 3, ways: 1, purse: [1, 2, 1, 5], item: 'apple' },
               { price: 6, ways: 1, purse: [5, 2, 1, 2, 1], item: 'carrot' }] },
     { tasks: [{ price: 7, ways: 2, purse: [5, 2, 2, 1, 1, 1], item: 'basket' }] },
@@ -207,11 +212,78 @@
     setTimeout(function () { busy = false; pay(c); }, 1400);
   }
 
+  /* ── «Кто купит?»: два кошелька, ставка касанием ─────────── */
+  var purses = [];
+  function clearPurses() { purses.forEach(function (p) { p.box.remove(); p.coins.forEach(function (c) { c.el.remove(); }); if (p.mark) p.mark.remove(); }); purses = []; }
+  function setupWho(t) {
+    clearPurses();
+    [[t.A, 27], [t.B, 73]].forEach(function (q, side) {
+      var box = M.el('button', 'ml-purse'); box.type = 'button';
+      box.style.left = q[1] + '%'; box.style.top = PURSE_Y[0] + '%';
+      stage.appendChild(box);
+      var P = { side: side, x: q[1], box: box, coins: [] };
+      q[0].forEach(function (v, i) {
+        var c = { v: v, el: M.el('div', 'ml-coin ml-coin--' + v, '<b>' + v + '</b>') };
+        c.el.style.width = SIZE[v] + '%';
+        c.home = [q[1] + (i - (q[0].length - 1) / 2) * 12, PURSE_Y[0]];
+        move(c, c.home); c.el.style.pointerEvents = 'none';
+        stage.appendChild(c.el); P.coins.push(c);
+      });
+      box.onclick = function () { bet(side); };
+      purses.push(P);
+    });
+    card.innerHTML = '<b><span class="ml-coin-ico"></span>' + t.price + '</b><span class="ml-who">кто купит?</span>';
+  }
+  function bet(side) {
+    if (busy) return;
+    busy = true; stopHint();
+    var t = cur(), sums = purses.map(function (p) { return p.coins.reduce(function (s, c) { return s + c.v; }, 0); });
+    var okSide = sums[0] >= t.price ? 0 : 1;
+    purses[side].box.classList.add('chosen');
+    /* сначала платит выбранный кошелёк, потом второй */
+    function tryPay(p, next) {
+      p.coins.forEach(function (c, k) { setTimeout(function () { move(c, [DISH[0] + (k - (p.coins.length - 1) / 2) * 7, DISH[1]]); }, k * 160); });
+      setTimeout(function () {
+        var s = sums[p.side];
+        dishSum.textContent = s; dish.classList.add('has');
+        var ok = s >= t.price;
+        p.mark = M.el('b', 'ml-mark ' + (ok ? 'ok' : 'no'), ok ? '✓' : '✗');
+        p.mark.style.left = p.x + '%'; p.mark.style.top = (PURSE_Y[0] - 9) + '%';
+        stage.appendChild(p.mark);
+        if (ok) { item.classList.remove('sold'); void item.offsetWidth; item.classList.add('sold'); M.sparks(stage, DISH[0], DISH[1], 10); }
+        else { dish.classList.remove('shake'); void dish.offsetWidth; dish.classList.add('shake'); }
+        setTimeout(function () {
+          p.coins.forEach(function (c) { move(c, c.home); });
+          dishSum.textContent = ''; dish.classList.remove('has'); item.classList.remove('sold');
+          setTimeout(next, 400);
+        }, 1100);
+      }, p.coins.length * 160 + 500);
+    }
+    tryPay(purses[side], function () {
+      tryPay(purses[1 - side], function () {
+        /* итог: сколько денег в каждом кошельке — не сколько монет */
+        card.innerHTML = '<b>' + sums[0] + ' ' + (sums[0] > sums[1] ? '&gt;' : '&lt;') + ' ' + sums[1] + '</b><span class="ml-who">' + (side === okSide ? 'угадано!' : 'монет больше — а денег меньше') + '</span>';
+        card.classList.add('ok');
+        face(side === okSide ? 'win' : 'think');
+        setTimeout(nextTask, 2300);
+      });
+    });
+  }
+
   function startTask() {
     var t = cur();
     busy = false; ways = [];
     stopHint();
+    clearPurses();
     coins.forEach(function (c) { c.el.remove(); });
+    if (ROUNDS[round].kind === 'who') {
+      coins = [];
+      iimg.src = 'math/' + t.item + '.webp'; tag.textContent = t.price;
+      item.classList.remove('sold'); card.classList.remove('ok'); face('hello'); drawDish();
+      setupWho(t);
+      idleT = setTimeout(function () { if (!busy) { var p = purses[0]; hand.drag([p.x, PURSE_Y[0] + 1], [p.x, PURSE_Y[0] + 2]); } }, 2600);
+      return;
+    }
     coins = t.purse.slice().sort(function (a, b) { return b - a; }).map(makeCoin);
     lineUp();
     iimg.src = 'math/' + t.item + '.webp';
@@ -221,7 +293,7 @@
     face('hello');
     drawCard();
     drawDish();
-    if (round === 0 && task === 0 && !demoDone) return setTimeout(demo, 1100);
+    if (!demoDone) return setTimeout(demo, 1100);     // «смотри — повтори» — в первом раунде с монетами
     idle(2400);
   }
 
@@ -262,7 +334,8 @@
   if (/[?&]debug=1/.test(location.search)) {
     window.__ml = {
       pay: function (v) { var c = coins.filter(function (x) { return !x.dish && x.v === v; })[0]; if (c) pay(c); },
-      state: function () { var on = round < ROUNDS.length; return { round: round, task: task, price: on && cur().price, sum: sum(), ways: ways.slice(), busy: busy, purse: coins.filter(function (c) { return !c.dish; }).map(function (c) { return c.v; }), card: card.textContent }; },
+      bet: function (side) { bet(side); },
+      state: function () { var on = round < ROUNDS.length; return { round: round, task: task, kind: on && (ROUNDS[round].kind || 'pay'), price: on && cur().price, sum: sum(), ways: ways.slice(), busy: busy, purse: coins.filter(function (c) { return !c.dish; }).map(function (c) { return c.v; }), card: card.textContent }; },
     };
   }
 

@@ -9,8 +9,11 @@
    светлячки слетаются к числу наверху: столько всего — последнее число.
 
    Раунды: 3 (игра сама показывает первое касание) → 6 летающих →
-   7 летающих, и в конце «сколько всего?» из трёх карточек. Правильный
-   ответ — последнее названное число; ошибка подсвечивает последнего.
+   7 летающих. В третьем раунде посчитанные светлячки разлетаются по
+   всему лугу, номера гаснут — «сколько теперь?» из трёх карточек.
+   Частое заблуждение шестилеток: разлетелись шире — значит, стало
+   больше (Пиаже, «сохранение числа»). Ошибка снова зажигает номера:
+   последний так и остался семёркой.
 
    Без слов и звука. Графика — Higgsfield: светлячок и ночной луг;
    свечение светлячка — стилями (жёлтый ореол), чтобы его можно было
@@ -99,7 +102,24 @@
     var R = ROUNDS[round];
     if (lit < R.n) return;
     busy = true;
-    setTimeout(R.ask ? ask : gather, 700);
+    setTimeout(R.ask ? scatter : gather, 700);
+  }
+
+  /* раунд 3: посчитали — разлетелись по всему лугу, номера гаснут */
+  function scatter() {
+    var far = { x0: 11, x1: 90, y0: 28, y1: 86 }, ps = [], tries = 0;
+    while (ps.length < bugs.length && tries < 3000) {
+      tries++;
+      var p = [rnd(far.x0, far.x1), rnd(far.y0, far.y1)];
+      if (p[0] > 70 && p[1] > 66) continue;
+      if (ps.every(function (q) { return Math.hypot(q[0] - p[0], (q[1] - p[1]) * 0.56) > 22; })) ps.push(p);
+    }
+    bugs.forEach(function (b, i) {
+      var p = ps[i] || b.pos;
+      b.el.classList.add('hidnum');
+      setTimeout(function () { b.el.style.left = p[0] + '%'; b.el.style.top = p[1] + '%'; }, i * 60);
+    });
+    setTimeout(ask, bugs.length * 60 + 1100);
   }
 
   /* все горят — слетаются к числу наверху: столько всего */
@@ -127,7 +147,7 @@
   function ask() {
     var R = ROUNDS[round], want = R.n;
     badge.innerHTML = '<b>?</b>';
-    var opts = [want, want - 2, want + 1].filter(function (o) { return o > 0; });
+    var opts = R.ask ? [want, want + 1, want + 3] : [want, want - 2, want + 1].filter(function (o) { return o > 0; });   // разлетелись — тянет ответить «больше»
     opts.sort(function (a, b) { return a - b; });
     cards.innerHTML = '';
     opts.forEach(function (o) {
@@ -142,7 +162,8 @@
         } else {
           c.classList.add('bad');
           think();
-          /* подсказка: последний посчитанный светлячок вспыхивает со своим номером */
+          /* подсказка: номера снова видны — последний так и остался тем же числом */
+          bugs.forEach(function (b) { b.el.classList.remove('hidnum'); });
           var last = bugs.filter(function (b) { return b.n === want; })[0];
           if (last) { last.el.classList.remove('pop'); void last.el.offsetWidth; last.el.classList.add('pop', 'hint'); }
           setTimeout(function () { c.classList.remove('bad'); if (last) last.el.classList.remove('hint'); }, 1600);
@@ -210,7 +231,7 @@
   function finish() {
     stopHint();
     var end = M.el('div', 'mh__end',
-      '<h2>Последнее число — это сколько всего</h2><p>Каждого — по одному разу, и последнее число скажет, сколько их</p>');
+      '<h2>Последнее число — это сколько всего</h2><p>Каждого — по одному разу. А разлетелись шире — их столько же</p>');
     var row = M.el('div', '');
     row.style.cssText = 'display:flex;gap:10px;justify-content:center';
     var again = M.el('button', 'nk-btn nk-btn--soft', 'Ещё раз');
@@ -229,6 +250,7 @@
   if (/[?&]debug=1/.test(location.search)) {
     window.__mff = {
       tapAll: function () { bugs.forEach(function (b) { tap(b); }); },
+      hidden: function () { return bugs.filter(function (b) { return b.el.classList.contains('hidnum'); }).length; },
       pick: function (o) { var c = [].filter.call(cards.children, function (x) { return +x.textContent === o; })[0]; if (c) c.click(); },
       state: function () { return { round: round, lit: lit, n: ROUNDS[round] && ROUNDS[round].n, cards: [].map.call(cards.children, function (x) { return +x.textContent; }), badge: badge.textContent }; },
     };

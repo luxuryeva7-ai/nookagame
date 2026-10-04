@@ -14,6 +14,10 @@
    2. «4 + ? = 7»: сначала угадай карточкой, весы проверят сами.
    3. «9 − 6 = ?»: тот же вопрос, записанный вычитанием. Выровнял —
       под примером видно «6 + 3 = 9».
+   4. Поровну: «3 + 4 = 5 + ?» — слева 3 красных и 4 зелёных яблока,
+      справа 5 гирек. Частая ошибка первоклассников: «=» значит «дальше
+      пиши ответ», и они пишут 7. На весах видно: «=» — это поровну
+      с обеих сторон, и ответ — 2.
 
    Графика — Higgsfield: мастерская, весы по частям, гирька, яблоко.
    ============================================================ */
@@ -28,6 +32,7 @@
     { kind: 'fill', tasks: [[5, 8], [6, 9]] },
     { kind: 'guess', tasks: [[4, 7], [3, 8]] },
     { kind: 'minus', tasks: [[6, 9], [5, 10]] },
+    { kind: 'equal', tasks: [[3, 4, 5], [2, 6, 5]] },        // a + b = c + ?
   ];
 
   var round = 0, task = 0, added = 0, spare = 0, busy = false, idleT = null, demoDone = false;
@@ -59,8 +64,11 @@
   stage.appendChild(cards);
 
   function cur() { return ROUNDS[round].tasks[task]; }
-  function leftN() { return cur()[1]; }
-  function rightN() { return cur()[0] + added; }
+  function isEq() { return ROUNDS[round].kind === 'equal'; }
+  function leftN() { var t = cur(); return isEq() ? t[0] + t[1] : t[1]; }
+  function baseR() { var t = cur(); return isEq() ? t[2] : t[0]; }       // сколько гирек на правой чаше с самого начала
+  function rightN() { return baseR() + added; }
+  function need() { return leftN() - baseR(); }
 
   /* раскладка в пикселях: коромысло крутится вокруг оси, чаши висят на крючках отвесно */
   function layout() {
@@ -97,7 +105,7 @@
   }
 
   /* содержимое чаш: ряды по четыре снизу вверх */
-  function fill(pan, n, kind, fromK) {
+  function fill(pan, n, kind, fromK, greenFrom) {
     [].slice.call(pan.querySelectorAll('.ms-it')).forEach(function (x) { x.remove(); });
     var rows = [4, 3, 2, 1], k = 0, r = 0;
     while (k < n) {
@@ -107,6 +115,7 @@
         var it = M.el(isAdded ? 'button' : 'span', 'ms-it ms-it--' + kind + (isAdded ? ' added' : ''));
         if (isAdded) { it.type = 'button'; it.onclick = takeBack; }
         var img = M.el('img'); img.src = 'math/' + (kind === 'apple' ? 'apple' : 'weight') + '.webp'; img.alt = ''; img.draggable = false;
+        if (kind === 'apple' && greenFrom != null && k >= greenFrom) it.classList.add('ms-it--green');   // вторая часть «3 + 4» — зелёные
         it.appendChild(img);
         it.style.left = (50 + (i - (inRow - 1) / 2) * 21) + '%';
         it.style.bottom = (9 + r * (kind === 'apple' ? 14 : 17)) + '%';
@@ -130,8 +139,8 @@
     }
   }
   function draw(pop) {
-    fill(panL, leftN(), 'apple');
-    fill(panR, rightN(), 'weight', cur()[0]);
+    fill(panL, leftN(), 'apple', null, isEq() ? cur()[0] : null);
+    fill(panR, rightN(), 'weight', baseR());
     badgeL.textContent = leftN();
     badgeR.textContent = rightN();
     drawTray();
@@ -143,10 +152,12 @@
   }
 
   function drawCard(done) {
-    var R = ROUNDS[round], t = cur(), d = t[1] - t[0];
-    var text = R.kind === 'minus' ? t[1] + ' − ' + t[0] + ' = ' + (done ? d : '?')
+    var R = ROUNDS[round], t = cur(), d = need();
+    var text = R.kind === 'equal' ? t[0] + ' + ' + t[1] + ' = ' + t[2] + ' + ' + (done ? d : '?')
+      : R.kind === 'minus' ? t[1] + ' − ' + t[0] + ' = ' + (done ? d : '?')
       : t[0] + ' + ' + (done ? d : '?') + ' = ' + t[1];
-    card.innerHTML = '<b>' + text + '</b>' + (R.kind === 'minus' && done ? '<small>' + t[0] + ' + ' + d + ' = ' + t[1] + '</small>' : '');
+    card.innerHTML = '<b>' + text + '</b>' + (R.kind === 'minus' && done ? '<small>' + t[0] + ' + ' + d + ' = ' + t[1] + '</small>'
+      : R.kind === 'equal' && done ? '<small>поровну: ' + (t[0] + t[1]) + ' и ' + (t[0] + t[1]) + '</small>' : '');
   }
 
   /* ── ходы ───────────────────────────────────────────────── */
@@ -187,7 +198,7 @@
 
   /* раунд 2: угадай — весы проверят */
   function ask() {
-    var t = cur(), want = t[1] - t[0];
+    var want = need();
     cards.innerHTML = '';
     [want - 1, want, want + 1].forEach(function (o) {
       var c = M.el('button', 'mf-card', '<b>' + o + '</b>');
@@ -245,7 +256,7 @@
   function startTask() {
     var R = ROUNDS[round], t = cur();
     busy = false; added = 0;
-    spare = t[1] - t[0] + 2;
+    spare = need() + 2;
     beam.classList.remove('even');
     card.classList.remove('ok');
     cards.hidden = true;
@@ -275,7 +286,7 @@
     stopHint();
     busy = true;
     var end = M.el('div', 'mh__end',
-      '<h2>Сколько не хватает — вычитаем</h2><p>5 + ? = 8: не хватает трёх, и 8 − 5 = 3</p>');
+      '<h2>Сколько не хватает — вычитаем</h2><p>5 + ? = 8: не хватает трёх, и 8 − 5 = 3. А «=» — это поровну с обеих сторон: 3 + 4 = 5 + 2</p>');
     var row = M.el('div', '');
     row.style.cssText = 'display:flex;gap:10px;justify-content:center';
     var again = M.el('button', 'nk-btn nk-btn--soft', 'Ещё раз');
@@ -295,7 +306,7 @@
     window.__ms = {
       put: put, take: function () { takeBack(); },
       pick: function (o) { var c = [].filter.call(cards.children, function (x) { return +x.textContent === o; })[0]; if (c) c.click(); },
-      state: function () { var on = round < ROUNDS.length; return { round: round, task: task, left: on && leftN(), right: on && rightN(), added: added, spare: spare, ang: +ang.toFixed(1), busy: busy, card: card.textContent, cards: cards.hidden ? [] : [].map.call(cards.children, function (x) { return +x.textContent; }) }; },
+      state: function () { var on = round < ROUNDS.length; return { round: round, task: task, kind: on && ROUNDS[round].kind, need: on && need(), left: on && leftN(), right: on && rightN(), added: added, spare: spare, ang: +ang.toFixed(1), busy: busy, card: card.textContent, cards: cards.hidden ? [] : [].map.call(cards.children, function (x) { return +x.textContent; }) }; },
     };
   }
 

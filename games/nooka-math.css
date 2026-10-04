@@ -527,3 +527,24 @@ body.mhub-body{background:linear-gradient(180deg,#DDEFF6,#FFF4E4 45%);height:100
   font-family:var(--nk-brand);font-weight:700;font-size:13px;line-height:22px;color:var(--nk-ink);white-space:nowrap;}
 .ml-slots i.on{border:2px solid var(--nk-ok-3);background:var(--nk-ok-1);}
 .ml-slots i.wink{animation:mtChip .8s ease-in-out 2;}
+/* светлячки разлетелись: номера гаснут (сохранение числа) */
+.mff-bug.hidnum .mff-num{opacity:0;transition:opacity .4s}
+/* крокодил: номера над яблоками после ловушки «длинный ряд» */
+.mcr-num{position:absolute;z-index:20;transform:translate(-50%,0) scale(0);font-family:var(--nk-brand);font-weight:700;font-size:15px;line-height:1;
+  color:#fff;background:rgba(45,27,69,.78);border-radius:8px;padding:3px 6px;animation:mcrNum .35s cubic-bezier(.3,1.6,.5,1) forwards;}
+@keyframes mcrNum{to{transform:translate(-50%,0) scale(1);}}
+/* домик: зеркальные способы «3 и 2» и «2 и 3» — переставили, а число то же */
+.mh-slot{position:relative;}
+.mh-slot.twin{box-shadow:0 0 0 3px var(--nk-sun-2),0 4px 0 rgba(45,27,69,.14);animation:mhPop .5s cubic-bezier(.3,1.6,.5,1);}
+.mh-twin{position:absolute;left:-13px;top:50%;transform:translateY(-50%);width:20px;height:20px;border-radius:50%;background:var(--nk-sun-2);
+  color:var(--nk-ink);font-style:normal;font-weight:900;font-size:13px;line-height:20px;text-align:center;box-shadow:0 2px 0 rgba(45,27,69,.18);z-index:2;}
+/* весы, раунд «поровну»: вторая часть слагаемого — зелёные яблоки */
+.ms-it--green img{filter:hue-rotate(95deg) saturate(1.15) brightness(1.05);}
+/* лавка, «Кто купит?»: два кошелька — ставка касанием */
+.ml-purse{position:absolute;z-index:20;width:38%;height:11%;transform:translate(-50%,-50%);border:none;border-radius:22px;cursor:pointer;
+  background:rgba(255,253,248,.55);box-shadow:inset 0 0 0 3px rgba(212,162,43,.6);-webkit-tap-highlight-color:transparent;}
+.ml-purse.chosen{background:rgba(255,226,122,.55);box-shadow:inset 0 0 0 4px #D4A22B;}
+.ml-mark{position:absolute;z-index:30;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:22px;color:#fff;animation:mhPop .4s cubic-bezier(.3,1.6,.5,1);}
+.ml-mark.ok{background:#3FC685;} .ml-mark.no{background:#FF7A64;}
+.ml-who{font-weight:800;font-size:13px;color:var(--nk-ink-2);margin-left:8px;}

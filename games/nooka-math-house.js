@@ -257,11 +257,22 @@
       idle(2500);
       return;
     }
+    /* «3 и 2» уже есть, а теперь «2 и 3» — переставили этажи, а число то же:
+       обе схемы в альбоме подсвечиваются вместе, между ними ⇄ */
+    var mirror = c[0] !== c[1] ? found.indexOf(c[1] + '+' + c[0]) : -1;
     found.push(key);
     allFound.push([R.n, c[0], c[1]]);
     M.sparks(stage, 46, 42, 16);
     cheer();
     drawBond(c, album.children[found.length - 1]);
+    if (mirror >= 0) {
+      var s1 = album.children[mirror], s2 = album.children[found.length - 1];
+      setTimeout(function () {
+        [s1, s2].forEach(function (sl) { sl.classList.remove('twin'); void sl.offsetWidth; sl.classList.add('twin'); });
+        var tag = M.el('i', 'mh-twin', '⇄');
+        s2.appendChild(tag);
+      }, 1600);
+    }
     var need = R.puzzle ? 1 : R.ways;
     if (found.length >= need) {
       busy = true;

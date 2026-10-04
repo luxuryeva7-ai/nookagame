@@ -11,7 +11,11 @@
    запись «3 < 6»: пасть знака открыта к большему, как у крокодила.
 
    Раунды: кучки сильно разные (3 и 6) → почти одинаковые (5 и 6),
-   тут надо посчитать → вместо кучек числа на табличках.
+   тут надо посчитать; последняя пара — ловушка: шесть яблок вытянуты
+   в длинный ряд, семь сложены плотной горкой. Шестилетки часто
+   выбирают «где длиннее» (Пиаже, сохранение числа). Не та кучка —
+   крокодил не ест, а над яблоками появляются номера: посчитай.
+   → вместо кучек числа на табличках.
 
    Графика — Higgsfield: берег реки, крокодил (рот закрыт/открыт),
    яблоко. Без слов и звука.
@@ -24,7 +28,7 @@
 
   var ROUNDS = [
     { kind: 'pile', tasks: [[3, 6], [7, 2]] },
-    { kind: 'pile', tasks: [[5, 6], [8, 7]] },
+    { kind: 'pile', tasks: [[5, 6], [8, 7], [6, 7, 'trap']] },   // trap: левая кучка длинным рядом, правая плотной горкой
     { kind: 'digit', tasks: [[8, 6], [4, 9], [7, 5]] },
   ];
 
@@ -54,17 +58,18 @@
   stage.appendChild(neuro);
 
   /* кучка: яблоки горкой — ряды снизу вверх, как их сложил бы ребёнок */
-  function drawPile(el, n, kind) {
+  /* mode: 'spread' — длинный ряд с промежутками, 'tight' — плотная горка */
+  function drawPile(el, n, kind, mode) {
     el.innerHTML = '';
     el.className = 'mcr-pile' + (kind === 'digit' ? ' mcr-pile--digit' : '');
     if (kind === 'digit') { el.appendChild(M.el('b', '', String(n))); return; }
-    var rows = [4, 3, 2, 1], k = 0, r = 0;
+    var rows = mode === 'spread' ? [n] : [4, 3, 2, 1], gap = mode === 'spread' ? 24 : mode === 'tight' ? 15 : 23, k = 0, r = 0;
     while (k < n) {
       var inRow = Math.min(rows[r] || 1, n - k);
       for (var i = 0; i < inRow; i++) {
         var a = M.el('img', 'mcr-apple'); a.src = 'math/apple.webp'; a.alt = '';
-        a.style.left = (50 + (i - (inRow - 1) / 2) * 23) + '%';
-        a.style.bottom = (r * 20) + '%';
+        a.style.left = (50 + (i - (inRow - 1) / 2) * gap) + '%';
+        a.style.bottom = (r * (mode === 'tight' ? 15 : 20)) + '%';
         a.style.zIndex = 10 - r;
         el.appendChild(a);
         k++;
@@ -121,6 +126,7 @@
         croc.classList.remove('nope'); void croc.offsetWidth; croc.classList.add('nope');
         piles[i].classList.remove('shake'); void piles[i].offsetWidth; piles[i].classList.add('shake');
         think();
+        if (t[2] === 'trap') countUp();
       }, 300);
       return setTimeout(function () { back(); busy = false; idle(2000); }, 1300);
     }
@@ -138,6 +144,18 @@
       showSign(t);
     }, 120 * apples.length + 450);
     setTimeout(nextTask, 120 * apples.length + 2600);
+  }
+
+  /* не на глаз, а счётом: над каждым яблоком — его номер */
+  function countUp() {
+    piles.forEach(function (el) {
+      [].slice.call(el.querySelectorAll('.mcr-apple')).forEach(function (a, k) {
+        var b = M.el('b', 'mcr-num', String(k + 1));
+        b.style.left = a.style.left; b.style.bottom = (parseFloat(a.style.bottom) * 2.2 + 26) + '%';   // верхние ряды — выше, номера не налезают
+        b.style.animationDelay = (k * 0.12) + 's';
+        el.appendChild(b);
+      });
+    });
   }
 
   /* запись сравнения: пасть знака открыта к большему, как у крокодила */
@@ -188,7 +206,7 @@
     croc.classList.remove('full', 'nope');
     back();
     strip.classList.remove('on');
-    piles.forEach(function (el, i) { drawPile(el, t[i], R.kind); });
+    piles.forEach(function (el, i) { drawPile(el, t[i], R.kind, t[2] === 'trap' ? (i === 0 ? 'spread' : 'tight') : null); });
     if (round === 0 && task === 0 && !demoDone) return setTimeout(demo, 1000);
     idle(round === 0 && task === 1 ? 2000 : 3200);
   }
@@ -211,7 +229,7 @@
     stopHint();
     busy = true;
     var end = M.el('div', 'mh__end',
-      '<h2>Крокодил выбирает, где больше</h2><p>Пасть знака открыта к большему: 3 &lt; 6, 8 &gt; 6</p>');
+      '<h2>Крокодил выбирает, где больше</h2><p>Считай, а не смотри на глаз: длинный ряд не значит «больше». Пасть знака открыта к большему: 6 &lt; 7</p>');
     var row = M.el('div', '');
     row.style.cssText = 'display:flex;gap:10px;justify-content:center';
     var again = M.el('button', 'nk-btn nk-btn--soft', 'Ещё раз');
