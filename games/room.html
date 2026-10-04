@@ -37,12 +37,19 @@
 /* На телефоне комната занимала 293 точки, и кнопки «Здесь ИИ / Просто
    программа» уезжали под нижний край: вещь подсвечена, а ответить нечем.
    Сжимаем комнату целиком — фонарь считает координаты от её размера. */
-@media (max-height:760px){
-  .rmscene{width:min(calc(100% - 28px),31vh);margin:8px auto 0;}
+@media (max-height:860px){
+  .rmscene{width:min(calc(100% - 28px),max(170px,calc(100vh - 450px)));margin:8px auto 0;}
   .rmsay{padding:10px 13px;}
-  .rmhow{margin-top:7px;padding:8px 12px;}
   .rmpick{margin-top:7px;padding:10px 13px;}
 }
+/* две попытки вещи: «что сделали → что вышло» */
+.rmtry{margin-top:6px;display:flex;flex-direction:column;gap:4px;min-height:42px;}
+.rmtry__r{display:flex;align-items:baseline;gap:6px;font-size:13px;line-height:1.35;animation:rmIn .3s ease-out both;}
+.rmpick .rmtry__r i{font-style:normal;font-weight:700;color:#8FA2BC;}
+.rmpick .rmtry__r em{display:inline;padding:0;font-style:normal;font-size:13px;color:#5C6E86;}
+.rmpick .rmtry__r b{display:inline;font-family:inherit;font-size:13px;font-weight:900;color:#4ED99B;margin:0;}
+.rmpick .rmtry__r--bad b{color:#FF9F6B;}
+.rmtry__wait{font-weight:800;font-size:12px;color:#6B7C94;}
 
 .rmhow{margin:10px 14px 0;padding:10px 14px;border-radius:15px;text-align:center;
   font-weight:800;font-size:12.5px;line-height:1.4;color:#9FD4FF;
@@ -137,31 +144,37 @@ const RM_THINGS = [
   {
     id: 'speaker', x: 74, y: 78, name: 'Умная колонка',
     what: 'Говоришь ей — она отвечает', ai: true,
+    tries: [['«Включи мультики»', 'Включаю мультики', true], ['«Поставь „Смешариков“»', 'Ищу «смешные шарики»…', false]],
     why: 'Её учили на миллионах чужих голосов. Твой она слышит впервые и ищет похожее — поэтому иногда не понимает.',
   },
   {
     id: 'lamp', x: 238, y: 60, name: 'Настольная лампа',
-    what: 'Щёлкнул выключателем — горит', ai: false,
+    what: 'Щёлк выключателем — горит', ai: false,
+    tries: [['Щёлк', 'Горит', true], ['Щёлк', 'Горит', true]],
     why: 'Человек соединил провода: замкнул — горит. Так будет всегда. Учиться тут нечему.',
   },
   {
     id: 'phone', x: 166, y: 176, name: 'Телефон узнаёт лицо',
-    what: 'Посмотрел — разблокировался', ai: true,
+    what: 'Смотришь в камеру — открывается', ai: true,
+    tries: [['Смотришь в камеру', 'Открылся', true], ['Смотришь в очках', 'Не узнаю, кто это', false]],
     why: 'Ему показали твои фотографии, и он ищет похожее лицо. Брата-близнеца может и перепутать.',
   },
   {
     id: 'clock', x: 290, y: 168, name: 'Будильник',
-    what: 'Поставил 7:00 — зазвонит в 7:00', ai: false,
+    what: 'Стоит на 7:00 — звонит в 7:00', ai: false,
+    tries: [['Стоит на 7:00', 'Звонит в 7:00', true], ['Стоит на 7:00', 'Звонит в 7:00', true]],
     why: 'Он не решает, а считает время. В семь утра — звонок, и ни разу иначе.',
   },
   {
     id: 'tv', x: 248, y: 250, name: 'Телевизор',
     what: 'Сам предлагает, что смотреть дальше', ai: true,
+    tries: [['Ты смотришь мультик', 'Предлагает ещё мультик', true], ['Брат смотрел футбол', 'Тебе предлагает футбол', false]],
     why: 'Он запомнил, что ты досматриваешь до конца, и ищет похожее. У соседа список получается совсем другой.',
   },
   {
     id: 'lock', x: 58, y: 220, name: 'Замок с кодом',
-    what: 'Набрал 1234 — открылся', ai: false,
+    what: 'Набираешь 1234 — открывается', ai: false,
+    tries: [['Набираешь 1234', 'Открыт', true], ['Набираешь 1234', 'Открыт', true]],
     why: 'Он просто сравнивает: код совпал или нет. Выглядит умным, а внутри одно правило.',
   },
 ];
@@ -170,7 +183,7 @@ const RM_THINGS = [
    Предметы видны только там, куда падает свет фонаря. Яркость
    считаем по расстоянию, а не маской: так же просто, но не
    ломается на старых мобильных браузерах.                     */
-function RmRoom({ light, done, active, onMove, all }) {
+function RmRoom({ light, done, active, onMove, all, shown }) {
   const W = 340, H = 300;
   const ref = React.useRef(null);
 
@@ -271,6 +284,12 @@ function RmRoom({ light, done, active, onMove, all }) {
       g,
       /* тёплый блик от фонаря поверх вещи */
       o > .5 && E('circle', { r: 34, fill: '#FFE9A8', opacity: (o - .5) * .16 }),
+      /* что вещь показала: две попытки — галочка или промах */
+      isAct && (active.tries || []).slice(0, shown || 0).map((tr, i) => E('g', { key: 'tr' + i,
+          transform: 'translate(' + (i ? 14 : -14) + ',-52)' },
+        E('circle', { r: 10, fill: tr[2] ? '#4ED99B' : '#FF7A59', stroke: '#0B1220', strokeWidth: 2 }),
+        E('path', { d: tr[2] ? 'M-4.5 0 l3 3 l6 -6.5' : 'M-4 -4 l8 8 M4 -4 l-8 8',
+          stroke: '#0B1220', strokeWidth: 2.6, fill: 'none', strokeLinecap: 'round' }))),
       isDone && E('circle', { cx: 24, cy: -26, r: 9.5, fill: mark }),
       isDone && E('path', {
         d: done[t.id] ? 'M20 -26 l3 3 l6 -6.5' : 'M21 -29 l6 6 M27 -29 l-6 6',
@@ -376,6 +395,19 @@ function LevelRoom({ onWin, onHome }) {
 
   const active = RM_THINGS.find(t => t.id === picked && done[t.id] === undefined) || null;
 
+  /* Вещь в луче сначала показывает себя: две попытки подряд. Программа оба
+     раза делает одно и то же, ИИ во второй раз промахивается. Решать можно,
+     когда обе попытки видны: ребёнок судит по тому, что увидел, а не наугад. */
+  const [shown, setShown] = useState(0);
+  const actId = active ? active.id : null;
+  useEffect(() => {
+    setShown(0);
+    if (!actId) return;
+    const a = setTimeout(() => setShown(1), 450), b = setTimeout(() => setShown(2), 1350);
+    return () => { clearTimeout(a); clearTimeout(b); };
+  }, [actId]);
+  const ready = !!active && shown >= 2;
+
   const answer = isAi => {
     if (!active) return;
     const ok = isAi === active.ai;
@@ -479,15 +511,10 @@ function LevelRoom({ onWin, onHome }) {
         React.createElement('i', null, NKM(last ? (last.ok ? 'win' : 'think') : 'hello', 30)),
         React.createElement('span', null, last
           ? (last.ok ? '' : 'Тут наоборот. ') + last.t.why
-          : 'Программу человек написал по шагам. Меня по шагам никто не писал — мне показали примеры.')),
+          : 'Всегда одно и то же — это программа. Угадывает и ошибается — это ИИ.')),
 
       React.createElement('div', { className: 'rmscene' },
-        React.createElement(RmRoom, { light: light, done: done, active: active, onMove: moveLight, all: all })),
-
-      React.createElement('div', { className: 'rmhow' },
-        all ? 'Все шесть разобраны'
-            : active ? 'Реши про эту вещь — или нажми на другую'
-            : 'Наведи фонарь на вещь'),
+        React.createElement(RmRoom, { light: light, done: done, active: active, onMove: moveLight, all: all, shown: shown })),
 
       React.createElement('div', { className: 'rmscore' },
         RM_THINGS.map(t => React.createElement('div', {
@@ -498,18 +525,24 @@ function LevelRoom({ onWin, onHome }) {
       React.createElement('div', { className: 'rmpick' },
         active
           ? [React.createElement('b', { key: 'n' }, active.name),
-             React.createElement('span', { key: 'w' }, active.what)]
+             React.createElement('div', { key: 't', className: 'rmtry' },
+               active.tries.slice(0, shown).map((tr, i) => React.createElement('div', {
+                 key: i, className: 'rmtry__r' + (tr[2] ? '' : ' rmtry__r--bad') },
+                 React.createElement('i', null, tr[0]),
+                 React.createElement('em', null, '→'),
+                 React.createElement('b', null, tr[1] + (tr[2] ? ' ✓' : ' ✗')))),
+               shown < 2 && React.createElement('div', { className: 'rmtry__wait' }, 'смотрим, что она делает…'))]
           : React.createElement('em', null, all
               ? 'Готово. Внизу — что дальше'
               : 'Наведи фонарь на вещь')),
 
       !all && React.createElement('div', { className: 'rmacts' },
         React.createElement('button', {
-          className: 'nk-btn ' + (active ? 'nk-btn--pri' : 'nk-btn--soft'),
-          disabled: !active, onClick: () => answer(true),
+          className: 'nk-btn ' + (ready ? 'nk-btn--pri' : 'nk-btn--soft'),
+          disabled: !ready, onClick: () => answer(true),
         }, 'Здесь ИИ'),
         React.createElement('button', {
-          className: 'nk-btn nk-btn--soft', disabled: !active, onClick: () => answer(false),
+          className: 'nk-btn nk-btn--soft', disabled: !ready, onClick: () => answer(false),
         }, 'Просто программа')),
 
       !all && React.createElement('div', { className: 'rmhint' },

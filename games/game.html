@@ -423,7 +423,7 @@ document.getElementById('route').innerHTML = G.levels.map(function (lv) {
   };
 });
 [].forEach.call(document.querySelectorAll('[data-pay]'), function (b) {
-  b.onclick = function () { nookaAccess.paywall({}); };
+  b.onclick = function () { nookaAccess.paywall({ game: G }); };
 });
 
 /* ── подвал: методика, коллекция, соседние игры ── */
@@ -472,7 +472,7 @@ document.getElementById('foot').innerHTML =
   '</div>' +
   '<div class="nav">' + others + '</div>';
 
-if (q.get('paywall')) nookaAccess.paywall({});
+if (q.get('paywall')) nookaAccess.paywall({ game: G });
 </script>
 </body>
 </html>
