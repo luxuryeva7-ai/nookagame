@@ -82,7 +82,6 @@ img{max-width:100%}
 .nk-coin--sun .ic{color:var(--nk-sun-3)}
 .nk-coin--ok .ic{color:var(--nk-ok-3)}
 .nk-coin--warn .ic{color:var(--nk-warn-3)}
-.band-feat .nk-coin .ic{color:var(--nk-pri-4)}
 
 .nk-chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--nk-display);font-weight:900;font-size:18px;
   color:var(--nk-ink);background:linear-gradient(180deg,#FFF1B4,#FFD84D);border-radius:999px;padding:9px 20px;
@@ -126,6 +125,7 @@ h1 .p{color:var(--nk-pri-3)} h1 .s{color:var(--nk-sun-3)}
 .hero-ctas{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:28px}
 .hero-safe{display:flex;align-items:center;gap:14px 22px;flex-wrap:wrap;color:var(--nk-ink-2);font-weight:800;font-size:14px}
 .hs-i{display:inline-flex;align-items:center;gap:11px}
+.hs-i .nk-coin{flex:none}
 .hero-visual{flex:1 1 380px;min-width:300px;position:relative}
 .hero-deco{position:absolute;inset:-24px;pointer-events:none;z-index:2}
 .hero-deco .nk-coin{position:absolute}
@@ -139,24 +139,18 @@ h1 .p{color:var(--nk-pri-3)} h1 .s{color:var(--nk-sun-3)}
 .hero-frame-inner{border-radius:var(--nk-r-l);overflow:hidden;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;
   background:radial-gradient(circle at 50% 38%,#fff,var(--nk-pri-0) 78%)}
 .hero-frame-inner img{width:100%;height:100%;object-fit:contain;display:block}
+/* живая игра на первом экране: вертикальный ролик и маскот сбоку */
+.hero-reel{position:relative;z-index:1;width:min(300px,62vw);margin:0 auto;aspect-ratio:320/568}
+.hero-reel__v{width:100%;height:100%;display:block;border-radius:30px;object-fit:cover;background:#1B1240;
+  box-shadow:0 14px 0 rgba(45,27,69,.10),0 34px 60px -22px rgba(45,27,69,.5)}
+.hero-reel__m{position:absolute;left:-64px;bottom:-12px;width:126px;pointer-events:none;
+  animation:kb-float 6s ease-in-out infinite;filter:drop-shadow(0 10px 14px rgba(45,27,69,.25))}
 
 .section{padding-top:72px;padding-bottom:8px}
 .sec-head-chip{margin-bottom:18px}
 .sec-h{font-size:clamp(30px,3.8vw,48px);margin:0 0 10px}
 .sec-h span{color:var(--nk-pri-3)}
 .sec-sub{color:var(--nk-ink-2);max-width:540px;margin:0 0 38px}
-
-.band{border-radius:var(--nk-r-xl);padding:clamp(28px,4vw,48px);color:#fff;
-  background:linear-gradient(160deg,#8A63FF,var(--nk-pri-3) 55%,var(--nk-pri-4));
-  box-shadow:0 18px 40px -18px rgba(88,54,189,.7),inset 0 2px 0 rgba(255,255,255,.25)}
-.band h2{font-size:clamp(24px,3vw,40px);line-height:1.1;margin:0 0 6px}
-.band h2 span{color:var(--nk-sun-2)}
-.band p{font-weight:700;color:rgba(255,255,255,.8);max-width:560px;margin:0 0 30px;font-size:16px}
-.band-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
-.band-feat{background:rgba(255,255,255,.12);border-radius:var(--nk-r-l);padding:22px;display:flex;gap:14px;align-items:flex-start}
-.band-feat .nk-coin{flex-shrink:0}
-.band-feat h3{font-family:var(--nk-display);font-weight:900;font-size:18px;margin:0 0 4px}
-.band-feat p{font-weight:700;font-size:14px;color:rgba(255,255,255,.82);line-height:1.5;margin:0;max-width:none}
 
 .grid-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
 .planet{border:none;cursor:pointer;padding:14px 14px 0;font-family:var(--nk-body);text-align:left;transition:transform .12s;display:block;width:100%}
@@ -177,32 +171,49 @@ h1 .p{color:var(--nk-pri-3)} h1 .s{color:var(--nk-sun-3)}
 .p-subject{text-transform:uppercase;letter-spacing:.09em;color:var(--nk-ink-3)}
 .p-name{margin:3px 0 8px}
 .p-desc{font-size:14px;color:var(--nk-ink-2);line-height:1.55}
+/* На телефоне девять карточек наук шли столбиком — почти 4000 точек ленты.
+   Две колонки, без описания: картинка, предмет, название и статус. */
+@media (max-width:600px){
+  #planets{grid-template-columns:1fr 1fr;gap:12px}
+  #planets .planet{padding:8px 8px 0;border-radius:22px}
+  #planets .p-media{aspect-ratio:4/3;border-radius:16px}
+  #planets .p-chip{top:7px;right:7px;left:7px;text-align:center;font-size:10.5px;padding:4px 6px}
+  #planets .p-coin{width:38px;height:38px;font-size:19px;left:8px;bottom:-12px}
+  #planets .p-body{padding:18px 6px 12px}
+  #planets .p-subject{font-size:10px}
+  #planets .p-name{font-size:16px;margin:2px 0 0}
+  #planets .p-desc{display:none}
+}
 
-/* ── что ребёнок умеет после курса: результат, за который платят ── */
-.skills{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:6px}
-.skill{padding:22px 24px;display:flex;gap:16px;align-items:flex-start}
-.skill .ic{width:22px;height:22px}
-.skill-txt b{display:block;font-family:var(--nk-display);font-weight:900;font-size:16.5px;
-  line-height:1.25;margin-bottom:6px}
-.skill-txt span{display:block;font-size:14px;line-height:1.55;color:var(--nk-ink-2)}
-.skill-txt em{display:block;margin-top:8px;font-style:normal;font-size:12px;font-weight:800;
-  color:var(--nk-ink-3)}
-/* Четыре умения: рамка курса, по ней же собран отчёт родителю и школьная дека */
-.skgroup{margin-top:26px}
-.skgroup__h{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px;padding-left:2px}
-.skgroup__n{font-family:var(--nk-display);font-weight:900;font-size:13px;color:var(--nk-pri-2);
-  letter-spacing:.04em}
-.skgroup__h b{font-family:var(--nk-display);font-weight:900;font-size:21px;line-height:1.1}
-.skgroup__h>span:last-child{font-size:14px;font-weight:700;color:var(--nk-ink-2)}
-.skills-note{margin:22px auto 0;max-width:640px;text-align:center;font-size:15px;
-  font-weight:700;line-height:1.55;color:var(--nk-ink)}
+/* ── Четыре умения: рамка курса, по ней же собран отчёт родителю и школьная дека.
+   Четыре карточки: иконка, глагол и одна строка — что это значит на деле.
+   Строка из кружков с цифрами (05.10) читалась бедно и ничего не объясняла. ── */
+.skcards{list-style:none;margin:26px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:18px;counter-reset:sk}
+.skcards li{counter-increment:sk;position:relative;padding:22px 18px 20px;border-radius:var(--nk-r-l);
+  background:var(--nk-surface);box-shadow:var(--nk-shadow-card),inset 0 -3px 0 rgba(45,27,69,.05)}
+.skcards li::before{content:'0' counter(sk);position:absolute;top:18px;right:18px;
+  font-family:var(--nk-display);font-weight:900;font-size:13px;color:var(--nk-ink-3);opacity:.7}
+/* стрелка между этапами — что умения идут по порядку */
+.skcards li+li::after{content:'';position:absolute;left:-14px;top:40px;width:10px;height:10px;
+  border-top:2.5px solid var(--nk-pri-2);border-right:2.5px solid var(--nk-pri-2);transform:rotate(45deg)}
+.skcards .nk-coin{width:50px;height:50px;font-size:25px;margin-bottom:14px}
+.skcards b{display:block;font-family:var(--nk-display);font-weight:900;font-size:21px;line-height:1.15;color:var(--nk-ink)}
+.skcards .sk-t{display:block;margin-top:6px;font-weight:700;font-size:14.5px;line-height:1.4;color:var(--nk-ink-2)}
+.skills-note{display:flex;align-items:center;gap:14px;margin:20px auto 0;max-width:720px;padding:16px 22px;
+  border-radius:var(--nk-r-l);background:linear-gradient(180deg,#fff,var(--nk-pri-0));
+  box-shadow:inset 0 0 0 1.5px var(--nk-pri-1);font-size:15px;font-weight:700;line-height:1.5;color:var(--nk-ink)}
+.skills-note .nk-coin{flex:none;width:42px;height:42px;font-size:21px}
 .skills-note b{color:var(--nk-pri-3)}
-
-.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
-.step{padding:32px 28px}
-.step-num{font-family:var(--nk-brand);font-weight:900;font-size:52px;line-height:1;margin-bottom:12px}
-.step h3{margin:14px 0 8px}
-.step p{font-size:14px;color:var(--nk-ink-2);line-height:1.6;margin:0}
+@media (max-width:760px){
+  .skcards{grid-template-columns:1fr 1fr;gap:10px}
+  .skcards li{padding:16px 14px 16px}
+  .skcards li::after{display:none}
+  .skcards li::before{top:14px;right:14px}
+  .skcards .nk-coin{width:42px;height:42px;font-size:21px;margin-bottom:10px}
+  .skcards b{font-size:17px}
+  .skcards .sk-t{font-size:13px}
+  .skills-note{padding:14px 16px;font-size:14px;align-items:flex-start}
+}
 
 .reviews{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
 .rev{padding:28px}
@@ -214,9 +225,11 @@ h1 .p{color:var(--nk-pri-3)} h1 .s{color:var(--nk-sun-3)}
 
 .pricing{max-width:860px;margin:0 auto;text-align:center}
 .price-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;text-align:left}
-.price-box{padding:36px 32px}
+.price-box{padding:36px 32px;display:flex;flex-direction:column}
+/* кнопки тарифов — на одной высоте, сколько бы пунктов ни было выше */
+.price-box > .nk-btn{margin-top:auto}
 .price-tier{text-transform:uppercase;letter-spacing:.12em}
-.price-amt{font-family:var(--nk-brand);font-weight:900;font-size:52px;line-height:1;margin:10px 0 4px}
+.price-amt{font-family:var(--nk-brand);font-weight:900;font-size:clamp(40px,4.2vw,52px);line-height:1;margin:10px 0 4px;white-space:nowrap}
 .pf{display:flex;flex-direction:column;gap:12px;margin-bottom:26px;font-weight:700;font-size:14px}
 .pf div{display:flex;gap:10px;align-items:flex-start}
 .pf div>span:first-child{flex:none}
@@ -263,26 +276,13 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
   transition:transform .34s cubic-bezier(.34,1.56,.64,1);max-width:90vw;text-align:center}
 .toast.show{transform:translateX(-50%) translateY(0)}
 
-/* «Час с ИИ» — вход для учителя прямо с главной */
-.hour{display:flex;align-items:center;gap:34px;padding:38px 40px;border-radius:32px;
-  background:linear-gradient(140deg,#2A1B52,#1B1236 62%,#150E2A);color:#F6F1FF;
-  box-shadow:0 26px 54px -24px rgba(45,27,69,.6)}
-.hour-txt{flex:1 1 420px;min-width:0}
-.hour-kick{display:inline-block;padding:6px 14px;border-radius:999px;background:rgba(255,216,77,.16);
-  color:var(--nk-sun-1);font-weight:900;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase}
-.hour h2{font-family:var(--nk-display);font-weight:900;font-size:clamp(26px,4vw,38px);
-  line-height:1.1;margin:14px 0 10px;color:#fff}
-.hour p{font-size:16px;line-height:1.6;color:#C9BAE6;margin:0 0 20px;max-width:640px}
-.hour p b{color:#fff}
-.hour-cta{display:flex;flex-wrap:wrap;align-items:center;gap:14px}
-.hour-note{font-size:13px;font-weight:700;color:#9C8CBE}
-.hour-num{flex:none;width:132px;height:132px;border-radius:50%;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;background:rgba(255,216,77,.13);
-  box-shadow:inset 0 0 0 2px rgba(255,216,77,.42)}
-.hour-num b{font-family:var(--nk-display);font-weight:900;font-size:44px;line-height:1;color:var(--nk-sun-1)}
-.hour-num span{font-weight:800;font-size:12.5px;color:#C9BAE6;margin-top:4px}
-@media(max-width:860px){.hour{flex-wrap:wrap;padding:30px 26px;gap:22px}.hour-num{width:96px;height:96px}
-  .hour-num b{font-size:34px}}
+/* «Час с ИИ» — вход для учителя одной строкой. Главная говорит с родителем,
+   большой тёмный блок для учителя его отвлекал. На телефоне кнопки «Школам»
+   в шапке нет, поэтому строка остаётся видна на любой ширине. */
+.hour-line{display:block;margin-top:44px;padding:14px 20px;border-radius:18px;text-align:center;
+  font-size:14px;font-weight:700;line-height:1.5;color:var(--nk-ink-2);background:rgba(123,79,242,.07)}
+.hour-line b{color:var(--nk-ink);font-weight:900}
+.hour-line:hover{color:var(--nk-pri-4);background:rgba(123,79,242,.11)}
 /* Подпись под логотипом стала длиннее и в полосе 640–700 px начинала
    поджимать кнопки шапки. Прячем её раньше: короткий вариант читается
    так же, а «Личный кабинет» и «Играть» не сжимаются. */
@@ -320,6 +320,8 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
   .hero-deco .nk-coin{width:42px;height:42px;font-size:21px}
   /* на узком экране плашка уезжала за левый край — прижимаем внутрь */
   .hero-tag{font-size:11px;padding:7px 12px;border-radius:15px;left:4%!important;bottom:28%!important}
+  .hero-reel{width:min(250px,64vw)}
+  .hero-reel__m{width:92px;left:-40px;bottom:-8px}
   .hero-safe{gap:10px}
 }
 @media(max-width:430px){
@@ -329,7 +331,7 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
   nav{gap:7px}
   nav .nk-btn--sm{padding:9px 12px;font-size:13px}
 }
-@media(prefers-reduced-motion:reduce){.nk-bob,.hero-deco .nk-coin,.hero-tag,.hero-badge .dot{animation:none}}
+@media(prefers-reduced-motion:reduce){.nk-bob,.hero-deco .nk-coin,.hero-tag,.hero-badge .dot,.hero-reel__m{animation:none}}
 
 /* ── первый ряд: курс ИИ-грамотности ── */
 .course-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(276px,1fr));gap:18px;margin-top:8px}
@@ -441,7 +443,8 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
         <a class="nk-btn nk-btn--soft nk-btn--lg" href="buy/">Купить доступ</a>
       </div>
       <div class="hero-safe">
-        <span class="hs-i"><span class="nk-coin nk-coin--ok" style="width:38px;height:38px"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-check"></use></svg></span>Без рекламы и чужих ссылок · с любого устройства</span>
+        <span class="hs-i"><span class="nk-coin nk-coin--ok" style="width:38px;height:38px"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-check"></use></svg></span>Без рекламы, чатов и чужих ссылок</span>
+        <span class="hs-i"><span class="nk-coin" style="width:38px;height:38px"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-progress"></use></svg></span>Вы видите, что ребёнок прошёл</span>
       </div>
     </div>
     <div class="hero-visual">
@@ -452,20 +455,14 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
         <div class="nk-coin nk-coin--warn" style="bottom:-2%;right:4%;animation:kb-float 7.5s ease-in-out infinite .4s"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-code"></use></svg></div>
         <div class="hero-tag" style="bottom:33%;left:-9%;animation:kb-float 6.8s ease-in-out infinite 1s"><em>НуКа</em> Наука!<br><em>НуКа</em> ИИ!</div>
       </div>
-      <div class="nk-clay hero-frame">
-        <div class="hero-frame-inner"><img src="mascot/hello.webp" alt="Маскот Nooka"></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="wrap">
-    <div class="band">
-      <h2 class="nk-t-brand">Внутри каждой игры<br><span>своя механика</span></h2>
-      <p>Где-то он рисует пальцем, где-то двигает ползунки, где-то спорит с роботом. Параграф из учебника он бы просто пролистал.</p>
-      <div class="band-grid">
-        <div class="band-feat"><span class="nk-coin nk-coin--sun"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-method"></use></svg></span><div><h3>Каждый уровень объясняет одно правило</h3><p>И ребёнок доходит до него сам: попробовал, ошибся, увидел, как это работает.</p></div></div>
-        <div class="band-feat"><span class="nk-coin nk-coin--ok"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-shield"></use></svg></span><div><h3>Безопасно</h3><p>Без рекламы, чатов и внешних ссылок.</p></div></div>
-        <div class="band-feat"><span class="nk-coin"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-progress"></use></svg></span><div><h3>Виден прогресс</h3><p>Опыт, звания и дни подряд. Вы видите, чем ребёнок занят и что уже прошёл.</p></div></div>
+      <!-- Вместо картинки с маскотом — живая игра (кусок ролика от 23.09.2026):
+           родитель за пять секунд видит, что ребёнок будет делать. Маскот остался
+           рядом — выглядывает сбоку. Ролик без звука, по кругу, 740 КБ. -->
+      <div class="hero-reel">
+        <video class="hero-reel__v" src="shots/hero-reel.mp4" poster="shots/hero-reel.jpg"
+          autoplay muted loop playsinline preload="metadata"
+          aria-label="Как играют в Nooka: ребёнок рисует кота, и ИИ учится его узнавать; джинн выполняет просьбу ровно так, как сказано"></video>
+        <img class="hero-reel__m" src="mascot/hello.webp" alt="" aria-hidden="true">
       </div>
     </div>
   </section>
@@ -473,84 +470,40 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
   <section class="wrap section" id="course">
     <div class="nk-chip sec-head-chip">Курс из трёх игр</div>
     <h2 class="nk-t-h1 sec-h">Игры про ИИ-грамотность <span>для детей 8–12</span></h2>
-    <p class="nk-t-body sec-sub">ИИ уже рядом с ребёнком — в поиске, в переводчике, в чатах. Здесь он разбирается, откуда программа берёт ответы, почему она уверенно ошибается и чего ей нельзя о себе рассказывать. <span id="courseVol">Тридцать три уровня и три мастерские</span> — и ни одного места, где надо просто читать.</p>
+    <p class="nk-t-body sec-sub">Ребёнок разбирается, откуда ИИ берёт ответы, почему он уверенно ошибается и чего ему нельзя о себе рассказывать.</p>
 
     <div class="course-grid" id="courseGrid"></div>
     <div class="course-note">Первые <span id="freeCnt">3 уровня</span> — бесплатно, без регистрации и без карты.
       Весь курс открывается <a href="/buy/">одним доступом на всю семью</a>.</div>
-    <p class="course-frame">Программа собрана по международной рамке <b>«Пять больших идей об ИИ»</b> — по ней выстроен весь курс: каждый уровень закрывает свою идею.</p>
+    <p class="course-frame">Программа собрана по международной рамке <b>«Пять больших идей об ИИ»</b>.</p>
   </section>
 
 
   <section class="wrap section" id="skills">
-    <div class="nk-chip sec-head-chip">Результат</div>
     <h2 class="nk-t-h1 sec-h">Четыре умения, <span>которые остаются</span></h2>
-    <p class="nk-t-body sec-sub">Не «познакомится с темой». Каждое умение ребёнок проходит руками — и может показать вам, как это работает.</p>
-    <div class="skgroup">
-      <div class="skgroup__h"><span class="skgroup__n">01</span><b>Понимает</b></div>
-      <div class="skills">
-      <div class="nk-clay skill"><span class="nk-coin"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-ai"></use></svg></span><div class="skill-txt"><b>Знает, как ИИ обучается и выдаёт ответы</b><em>Игра 1 · уровни 2, 5, 7</em></div></div>
-      <div class="nk-clay skill"><span class="nk-coin"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-method"></use></svg></span><div class="skill-txt"><b>Понимает, как ИИ принимает решения</b><em>Игра 3 · уровни 2 и 4</em></div></div>
-      </div>
-    </div>
-    <div class="skgroup">
-      <div class="skgroup__h"><span class="skgroup__n">02</span><b>Управляет</b></div>
-      <div class="skills">
-      <div class="nk-clay skill"><span class="nk-coin nk-coin--sun"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-prompt"></use></svg></span><div class="skill-txt"><b>Умеет объяснить ИИ, что именно нужно</b><em>Игра 2 · уровни 1–3</em></div></div>
-      <div class="nk-clay skill"><span class="nk-coin nk-coin--sun"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-code"></use></svg></span><div class="skill-txt"><b>Разбивает задачу на шаги</b><em>Игра 2 · уровень 8</em></div></div>
-      </div>
-    </div>
-    <div class="skgroup">
-      <div class="skgroup__h"><span class="skgroup__n">03</span><b>Проверяет</b></div>
-      <div class="skills">
-      <div class="nk-clay skill"><span class="nk-coin nk-coin--warn"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-check"></use></svg></span><div class="skill-txt"><b>Знает, как перепроверять ответы ИИ</b><em>Игра 1 · уровень 9</em></div></div>
-      <div class="nk-clay skill"><span class="nk-coin nk-coin--ok"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-progress"></use></svg></span><div class="skill-txt"><b>Знает, что ИИ может уверенно ошибаться</b><em>Игра 3 · уровень 7</em></div></div>
-      <div class="nk-clay skill"><span class="nk-coin nk-coin--warn"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-shield"></use></svg></span><div class="skill-txt"><b>Не рассказывает о себе лишнего</b><em>Игра 3 · уровень 10</em></div></div>
-      </div>
-    </div>
-    <div class="skgroup">
-      <div class="skgroup__h"><span class="skgroup__n">04</span><b>Создаёт и решает сам</b></div>
-      <div class="skills">
-      <div class="nk-clay skill"><span class="nk-coin nk-coin--ok"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-rocket"></use></svg></span><div class="skill-txt"><b>Обучает программу с нуля и проверяет её</b><em>Игра 1 · уровень 10</em></div></div>
-      <div class="nk-clay skill"><span class="nk-coin"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-shield"></use></svg></span><div class="skill-txt"><b>Знает, какие решения нельзя отдавать ИИ</b><em>Игра 2 · уровень 10</em></div></div>
-      </div>
-    </div>
-    <p class="skills-note">Проверить просто: через месяц спросите за ужином, <b>почему программа может уверенно ошибаться</b>. Ребёнок ответит своими словами.</p>
+    <ol class="skcards">
+      <li><span class="nk-coin"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-ai"></use></svg></span>
+        <b>Понимает</b><span class="sk-t">откуда ИИ берёт ответы</span></li>
+      <li><span class="nk-coin nk-coin--sun"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-prompt"></use></svg></span>
+        <b>Управляет</b><span class="sk-t">просит точно — и получает своё</span></li>
+      <li><span class="nk-coin nk-coin--ok"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-shield"></use></svg></span>
+        <b>Проверяет</b><span class="sk-t">не верит ИИ на слово</span></li>
+      <li><span class="nk-coin nk-coin--warn"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-check"></use></svg></span>
+        <b>Решает сам</b><span class="sk-t">знает, что нельзя поручать ИИ</span></li>
+    </ol>
+    <p class="skills-note"><span class="nk-coin"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-progress"></use></svg></span>
+      <span>Проверить просто: через месяц спросите за ужином, <b>почему программа может уверенно ошибаться</b>. Ребёнок ответит своими словами.</span></p>
   </section>
 
-  <section class="wrap section" id="hour">
-    <div class="hour">
-      <div class="hour-txt">
-        <span class="hour-kick">Учителям, школам и лагерям</span>
-        <h2>Час с ИИ</h2>
-        <p>Готовый урок на 45 минут. Дети не слушают про искусственный интеллект — они его обучают
-        с собственных телефонов. Вы получаете план с таймингом, три вопроса для обсуждения
-        и ответы на детские «а ИИ живой?». <b>Готовиться не нужно.</b></p>
-        <div class="hour-cta">
-          <a class="nk-btn nk-btn--cta" href="teacher/">Открыть готовый урок →</a>
-          <span class="hour-note">Бесплатно · без регистрации · урок идёт на бесплатных уровнях</span>
-        </div>
-      </div>
-      <div class="hour-num"><b>45</b><span>минут</span></div>
-    </div>
+  <section class="wrap" id="hour">
+    <a class="hour-line" href="teacher/"><b>Учителям, школам и лагерям:</b> готовый урок «Час с ИИ» на 45 минут. Бесплатно, готовиться не нужно →</a>
   </section>
 
   <section class="wrap section" id="subjects">
     <div class="nk-chip sec-head-chip">Ещё игры</div>
     <h2 class="nk-t-h1 sec-h">Науки, которые <span>можно потрогать</span></h2>
-    <p class="nk-t-body sec-sub">Физика, химия и программирование — бесплатно. КосмоПорт, РобоЛаб и БиоМир — первые два уровня бесплатно, дальше по доступу. Остальные миры в работе и войдут в годовой доступ.</p>
+    <p class="nk-t-body sec-sub">Физика, химия и программирование — бесплатно. КосмоПорт, РобоЛаб и БиоМир — первые два уровня бесплатно.</p>
     <div class="grid-cards" id="planets"></div>
-  </section>
-
-  <section class="wrap section" id="how">
-    <div class="nk-chip sec-head-chip">Как это работает</div>
-    <h2 class="nk-t-h1 sec-h">Ребёнок начинает играть <span>за три шага</span></h2>
-    <p class="nk-t-body sec-sub">Никаких лекций и домашних заданий.</p>
-    <div class="steps">
-      <div class="nk-clay step"><div class="step-num" style="color:var(--nk-pri-1)">01</div><span class="nk-coin"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-world"></use></svg></span><h3 class="nk-t-h2">Выбираете игру</h3><p>Каждая — отдельный мир со своими уровнями и прогрессом.</p></div>
-      <div class="nk-clay step"><div class="step-num" style="color:var(--nk-sun-1)">02</div><span class="nk-coin nk-coin--sun"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-play"></use></svg></span><h3 class="nk-t-h2">Проходите миссию</h3><p>Где-то надо рисовать, где-то двигать ползунки, где-то объяснять задачу словами. Каждый уровень устроен по-своему.</p></div>
-      <div class="nk-clay step"><div class="step-num" style="color:var(--nk-ok-1)">03</div><span class="nk-coin nk-coin--ok"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-progress"></use></svg></span><h3 class="nk-t-h2">Видите результат</h3><p>Ребёнок за ужином объясняет, почему программа ошиблась, и показывает, что сделал сам. Плюс опыт и звание в игре.</p></div>
-    </div>
   </section>
 
   <section class="wrap section" id="reviews">
@@ -587,6 +540,7 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
         <div class="price-why">163 ₽ в месяц — дешевле одного занятия с репетитором</div>
         <div class="pf">
           <div><span class="ok">✓</span> <span class="pt"><b>Весь курс: ещё <span id="pfPaid">30 уровней и три мастерские</span></b></span></div>
+          <div><span class="ok">✓</span> <span class="pt">Игры по наукам и технологиям — <b>КосмоПорт, РобоЛаб, БиоМир</b> и новые</span></div>
           <div><span class="ok">✓</span> <span class="pt">Один доступ на <b>всю семью</b>, а не на одного ребёнка</span></div>
           <div><span class="ok">✓</span> <span class="pt">Отчёт родителю: что ребёнок освоил и о чём его спросить</span></div>
           <div><span class="ok">✓</span> <span class="pt">Карта не привязывается, <b>списывать нечего</b></span></div>
@@ -602,7 +556,7 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
         <div class="pf">
           <div><span class="ok">✓</span> <span class="pt">Тот же курс, <span id="pfPaidYear">30 уровней</span>, но <b>на 12 месяцев</b></span></div>
           <div><span class="ok">✓</span> <span class="pt">Плюс каждая игра, которая выйдет в течение года</span></div>
-          <div><span class="ok">✓</span> <span class="pt">В планах науки и технологии, <b>доплачивать не нужно</b></span></div>
+          <div><span class="ok">✓</span> <span class="pt">Игры по наукам и технологиям — КосмоПорт, РобоЛаб, БиоМир и все новые, <b>доплачивать не нужно</b></span></div>
           <div><span class="ok">✓</span> <span class="pt">Не подошло, <b>вернём деньги</b> за 14 дней</span></div>
         </div>
         <button class="nk-btn nk-btn--cta" style="width:100%" data-buy="year">Взять на год</button>
@@ -836,7 +790,6 @@ renderCourse();
 (function(){
   if (!window.nookaLevels) return;
   function put(id, text) { var el = document.getElementById(id); if (el) el.textContent = text; }
-  put('courseVol', nookaLevels.volume('all').text);
   put('pfFree', nookaLevels.volume('free').text);
   put('freeCnt', nookaLevels.volume('free').short);
   put('pfPaid', nookaLevels.volume('paid').text);
