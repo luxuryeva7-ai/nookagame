@@ -258,6 +258,25 @@ h1 span{color:var(--pri-3)}
     }, 60);
   }
 
+  /* Доступ уже открыт — страница не продаёт его второй раз, а говорит,
+     до какого числа открыто, и предлагает продлить: новый срок
+     прибавляется к нынешнему (так считает сервер, см. base/pay.html). */
+  A.ready.then(function (st) {
+    if (!st.paid) return;
+    var until = st.until ? new Date(st.until).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }).replace(' г.', '') : '';
+    document.querySelector('.head .chip').innerHTML = '<span class="dot"></span>' + (until ? 'Доступ открыт до ' + until : 'Доступ открыт');
+    document.querySelector('.head h1').innerHTML = 'Продлить <span>доступ</span>';
+    document.querySelector('.head .lede').textContent = 'Весь курс и игры по наукам уже открыты. Можно продлить заранее: ' +
+      'новый срок прибавится к нынешнему, ничего не сгорит.';
+    Array.prototype.forEach.call(document.querySelectorAll('[data-plan]'), function (b) {
+      var k = b.getAttribute('data-plan');
+      b.textContent = 'Продлить за ' + A.plans[k].price;
+      b.setAttribute('href', A.payUrl + '#' + k);
+    });
+    var h3 = document.querySelector('.paid h3');
+    if (h3) h3.textContent = 'Ваш доступ';
+  });
+
   /* Вошедшему звать войти незачем: ведём его туда, где видно срок доступа. */
   A.ready.then(function (st) {
     if (st.guest) return;

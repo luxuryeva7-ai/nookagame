@@ -737,15 +737,19 @@ document.querySelectorAll('[data-play]').forEach(function(b){ b.addEventListener
 /* Куда ведёт «купить» — решает games/nooka-access.js (там же и стена внутри игр),
    чтобы ссылка оплаты правилась в одном месте на весь сайт. */
 document.querySelectorAll('[data-buy]').forEach(function(b){ b.addEventListener('click', function(){
-  var url = (window.nookaAccess && window.nookaAccess.buyUrl) || '/buy/';
+  var A = window.nookaAccess;
+  var url = A ? (A.state().paid ? A.payUrl : A.buyUrl) : '/buy/';
   var plan = b.getAttribute('data-buy');
   window.location.href = url + (plan ? '#' + plan : '');
 }); });
 
-/* витрина курса — из единого реестра games/nooka-levels.js */
-(function(){
+/* витрина курса — из единого реестра games/nooka-levels.js.
+   Рисуем сразу, не дожидаясь сервера, а когда он ответит «оплачено» —
+   рисуем заново: иначе оплатившему так и висели «от 490 ₽» и «Купить». */
+function renderCourse(){
   var box = document.getElementById('courseGrid');
   if (!box || !window.nookaLevels) return;
+  box.innerHTML = '';
   var NO = ['','Игра 1','Игра 2','Игра 3'];
   nookaLevels.games.forEach(function(g, i){
     var st = nookaLevels.stats(g.key);
@@ -826,7 +830,8 @@ document.querySelectorAll('[data-buy]').forEach(function(b){ b.addEventListener(
     card.addEventListener('click', function(){ openGame('games/game.html?g='+g.key); });
     box.appendChild(card);
   });
-})();
+}
+renderCourse();
 /* Объём в тарифах — тоже из реестра: руками цифры разъезжаются с курсом */
 (function(){
   if (!window.nookaLevels) return;
@@ -836,6 +841,39 @@ document.querySelectorAll('[data-buy]').forEach(function(b){ b.addEventListener(
   put('freeCnt', nookaLevels.volume('free').short);
   put('pfPaid', nookaLevels.volume('paid').text);
   put('pfPaidYear', nookaLevels.volume('paid').short);
+})();
+/* У кого доступ уже открыт, главная не зовёт купить: кнопки ведут играть
+   и продлевать, а вместо «первые 3 бесплатно» — до какого числа открыто.
+   Ответ о доступе приходит с сервера, поэтому всё это — после ready. */
+(function(){
+  var A = window.nookaAccess;
+  if (!A) return;
+  A.ready.then(function (s) {
+    if (!s.paid) return;
+    var until = s.until ? new Date(s.until).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }) : '';
+    var open = until ? 'Доступ открыт до ' + until : 'Доступ открыт';
+    renderCourse();
+    document.querySelectorAll('[data-play]').forEach(function (b) { b.textContent = b.textContent.replace('Играть бесплатно', 'Играть'); });
+    var heroBuy = document.querySelector('.hero-ctas a[href="buy/"]');
+    if (heroBuy) { heroBuy.textContent = 'Мой доступ'; heroBuy.href = A.accessUrl; }
+    var note = document.querySelector('.course-note');
+    if (note) note.textContent = open + ' — весь курс и игры по наукам ваши.';
+    document.querySelectorAll('#planets .p-chip.open').forEach(function (c) { c.textContent = c.textContent.replace(/^\d+ бесплатно/, 'Открыто'); });
+    var plans = document.getElementById('plans');
+    if (plans) {
+      plans.querySelector('.sec-h').innerHTML = open + ', <span>можно продлить</span>';
+      plans.querySelector('.sec-sub').textContent = 'Новый срок прибавится к нынешнему — ничего не сгорит. Карта не привязывается.';
+      plans.querySelectorAll('[data-buy]').forEach(function (b) {
+        b.textContent = b.getAttribute('data-buy') === 'year' ? 'Продлить на год' : 'Продлить на три месяца';
+      });
+      var free = plans.querySelector('.price-box');       // «0 ₽, остальное закрыто» — уже не про них
+      if (free && /0 ₽/.test(free.textContent)) free.style.display = 'none';
+      var hint = plans.querySelector('.price-hint');
+      if (hint) hint.innerHTML = 'Срок и устройства — на странице <a href="' + A.accessUrl + '">«Мой доступ» →</a>';
+    }
+    var fin = document.querySelector('.final-block p');
+    if (fin) fin.textContent = open + '. Играть можно на любом устройстве, где выполнен вход.';
+  });
 })();
 document.querySelectorAll('[data-wait]').forEach(function(b){ b.addEventListener('click', function(){ window.open(WAITLIST_URL,'_blank','noopener'); }); });
 </script>
