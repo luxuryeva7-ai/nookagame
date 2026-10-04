@@ -81,6 +81,13 @@
   background:rgba(255,255,255,.07);overflow:hidden;}
 .wtrow__b i{display:block;height:100%;background:linear-gradient(90deg,#4E9BE0,#7FC8FF);}
 .wtrow__v{width:52px;flex-shrink:0;text-align:right;font-weight:900;font-size:11.5px;color:#7FC8FF;}
+/* десять дней с прогнозом «80%»: восемь дождливых, два сухих */
+.wtten{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+.wtten i{display:flex;align-items:center;justify-content:center;aspect-ratio:1;border-radius:14px;
+  font-style:normal;font-size:26px;animation:wtPop .35s cubic-bezier(.2,.8,.3,1.2) both;}
+.wtten i.r{background:rgba(127,200,255,.14);box-shadow:inset 0 0 0 1.5px rgba(127,200,255,.4);}
+.wtten i.s{background:rgba(255,216,77,.16);box-shadow:inset 0 0 0 1.5px rgba(255,216,77,.55);}
+@keyframes wtPop{0%{opacity:0;transform:scale(.5);}100%{opacity:1;transform:none;}}
 
 /* финал */
 .wtdone{display:flex;flex-direction:column;align-items:center;padding-top:6px;}
@@ -285,12 +292,12 @@ function WtCard({ log }) {
               d: 'M108,' + (y - 4) + ' a6,6 0 0 1 5,-9 a7,7 0 0 1 13,2 a5,5 0 0 1 -1,10 z',
               fill: '#7FC8FF' })
           : React.createElement('circle', { cx: 117, cy: y - 2, r: 7, fill: '#FFD84D' }),
-        React.createElement('text', { x: 140, y: y + 4, fill: e.good ? '#4ED99B' : '#8FA5C0',
-          style: { font: '900 11px Nunito,sans-serif' } }, e.pick ? 'с зонтом' : 'без зонта'));
+        React.createElement('text', { x: 140, y: y + 4, fill: e.good ? '#4ED99B' : '#FF9F6B',
+          style: { font: '900 11px Nunito,sans-serif' } }, (e.pick ? 'зонт' : 'без зонта') + (e.good ? ' ✓' : ' ✗')));
     }),
     React.createElement('text', { x: 110, y: 228, textAnchor: 'middle', fill: '#8FA5C0',
       style: { font: '900 11px Nunito,sans-serif' } },
-      'сухо было ' + wtTimes(log.filter(e => e.good).length) + ' из 6'));
+      'верных решений: ' + log.filter(e => e.good).length + ' из 6'));
 }
 
 function LevelWeather({ onWin, onHome }) {
@@ -320,10 +327,13 @@ function LevelWeather({ onWin, onHome }) {
   };
 
   const decide = umbrella => {
-    /* сухим ребёнок остаётся, если угадал с зонтом или день выдался ясным */
-    const good = umbrella ? cur.rain : !cur.rain;
+    /* Решение судим по тому, что было известно утром, а не по погоде: при
+       шансе выше половины зонт — верный выбор, даже если день вышел сухим.
+       Раньше хвалили и ругали по погоде («Промок», «зонт зря») — и уровень
+       учил ровно обратному тому, что говорил в конце. */
+    const wise = p > .5 ? umbrella : p < .5 ? !umbrella : true;
     setPick(umbrella);
-    setLog(log.concat([{ d: cur.d, p: p, pick: umbrella, rain: cur.rain, good: good, k: opened.length }]));
+    setLog(log.concat([{ d: cur.d, p: p, pick: umbrella, rain: cur.rain, good: wise, k: opened.length }]));
     /* Первое утро уже прожито руками — теперь фраза про проценты читается
        как про свой случай, а не как правило из учебника. */
     if (!log.length) window.nooka.beat('80% — это не обещание. Это восемь дождей из десяти таких дней');
@@ -344,10 +354,7 @@ function LevelWeather({ onWin, onHome }) {
         React.createElement('div', { className: 'wtlaw' },
           React.createElement('b', null, 'Проценты — это не обещание'),
           React.createElement('span', null,
-            'Восемьдесят процентов значит: из десяти таких дней в восьми был дождь, а в двух не было. ' +
-            'Если прогноз не сбылся, он не был неправильным — просто выпал тот самый редкий день. ' +
-            'И зонт в такое утро — верное решение: его оценивают по тому, что было известно, ' +
-            'а не по тому, чем всё кончилось.'))),
+            '80% — это два сухих дня из десяти. Зонт при 80% — верное решение, даже если дождя не было.'))),
       React.createElement('div', { className: 'wtfoot' },
         React.createElement('div', { style: { display: 'flex', gap: 8 } },
           React.createElement('button', {
@@ -372,9 +379,9 @@ function LevelWeather({ onWin, onHome }) {
   /* ── проверка связи ── */
   if (phase === 'quiz') {
     const o1 = nkMix([
-      { t: 'Нет. Из десяти таких дней в двух дождя и не бывает', ok: true },
-      { t: 'Да, раз дождя не было — прогноз неверный', ok: false },
-      { t: 'Да, ему надо было сказать сто процентов', ok: false },
+      { t: 'Верное: судят по тому, что знали утром', ok: true },
+      { t: 'Неверное: зонт зря носили', ok: false },
+      { t: 'Неверное: надо было ждать ста процентов', ok: false },
     ]);
     const o2 = nkMix([
       { t: 'Данных стало больше, и он стал увереннее', ok: true },
@@ -386,7 +393,7 @@ function LevelWeather({ onWin, onHome }) {
       React.createElement(TopBar, { level: LV_NO, title: 'Метеоролог', onHome, step: 6, total: 1 }),
       React.createElement('div', { className: 'wtbody' },
         React.createElement('div', { className: 'wtq' },
-          React.createElement('div', { className: 'wtq__t' }, 'Нейро сказал «дождь 80%», а день вышел сухой. Он ошибся?'),
+          React.createElement('div', { className: 'wtq__t' }, 'Утром шанс дождя 80%. Зонт взяли, а дождя не было. Решение было…'),
           o1.map((o, i) => React.createElement('button', {
             key: i, className: q1 === i ? (o.ok ? 'on--ok' : 'on--bad') : '',
             onClick: () => setQ1(i),
@@ -394,8 +401,8 @@ function LevelWeather({ onWin, onHome }) {
         q1 !== null && React.createElement('div', { className: 'wtsay ' + (o1[q1].ok ? 'wtsay--ok' : ''), style: { marginTop: 10 } },
           React.createElement('i', null, NKM(o1[q1].ok ? 'win' : 'think', 30)),
           React.createElement('span', null, o1[q1].ok
-            ? 'Верно. Я и не обещал дождь. Я сказал, насколько он вероятен. Два дня из десяти обязаны быть сухими — иначе восемьдесят было бы враньём.'
-            : 'Нет. Сто процентов я сказать не могу почти никогда. Восемьдесят — это честно: в двух днях из десяти дождя не будет, и это не ошибка.')),
+            ? 'Верно. Утром было 80% — зонт брать правильно. Что день выйдет сухим, утром знать было нельзя.'
+            : 'Нет. Решение судят по тому, что знали утром. При 80% зонт — верный выбор, даже если с погодой повезло.')),
 
         React.createElement('div', { className: 'wtq' },
           React.createElement('div', { className: 'wtq__t' }, 'Одна станция дала 65%. Ещё три — и стало 92%. Почему?'),
@@ -424,27 +431,19 @@ function LevelWeather({ onWin, onHome }) {
         React.createElement('div', { className: 'wtsay' },
           React.createElement('i', null, NKM('think', 30)),
           React.createElement('span', null, miss.length
-            ? 'За неделю я ' + wtTimes(miss.length) + ' назвал большой процент, а вышло наоборот. Значит ли это, что мне нельзя верить? Смотри мой архив.'
-            : 'Неделя удалась. Но чтобы понять, можно ли мне верить, одной недели мало — смотри мой архив.')),
+            ? 'За неделю я ' + wtTimes(miss.length) + ' назвал большой процент, а вышло наоборот. Значит, мне нельзя верить? Смотри.'
+            : 'Чтобы понять, можно ли мне верить, одной недели мало. Смотри.')),
+        /* Вместо графика архива — десять дней, когда Нейро говорил «80%».
+           Восемь с дождём, два сухих: так выглядит честный прогноз. */
         React.createElement('div', { className: 'wtcal' },
-          React.createElement('div', { className: 'wtcal__t' },
-            'Четыре тысячи прошлых дней · что обещал → как вышло'),
-          WT_BINS.map(([a, z], i) => {
-            const h = WT_ARCHIVE[i];
-            const real = h.n ? h.rain / h.n : 0;
-            return React.createElement('div', { key: i, className: 'wtrow' },
-              React.createElement('div', { className: 'wtrow__l' }, a + '–' + Math.min(z, 100) + '%'),
-              React.createElement('div', { className: 'wtrow__b' },
-                React.createElement('i', { style: { width: (real * 100) + '%' } })),
-              React.createElement('div', { className: 'wtrow__v' }, Math.round(real * 100) + '%'));
-          })),
-        React.createElement('div', { className: 'wthow' },
-          'Слева — что я обещал. Справа — как часто дождь правда шёл'),
-        React.createElement('div', { className: 'wtsay', style: { marginTop: 11 } },
+          React.createElement('div', { className: 'wtcal__t' }, 'Десять дней, когда я говорил «дождь 80%»'),
+          React.createElement('div', { className: 'wtten' },
+            ['r', 'r', 's', 'r', 'r', 'r', 'r', 's', 'r', 'r'].map((k, i) => React.createElement('i', {
+              key: i, className: k, style: { animationDelay: (.15 + i * .18) + 's' } }, k === 'r' ? '🌧' : '☀️')))),
+        React.createElement('div', { className: 'wtsay wtsay--ok', style: { marginTop: 11 } },
           React.createElement('i', null, NKM('win', 30)),
           React.createElement('span', null,
-            'Сходится. Когда я говорю «около 70», дождь идёт примерно в семи днях из десяти. ' +
-            'Значит проценты честные — просто они не про один день, а про то, как часто.'))),
+            'Восемь дождей и два сухих дня. Так и выглядят 80% — это не ошибка, а честный шанс.'))),
       React.createElement('div', { className: 'wtfoot' },
         React.createElement('button', {
           className: 'nk-btn nk-btn--pri', style: { width: '100%' },
@@ -454,11 +453,17 @@ function LevelWeather({ onWin, onHome }) {
 
   /* ── неделя ── */
   const done = pick !== null;
-  const result = !done ? '' :
-    pick && cur.rain ? 'Дождь! Хорошо, что зонт с собой.' :
-    pick && !cur.rain ? 'Дождя не было — зонт проездил зря.' :
-    !pick && !cur.rain ? 'Ясно весь день. Хорошо, что зонт остался дома.' :
-    'Дождь всё-таки пошёл, а зонт остался дома.';
+  const last = done ? log[log.length - 1] : null;
+  const verdict = !done ? '' :
+    Math.abs(last.p - .5) < .001 ? 'Шанс был 50 на 50 — тут честно любое решение.' :
+    last.good ? 'Верное решение: шанс дождя был ' + Math.round(last.p * 100) + '%.' :
+    'Рискованно: шанс дождя был ' + Math.round(last.p * 100) + '%.';
+  const weather = !done ? '' :
+    pick && cur.rain ? 'Пошёл дождь — зонт пригодился.' :
+    pick && !cur.rain ? 'Дождя не было, зонт не понадобился.' :
+    !pick && !cur.rain ? 'Дождя не было.' :
+    'Пошёл дождь, а зонт дома.';
+  const result = verdict + ' ' + weather;
 
   return React.createElement('div', { className: 'wt' },
     React.createElement(TopBar, { level: LV_NO, title: 'Метеоролог', onHome, step: idx, total: 6 }),
@@ -479,7 +484,7 @@ function LevelWeather({ onWin, onHome }) {
              равно звала спрашивать, и уровень выглядел сломанным. */
           : budget <= 0 ? 'Вызовы кончились. Решай по тому, что уже знаешь.'
           : opened.length ? 'Спроси ещё станцию или решай.'
-          : 'Нажми на станцию, чтобы её опросить.')),
+          : 'Нажми на станцию — она скажет, что видит. Станции иногда ошибаются.')),
 
       React.createElement('div', { className: 'wtday' },
         React.createElement('div', null,
@@ -505,8 +510,11 @@ function LevelWeather({ onWin, onHome }) {
         React.createElement('div', { className: 'wtfc__t' }, 'Шанс дождя'),
         React.createElement('div', { className: 'wtfc__n' }, pc + '%'),
         React.createElement('div', { className: 'wtfc__s' },
-          opened.length === 0 ? 'ни одной станции — знаю не больше твоего'
-            : 'опрошено станций: ' + opened.length + ' из ' + WT_STATIONS),
+          /* Откуда взялся процент — прямо под ним. Раньше число менялось
+             «само», и было непонятно, при чём тут станции. */
+          opened.length === 0 ? 'Спроси станции — пока я знаю не больше тебя'
+            : '🌧 за дождь: ' + opened.filter(i => cur.sig[i]).length +
+              '   ☀️ за солнце: ' + opened.filter(i => !cur.sig[i]).length),
         React.createElement('div', { className: 'wtbarline' },
           React.createElement('i', { style: { width: pc + '%' } }))),
 
