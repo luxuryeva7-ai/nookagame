@@ -208,9 +208,12 @@
 
     // Отметить миссию пройденной. XP начисляется один раз, день идёт в стрик всегда.
     completeMission: function (id, xp) {
-      /* Первый уровень курса — ключевая точка воронки: если ребёнок его
-         прошёл, он играет дальше. Считаем только первое прохождение. */
-      if (id === 'data1' && window.nkGoal && !load().missions[id]) nkGoal('level_1_done');
+      /* Три бесплатных уровня — ключевые точки воронки: видно, на каком
+         из них бросают, не дойдя до оплаты. Считаем только первое прохождение.
+         Коды — по месту в курсе, а не по номеру уровня: третий бесплатный
+         пришёл из третьей игры (in10). */
+      var FUNNEL = { data1: 'level_1_done', data2: 'level_2_done', in10: 'level_3_done' };
+      if (FUNNEL[id] && window.nkGoal && !load().missions[id]) nkGoal(FUNNEL[id]);
       var p = load();
       var t = dstr(new Date());
       if (p.days.indexOf(t) < 0) p.days.push(t);
