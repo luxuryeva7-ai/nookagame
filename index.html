@@ -660,11 +660,11 @@ var WAITLIST_URL = 'https://t.me/NookaGame';
   /* Адрес на главной не нужен: он есть в оферте, а номер дома посторонним ни к чему */
   el.innerHTML = R.seller + ' · ИНН ' + R.inn + ' · ОГРНИП ' + R.ogrnip +
     (R.email ? ' · <a href="mailto:' + R.email + '">' + R.email + '</a>' : ''); })();
-var V = '?v=202610050900';
+var V = '?v=202610051000';
 
 var PLANETS = [
   {key:'phys',  icon:'phys', coin:'nk-coin--sun',  subject:'Физика',                  name:'КвантУм',        desc:'Пушка, качели, струна и кораблик: угадай, а потом проверь руками.', active:true,  levels:11,  img:'screenshots/phys.jpg',   src:'games/physics.html'},
-  {key:'chem',  icon:'chem', coin:'nk-coin--ok',   subject:'Химия',                   name:'Хемо Лаб',       desc:'Лёд и пар, капустное зелье, невидимый газ: угадай, а потом проверь опытом.', active:true,  levels:10,  img:'screenshots/chem.jpg',   src:'games/chemistry.html'},
+  {key:'chem',  icon:'chem', coin:'nk-coin--ok',   subject:'Химия',                   name:'Хемо Лаб',       desc:'Лёд и пар, капустное зелье, невидимый газ: угадай, а потом проверь опытом.', active:true,  levels:11,  img:'screenshots/chem.jpg',   src:'games/chemistry.html'},
   {key:'code',  icon:'code', coin:'',              subject:'Программирование',        name:'КодБот',         desc:'Программы из блоков: робот рисует, ищет ключ и учит свою команду.', active:true,  levels:10,  img:'screenshots/code.jpg',   src:'games/code.html'},
   {key:'space', icon:'space', coin:'nk-coin--warn', subject:'Астрономия',              name:'КосмоПорт',      desc:'Собери ракету, рассчитай топливо и выйди на орбиту.', active:true,  levels:10,  free:2, img:'screenshots/space.jpg',   src:'games/space.html'},
   {key:'robo',  icon:'robo', coin:'',              subject:'Робототехника',           name:'РобоЛаб',        desc:'Моторы, датчики и плата-мозг: собери своего робота и придумай ему правила.', active:true,  levels:10, free:2, img:'screenshots/robo.jpg',  src:'games/robo.html'},
