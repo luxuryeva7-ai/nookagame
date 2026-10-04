@@ -185,9 +185,42 @@
       "cursor:pointer;text-align:center;text-decoration:none;font-family:'Unbounded','Nunito',system-ui,sans-serif;" +
       'font-weight:700;font-size:15px;color:#fff;background:linear-gradient(180deg,#9B78FF,#7B4FF2)}' +
     '.nkpw__alt{display:block;margin-top:12px;text-align:center;font-weight:800;font-size:13px;color:#A896C9}' +
+    '.nkpw__did,.nkpw__next{margin-top:10px;padding:10px 13px;border-radius:16px;' +
+      'background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}' +
+    '.nkpw__did{background:rgba(78,217,155,.1);box-shadow:inset 0 0 0 1px rgba(78,217,155,.3)}' +
+    '.nkpw__did b,.nkpw__next b{display:block;margin-bottom:6px;font-weight:900;font-size:11px;' +
+      'letter-spacing:.06em;text-transform:uppercase;color:#A896C9}' +
+    '.nkpw__did b{color:#7FE3B4}' +
+    '.nkpw__did span,.nkpw__next span{display:block;font-weight:700;font-size:12.5px;line-height:1.35;' +
+      'color:#E4DAF7;margin-top:2px}' +
     '.nkpw__fine{margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.09);' +
       'font-weight:700;font-size:11.5px;line-height:1.5;color:#7E6E9C}' +
     '.nkpw__fine a{color:#A896C9;text-decoration:underline}';
+
+  /* Что откроется по доступу — словами для родителя, по одному пункту на игру.
+     Стену видит ребёнок, а платит родитель: ему нужно не «уровень платный»,
+     а что ребёнок уже умеет и что будет дальше. */
+  var WALL_NEXT = [
+    'Увидит своими глазами, как ИИ уверенно ошибается',
+    'Научится объяснять ИИ задачу так, чтобы вышло как надо',
+    'Научится отличать картинку ИИ от настоящей',
+    'Плюс игры по наукам: КосмоПорт, РобоЛаб, БиоМир'
+  ];
+  var AI_GAMES = { data: 1, control: 1, inside: 1 };
+
+  /* «Ребёнок уже умеет» — цели пройденных бесплатных уровней этой игры */
+  function wallFor(game) {
+    if (!game || !AI_GAMES[game.key] || !window.nookaLevels) return '';
+    var did = game.levels.filter(function (lv) {
+      return lv.n <= (game.free || 0) && lv.goal && window.nookaLevels.isDone(lv);
+    }).map(function (lv) { return lv.goal; });
+    return (did.length
+        ? '<div class="nkpw__did"><b>Ребёнок уже умеет</b>' +
+            did.map(function (t) { return '<span>✓ ' + t + '</span>'; }).join('') + '</div>'
+        : '') +
+      '<div class="nkpw__next"><b>Откроется дальше</b>' +
+        WALL_NEXT.map(function (t) { return '<span>' + t + '</span>'; }).join('') + '</div>';
+  }
 
   function nextUrl() {
     return encodeURIComponent(location.pathname + location.search + location.hash);
@@ -219,12 +252,14 @@
        Оплатившему, который просто не вошёл на этом устройстве, эта же
        кнопка сразу вернёт доступ — поэтому она первая и главная. */
     var guest = S.guest && !allOpen();
+    /* Есть блок для родителя — прежняя строка «что бесплатно» его повторяет */
+    var extra = wallFor(opts.game);
     var body = guest
-      ? '<p class="nkpw__s">' + (opts.sub || 'Платные уровни открываются в аккаунте.') +
-          ' Если доступ уже оплачен, войдите по почте — и всё откроется на этом устройстве тоже.</p>' +
+      ? '<p class="nkpw__s">' + (extra ? '' : (opts.sub || 'Платные уровни открываются в аккаунте.') + ' ') +
+          'Если доступ уже оплачен, войдите по почте — и всё откроется на этом устройстве тоже.</p>' +
         '<a class="nkpw__go" href="' + LOGIN_URL + '?next=' + nextUrl() + '">Войти по почте</a>' +
         '<a class="nkpw__alt" href="' + BUY_URL + '">Что входит в доступ и сколько стоит →</a>'
-      : '<p class="nkpw__s">' + (opts.sub || freeLine() + ' Весь курс — ' + paidLine() + ' — по доступу для одной семьи.') + '</p>' +
+      : (extra ? '' : '<p class="nkpw__s">' + (opts.sub || freeLine() + ' Весь курс — ' + paidLine() + ' — по доступу для одной семьи.') + '</p>') +
         '<div class="nkpw__plans">' + plan('quarter') + plan('year') + '</div>' +
         '<a class="nkpw__alt" href="' + BUY_URL + '">Подробнее о том, что открывается →</a>';
 
@@ -234,8 +269,9 @@
     w.innerHTML =
       '<div class="nkpw__card">' +
         '<button class="nkpw__x" aria-label="Закрыть">✕</button>' +
-        '<div class="nkpw__kick">Дальше — по доступу</div>' +
+        '<div class="nkpw__kick">Покажи родителям</div>' +
         '<h2 class="nkpw__h">' + (opts.title || 'Тут заканчивается бесплатная часть') + '</h2>' +
+        extra +
         body +
         '<div class="nkpw__fine">Разовая оплата, без автосписаний. Вернём деньги за 14 дней. ' +
           '<a href="' + OFERTA_URL + '" target="_blank" rel="noopener">Оферта</a></div>' +
@@ -405,6 +441,7 @@
         ? 'Бесплатно открыты первые ' + window.nookaLevels.levelsWord(cur.game.free) + ' этой игры.'
         : freeLine();
       paywall({
+        game: cur.game,
         title: cur.shop ? 'Мастерская — в платной части'
           : whole ? 'Эта игра — в платной части' : 'Этот уровень — в платной части',
         sub: cur.shop ? 'Мастерская «' + cur.level.t + '» открывается по доступу. ' + here
