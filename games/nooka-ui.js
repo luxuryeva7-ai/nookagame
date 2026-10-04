@@ -234,7 +234,9 @@ function FailModal({
 function nkMix(list) {
   return (window.nooka && window.nooka.shuffled) ? window.nooka.shuffled(list) : list;
 }
-function nkGoal() {
+/* Не «nkGoal»: так называется отправка целей в Метрику (metrika.js), и она
+   затирала эту функцию — строка «Здесь учимся» пропадала на части уровней. */
+function nkLevelGoal() {
   var lv = nkLevel();
   return (lv && lv.goal) || '';
 }
@@ -293,7 +295,7 @@ function GuessGate({ emoji, title, ask, bets, tip, onStart }) {
         color: 'var(--ak-ink)', textAlign: 'center', marginBottom: 8
       }
     }, title),
-    (nkDo() || nkGoal()) && React.createElement('div', {
+    (nkDo() || nkLevelGoal()) && React.createElement('div', {
       style: {
         width: '100%', maxWidth: 330, marginBottom: 18, padding: '12px 16px 14px',
         borderRadius: 18, textAlign: 'center',
@@ -313,17 +315,17 @@ function GuessGate({ emoji, title, ask, bets, tip, onStart }) {
           fontFamily: 'var(--ak-display)', fontWeight: 700, fontSize: 17,
           lineHeight: 1.28, color: '#FFF6DC'
         }
-      }, nkDo() || nkGoal()),
+      }, nkDo() || nkLevelGoal()),
       /* Цель уровня остаётся на входе мелкой строкой: ту же фразу ребёнок
          увидит на экране победы как «теперь ты это умеешь». Без начала
          замыкание не работает — фраза в конце читается как новая. */
-      nkDo() && nkGoal() && React.createElement('div', {
+      nkDo() && nkLevelGoal() && React.createElement('div', {
         style: {
           marginTop: 9, paddingTop: 9, borderTop: '1px solid rgba(255,216,77,.22)',
           fontFamily: 'var(--ak-display)', fontWeight: 700, fontSize: 12.5,
           lineHeight: 1.3, color: '#E6C77A'
         }
-      }, 'Здесь учимся: ' + nkGoal())
+      }, 'Здесь учимся: ' + nkLevelGoal())
     ),
     React.createElement('div', {
       style: {
@@ -397,7 +399,7 @@ function IntroModal({
       marginBottom: 16,
       textAlign: 'center'
     }
-  }, title), (goal = nkDo() || goal || nkGoal()) && /*#__PURE__*/React.createElement("div", {
+  }, title), (goal = nkDo() || goal || nkLevelGoal()) && /*#__PURE__*/React.createElement("div", {
     style: {
       width: '100%',
       maxWidth: 320,
@@ -425,7 +427,7 @@ function IntroModal({
       lineHeight: 1.25,
       color: '#FFF6DC'
     }
-  }, goal), nkDo() && nkGoal() && /*#__PURE__*/React.createElement("div", {
+  }, goal), nkDo() && nkLevelGoal() && /*#__PURE__*/React.createElement("div", {
     /* Цель остаётся видна и здесь: на экране победы она вернётся как
        «теперь ты это умеешь», и ребёнок должен её узнать, а не прочесть
        впервые. */
@@ -439,7 +441,7 @@ function IntroModal({
       lineHeight: 1.3,
       color: '#E6C77A'
     }
-  }, 'Здесь учимся: ' + nkGoal())), diagram && /*#__PURE__*/React.createElement("div", {
+  }, 'Здесь учимся: ' + nkLevelGoal())), diagram && /*#__PURE__*/React.createElement("div", {
     style: {
       width: '100%',
       maxWidth: 320,
@@ -490,14 +492,30 @@ function IntroModal({
       color: 'var(--ak-ink-2)',
       lineHeight: 1.5
     }
-  }, tip), /*#__PURE__*/React.createElement("button", {
+  }, tip), /*#__PURE__*/React.createElement("div", {
+    /* Кнопка прилипает к низу: на маленьком телефоне длинное описание
+       уводило её под край экрана, и начать уровень было нечем. Под ней —
+       затемнение цвета фона, чтобы текст уходил под кнопку, а не просвечивал. */
+    style: {
+      position: 'sticky',
+      bottom: -28,
+      margin: '-12px -24px -28px',
+      padding: '22px 24px 28px',
+      alignSelf: 'stretch',
+      display: 'flex',
+      justifyContent: 'center',
+      flexShrink: 0,
+      zIndex: 1,
+      background: 'linear-gradient(180deg, rgba(13,20,39,0) 0%, #0D1427 45%)'
+    }
+  }, /*#__PURE__*/React.createElement("button", {
     className: "ak-btn ak-btn--phys",
     style: {
       minWidth: 200,
       fontSize: 18
     },
     onClick: onStart
-  }, "Начать!"));
+  }, "Начать!")));
 }
 
 /* ══════════════════════════════════════════════════════════════

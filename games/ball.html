@@ -98,6 +98,8 @@
 <script src="nooka-gallery.js"></script>
 <script src="nooka-ui.js"></script>
 <script>
+/* Номер в шапке — из реестра: порядок уровней в игре меняли, а числа в коде отстали */
+const LV_NO = (window.nookaLevels && window.nookaLevels.numberOf('in3')) || 3;
 /* ============================================================
    ШАРИК ИЩЕТ ДНО — уровень 8 игры «Как применять ИИ в жизни».
 
@@ -269,7 +271,7 @@ function LevelBall({ onWin, onHome }) {
       : { b: 'шагов до дна', t: String(run.steps), ok: true };
 
     return React.createElement('div', { className: 'bl' },
-      React.createElement(TopBar, { level: 3, title: 'Шарик ищет дно', onHome, step: 0, total: 2 }),
+      React.createElement(TopBar, { level: LV_NO, title: 'Шарик ищет дно', onHome, step: 0, total: 2 }),
       React.createElement('div', { className: 'blbody' },
         React.createElement('div', { className: 'blsay' },
           React.createElement('i', null, NKM(done ? (итог.ok ? 'win' : 'think') : 'hello', 30)),
@@ -336,7 +338,7 @@ function LevelBall({ onWin, onHome }) {
     const обе = runs.length >= 2 && runs.some(r => r === 'дно') && runs.some(r => r === 'ямка');
 
     return React.createElement('div', { className: 'bl' },
-      React.createElement(TopBar, { level: 3, title: 'Шарик ищет дно', onHome, step: 1, total: 2 }),
+      React.createElement(TopBar, { level: LV_NO, title: 'Шарик ищет дно', onHome, step: 1, total: 2 }),
       React.createElement('div', { className: 'blbody' },
         React.createElement('div', { className: 'blsay' },
           React.createElement('i', null, NKM(done ? (пришёл === 'дно' ? 'win' : 'think') : 'hello', 30)),
@@ -401,7 +403,7 @@ function LevelBall({ onWin, onHome }) {
     ]);
     const both = q1 !== null && o1[q1].ok && q2 !== null && o2[q2].ok;
     return React.createElement('div', { className: 'bl' },
-      React.createElement(TopBar, { level: 3, title: 'Шарик ищет дно', onHome, step: 1, total: 2 }),
+      React.createElement(TopBar, { level: LV_NO, title: 'Шарик ищет дно', onHome, step: 1, total: 2 }),
       React.createElement('div', { className: 'blbody' },
         React.createElement('div', { className: 'blq' },
           React.createElement('div', { className: 'blq__t' }, 'Почему при огромном шаге шарик улетел со склона?'),
@@ -423,7 +425,7 @@ function LevelBall({ onWin, onHome }) {
           React.createElement('i', null, NKM(o2[q2].ok ? 'win' : 'think', 30)),
           React.createElement('span', null, o2[q2].ok
             ? 'Именно. В ямке со всех сторон вверх — значит, для шарика это и есть дно. Что там за бугром, он не знает.'
-            : 'Не угадал. Шарик ничего не помнит и не выбирает: он просто идёт туда, где ниже прямо сейчас.'))),
+            : 'Не совсем. Шарик ничего не помнит и не выбирает: он просто идёт туда, где ниже прямо сейчас.'))),
       React.createElement('div', { className: 'blfoot' },
         React.createElement('button', {
           className: 'nk-btn nk-btn--pri', style: { width: '100%' }, disabled: !both,
@@ -434,7 +436,7 @@ function LevelBall({ onWin, onHome }) {
   /* ── финал ── */
   if (phase === 'done') {
     return React.createElement('div', { className: 'bl' },
-      React.createElement(TopBar, { level: 3, title: 'Шарик ищет дно', onHome, step: 2, total: 2 }),
+      React.createElement(TopBar, { level: LV_NO, title: 'Шарик ищет дно', onHome, step: 2, total: 2 }),
       React.createElement('div', { className: 'blbody bldone' },
         React.createElement('div', { className: 'bllaw' },
           React.createElement('b', null, 'Учиться — значит идти туда, где ошибок меньше'),
@@ -453,7 +455,7 @@ function LevelBall({ onWin, onHome }) {
 
   /* ── заставка ── */
   return React.createElement('div', { className: 'bl' },
-    React.createElement(TopBar, { level: 3, title: 'Шарик ищет дно', onHome, step: 0, total: 2 }),
+    React.createElement(TopBar, { level: LV_NO, title: 'Шарик ищет дно', onHome, step: 0, total: 2 }),
     React.createElement(IntroModal, {
       emoji: NKM('hello', 88),
       title: 'Шарик ищет дно',

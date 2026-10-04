@@ -117,6 +117,8 @@
 <script src="nooka-gallery.js"></script>
 <script src="nooka-ui.js"></script>
 <script>
+/* Номер в шапке — из реестра: порядок уровней в игре меняли, а числа в коде отстали */
+const LV_NO = (window.nookaLevels && window.nookaLevels.numberOf('in6')) || 6;
 /* ============================================================
    РЕНТГЕНОЛОГ — уровень 3 игры «Как применять ИИ в жизни».
 
@@ -502,7 +504,7 @@ function LevelXray({ onWin, onHome }) {
   /* ── финал ── */
   if (phase === 'done') {
     return React.createElement('div', { className: 'xr' },
-      React.createElement(TopBar, { level: 6, title: 'Рентгенолог', onHome, step: 4, total: 1 }),
+      React.createElement(TopBar, { level: LV_NO, title: 'Рентгенолог', onHome, step: 4, total: 1 }),
       React.createElement('div', { className: 'xrbody xrdone' },
         React.createElement(XrCard, { right: right }),
         React.createElement('div', { className: 'xrlaw' },
@@ -535,7 +537,7 @@ function LevelXray({ onWin, onHome }) {
     ]);
     const both = q1 !== null && o1[q1].ok && q2 !== null && o2[q2].ok;
     return React.createElement('div', { className: 'xr' },
-      React.createElement(TopBar, { level: 6, title: 'Рентгенолог', onHome, step: 4, total: 1 }),
+      React.createElement(TopBar, { level: LV_NO, title: 'Рентгенолог', onHome, step: 4, total: 1 }),
       React.createElement('div', { className: 'xrbody' },
         React.createElement('div', { className: 'xrq' },
           React.createElement('div', { className: 'xrq__t' }, 'На снимке Веры кость была целая. Почему Нейро всё равно подчеркнул место?'),
@@ -575,7 +577,7 @@ function LevelXray({ onWin, onHome }) {
     verdict.kind === 'clean' ? c.noSay : c.badSay;
 
   return React.createElement('div', { className: 'xr' },
-    React.createElement(TopBar, { level: 6, title: 'Рентгенолог', onHome, step: idx, total: 4 }),
+    React.createElement(TopBar, { level: LV_NO, title: 'Рентгенолог', onHome, step: idx, total: 4 }),
 
     phase === 'intro' && React.createElement(IntroModal, {
       emoji: NKM('hello', 88),

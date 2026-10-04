@@ -117,6 +117,8 @@
 <script src="nooka-gallery.js"></script>
 <script src="nooka-ui.js"></script>
 <script>
+/* Номер в шапке — из реестра: порядок уровней в игре меняли, а числа в коде отстали */
+const LV_NO = (window.nookaLevels && window.nookaLevels.numberOf('in5')) || 5;
 /* ============================================================
    УГАДАЙ СЛЕДУЮЩЕЕ СЛОВО — уровень 6 игры «Как применять ИИ в жизни».
    Пара к Диджею: там ребёнок услышал предсказание ушами,
@@ -258,7 +260,7 @@ function LevelWords({ onWin, onHome }) {
   /* ── финал ── */
   if (phase === 'done') {
     return React.createElement('div', { className: 'wd' },
-      React.createElement(TopBar, { level: 5, title: 'Следующее слово', onHome, step: 1, total: 1 }),
+      React.createElement(TopBar, { level: LV_NO, title: 'Угадай следующее слово', onHome, step: 1, total: 1 }),
       React.createElement('div', { className: 'wdbody wddone' },
         React.createElement('div', { className: 'wdscore', style: { width: 'calc(100% - 28px)' } },
           React.createElement('div', null,
@@ -295,7 +297,7 @@ function LevelWords({ onWin, onHome }) {
     ]);
     const both = q1 !== null && o1[q1].ok && q2 !== null && o2[q2].ok;
     return React.createElement('div', { className: 'wd' },
-      React.createElement(TopBar, { level: 5, title: 'Следующее слово', onHome, step: 1, total: 1 }),
+      React.createElement(TopBar, { level: LV_NO, title: 'Угадай следующее слово', onHome, step: 1, total: 1 }),
       React.createElement('div', { className: 'wdbody' },
         React.createElement('div', { className: 'wdq' },
           React.createElement('div', { className: 'wdq__t' }, 'Откуда Нейро знает, какое слово идёт следующим?'),
@@ -332,11 +334,11 @@ function LevelWords({ onWin, onHome }) {
   const g = turn ? turn.ai : wdGuess(words, wi, longMem);
 
   return React.createElement('div', { className: 'wd' },
-    React.createElement(TopBar, { level: 5, title: 'Следующее слово', onHome, step: 1, total: 1 }),
+    React.createElement(TopBar, { level: LV_NO, title: 'Угадай следующее слово', onHome, step: 1, total: 1 }),
 
     phase === 'intro' && React.createElement(IntroModal, {
       emoji: NKM('hello', 88),
-      title: 'Следующее слово',
+      title: 'Угадай следующее слово',
       law: 'Я прочитал тридцать фраз.\nБольше про язык я ничего не знаю.',
       tip: 'Угадываем по очереди, какое слово будет дальше. Посмотрим, кто чаще прав.',
       onStart: () => setPhase('play'),

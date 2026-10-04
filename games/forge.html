@@ -1148,7 +1148,7 @@ function LevelForge({
     className: 'fg'
   }, React.createElement(TopBar, {
     level: bonus ? '★' : 4,
-    title: bonus ? 'Мастерская загадок' : 'Мастерская',
+    title: bonus ? 'Мастерская загадок' : 'Мастерская предметов',
     onHome,
     step: bonus ? null : (phase === 'rough' ? 0 : phase === 'orders' ? 1 + oIdx : 4),
     total: bonus ? null : 5

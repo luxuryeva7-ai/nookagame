@@ -120,6 +120,8 @@
 <script src="nooka-gallery.js"></script>
 <script src="nooka-ui.js"></script>
 <script>
+/* Номер в шапке — из реестра: порядок уровней в игре меняли, а числа в коде отстали */
+const LV_NO = (window.nookaLevels && window.nookaLevels.numberOf('in8')) || 8;
 /* ============================================================
    МЕТЕОРОЛОГ — уровень 7 игры «Как применять ИИ в жизни».
 
@@ -288,7 +290,7 @@ function WtCard({ log }) {
     }),
     React.createElement('text', { x: 110, y: 228, textAnchor: 'middle', fill: '#8FA5C0',
       style: { font: '900 11px Nunito,sans-serif' } },
-      'сухим остался ' + wtTimes(log.filter(e => e.good).length) + ' из 6'));
+      'сухо было ' + wtTimes(log.filter(e => e.good).length) + ' из 6'));
 }
 
 function LevelWeather({ onWin, onHome }) {
@@ -336,7 +338,7 @@ function LevelWeather({ onWin, onHome }) {
   if (phase === 'done') {
     const shown = log.length ? log : days.map(d => ({ d: d.d, p: .5, pick: true, rain: d.rain, good: d.rain }));
     return React.createElement('div', { className: 'wt' },
-      React.createElement(TopBar, { level: 8, title: 'Метеоролог', onHome, step: 6, total: 1 }),
+      React.createElement(TopBar, { level: LV_NO, title: 'Метеоролог', onHome, step: 6, total: 1 }),
       React.createElement('div', { className: 'wtbody wtdone' },
         React.createElement(WtCard, { log: shown }),
         React.createElement('div', { className: 'wtlaw' },
@@ -381,7 +383,7 @@ function LevelWeather({ onWin, onHome }) {
     ]);
     const both = q1 !== null && o1[q1].ok && q2 !== null && o2[q2].ok;
     return React.createElement('div', { className: 'wt' },
-      React.createElement(TopBar, { level: 8, title: 'Метеоролог', onHome, step: 6, total: 1 }),
+      React.createElement(TopBar, { level: LV_NO, title: 'Метеоролог', onHome, step: 6, total: 1 }),
       React.createElement('div', { className: 'wtbody' },
         React.createElement('div', { className: 'wtq' },
           React.createElement('div', { className: 'wtq__t' }, 'Нейро сказал «дождь 80%», а день вышел сухой. Он ошибся?'),
@@ -405,7 +407,7 @@ function LevelWeather({ onWin, onHome }) {
           React.createElement('i', null, NKM(o2[q2].ok ? 'win' : 'think', 30)),
           React.createElement('span', null, o2[q2].ok
             ? 'Да. Одна станция может и напутать, а когда четыре говорят одно и то же — сомнений меньше. Погода при этом не менялась, менялось только то, сколько я знаю.'
-            : 'Не угадал. Погода не менялась — менялось то, сколько я про неё знаю. Одна станция ошибается чаще, чем четыре сразу.'))),
+            : 'Не совсем. Погода не менялась — менялось то, сколько я про неё знаю. Одна станция ошибается чаще, чем четыре сразу.'))),
       React.createElement('div', { className: 'wtfoot' },
         React.createElement('button', {
           className: 'nk-btn nk-btn--pri', style: { width: '100%' }, disabled: !both,
@@ -417,7 +419,7 @@ function LevelWeather({ onWin, onHome }) {
   if (phase === 'review') {
     const miss = log.filter(e => (e.p > .7 && !e.rain) || (e.p < .3 && e.rain));
     return React.createElement('div', { className: 'wt' },
-      React.createElement(TopBar, { level: 8, title: 'Метеоролог', onHome, step: 6, total: 1 }),
+      React.createElement(TopBar, { level: LV_NO, title: 'Метеоролог', onHome, step: 6, total: 1 }),
       React.createElement('div', { className: 'wtbody' },
         React.createElement('div', { className: 'wtsay' },
           React.createElement('i', null, NKM('think', 30)),
@@ -453,13 +455,13 @@ function LevelWeather({ onWin, onHome }) {
   /* ── неделя ── */
   const done = pick !== null;
   const result = !done ? '' :
-    pick && cur.rain ? 'Сухой. Зонт пригодился.' :
+    pick && cur.rain ? 'Дождь! Хорошо, что зонт с собой.' :
     pick && !cur.rain ? 'Дождя не было — зонт проездил зря.' :
     !pick && !cur.rain ? 'Ясно весь день. Хорошо, что зонт остался дома.' :
-    'Промок. Дождь всё-таки пошёл.';
+    'Дождь всё-таки пошёл, а зонт остался дома.';
 
   return React.createElement('div', { className: 'wt' },
-    React.createElement(TopBar, { level: 8, title: 'Метеоролог', onHome, step: idx, total: 6 }),
+    React.createElement(TopBar, { level: LV_NO, title: 'Метеоролог', onHome, step: idx, total: 6 }),
 
     phase === 'intro' && React.createElement(IntroModal, {
       emoji: NKM('hello', 88),
