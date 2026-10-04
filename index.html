@@ -139,6 +139,12 @@ h1 .p{color:var(--nk-pri-3)} h1 .s{color:var(--nk-sun-3)}
 .hero-frame-inner{border-radius:var(--nk-r-l);overflow:hidden;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;
   background:radial-gradient(circle at 50% 38%,#fff,var(--nk-pri-0) 78%)}
 .hero-frame-inner img{width:100%;height:100%;object-fit:contain;display:block}
+/* живая игра на первом экране: вертикальный ролик и маскот сбоку */
+.hero-reel{position:relative;z-index:1;width:min(300px,62vw);margin:0 auto;aspect-ratio:320/568}
+.hero-reel__v{width:100%;height:100%;display:block;border-radius:30px;object-fit:cover;background:#1B1240;
+  box-shadow:0 14px 0 rgba(45,27,69,.10),0 34px 60px -22px rgba(45,27,69,.5)}
+.hero-reel__m{position:absolute;left:-64px;bottom:-12px;width:126px;pointer-events:none;
+  animation:kb-float 6s ease-in-out infinite;filter:drop-shadow(0 10px 14px rgba(45,27,69,.25))}
 
 .section{padding-top:72px;padding-bottom:8px}
 .sec-head-chip{margin-bottom:18px}
@@ -165,6 +171,19 @@ h1 .p{color:var(--nk-pri-3)} h1 .s{color:var(--nk-sun-3)}
 .p-subject{text-transform:uppercase;letter-spacing:.09em;color:var(--nk-ink-3)}
 .p-name{margin:3px 0 8px}
 .p-desc{font-size:14px;color:var(--nk-ink-2);line-height:1.55}
+/* На телефоне девять карточек наук шли столбиком — почти 4000 точек ленты.
+   Две колонки, без описания: картинка, предмет, название и статус. */
+@media (max-width:600px){
+  #planets{grid-template-columns:1fr 1fr;gap:12px}
+  #planets .planet{padding:8px 8px 0;border-radius:22px}
+  #planets .p-media{aspect-ratio:4/3;border-radius:16px}
+  #planets .p-chip{top:7px;right:7px;left:7px;text-align:center;font-size:10.5px;padding:4px 6px}
+  #planets .p-coin{width:38px;height:38px;font-size:19px;left:8px;bottom:-12px}
+  #planets .p-body{padding:18px 6px 12px}
+  #planets .p-subject{font-size:10px}
+  #planets .p-name{font-size:16px;margin:2px 0 0}
+  #planets .p-desc{display:none}
+}
 
 /* ── Четыре умения: рамка курса, по ней же собран отчёт родителю и школьная дека.
    На главной — одной строкой, этап = одно-два слова: карточки съедали полэкрана,
@@ -190,9 +209,11 @@ h1 .p{color:var(--nk-pri-3)} h1 .s{color:var(--nk-sun-3)}
 
 .pricing{max-width:860px;margin:0 auto;text-align:center}
 .price-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;text-align:left}
-.price-box{padding:36px 32px}
+.price-box{padding:36px 32px;display:flex;flex-direction:column}
+/* кнопки тарифов — на одной высоте, сколько бы пунктов ни было выше */
+.price-box > .nk-btn{margin-top:auto}
 .price-tier{text-transform:uppercase;letter-spacing:.12em}
-.price-amt{font-family:var(--nk-brand);font-weight:900;font-size:52px;line-height:1;margin:10px 0 4px}
+.price-amt{font-family:var(--nk-brand);font-weight:900;font-size:clamp(40px,4.2vw,52px);line-height:1;margin:10px 0 4px;white-space:nowrap}
 .pf{display:flex;flex-direction:column;gap:12px;margin-bottom:26px;font-weight:700;font-size:14px}
 .pf div{display:flex;gap:10px;align-items:flex-start}
 .pf div>span:first-child{flex:none}
@@ -283,6 +304,8 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
   .hero-deco .nk-coin{width:42px;height:42px;font-size:21px}
   /* на узком экране плашка уезжала за левый край — прижимаем внутрь */
   .hero-tag{font-size:11px;padding:7px 12px;border-radius:15px;left:4%!important;bottom:28%!important}
+  .hero-reel{width:min(250px,64vw)}
+  .hero-reel__m{width:92px;left:-40px;bottom:-8px}
   .hero-safe{gap:10px}
 }
 @media(max-width:430px){
@@ -292,7 +315,7 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
   nav{gap:7px}
   nav .nk-btn--sm{padding:9px 12px;font-size:13px}
 }
-@media(prefers-reduced-motion:reduce){.nk-bob,.hero-deco .nk-coin,.hero-tag,.hero-badge .dot{animation:none}}
+@media(prefers-reduced-motion:reduce){.nk-bob,.hero-deco .nk-coin,.hero-tag,.hero-badge .dot,.hero-reel__m{animation:none}}
 
 /* ── первый ряд: курс ИИ-грамотности ── */
 .course-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(276px,1fr));gap:18px;margin-top:8px}
@@ -416,8 +439,14 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
         <div class="nk-coin nk-coin--warn" style="bottom:-2%;right:4%;animation:kb-float 7.5s ease-in-out infinite .4s"><svg class="ic" aria-hidden="true"><use href="icons.svg#nk-code"></use></svg></div>
         <div class="hero-tag" style="bottom:33%;left:-9%;animation:kb-float 6.8s ease-in-out infinite 1s"><em>НуКа</em> Наука!<br><em>НуКа</em> ИИ!</div>
       </div>
-      <div class="nk-clay hero-frame">
-        <div class="hero-frame-inner"><img src="mascot/hello.webp" alt="Маскот Nooka"></div>
+      <!-- Вместо картинки с маскотом — живая игра (кусок ролика от 23.09.2026):
+           родитель за пять секунд видит, что ребёнок будет делать. Маскот остался
+           рядом — выглядывает сбоку. Ролик без звука, по кругу, 740 КБ. -->
+      <div class="hero-reel">
+        <video class="hero-reel__v" src="shots/hero-reel.mp4" poster="shots/hero-reel.jpg"
+          autoplay muted loop playsinline preload="metadata"
+          aria-label="Как играют в Nooka: ребёнок рисует кота, и ИИ учится его узнавать; джинн выполняет просьбу ровно так, как сказано"></video>
+        <img class="hero-reel__m" src="mascot/hello.webp" alt="" aria-hidden="true">
       </div>
     </div>
   </section>
@@ -452,7 +481,7 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
   <section class="wrap section" id="subjects">
     <div class="nk-chip sec-head-chip">Ещё игры</div>
     <h2 class="nk-t-h1 sec-h">Науки, которые <span>можно потрогать</span></h2>
-    <p class="nk-t-body sec-sub">Физика, химия и программирование — бесплатно. КосмоПорт, РобоЛаб и БиоМир — первые два уровня бесплатно, дальше по доступу. Остальные миры в работе и войдут в годовой доступ.</p>
+    <p class="nk-t-body sec-sub">Физика, химия и программирование — бесплатно. КосмоПорт, РобоЛаб и БиоМир — первые два уровня бесплатно.</p>
     <div class="grid-cards" id="planets"></div>
   </section>
 
