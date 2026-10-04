@@ -146,6 +146,8 @@
 <script src="nooka-gallery.js"></script>
 <script src="nooka-ui.js"></script>
 <script>
+/* Номер в шапке — из реестра: порядок уровней в игре меняли, а числа в коде отстали */
+const LV_NO = (window.nookaLevels && window.nookaLevels.numberOf('in4')) || 4;
 /* ============================================================
    БИБЛИОТЕКАРЬ — уровень 1 игры «Как применять ИИ в жизни».
 
@@ -583,7 +585,7 @@ function LevelLibrary({ onWin, onHome }) {
     const ready = tried.length >= 2;
 
     return React.createElement('div', { className: 'lb' },
-      React.createElement(TopBar, { level: 4, title: 'Библиотекарь', onHome, step: 0, total: 3 }),
+      React.createElement(TopBar, { level: LV_NO, title: 'Библиотекарь', onHome, step: 0, total: 3 }),
       React.createElement('div', { className: 'lbbody' },
         React.createElement('div', { className: 'lbask' },
           React.createElement('div', { className: 'lbask__w' }, 'читатель'),
@@ -661,7 +663,7 @@ function LevelLibrary({ onWin, onHome }) {
     };
 
     return React.createElement('div', { className: 'lb' },
-      React.createElement(TopBar, { level: 4, title: 'Библиотекарь', onHome, step: 1, total: 3 }),
+      React.createElement(TopBar, { level: LV_NO, title: 'Библиотекарь', onHome, step: 1, total: 3 }),
       React.createElement('div', { className: 'lbbody' },
         React.createElement('div', { className: 'lbsay' },
           React.createElement('i', null, NKM(drop ? (ok ? 'win' : 'think') : 'hello', 30)),
@@ -739,7 +741,7 @@ function LevelLibrary({ onWin, onHome }) {
     const wantBook = LB_BOOKS.find(b => b.id === ask.want);
 
     return React.createElement('div', { className: 'lb' },
-      React.createElement(TopBar, { level: 4, title: 'Библиотекарь', onHome, step: 2, total: 3 }),
+      React.createElement(TopBar, { level: LV_NO, title: 'Библиотекарь', onHome, step: 2, total: 3 }),
       React.createElement('div', { className: 'lbbody' },
         React.createElement('div', { className: 'lbask' },
           React.createElement('div', { className: 'lbask__w' }, 'читатель ' + (ai + 1) + ' из ' + LB_ASK.length),
@@ -812,7 +814,7 @@ function LevelLibrary({ onWin, onHome }) {
     ]);
     const both = q1 !== null && o1[q1].ok && q2 !== null && o2[q2].ok;
     return React.createElement('div', { className: 'lb' },
-      React.createElement(TopBar, { level: 4, title: 'Библиотекарь', onHome, step: 2, total: 3 }),
+      React.createElement(TopBar, { level: LV_NO, title: 'Библиотекарь', onHome, step: 2, total: 3 }),
       React.createElement('div', { className: 'lbbody' },
         React.createElement('div', { className: 'lbq' },
           React.createElement('div', { className: 'lbq__t' }, 'Почему каталог не нашёл книгу про зверя, который спит зимой?'),
@@ -847,7 +849,7 @@ function LevelLibrary({ onWin, onHome }) {
   /* ── финал ── */
   if (phase === 'done') {
     return React.createElement('div', { className: 'lb' },
-      React.createElement(TopBar, { level: 4, title: 'Библиотекарь', onHome, step: 3, total: 3 }),
+      React.createElement(TopBar, { level: LV_NO, title: 'Библиотекарь', onHome, step: 3, total: 3 }),
       React.createElement('div', { className: 'lbbody lbdone' },
         React.createElement('div', { className: 'lblaw' },
           React.createElement('b', null, 'Похожее лежит рядом'),
@@ -867,7 +869,7 @@ function LevelLibrary({ onWin, onHome }) {
 
   /* ── заставка ── */
   return React.createElement('div', { className: 'lb' },
-    React.createElement(TopBar, { level: 4, title: 'Библиотекарь', onHome, step: 0, total: 3 }),
+    React.createElement(TopBar, { level: LV_NO, title: 'Библиотекарь', onHome, step: 0, total: 3 }),
     React.createElement(IntroModal, {
       emoji: NKM('hello', 88),
       title: 'Библиотекарь',

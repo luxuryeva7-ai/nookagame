@@ -6124,7 +6124,7 @@ function PromptGameMech({ room, onDone }) {
         background:'#051a05',border:'2px solid #44cc8844',borderRadius:12,
         padding:'12px 16px',fontSize:13,color:'#CCDDEE',lineHeight:1.5,textAlign:'center',width:'100%'
       }},
-        '💡 Чувствуешь разницу? Лучший промпт = лучший результат!\nТак работает ИИ — он делает ровно то, что ты попросил. Попроси точнее — получишь чудо! ✨'
+        '💡 Чувствуешь разницу? Лучший промпт = лучший результат!\nТак работает ИИ — он делает ровно то, о чём попросили. Попроси точнее — получишь чудо! ✨'
       ),
       /*#__PURE__*/React.createElement('button',{
         onClick:()=>onDone(total*3+50,100),
@@ -6599,7 +6599,7 @@ function AutopilotMech({ room, onDone }) {
     React.createElement('div',{style:{fontSize:11,lineHeight:1.6,marginBottom:6,padding:'8px 10px',background:'#0A0800',borderRadius:8,borderLeft:'3px solid #FFD700'}},
       React.createElement('div',{style:{color:'#FFD700',marginBottom:4,fontWeight:700}},'🧠 Что не так на этот раз?'),
       React.createElement('div',{style:{color:'#CC9933'}},
-        'Ты добавил «объезжай», и рамка загоралась ',React.createElement('strong',{style:{color:'#44FF88'}},'зелёным'),
+        'Появилось «объезжай» — и рамка загоралась ',React.createElement('strong',{style:{color:'#44FF88'}},'зелёным'),
         ' — ИИ успешно уворачивался! Но про топливо ты снова забыл.',React.createElement('br',null),
         'ИИ делает только то, что написано в промпте. Нет правила — нет действия.'
       )
@@ -6941,7 +6941,7 @@ const INIT_CELLS = [
   {r:1,c:1,type:'straight',rot:0,solRot:1,fixed:false, info:{em:'🔢',name:'КУСОЧКИ',   color:'#a855f7',fact:'Сначала фразу режут на кусочки: «кот» — кусочек, «спит» — кусочек. Целую фразу я не вижу.'}},
   {r:0,c:1,type:'corner',  rot:3,solRot:1,fixed:false, info:{em:'🧮',name:'ЧИСЛА',     color:'#ef476f',fact:'Каждый кусочек становится числами. Слов я не понимаю совсем — только числа.'}},
   {r:0,c:2,type:'corner',  rot:0,solRot:2,fixed:false, info:{em:'🧠',name:'ЧТО ГЛАВНОЕ',color:'#ff6b35',fact:'Я смотрю на все кусочки сразу и решаю, какие из них главные для ответа. Как ты в задаче: сначала ищешь, что важно, а что можно пропустить.'}},
-  {r:1,c:2,type:'corner',  rot:2,solRot:0,fixed:false, info:{em:'📈',name:'НЕЙРОНЫ',   color:'#118ab2',fact:'Числа идут через нейроны — такие же, как тот один, что ты настраивал кранами.'}},
+  {r:1,c:2,type:'corner',  rot:2,solRot:0,fixed:false, info:{em:'📈',name:'НЕЙРОНЫ',   color:'#118ab2',fact:'Числа идут через нейроны — такие же, как тот один, с двумя кранами.'}},
   {r:1,c:3,type:'corner',  rot:0,solRot:2,fixed:false, info:{em:'🔄',name:'ДОГАДКА',   color:'#e040fb',fact:'Я угадываю следующее слово, потом ещё одно — как продолжал твою мелодию в Диджее.'}},
   {r:2,c:3,type:'corner',  rot:0,solRot:0,fixed:true,  info:{em:'💬',name:'ОТВЕТ',     color:'#ffd166',fact:'Ответ готов. Весь путь занял около секунды — и так каждый раз.'}},
   {r:0,c:0,type:'tee',   rot:1,solRot:1,fixed:false,info:null},
@@ -7318,7 +7318,7 @@ function CpuAssembly({onDone}){
       )
     ),
     !done&&React.createElement('div',{style:{textAlign:'center',fontSize:11,color:C.textDim,marginBottom:8}},
-      nextIdx===0?'Что происходит первым, когда ты написал вопрос?':
+      nextIdx===0?'Что происходит первым, когда вопрос написан?':
       nextIdx===4?'Остался последний шаг':'А что дальше?'
     ),
     !done&&React.createElement('div',{style:{display:'flex',flexWrap:'wrap',gap:7,justifyContent:'center',marginBottom:8}},
@@ -8337,7 +8337,7 @@ function BiasMech({
         lineHeight: 1.5,
         marginBottom: 8
       }
-    }, win ? 'Нейро узнал всех котов! Ты дал ему разнообразные примеры.' : 'Нейро узнал ' + (BIAS_TESTS.length - failed.length) + ' из ' + BIAS_TESTS.length + '. Он решил, что кот — это только то, что ты ему показал.'), !win && /*#__PURE__*/React.createElement("div", {
+    }, win ? 'Нейро узнал всех котов! Разные примеры сработали.' : 'Нейро узнал ' + (BIAS_TESTS.length - failed.length) + ' из ' + BIAS_TESTS.length + '. Он решил, что кот — это только то, что ты ему показал.'), !win && /*#__PURE__*/React.createElement("div", {
       style: {
         display: 'flex',
         gap: 8,
@@ -8596,7 +8596,7 @@ const MODULES = [{
       icon: "🔍",
       text: "Телефон исправляет ошибки при наборе",
       isAI: true,
-      why: "Когда телефон сам исправляет слово — это ИИ! Он угадывает, что ты хотел написать, даже если ошибся"
+      why: "Когда телефон сам исправляет слово — это ИИ! Он угадывает, какое слово хотели написать, даже с ошибкой"
     }, {
       icon: "🌡️",
       text: "Обычный градусник",

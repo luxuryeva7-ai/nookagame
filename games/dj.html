@@ -115,6 +115,8 @@
 <script src="nooka-gallery.js"></script>
 <script src="nooka-ui.js"></script>
 <script>
+/* Номер в шапке — из реестра: порядок уровней в игре меняли, а числа в коде отстали */
+const LV_NO = (window.nookaLevels && window.nookaLevels.numberOf('in7')) || 7;
 /* ============================================================
    ДИДЖЕЙ — уровень 5 игры «Как применять ИИ в жизни».
 
@@ -346,7 +348,7 @@ function LevelDj({ onWin, onHome }) {
   /* ── финал ── */
   if (phase === 'done') {
     return React.createElement('div', { className: 'dj' },
-      React.createElement(TopBar, { level: 7, title: 'Диджей', onHome, step: 1, total: 1 }),
+      React.createElement(TopBar, { level: LV_NO, title: 'Диджей', onHome, step: 1, total: 1 }),
       React.createElement('div', { className: 'djbody djdone' },
         /* по карточке можно постучать и послушать, что вышло */
         React.createElement('div', {
@@ -397,7 +399,7 @@ function LevelDj({ onWin, onHome }) {
     ]);
     const both = q1 !== null && o1[q1].ok && q2 !== null && o2[q2].ok;
     return React.createElement('div', { className: 'dj' },
-      React.createElement(TopBar, { level: 7, title: 'Диджей', onHome, step: 1, total: 1 }),
+      React.createElement(TopBar, { level: LV_NO, title: 'Диджей', onHome, step: 1, total: 1 }),
       React.createElement('div', { className: 'djbody' },
         React.createElement('div', { className: 'djq' },
           React.createElement('div', { className: 'djq__t' }, 'На смелости «как чаще» мелодия начала топтаться: две ноты по кругу. Почему?'),
@@ -434,7 +436,7 @@ function LevelDj({ onWin, onHome }) {
   const seq = mine.concat(tail);
   const nowNote = at >= 0 && at < seq.length ? seq[at] : -1;
   return React.createElement('div', { className: 'dj' },
-    React.createElement(TopBar, { level: 7, title: 'Диджей', onHome, step: 1, total: 1 }),
+    React.createElement(TopBar, { level: LV_NO, title: 'Диджей', onHome, step: 1, total: 1 }),
 
     phase === 'intro' && React.createElement(IntroModal, {
       emoji: NKM('hello', 88),

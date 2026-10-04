@@ -338,7 +338,7 @@ function LevelPrivate({ onWin, onHome }) {
   if (phase === 'done') {
     const safe = kept.length === 0;
     return React.createElement('div', { className: 'pv' },
-      React.createElement(TopBar, { level: LV_NO, title: 'Что не говорить ИИ', onHome, step: 1, total: 1 }),
+      React.createElement(TopBar, { level: LV_NO, title: 'Что не рассказывать ИИ', onHome, step: 1, total: 1 }),
       React.createElement('div', { className: 'pvbody pvdone' },
         React.createElement(PvCard, { kept: kept, safe: safe }),
         React.createElement('div', { className: 'pvlaw' },
@@ -382,7 +382,7 @@ function LevelPrivate({ onWin, onHome }) {
     ]);
     const both = q1 !== null && o1[q1].ok && q2 !== null && o2[q2].ok;
     return React.createElement('div', { className: 'pv' },
-      React.createElement(TopBar, { level: LV_NO, title: 'Что не говорить ИИ', onHome, step: 1, total: 1 }),
+      React.createElement(TopBar, { level: LV_NO, title: 'Что не рассказывать ИИ', onHome, step: 1, total: 1 }),
       React.createElement('div', { className: 'pvbody' },
         React.createElement('div', { className: 'pvq' },
           React.createElement('div', { className: 'pvq__t' }, 'Помощник был вежливый и правда помогал. Почему адрес ему говорить не стоило?'),
@@ -415,7 +415,7 @@ function LevelPrivate({ onWin, onHome }) {
   /* ── переписка ── */
   const shown = log.slice(-4);
   return React.createElement('div', { className: 'pv' },
-    React.createElement(TopBar, { level: LV_NO, title: 'Что не говорить ИИ', onHome, step: 1, total: 1 }),
+    React.createElement(TopBar, { level: LV_NO, title: 'Что не рассказывать ИИ', onHome, step: 1, total: 1 }),
 
     phase === 'intro' && React.createElement(IntroModal, {
       emoji: NKM('hello', 88),

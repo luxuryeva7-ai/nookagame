@@ -132,6 +132,8 @@
 <script src="nooka-gallery.js"></script>
 <script src="nooka-ui.js"></script>
 <script>
+/* Номер в шапке — из реестра: порядок уровней в игре меняли, а числа в коде отстали */
+const LV_NO = (window.nookaLevels && window.nookaLevels.numberOf('in1')) || 1;
 /* ============================================================
    ОДИН НЕЙРОН — уровень 2 игры «Как применять ИИ в жизни».
 
@@ -285,7 +287,7 @@ function LevelNeuron({ onWin, onHome }) {
   /* ── финал ── */
   if (phase === 'done') {
     return React.createElement('div', { className: 'nn' },
-      React.createElement(TopBar, { level: 1, title: 'Один нейрон', onHome, step: 1, total: 1 }),
+      React.createElement(TopBar, { level: LV_NO, title: 'Один нейрон', onHome, step: 1, total: 1 }),
       React.createElement('div', { className: 'nnbody nndone' },
         React.createElement('svg', { viewBox: '0 0 200 220', className: 'nncard' },
           React.createElement('rect', { x: 10, y: 8, width: 180, height: 204, rx: 20,
@@ -323,7 +325,7 @@ function LevelNeuron({ onWin, onHome }) {
       { t: 'Нейро запомнил всех котов по именам', ok: false },
     ]);
     return React.createElement('div', { className: 'nn' },
-      React.createElement(TopBar, { level: 1, title: 'Один нейрон', onHome, step: 1, total: 1 }),
+      React.createElement(TopBar, { level: LV_NO, title: 'Один нейрон', onHome, step: 1, total: 1 }),
       React.createElement('div', { className: 'nnbody' },
         React.createElement('div', { className: 'nnq' },
           React.createElement('div', { className: 'nnq__t' }, 'Почему Нейро стал узнавать котов?'),
@@ -346,7 +348,7 @@ function LevelNeuron({ onWin, onHome }) {
 
   /* ── игра ── */
   return React.createElement('div', { className: 'nn' },
-    React.createElement(TopBar, { level: 1, title: 'Один нейрон', onHome, step: 1, total: 1 }),
+    React.createElement(TopBar, { level: LV_NO, title: 'Один нейрон', onHome, step: 1, total: 1 }),
 
     phase === 'intro' && React.createElement(IntroModal, {
       emoji: NKM('hello', 88),
