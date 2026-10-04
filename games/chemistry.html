@@ -803,7 +803,7 @@ function ChHomeCard({ done }) {
   const [sel, setSel] = useState(null);
   return h('div', { style: { width: '100%', maxWidth: 340, background: 'rgba(255,255,255,.92)', borderRadius: 22, padding: '12px 12px', marginBottom: 14, boxSizing: 'border-box', boxShadow: '0 6px 0 rgba(45,27,69,.08)' } },
     h('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', fontFamily: 'var(--ak-display)', fontSize: 15, color: 'var(--ak-ink)', marginBottom: 4, padding: '0 4px' } },
-      h('span', null, '🧪 Полка зелий'), h('span', { style: { fontSize: 12, color: 'var(--ak-ink-3)' } }, `зелий: ${done.size} из 10`)),
+      h('span', null, '🧪 Полка зелий'), h('span', { style: { fontSize: 12, color: 'var(--ak-ink-3)' } }, `зелий: ${CH_FLASKS.filter((_, i) => done.has(i + 1)).length} из ${CH_FLASKS.length}`)),
     h('svg', { viewBox: '0 0 340 116', style: { width: '100%', display: 'block' }, onClick: e => { const r = e.currentTarget.getBoundingClientRect(), x = (e.clientX - r.left) * 340 / r.width, y = (e.clientY - r.top) * 116 / r.height; const i = Math.round((x - 34) / 68) + (y > 58 ? 5 : 0); if (i >= 0 && i < 10) setSel(i === sel ? null : i); } },
       [50, 106].map(y => h('rect', { key: y, x: 4, y, width: 332, height: 6, rx: 3, fill: '#E8C597' })),
       CH_FLASKS.map((c, i) => h(ChFlask, { key: i, x: 34 + (i % 5) * 68, y: i < 5 ? 46 : 102, col: c, n: i + 1, on: done.has(i + 1), sel: sel === i }))),
@@ -2033,9 +2033,148 @@ function Level10Atoms({ onWin, onHome }) {
     }));
 }
 
+/* ══════════════════════════════════════════════════════════════
+   УРОВЕНЬ 11 — Машина температур (прежний уровень 1 Хемо Лаба, возвращён
+   по просьбе Артёма 05.10.2026: «верни, лишним не будет, даже если повтор»).
+   Как было: частички на экране, градусник, цветной ползунок −30…130 °C,
+   пять заданий (лёд, вода, пар, тёплая вода, шоколад) с фактом после каждого.
+   Поправлено по разбору: нет подсказки «нужно от … до …» — 0 и 100 ребёнок
+   находит сам, глядя на частички; каждое задание начинается с нужного
+   вещества (лёд — холодным, кипяток — горячим); «молекулы» → «частички».
+   ══════════════════════════════════════════════════════════════ */
+const C11_MISSIONS = [
+  { goal: 'Заморозь воду!', substance: 'Вода 💧', start: 20, min: -30, max: -1, reward: '🧊 Готово! Лёд!',
+    fact: 'При 0 °C вода замерзает. Частички замедляются и встают ровными рядами — получается лёд.' },
+  { goal: 'Растопи лёд — сделай жидкой водой', substance: 'Лёд 🧊', start: -15, min: 1, max: 60, reward: '💧 Вода течёт!',
+    fact: 'Выше 0 °C частички начинают скользить друг мимо друга — это жидкость.' },
+  { goal: 'Вскипяти воду!', substance: 'Вода 💧', start: 20, min: 100, max: 130, reward: '♨️ Кипит!',
+    fact: 'При 100 °C частички так разгоняются, что вырываются в воздух — это пар!' },
+  { goal: 'Охлади кипяток до тёплой воды: 35–40 °C', substance: 'Кипяток ♨️', start: 110, min: 35, max: 40, reward: '☕ Идеально!', hint: true,
+    fact: 'Температура тела человека — около 36,6 °C. Вода такой температуры кажется ни тёплой, ни холодной.' },
+  { goal: 'Растопи шоколад!', substance: 'Шоколад 🍫', start: 20, min: 34, max: 60, reward: '🍫 Растаял!', choc: true,
+    fact: 'Шоколад плавится при 32–34 °C — почти температура рук! Поэтому тает в ладонях.' }
+];
+const c11Phase = (m, t) => m.choc ? (t < 34 ? 'solid' : 'liquid') : t < 0 ? 'solid' : t < 100 ? 'liquid' : 'gas';
+function c11Color(t) {
+  if (t <= 0) return '#60B5E8';
+  if (t >= 100) return '#FF6B35';
+  const k = t / 100;
+  return `rgb(${Math.round(96 + k * 159)},${Math.round(181 - k * 74)},${Math.round(232 - k * 179)})`;
+}
+function C11Particles({ tempRef, mission }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const cv = ref.current; if (!cv) return;
+    const W = cv.width, H = cv.height, ctx = cv.getContext('2d');
+    const small = window.innerWidth < 600, N = small ? 25 : 35, cols = small ? 5 : 7, rows = Math.ceil(N / cols) - 1 || 1;
+    const SOLID = mission.choc ? '#8B4513' : '#A8D8FF', LIQUID = mission.choc ? '#D2691E' : '#7BD9A8', GAS = '#FFD262';
+    const ps = Array.from({ length: N }, (_, i) => {
+      const bx = 20 + (i % cols) * (W - 40) / (cols - 1), by = 20 + Math.floor(i / cols) * (H - 40) / rows;
+      return { x: bx, y: by, bx, by, vx: (Math.random() - 0.5) * 2, vy: (Math.random() - 0.5) * 2 };
+    });
+    let id, last = null, bg = null;
+    const draw = () => {
+      const t = tempRef.current, ph = c11Phase(mission, t);
+      ctx.clearRect(0, 0, W, H);
+      if (ph !== last) {
+        bg = ctx.createLinearGradient(0, 0, 0, H);
+        const [a, b] = ph === 'solid' ? ['#E8F4FF', '#C8E8FF'] : ph === 'gas' ? ['#FFF8E0', '#FFE8B0'] : ['#E8FFF4', '#C8F0DC'];
+        bg.addColorStop(0, a); bg.addColorStop(1, b); last = ph;
+      }
+      ctx.fillStyle = bg; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(0, 0, W, H, 16) : ctx.rect(0, 0, W, H); ctx.fill();
+      const speed = ph === 'solid' ? 0.3 : ph === 'gas' ? 2 + (t - 100) * 0.04 : 0.4 + t * 0.012;
+      const col = ph === 'solid' ? SOLID : ph === 'liquid' ? LIQUID : GAS, r = ph === 'gas' ? 4 : 5;
+      if (ph === 'solid') {                                       // во льду частички держатся друг за друга
+        ctx.strokeStyle = SOLID + '55'; ctx.lineWidth = 1; ctx.beginPath();
+        ps.forEach((p, i) => {
+          const nx = ps[i + 1], dn = ps[i + cols];
+          if (nx && i % cols < cols - 1) { ctx.moveTo(p.x, p.y); ctx.lineTo(nx.x, nx.y); }
+          if (dn) { ctx.moveTo(p.x, p.y); ctx.lineTo(dn.x, dn.y); }
+        });
+        ctx.stroke();
+      }
+      ps.forEach(p => {
+        if (ph === 'solid') { p.x = p.bx + (Math.random() - 0.5) * 2; p.y = p.by + (Math.random() - 0.5) * 2; }
+        else {
+          p.x += p.vx * speed; p.y += p.vy * speed;
+          if (p.x < 8) { p.x = 8; p.vx = Math.abs(p.vx); } if (p.x > W - 8) { p.x = W - 8; p.vx = -Math.abs(p.vx); }
+          if (p.y < 8) { p.y = 8; p.vy = Math.abs(p.vy); } if (p.y > H - 8) { p.y = H - 8; p.vy = -Math.abs(p.vy); }
+        }
+        ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.fillStyle = col; ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,0.55)'; ctx.lineWidth = 1.2; ctx.stroke();
+        ctx.beginPath(); ctx.arc(p.x - r * 0.3, p.y - r * 0.3, r * 0.3, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,0.7)'; ctx.fill();
+      });
+      if (ph === 'gas') {                                         // струйки пара
+        const ts = Date.now() * 0.001; ctx.strokeStyle = 'rgba(255,210,98,0.35)'; ctx.lineWidth = 2;
+        for (let i = 0; i < 2; i++) { const sx = 60 + i * 140; ctx.beginPath(); ctx.moveTo(sx, H); ctx.bezierCurveTo(sx + Math.sin(ts + i) * 12, H * 0.6, sx - Math.sin(ts + i) * 12, H * 0.3, sx, 0); ctx.stroke(); }
+      }
+      id = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(id);
+  }, [mission]);
+  return h('canvas', { ref, width: 280, height: 175, style: { borderRadius: 16, display: 'block', margin: '0 auto', flexShrink: 0, maxWidth: '100%', boxShadow: '0 4px 0 rgba(45,27,69,.08),0 8px 20px -6px rgba(45,27,69,.12)' } });
+}
+function Level11TempMachine({ onWin, onHome }) {
+  const [phase, setPhase] = useState('intro');                   // intro | play | win
+  const [mi, setMi] = useState(0);
+  const m = C11_MISSIONS[mi];
+  const tempRef = useRef(m.start);
+  const [temp, setTemp] = useState(m.start);
+  const raf = useRef(null);
+  const [cheer, setCheer] = useState(false);
+  const ph = c11Phase(m, temp), inRange = temp >= m.min && temp <= m.max, tc = c11Color(temp);
+  const onSlide = e => {
+    tempRef.current = Number(e.target.value);
+    if (!raf.current) raf.current = requestAnimationFrame(() => { setTemp(tempRef.current); raf.current = null; });
+  };
+  const next = () => {
+    setCheer(false);
+    if (mi + 1 >= C11_MISSIONS.length) { setPhase('win'); return; }
+    const n = C11_MISSIONS[mi + 1]; tempRef.current = n.start; setTemp(n.start); setMi(mi + 1);
+  };
+  const LABEL = { solid: 'ТВЁРДОЕ 🧱', liquid: 'ЖИДКОЕ 💧', gas: 'ГАЗ 💨' }, PCOL = { solid: '#7C5FE0', liquid: '#3CA876', gas: '#D4A22B' };
+  return h(LbShell, { n: 11, title: 'Машина температур', step: mi, total: C11_MISSIONS.length, onHome },
+    phase === 'intro' && h(IntroModal, {
+      emoji: '🌡️', title: 'Машина температур', task: 'Двигай ползунок температуры и смотри, что делают частички. Сделай лёд, воду, пар — и растопи шоколад.',
+      tip: 'Подсказок «сколько градусов» не будет: смотри на частички, они всё покажут', onStart: () => { SFX.pop(); setPhase('play'); }
+    }),
+    phase !== 'intro' && h(LbBody, null,
+      h(TaskBadge, null, m.goal),
+      h('div', { style: { fontFamily: 'var(--ak-display)', fontWeight: 700, fontSize: 14, color: 'var(--ak-ink-2)' } }, 'Вещество: ', m.substance),
+      h(C11Particles, { tempRef, mission: m }),
+      h('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, width: '100%', maxWidth: 340, flexShrink: 0 } },
+        h('div', { style: { padding: '10px 18px', borderRadius: 999, background: PCOL[ph], color: '#fff', fontFamily: 'var(--ak-display)', fontWeight: 700, fontSize: 14, boxShadow: '0 4px 0 rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.3)', transition: 'background .5s' } }, LABEL[ph]),
+        h('div', { style: { display: 'flex', alignItems: 'center', gap: 10 } },
+          h('div', { style: { width: 28, height: 80, background: 'rgba(45,27,69,.08)', borderRadius: 14, position: 'relative', overflow: 'hidden', boxShadow: 'inset 0 2px 4px rgba(45,27,69,.15)' } },
+            h('div', { style: { position: 'absolute', bottom: 0, left: 0, right: 0, height: `${Math.max(5, (temp + 30) / 160 * 100)}%`, background: tc, borderRadius: 14, transition: 'height .2s, background .2s' } })),
+          h('div', { style: { fontFamily: 'var(--ak-display)', fontWeight: 700, fontSize: 32, color: tc, transition: 'color .2s', minWidth: 84, textAlign: 'right' } }, temp, '°C'))),
+      h('div', { style: { width: '100%', maxWidth: 340, flexShrink: 0, padding: '6px 4px 0', boxSizing: 'border-box' } },
+        h('div', { style: { position: 'relative', borderRadius: 999, background: 'linear-gradient(90deg,#60B5E8 0%,#7BD9A8 40%,#FFD262 70%,#FF6B35 100%)', height: 18, boxShadow: 'inset 0 2px 4px rgba(45,27,69,.2)' } },
+          h('input', { type: 'range', min: -30, max: 130, value: temp, onChange: onSlide, 'aria-label': 'Температура', style: { position: 'absolute', inset: '-10px 0', width: '100%', opacity: 0, height: 'calc(100% + 20px)', cursor: 'pointer', zIndex: 2, margin: 0 } }),
+          h('div', { style: { position: 'absolute', left: `calc(${(temp + 30) / 160 * 100}% - 18px)`, top: '50%', transform: 'translateY(-50%)', width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(180deg,#fff 0%,#FFF7E8 100%)', boxShadow: '0 4px 0 rgba(45,27,69,.15),0 8px 18px -6px rgba(45,27,69,.2),inset 0 2px 0 rgba(255,255,255,.95)', pointerEvents: 'none' } })),
+        h('div', { style: { display: 'flex', justifyContent: 'space-between', marginTop: 8, fontFamily: 'var(--ak-display)', fontSize: 11, color: 'var(--ak-ink-3)', fontWeight: 600 } },
+          h('span', null, '❄️ холодно'), h('span', null, 'горячо 🔥'))),
+      h('div', { style: { textAlign: 'center', fontFamily: 'var(--ak-display)', fontSize: 13, color: inRange ? '#2BA873' : 'var(--ak-ink-3)', fontWeight: 700, transition: 'color .3s', flexShrink: 0 } },
+        inRange ? '✅ Получилось!' : m.hint ? `Нужно: от ${m.min} до ${m.max} °C` : 'Смотри на частички'),
+      h('button', { className: 'ak-btn ak-btn--cta', style: { width: '100%', maxWidth: 340, flexShrink: 0, opacity: inRange ? 1 : 0.4, transition: 'opacity .3s' }, disabled: !inRange, onClick: () => { if (inRange) { SFX.ok(); setCheer(true); } } }, m.reward, ' Принять!')),
+    cheer && h('div', { style: { position: 'absolute', inset: 0, background: 'rgba(45,27,69,.5)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 150, padding: '0 24px' } },
+      h('div', { className: 'ak-pop', style: { background: '#fff', borderRadius: 28, padding: '28px 22px', textAlign: 'center', boxShadow: '0 12px 0 rgba(60,168,118,.18),0 24px 48px -12px rgba(45,27,69,.25)', maxWidth: 320, width: '100%' } },
+        h('div', { style: { fontSize: 56, marginBottom: 12, lineHeight: 1 } }, m.reward.split(' ')[0]),
+        h('div', { style: { fontFamily: 'var(--ak-display)', fontWeight: 700, fontSize: 22, color: 'var(--ak-ink)', marginBottom: 10 } }, m.reward.split(' ').slice(1).join(' ')),
+        h('div', { style: { fontSize: 14, lineHeight: 1.55, color: 'var(--ak-ink-2)', fontWeight: 500, marginBottom: 20 } }, m.fact),
+        h('button', { className: 'ak-btn ak-btn--ok', style: { width: '100%' }, onClick: next }, mi < C11_MISSIONS.length - 1 ? 'Следующая задача →' : 'Финиш! 🎉'))),
+    phase === 'win' && h(WinModal, {
+      title: 'Лаборант года! 🔬',
+      law: 'Тепло разгоняет частички: стоят рядами — лёд, скользят — вода, разлетаются — пар',
+      fact: 'В горах вода закипает раньше 100 °C: на вершине Эвереста — примерно при 70 °C. Поэтому там трудно сварить макароны.',
+      onNext: onWin, onHome
+    }));
+}
+
 /* ── настройки игры для общего ядра ─────────────────────── */
 const LAB = {
-  key: 'chem', name: 'Хемо Лаб', subject: 'Химия', emoji: '🧪', free: 10,
+  key: 'chem', name: 'Хемо Лаб', subject: 'Химия', emoji: '🧪', free: 11,
   book: 'Журнал опытов', bookShort: 'журнал', bookEmoji: '📓',
   wall: '', sceneBg: '#F6FBF8', sceneDeco: chDeco, homeCard: ChHomeCard
 };
@@ -2060,7 +2199,9 @@ const LB_LEVELS = [
   { C: chC('Level9Gas'), t: 'Газ можно налить', emoji: '🫗', sub: 'Невидимый газ гасит свечи', aga: 'Газ — тоже вещество. Газ из соды и уксуса тяжелее воздуха и копится снизу.',
     bet: { q: 'Можно ли налить газ, как воду из кувшина?', opts: ['Нет, газ всегда улетает вверх', 'Да, если газ тяжелее воздуха', 'Газ не видно — значит, нельзя'], ok: 1 } },
   { C: chC('Level10Atoms'), t: 'Конструктор молекул', emoji: '⚛️', sub: 'Из чего всё сделано', aga: 'Всё собрано из крошечных шариков. Те же шарики, собранные по-разному, — разные вещества.',
-    bet: { q: 'Из чего сделана вода?', opts: ['Ни из чего — она сплошная', 'Из крошечных шариков', 'Из маленьких капелек'], ok: 1 } }
+    bet: { q: 'Из чего сделана вода?', opts: ['Ни из чего — она сплошная', 'Из крошечных шариков', 'Из маленьких капелек'], ok: 1 } },
+  { C: chC('Level11TempMachine'), t: 'Машина температур', emoji: '🌡️', sub: 'Как тепло двигает частички', aga: 'Тепло разгоняет частички: стоят рядами — лёд, скользят — вода, разлетаются — пар.',
+    bet: { q: 'Воду нагревают. Что происходит с её частичками?', opts: ['Двигаются быстрее', 'Раздуваются, как воздушные шарики', 'Ничего — просто вода теплеет'], ok: 0 } }
 ];
 const LB_QUIZ = {
   1: [{ q: 'Кастрюля с водой кипит на огне. Что показывает градусник, пока вода не выкипела?',
@@ -2142,7 +2283,15 @@ const LB_QUIZ = {
   { q: 'Воду разобрали током. Что получилось?',
     opts: [{ t: 'Два разных газа', ok: true }, { t: 'Пар' }, { t: 'Ничего' }],
     yes: 'Верно. Водород и кислород.',
-    no: 'Ток разбирает воду на два газа — водород и кислород.' }]
+    no: 'Ток разбирает воду на два газа — водород и кислород.' }],
+  11: [{ q: 'Чем лёд отличается от пара?',
+    opts: [{ t: 'Это одна и та же вода, только частички двигаются по-разному', ok: true }, { t: 'Это разные вещества' }, { t: 'Пар — это дым' }],
+    yes: 'Да. Во льду частички стоят, в воде скользят, в паре разлетаются.',
+    no: 'Лёд, вода и пар — одно вещество. Разница в том, как двигаются частички.' },
+  { q: 'Что нужно, чтобы лёд стал водой?',
+    opts: [{ t: 'Нагреть', ok: true }, { t: 'Охладить' }, { t: 'Посолить' }],
+    yes: 'Верно. Тепло расшевеливает частички.',
+    no: 'От холода лёд не растает. Нужно тепло — оно расшевелит частички.' }]
 };
 ReactDOM.createRoot(document.getElementById('root')).render(h(LbApp));
 </script>

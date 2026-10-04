@@ -203,7 +203,7 @@
 
   /* бонусные игры — вне курса ИИ-грамотности, идут вторым рядом */
   var EXTRA = [
-    { key: 'chem',   name: 'Хемо Лаб', sub: 'Химия',            total: 10, href: '../games/chemistry.html' },
+    { key: 'chem',   name: 'Хемо Лаб', sub: 'Химия',            total: 11, href: '../games/chemistry.html' },
     { key: 'phys',   name: 'КвантУм',  sub: 'Физика',           total: 11, href: '../games/physics.html' },
     { key: 'code',   name: 'КодБот',   sub: 'Программирование', total: 10, href: '../games/code.html' },
     /* платные: бесплатны два уровня, остальное проверяет сама игра через nooka-access */
