@@ -203,9 +203,13 @@
 
   /* бонусные игры — вне курса ИИ-грамотности, идут вторым рядом */
   var EXTRA = [
-    { key: 'chem',   name: 'Хемо Лаб', sub: 'Химия',            total: 6, href: '../games/chemistry.html' },
-    { key: 'phys',   name: 'КвантУм',  sub: 'Физика',           total: 6, href: '../games/physics.html' },
-    { key: 'code',   name: 'КодБот',   sub: 'Программирование', total: 3, href: '../games/code.html' }
+    { key: 'chem',   name: 'Хемо Лаб', sub: 'Химия',            total: 10, href: '../games/chemistry.html' },
+    { key: 'phys',   name: 'КвантУм',  sub: 'Физика',           total: 10, href: '../games/physics.html' },
+    { key: 'code',   name: 'КодБот',   sub: 'Программирование', total: 10, href: '../games/code.html' },
+    /* платные: бесплатны два уровня, остальное проверяет сама игра через nooka-access */
+    { key: 'space',  name: 'КосмоПорт', sub: 'Астрономия',      total: 10, href: '../games/space.html' },
+    { key: 'robo',   name: 'РобоЛаб',   sub: 'Робототехника',   total: 10, href: '../games/robo.html' },
+    { key: 'bio',    name: 'БиоМир',    sub: 'Биология',        total: 10, href: '../games/bio.html' }
   ];
 
   /* ── прогресс ─────────────────────────────────────────────

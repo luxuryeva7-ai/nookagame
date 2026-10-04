@@ -357,7 +357,8 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
 .cc-st svg{width:13px;height:13px;flex:none}
 .cc-st--free{color:#0C2A1E;background:#5FE3A6;box-shadow:0 6px 16px -6px rgba(0,0,0,.55)}
 .cc-st--lock{color:#FFE7AE;background:rgba(18,12,34,.9);box-shadow:inset 0 0 0 1px rgba(255,216,77,.5)}
-.cc-shot--lock img{filter:saturate(.5) brightness(.62)}
+/* платные — чуть приглушены, но рендер должен манить: замок и так показан биркой */
+.cc-shot--lock img{filter:saturate(.85) brightness(.82)}
 .cc-shot--lock::before{content:'';position:absolute;inset:0;z-index:1;
   background:linear-gradient(180deg,rgba(12,8,24,.34),rgba(12,8,24,.06))}
 .cc-no{color:var(--t)}
@@ -537,7 +538,7 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
   <section class="wrap section" id="subjects">
     <div class="nk-chip sec-head-chip">Ещё игры</div>
     <h2 class="nk-t-h1 sec-h">Науки, которые <span>можно потрогать</span></h2>
-    <p class="nk-t-body sec-sub">Физика, химия и программирование уже открыты. Остальные миры в работе, они войдут в годовой доступ по мере выхода.</p>
+    <p class="nk-t-body sec-sub">Физика, химия и программирование — бесплатно. КосмоПорт, РобоЛаб и БиоМир — первые два уровня бесплатно, дальше по доступу. Остальные миры в работе и войдут в годовой доступ.</p>
     <div class="grid-cards" id="planets"></div>
   </section>
 
@@ -659,15 +660,15 @@ var WAITLIST_URL = 'https://t.me/NookaGame';
   /* Адрес на главной не нужен: он есть в оферте, а номер дома посторонним ни к чему */
   el.innerHTML = R.seller + ' · ИНН ' + R.inn + ' · ОГРНИП ' + R.ogrnip +
     (R.email ? ' · <a href="mailto:' + R.email + '">' + R.email + '</a>' : ''); })();
-var V = '?v=202607211900';
+var V = '?v=202610041800';
 
 var PLANETS = [
-  {key:'phys',  icon:'phys', coin:'nk-coin--sun',  subject:'Физика',                  name:'КвантУм',        desc:'Рычаги, траектории, равновесие: физика, которую можно потрогать.', active:true,  levels:6,  img:'screenshots/phys.jpg',   src:'games/physics.html'},
-  {key:'chem',  icon:'chem', coin:'nk-coin--ok',   subject:'Химия',                   name:'Хемо Лаб',       desc:'Реакции, плотность и опыты, которые дома никто не разрешит.', active:true,  levels:6,  img:'screenshots/chem.jpg',   src:'games/chemistry.html'},
-  {key:'code',  icon:'code', coin:'',              subject:'Программирование',        name:'КодБот',         desc:'Составь программу из блоков — и робот дойдёт до звезды.', active:true,  levels:3,  img:'screenshots/code.jpg',   src:'games/code.html'},
-  {key:'space', icon:'space', coin:'nk-coin--warn', subject:'Астрономия',              name:'КосмоПорт',      desc:'Собери ракету, рассчитай топливо и выйди на орбиту.', active:false, levels:6,  img:'screenshots/space.svg'},
-  {key:'robo',  icon:'robo', coin:'',              subject:'Инженерия',               name:'РобоЛаб',        desc:'Шестерёнки, рычаги и моторы: собери машину, которая едет сама.', active:false, levels:6,  img:'screenshots/robo.svg'},
-  {key:'bio',   icon:'bio', coin:'nk-coin--ok',   subject:'Биология',                name:'БиоМир',         desc:'Клетки, ДНК, экосистемы: собери живой мир своими руками.', active:false, levels:8,  img:'screenshots/bio.svg'},
+  {key:'phys',  icon:'phys', coin:'nk-coin--sun',  subject:'Физика',                  name:'КвантУм',        desc:'Пушка, качели, струна и кораблик: угадай, а потом проверь руками.', active:true,  levels:10,  img:'screenshots/phys.jpg',   src:'games/physics.html'},
+  {key:'chem',  icon:'chem', coin:'nk-coin--ok',   subject:'Химия',                   name:'Хемо Лаб',       desc:'Лёд и пар, капустное зелье, невидимый газ: угадай, а потом проверь опытом.', active:true,  levels:10,  img:'screenshots/chem.jpg',   src:'games/chemistry.html'},
+  {key:'code',  icon:'code', coin:'',              subject:'Программирование',        name:'КодБот',         desc:'Программы из блоков: робот рисует, ищет ключ и учит свою команду.', active:true,  levels:10,  img:'screenshots/code.jpg',   src:'games/code.html'},
+  {key:'space', icon:'space', coin:'nk-coin--warn', subject:'Астрономия',              name:'КосмоПорт',      desc:'Собери ракету, рассчитай топливо и выйди на орбиту.', active:true,  levels:10,  free:2, img:'screenshots/space.jpg',   src:'games/space.html'},
+  {key:'robo',  icon:'robo', coin:'',              subject:'Робототехника',           name:'РобоЛаб',        desc:'Моторы, датчики и плата-мозг: собери своего робота и придумай ему правила.', active:true,  levels:10, free:2, img:'screenshots/robo.jpg',  src:'games/robo.html'},
+  {key:'bio',   icon:'bio', coin:'nk-coin--ok',   subject:'Биология',                name:'БиоМир',         desc:'Микроскоп, остров с лисами, сердце-насос и бабочки, которые меняют цвет.', active:true,  levels:10, free:2, img:'screenshots/bio.jpg',   src:'games/bio.html'},
   {key:'eco',   icon:'eco', coin:'nk-coin--ok',   subject:'Экология и энергия',      name:'ЭкоСфера',       desc:'Запитай целый город чистой энергией — и не устрой блэкаут.', active:false, levels:6,  img:'screenshots/eco.svg'},
   {key:'math',  icon:'math', coin:'nk-coin--warn', subject:'Математика',              name:'Цифрариум',      desc:'Числа, фигуры и шифры: головоломки, за которые берёшься сам.', active:false, levels:10, img:'screenshots/math.svg'},
   {key:'geo',   icon:'geo', coin:'',              subject:'География',               name:'ГеоАтлас',       desc:'Материки, климаты, страны: квесты по всей планете.', active:false, levels:7,  img:'screenshots/geo.svg'}
@@ -675,7 +676,7 @@ var PLANETS = [
 
 var grid = document.getElementById('planets');
 PLANETS.forEach(function(p){
-  var status = p.active ? ('Открыто · '+p.levels+' ур.') : ('Скоро · '+p.levels+' ур.');
+  var status = !p.active ? ('Скоро · '+p.levels+' ур.') : p.free ? (p.free+' бесплатно · '+p.levels+' ур.') : ('Открыто · '+p.levels+' ур.');
   var card = document.createElement(p.active ? 'button' : 'div');
   card.className = 'nk-clay planet' + (p.active ? '' : ' locked');
   card.innerHTML =
@@ -755,7 +756,8 @@ document.querySelectorAll('[data-buy]').forEach(function(b){ b.addEventListener(
     var card = document.createElement('div');
     card.className = 'cc';
     card.style.setProperty('--t', g.tint);
-    var SHOT = { data: 'cover-data', control: 'cover-control', inside: 'cover-inside' };
+    /* Обложки — 3D-рендеры в технике Нейро (Higgsfield, 01.10.2026); старые SVG лежат рядом */
+    var SHOT = { data: 'cover-data-3d', control: 'cover-control-3d', inside: 'cover-inside-3d' };
     /* Бирка говорит то, чего не видно из названия игры: чем она берёт. */
     var MARK = { data: 'Рисует пальцем', control: 'Заказывает словами', inside: 'Три профессии' };
     var full = st.ready === st.total;
@@ -782,7 +784,7 @@ document.querySelectorAll('[data-buy]').forEach(function(b){ b.addEventListener(
         '<span class="cc-tag' + (full ? '' : ' cc-tag--soon') + '">' +
           (full ? MARK[g.key] : 'Готово ' + st.ready + ' из ' + st.total) + '</span>' +
         status +
-        '<img src="shots/' + SHOT[g.key] + '.svg" alt="Обложка игры «' + g.name + '»" loading="lazy">' +
+        '<img src="shots/' + SHOT[g.key] + '.webp" alt="Обложка игры «' + g.name + '»" loading="lazy">' +
       '</div>' +
       '<div class="cc-body">' +
         '<div class="cc-top"><span class="cc-no">'+NO[i+1]+'</span><span class="cc-age">'+g.age+'</span></div>' +

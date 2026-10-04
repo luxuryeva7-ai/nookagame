@@ -3,18 +3,18 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"/>
-<title>КодБот — Программирование</title>
+<title>БиоМир — Биология</title>
 <link href="/fonts/nooka-fonts.css" rel="stylesheet">
 <style>
-
+/* Светлый стиль наук (КодБот, КвантУм, Хемо Лаб) — решение Артёма 03.10.2026.
+   --ak-acc-* — цвет игры. */
 :root{
   --ak-bg:#FFF3E2;--ak-bg-2:#FFE8CC;--ak-surface:#FFFDF7;
   --ak-ink:#2D1B45;--ak-ink-2:#6B5680;--ak-ink-3:#A797B8;
-  --ak-phys-1:#E5DCFF;--ak-phys-2:#B5A1FF;--ak-phys-3:#7C5FE0;
+  --ak-acc-1:#DDF4D5;--ak-acc-2:#6CC46A;--ak-acc-3:#3E9A3C;
   --ak-cta-1:#FFEDA8;--ak-cta-2:#FFD262;--ak-cta-3:#D4A22B;
   --ak-ok-1:#C8F2DD;--ak-ok-2:#5DD9A0;--ak-ok-3:#2BA873;
   --ak-warn-1:#FFD2C8;--ak-warn-2:#FF8B7A;--ak-warn-3:#D9523F;
-  --ak-star-1:#FFE49E;--ak-star-2:#FFC857;--ak-star-3:#D4972B;
   --ak-display:'Fredoka One','Nunito',system-ui,sans-serif;
   --ak-body:'Nunito',system-ui,sans-serif;
 }
@@ -23,9 +23,10 @@ html,body{background:var(--ak-bg);margin:0;overflow:hidden;}
 body{margin:0;font-family:var(--ak-body);color:var(--ak-ink);}
 .ak{font-family:var(--ak-body);color:var(--ak-ink);-webkit-font-smoothing:antialiased;}
 .ak-clay{background:var(--ak-surface);border-radius:28px;box-shadow:0 10px 22px -8px rgba(45,27,69,.22),0 4px 10px -4px rgba(45,27,69,.10),inset 0 2px 0 rgba(255,255,255,.9),inset 0 -3px 0 rgba(45,27,69,.06);}
-.ak-btn{font-family:var(--ak-display);font-size:17px;border:none;cursor:pointer;transition:transform .08s,box-shadow .08s;user-select:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;line-height:1;padding:15px 26px;border-radius:999px;color:var(--ak-ink);}
-.ak-btn--phys{color:#fff;background:linear-gradient(180deg,#C4B5FF,#B5A1FF 55%,#9C83FF);box-shadow:0 6px 0 var(--ak-phys-3),0 12px 24px -6px rgba(124,95,224,.5),inset 0 2px 0 rgba(255,255,255,.5);}
-.ak-btn--phys:active{transform:translateY(4px);box-shadow:0 2px 0 var(--ak-phys-3);}
+.ak-btn{font-family:var(--ak-display);font-size:17px;border:none;cursor:pointer;transition:transform .08s,box-shadow .08s;user-select:none;-webkit-user-select:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;line-height:1;padding:15px 26px;border-radius:999px;color:var(--ak-ink);}
+.ak-btn:disabled{opacity:.55;cursor:default;}
+.ak-btn--acc{color:#fff;background:linear-gradient(180deg,var(--ak-acc-2),var(--ak-acc-2) 55%,var(--ak-acc-3));box-shadow:0 6px 0 var(--ak-acc-3),0 12px 24px -6px rgba(45,27,69,.3),inset 0 2px 0 rgba(255,255,255,.45);}
+.ak-btn--acc:active{transform:translateY(4px);box-shadow:0 2px 0 var(--ak-acc-3);}
 .ak-btn--cta{color:var(--ak-ink);background:linear-gradient(180deg,#FFEDA8,#FFD262 55%,#FFC03A);box-shadow:0 6px 0 var(--ak-cta-3),0 12px 24px -6px rgba(212,162,43,.55),inset 0 2px 0 rgba(255,255,255,.85);}
 .ak-btn--cta:active{transform:translateY(4px);}
 .ak-btn--soft{color:var(--ak-ink);background:linear-gradient(180deg,#fff,#FFF7E8);box-shadow:0 4px 0 rgba(45,27,69,.10),0 8px 18px -6px rgba(45,27,69,.12),inset 0 2px 0 #fff,inset 0 0 0 1px rgba(45,27,69,.06);}
@@ -33,16 +34,27 @@ body{margin:0;font-family:var(--ak-body);color:var(--ak-ink);}
 .ak-btn--sm{padding:10px 18px;font-size:14px;}
 .ak-btn--ok{color:#fff;background:linear-gradient(180deg,#7CECB5,#5DD9A0 55%,#3FC685);box-shadow:0 6px 0 var(--ak-ok-3),0 12px 24px -6px rgba(43,168,115,.5),inset 0 2px 0 rgba(255,255,255,.5);}
 .ak-btn--ok:active{transform:translateY(4px);}
+.ak-btn--go{color:#fff;background:linear-gradient(180deg,#FFA48F,#FF7A64 55%,#F25D45);box-shadow:0 6px 0 var(--ak-warn-3),0 12px 24px -6px rgba(217,82,63,.5),inset 0 2px 0 rgba(255,255,255,.45);}
+.ak-btn--go:active{transform:translateY(4px);box-shadow:0 2px 0 var(--ak-warn-3);}
 @keyframes ak-bob{0%,100%{transform:translateY(0) rotate(-1deg);}50%{transform:translateY(-5px) rotate(1deg);}}
 @keyframes ak-pop{0%{transform:scale(.65);opacity:0;}65%{transform:scale(1.07);}100%{transform:scale(1);opacity:1;}}
-@keyframes ak-shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-8px);}40%{transform:translateX(8px);}60%{transform:translateX(-5px);}80%{transform:translateX(5px);}}
 @keyframes ak-pulse{0%,100%{opacity:1;}50%{opacity:.45;}}
+@keyframes ak-shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-7px);}40%{transform:translateX(7px);}60%{transform:translateX(-4px);}80%{transform:translateX(4px);}}
+@keyframes lb-hint{0%,100%{transform:translate(0,0);opacity:.95;}50%{transform:translate(-14px,-10px);opacity:.6;}}
+@keyframes lb-spin{to{transform:rotate(360deg);}}
+@keyframes lb-blink{0%,100%{opacity:1;}50%{opacity:.25;}}
+@keyframes lb-flow{to{stroke-dashoffset:-20;}}
+.lb-flow{stroke-dasharray:4 6;animation:lb-flow .5s linear infinite;}
+.lb-body>*{flex-shrink:0;}
 .ak-bob{animation:ak-bob 3s ease-in-out infinite;}
 .ak-pop{animation:ak-pop .38s cubic-bezier(.2,.8,.3,1) both;}
-.ak-shake{animation:ak-shake .4s ease-in-out;}
 .ak-pulse{animation:ak-pulse 1.4s ease-in-out infinite;}
+.ak-shake{animation:ak-shake .4s ease-in-out;}
+.lb-hint{animation:lb-hint 1.6s ease-in-out infinite;}
+.lb-spin{transform-box:fill-box;transform-origin:50% 50%;animation:lb-spin 1s linear infinite;}
+.lb-blink{animation:lb-blink .8s ease-in-out infinite;}
 input[type=range]{-webkit-appearance:none;width:100%;height:20px;border-radius:999px;background:transparent;cursor:pointer;outline:none;}
-input[type=range]::-webkit-slider-runnable-track{height:20px;border-radius:999px;background:linear-gradient(180deg,var(--ak-phys-1),var(--ak-phys-2));}
+input[type=range]::-webkit-slider-runnable-track{height:20px;border-radius:999px;background:linear-gradient(180deg,var(--ak-acc-1),var(--ak-acc-2));}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:38px;height:38px;border-radius:50%;margin-top:-9px;cursor:pointer;background:linear-gradient(180deg,#fff,#FFF7E8);box-shadow:0 4px 0 rgba(45,27,69,.15),0 8px 16px -6px rgba(45,27,69,.2);}
 </style>
 <script src="/metrika.js" defer></script>
@@ -353,1240 +365,1520 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
 
 </script>
 <script src="nooka-core.js"></script>
+<script src="nooka-levels.js"></script>
+<script src="nooka-account.js"></script>
+<script src="nooka-access.js"></script>
 <script>
+/* ============================================================
+   Общее ядро светлых игр Nooka (РобоЛаб, БиоМир) — 03.10.2026.
+   Устроено как КосмоПорт (games/space.html), но в светлом стиле
+   наук. Игра задаёт перед запуском:
+     LAB       — ключ, название, предмет, бесплатные уровни, тексты;
+     LB_LEVELS — уровни: компонент, название, подпись, «ага»;
+     LB_QUIZ   — по два вопроса проверки связи на уровень.
+   У уровня может быть ставка: bet: { q, opts: [три ответа], ok: индекс }.
+   Тогда заставка не пускает в уровень без ставки, а экран победы
+   сверяет её с тем, что вышло на деле (КвантУм, 03.10.2026).
+   ============================================================ */
+const { useState, useEffect, useRef, useMemo } = React;
+const h = React.createElement;
 
-const {
-  useState,
-  useEffect,
-  useRef
-} = React;
-const G = 0.27;
+/* ── мелочи ─────────────────────────────────────────────── */
+const lbClamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const lbNorm = d => ((d % 360) + 540) % 360 - 180;
+const lbRad = d => d * Math.PI / 180;
+function lbPt(svg, e) {
+  const r = svg.getBoundingClientRect(), vb = svg.viewBox.baseVal;
+  return { x: (e.clientX - r.left) * vb.width / r.width, y: (e.clientY - r.top) * vb.height / r.height };
+}
+function useLoop(fn, on) {
+  const f = useRef(fn);
+  f.current = fn;
+  useEffect(() => {
+    if (!on) return;
+    let id, last = performance.now();
+    const tick = now => { const dt = Math.min(0.05, (now - last) / 1000); last = now; f.current(dt, now); id = requestAnimationFrame(tick); };
+    id = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(id);
+  }, [on]);
+}
+const lbWord = (n, a, b, c) => window.nooka ? window.nooka.plural(n, a, b, c) : c;
 
-/* ── canvas utils ─────────────────────────────────────────── */
-function rrect(ctx, x, y, w, h, r) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.lineTo(x + w - r, y);
-  ctx.arcTo(x + w, y, x + w, y + r, r);
-  ctx.lineTo(x + w, y + h - r);
-  ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
-  ctx.lineTo(x + r, y + h);
-  ctx.arcTo(x, y + h, x, y + h - r, r);
-  ctx.lineTo(x, y + r);
-  ctx.arcTo(x, y, x + r, y, r);
-  ctx.closePath();
-}
-function arrowLine(ctx, x1, y1, x2, y2, col, w) {
-  const a = Math.atan2(y2 - y1, x2 - x1),
-    hw = w * 3.2;
-  ctx.save();
-  ctx.strokeStyle = col;
-  ctx.fillStyle = col;
-  ctx.lineWidth = w;
-  ctx.lineCap = 'round';
-  ctx.beginPath();
-  ctx.moveTo(x1, y1);
-  ctx.lineTo(x2, y2);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(x2, y2);
-  ctx.lineTo(x2 - hw * Math.cos(a - .42), y2 - hw * Math.sin(a - .42));
-  ctx.lineTo(x2 - hw * Math.cos(a + .42), y2 - hw * Math.sin(a + .42));
-  ctx.closePath();
-  ctx.fill();
-  ctx.restore();
-}
-function gBall(ctx, x, y, r, c1, c2) {
-  const g = ctx.createRadialGradient(x - r * .3, y - r * .35, 0, x, y, r);
-  g.addColorStop(0, '#fff');
-  g.addColorStop(.25, c1);
-  g.addColorStop(1, c2);
-  ctx.beginPath();
-  ctx.arc(x, y, r, 0, Math.PI * 2);
-  ctx.fillStyle = g;
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(45,27,69,.2)';
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
-}
-function evXY(e, canvas) {
-  const r = canvas.getBoundingClientRect(),
-    t = e.touches ? e.touches[0] : e;
-  return {
-    x: (t.clientX - r.left) * (canvas.width / r.width),
-    y: (t.clientY - r.top) * (canvas.height / r.height)
+/* ── звук: синтез в браузере, без файлов ─────────────────── */
+const SFX = (() => {
+  let ctx = null, eng = null, mute = false;
+  try { mute = localStorage.getItem('nooka_lab_mute') === '1'; } catch (e) {}
+  const ac = () => {
+    if (mute) return null;
+    if (!ctx) { const C = window.AudioContext || window.webkitAudioContext; if (!C) return null; ctx = new C(); }
+    if (ctx.state === 'suspended') ctx.resume();
+    return ctx;
   };
+  function tone(f, d, type, vol, f2) {
+    const c = ac(); if (!c) return;
+    const o = c.createOscillator(), g = c.createGain(), t = c.currentTime;
+    o.type = type || 'sine'; o.frequency.setValueAtTime(f, t);
+    if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + d);
+    g.gain.setValueAtTime(vol || 0.1, t); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + d);
+  }
+  function noise(d, vol, lp) {
+    const c = ac(); if (!c) return;
+    const n = Math.floor(c.sampleRate * d), b = c.createBuffer(1, n, c.sampleRate), a = b.getChannelData(0);
+    for (let i = 0; i < n; i++) a[i] = Math.random() * 2 - 1;
+    const s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain(), t = c.currentTime;
+    s.buffer = b; f.type = 'lowpass'; f.frequency.value = lp || 600;
+    g.gain.setValueAtTime(vol || 0.25, t); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    s.connect(f); f.connect(g); g.connect(c.destination); s.start(t);
+  }
+  return {
+    get mute() { return mute; },
+    setMute(v) { mute = v; try { localStorage.setItem('nooka_lab_mute', v ? '1' : '0'); } catch (e) {} },
+    tick: () => tone(880, 0.1, 'square', 0.04),
+    pop: () => tone(620, 0.09, 'triangle', 0.08, 940),
+    no: () => tone(220, 0.18, 'triangle', 0.08, 160),
+    bump: () => { noise(0.15, 0.25, 500); tone(140, 0.15, 'sine', 0.1, 70); },
+    whir: () => tone(300, 0.25, 'sawtooth', 0.03, 520),
+    beep: () => tone(1500, 0.06, 'sine', 0.05),
+    note: (f, d, vol) => tone(f, d || 0.5, 'triangle', vol || 0.09),
+    /* щипок струны: шум бежит по кольцу и гаснет (алгоритм Карплуса — Стронга) */
+    pluck: (f, vol, dur) => {
+      const c = ac(); if (!c) return;
+      const sr = c.sampleRate, n = Math.floor(sr * (dur || 1.8)), b = c.createBuffer(1, n, sr), a = b.getChannelData(0);
+      const N = Math.max(2, Math.round(sr / f - 0.5)), ring = new Float32Array(N);
+      for (let i = 0; i < N; i++) ring[i] = Math.random() * 2 - 1;
+      for (let i = 0, k = 0; i < n; i++) { const v = ring[k], w = ring[(k + 1) % N]; a[i] = v; ring[k] = 0.4985 * (v + w); k = (k + 1) % N; }
+      const s = c.createBufferSource(), g = c.createGain(), lp = c.createBiquadFilter(), t = c.currentTime;
+      s.buffer = b; lp.type = 'lowpass'; lp.frequency.value = Math.min(9000, f * 9);
+      g.gain.setValueAtTime(vol || 0.3, t);
+      s.connect(lp); lp.connect(g); g.connect(c.destination); s.start(t);
+    },
+    ok: () => { tone(660, 0.12, 'triangle', 0.09); setTimeout(() => tone(880, 0.12, 'triangle', 0.09), 110); setTimeout(() => tone(1320, 0.26, 'triangle', 0.09), 220); }
+  };
+})();
+
+/* ── ставка до опыта ─────────────────────────────────────── */
+let LB_CUR = 0;                                   // какой уровень открыт
+const LB_BET = {};                                // номер уровня → индекс ставки
+const lbBetOf = n => { const L = LB_LEVELS[n - 1]; return L && L.bet; };
+function lbBetSave(n, i) {
+  LB_BET[n] = i;
+  try { localStorage.setItem(`nooka_bet_${LAB.key}_${n}`, String(i)); } catch (e) {}
+}
+function lbBetGet(n) {
+  if (LB_BET[n] != null) return LB_BET[n];
+  try { const v = localStorage.getItem(`nooka_bet_${LAB.key}_${n}`); return v == null ? null : +v; } catch (e) { return null; }
+}
+function BetReveal() {
+  const B = lbBetOf(LB_CUR), i = lbBetGet(LB_CUR);
+  if (!B || i == null || !B.opts[i]) return null;
+  const hit = i === B.ok;
+  return h('div', { style: { background: hit ? 'var(--ak-ok-1)' : '#fff', border: '2px dashed ' + (hit ? 'var(--ak-ok-2)' : 'var(--ak-acc-2)'), borderRadius: 16, padding: '10px 14px', marginBottom: 12, textAlign: 'left', fontSize: 13.5, lineHeight: 1.45, color: 'var(--ak-ink)' } },
+    h('div', { style: { fontFamily: 'var(--ak-display)', color: hit ? 'var(--ak-ok-3)' : 'var(--ak-acc-3)', marginBottom: 2 } }, hit ? '🎯 Ставка сыграла!' : '🤔 Ставка и опыт'),
+    'Твоя ставка: «', B.opts[i], '».', hit ? ' Так и есть.' : h('span', null, ' На деле: «', h('b', null, B.opts[B.ok]), '».'));
 }
 
-/* ── shared UI ─────────────────────────────────────────────── */
-function TopBar({
-  level,
-  title,
-  onHome,
-  step,
-  total
-}) {
-  return /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: 10,
-      padding: '12px 16px 6px',
-      flexShrink: 0
-    }
-  }, /*#__PURE__*/React.createElement("button", {
-    className: "ak-btn ak-btn--soft ak-btn--sm",
-    onClick: onHome
-  }, "← Назад"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      flex: 1
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontFamily: 'var(--ak-display)',
-      fontSize: 11,
-      color: 'var(--ak-ink-3)',
-      textTransform: 'uppercase',
-      letterSpacing: 1
-    }
-  }, "Уровень ", level), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontFamily: 'var(--ak-display)',
-      fontSize: 16,
-      fontWeight: 700,
-      color: 'var(--ak-ink)'
-    }
-  }, title)), total > 1 && /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: 'flex',
-      gap: 5
-    }
-  }, Array.from({
-    length: total
-  }, (_, i) => /*#__PURE__*/React.createElement("div", {
-    key: i,
-    style: {
-      width: 22,
-      height: 22,
-      borderRadius: '50%',
-      background: i < step ? 'var(--ak-ok-2)' : i === step ? 'var(--ak-phys-2)' : 'rgba(45,27,69,.1)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontSize: 12,
-      color: i < step ? '#fff' : i === step ? '#fff' : 'var(--ak-ink-3)',
-      fontFamily: 'var(--ak-display)'
-    }
-  }, i + 1))));
+/* ── общие окна, светлый стиль наук ──────────────────────── */
+function TopBar({ n, title, onHome, step, total }) {
+  const [mute, setMute] = useState(SFX.mute);
+  return h('div', { style: { display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px 6px', flexShrink: 0 } },
+    h('button', { className: 'ak-btn ak-btn--soft ak-btn--sm', onClick: onHome }, '← Назад'),
+    h('div', { style: { flex: 1, minWidth: 0 } },
+      h('div', { style: { fontFamily: 'var(--ak-display)', fontSize: 11, color: 'var(--ak-ink-3)', textTransform: 'uppercase', letterSpacing: 1 } }, 'Уровень ', n),
+      h('div', { style: { fontFamily: 'var(--ak-display)', fontSize: 15.5, lineHeight: 1.15, color: 'var(--ak-ink)' } }, title)),
+    total > 1 && h('div', { style: { display: 'flex', gap: 5 } }, Array.from({ length: total }, (_, i) => h('div', {
+      key: i,
+      style: {
+        width: 22, height: 22, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontFamily: 'var(--ak-display)',
+        background: i < step ? 'var(--ak-ok-2)' : i === step ? 'var(--ak-acc-2)' : 'rgba(45,27,69,.1)', color: i <= step ? '#fff' : 'var(--ak-ink-3)'
+      }
+    }, i + 1))),
+    h('button', {
+      'aria-label': mute ? 'Включить звук' : 'Выключить звук', onClick: () => { SFX.setMute(!mute); setMute(!mute); },
+      style: { border: 'none', background: 'transparent', fontSize: 17, cursor: 'pointer', padding: 4, opacity: 0.6 }
+    }, mute ? '🔇' : '🔊'));
 }
-function TaskBadge({
-  children
-}) {
-  return /*#__PURE__*/React.createElement("div", {
-    className: "ak-pulse",
+function TaskBadge({ children }) {
+  return h('div', {
     style: {
-      margin: '0 16px 10px',
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: 10,
-      padding: '11px 18px 11px 14px',
-      borderRadius: 999,
-      background: '#fff',
-      fontFamily: 'var(--ak-display)',
-      fontSize: 14,
-      fontWeight: 600,
-      color: 'var(--ak-ink)',
-      boxShadow: '0 4px 0 rgba(45,27,69,.08),0 10px 22px -6px rgba(45,27,69,.14),inset 0 1px 0 rgba(255,255,255,1)'
+      display: 'inline-flex', alignItems: 'center', gap: 10, padding: '10px 16px 10px 13px', borderRadius: 999, background: '#fff', maxWidth: 360, boxSizing: 'border-box', flexShrink: 0,
+      fontFamily: 'var(--ak-display)', fontSize: 14, color: 'var(--ak-ink)', lineHeight: 1.3, boxShadow: '0 4px 0 rgba(45,27,69,.08),0 10px 22px -6px rgba(45,27,69,.14)'
     }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      width: 10,
-      height: 10,
-      borderRadius: '50%',
-      background: '#B5A1FF',
-      flexShrink: 0,
-      boxShadow: '0 0 0 4px rgba(181,161,255,.33),inset 0 -1px 0 #7C5FE0'
-    }
-  }), /*#__PURE__*/React.createElement("span", null, children));
+  }, h('div', { className: 'ak-pulse', style: { width: 10, height: 10, borderRadius: '50%', background: 'var(--ak-acc-2)', flexShrink: 0, boxShadow: '0 0 0 4px var(--ak-acc-1)' } }),
+  h('span', null, children));
 }
-function WinModal({
-  emoji,
-  title,
-  law,
-  fact,
-  cta,
-  onNext,
-  onHome,
-  extra
-}) {
-  return /*#__PURE__*/React.createElement("div", {
-    style: {
-      position: 'absolute',
-      inset: 0,
-      background: 'rgba(45,27,69,.5)',
-      backdropFilter: 'blur(10px)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 200
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "ak-clay ak-pop",
-    style: {
-      margin: 20,
-      padding: 28,
-      textAlign: 'center',
-      maxWidth: 320
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 52,
-      marginBottom: 6
-    }
-  }, emoji), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontFamily: 'var(--ak-display)',
-      fontSize: 22,
-      fontWeight: 700,
-      color: 'var(--ak-ink)',
-      marginBottom: 12
-    }
-  }, title), extra || null, /*#__PURE__*/React.createElement("div", {
-    style: {
-      background: 'var(--ak-phys-1)',
-      borderRadius: 18,
-      padding: '14px 18px',
-      marginBottom: 18,
-      textAlign: 'left'
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontFamily: 'var(--ak-display)',
-      fontSize: 13,
-      color: 'var(--ak-phys-3)',
-      marginBottom: 6
-    }
-  }, "⚡ ", law), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 13,
-      color: 'var(--ak-ink)',
-      lineHeight: 1.55
-    }
-  }, fact)), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: 'flex',
-      gap: 10,
-      justifyContent: 'center'
-    }
-  }, /*#__PURE__*/React.createElement("button", {
-    className: "ak-btn ak-btn--soft ak-btn--sm",
-    onClick: onHome
-  }, "🏠"), /*#__PURE__*/React.createElement("button", {
-    className: "ak-btn ak-btn--cta",
-    onClick: onNext
-  }, cta))));
+function LbMascot({ kind, size }) {
+  return h('img', { src: `../mascot/${kind || 'hello'}.webp`, alt: 'Нейро', width: size, style: { width: size, height: 'auto', display: 'block', filter: 'drop-shadow(0 8px 14px rgba(45,27,69,.18))' } });
 }
-function FailModal({
-  tip,
-  onRetry
-}) {
-  return /*#__PURE__*/React.createElement("div", {
-    style: {
-      position: 'absolute',
-      inset: 0,
-      background: 'rgba(45,27,69,.5)',
-      backdropFilter: 'blur(10px)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 200
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "ak-clay ak-pop",
-    style: {
-      margin: 20,
-      padding: 28,
-      textAlign: 'center',
-      maxWidth: 300
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 44,
-      marginBottom: 8
-    }
-  }, "🤔"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontFamily: 'var(--ak-display)',
-      fontSize: 20,
-      fontWeight: 700,
-      color: 'var(--ak-ink)',
-      marginBottom: 10
-    }
-  }, "Попробуй ещё!"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 14,
-      color: 'var(--ak-ink-2)',
-      lineHeight: 1.55,
-      marginBottom: 22
-    }
-  }, "💡 ", tip), /*#__PURE__*/React.createElement("button", {
-    className: "ak-btn ak-btn--phys",
-    onClick: onRetry
-  }, "Ещё раз 🔄")));
+function WinModal({ title, law, fact, onNext, onHome }) {
+  return h('div', {
+    style: { position: 'absolute', inset: 0, background: 'rgba(45,27,69,.5)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200 }
+  }, h('div', { className: 'ak-clay ak-pop', style: { margin: 18, padding: '20px 22px 24px', textAlign: 'center', maxWidth: 330 } },
+    h('div', { style: { display: 'flex', justifyContent: 'center', marginBottom: 2 } }, h(LbMascot, { kind: 'win', size: 120 })),
+    h('div', { style: { fontFamily: 'var(--ak-display)', fontSize: 22, color: 'var(--ak-ink)', marginBottom: 12 } }, title),
+    h(BetReveal),
+    h('div', { style: { background: 'var(--ak-acc-1)', borderRadius: 18, padding: '13px 16px', marginBottom: 18, textAlign: 'left' } },
+      h('div', { style: { fontFamily: 'var(--ak-display)', fontSize: 13.5, color: 'var(--ak-acc-3)', marginBottom: 6, lineHeight: 1.4 } }, '💡 ', law),
+      h('div', { style: { fontSize: 13, color: 'var(--ak-ink)', lineHeight: 1.55 } }, fact)),
+    h('div', { style: { display: 'flex', gap: 10, justifyContent: 'center' } },
+      h('button', { className: 'ak-btn ak-btn--soft ak-btn--sm', onClick: onHome }, '🏠'),
+      h('button', { className: 'ak-btn ak-btn--cta', onClick: onNext }, 'Дальше →'))));
 }
-function IntroModal({
-  emoji,
-  title,
-  law,
-  diagram,
-  tip,
-  onStart,
-  bet,
-  onBet
-}) {
+function IntroModal({ emoji, title, ask, task, tip, onStart }) {
+  const B = lbBetOf(LB_CUR);
   const [pick, setPick] = useState(null);
-  const ready = !bet || pick != null;
-  return /*#__PURE__*/React.createElement("div", {
+  const ready = !B || pick != null;
+  return h('div', {
     style: {
-      position: 'absolute',
-      inset: 0,
-      background: 'linear-gradient(160deg,var(--ak-phys-1) 0%,var(--ak-bg) 55%)',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      padding: '32px 24px 28px',
-      overflowY: 'auto',
-      zIndex: 100
+      position: 'absolute', inset: 0, zIndex: 100, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '24px 22px 26px', overflowY: 'auto', boxSizing: 'border-box',
+      background: 'linear-gradient(160deg,var(--ak-acc-1) 0%,var(--ak-bg) 55%)'
     }
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "ak-bob",
+  }, h('div', { className: 'ak-bob', style: { marginBottom: 4 } }, emoji ? h('div', { style: { fontSize: 58 } }, emoji) : h(LbMascot, { kind: 'hello', size: B ? 84 : 100 })),
+  h('div', { style: { fontFamily: 'var(--ak-display)', fontSize: 26, color: 'var(--ak-ink)', marginBottom: 4, textAlign: 'center' } }, title),
+  B ? h('div', { style: { width: '100%', maxWidth: 320, marginBottom: 12 } },
+    h('div', { style: { fontFamily: 'var(--ak-display)', fontSize: 16, color: 'var(--ak-acc-3)', marginBottom: 8, textAlign: 'center', lineHeight: 1.35 } }, '🤔 Спорим? ', B.q),
+    B.opts.map((o, i) => h('button', {
+      key: i, onClick: () => { SFX.tick(); setPick(i); },
+      style: {
+        display: 'block', width: '100%', marginBottom: 7, padding: '11px 14px', borderRadius: 14, cursor: 'pointer', textAlign: 'left', fontFamily: 'var(--ak-body)', fontWeight: 800, fontSize: 14,
+        color: 'var(--ak-ink)', border: 'none', background: pick === i ? 'var(--ak-acc-1)' : 'rgba(255,255,255,.92)',
+        boxShadow: pick === i ? 'inset 0 0 0 3px var(--ak-acc-3)' : '0 3px 0 rgba(45,27,69,.07)'
+      }
+    }, pick === i ? '👉 ' : '', o)))
+    : ask && h('div', { style: { fontFamily: 'var(--ak-display)', fontSize: 16, color: 'var(--ak-acc-3)', marginBottom: 16, textAlign: 'center' } }, ask),
+  h('div', { style: { width: '100%', maxWidth: 320, background: 'rgba(255,255,255,.85)', borderRadius: 20, padding: '12px 18px', marginBottom: 10, boxSizing: 'border-box', boxShadow: 'inset 0 1px 0 #fff, 0 4px 12px -6px rgba(45,27,69,.1)' } },
+    h('div', { style: { fontFamily: 'var(--ak-display)', fontSize: 13, color: 'var(--ak-acc-3)', marginBottom: 4 } }, B ? '🎯 Проверь опытом' : '🎯 Задача'),
+    h('div', { style: { fontSize: 14.5, color: 'var(--ak-ink)', lineHeight: 1.5, fontWeight: 700 } }, task)),
+  h('div', { style: { width: '100%', maxWidth: 320, background: 'rgba(255,210,98,.2)', borderRadius: 14, padding: '9px 16px', marginBottom: 18, fontSize: 13.5, color: 'var(--ak-ink-2)', lineHeight: 1.5, boxSizing: 'border-box' } }, '👆 ', tip),
+  h('button', {
+    className: 'ak-btn ak-btn--acc', style: { minWidth: 200, fontSize: 18 }, disabled: !ready,
+    onClick: () => { SFX.pop(); if (B) lbBetSave(LB_CUR, pick); onStart(); }
+  }, ready ? 'Начать!' : 'Сначала ставка'));
+}
+function LbShell({ n, title, step, total, onHome, children }) {
+  return h('div', {
+    className: 'ak',
     style: {
-      fontSize: 64,
-      marginBottom: 10
+      height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative',
+      background: 'radial-gradient(120% 60% at 50% -10%,var(--ak-acc-1) 0%,transparent 60%),linear-gradient(180deg,var(--ak-bg-2),var(--ak-bg))'
     }
-  }, emoji), /*#__PURE__*/React.createElement("div", {
+  }, h(TopBar, { n, title, onHome, step: step || 0, total: total || 1 }), children);
+}
+function LbBody({ children }) {
+  /* lb-body: дети не сжимаются — длинная подсказка не наезжает на кнопку, экран просто прокручивается */
+  return h('div', { className: 'lb-body', style: { flex: 1, display: 'flex', flexDirection: 'column', gap: 10, padding: '6px 16px 22px', alignItems: 'center', overflowY: 'auto' } }, children);
+}
+/* Сцена: светлая карточка. bg — фон игры (чертёж у РобоЛаба, зелень у БиоМира). */
+function LbScene({ H, children, svgRef, bg, shake, ...ev }) {
+  return h('div', { className: shake ? 'ak-shake' : null, style: { width: '100%', maxWidth: 360, flexShrink: 0, position: 'relative' } },
+    h('svg', {
+      ref: svgRef, viewBox: `0 0 340 ${H}`, ...ev,
+      style: { width: '100%', display: 'block', borderRadius: 22, touchAction: 'none', userSelect: 'none', WebkitUserSelect: 'none', background: bg || LAB.sceneBg, boxShadow: '0 6px 0 rgba(45,27,69,.08)' }
+    }, LAB.sceneDeco ? LAB.sceneDeco(H) : null, children));
+}
+function LbNote({ children, ok }) {
+  return h('div', {
+    style: { fontSize: 14.5, textAlign: 'center', maxWidth: 330, lineHeight: 1.45, minHeight: 21, fontFamily: 'var(--ak-display)', color: ok ? 'var(--ak-ok-3)' : 'var(--ak-ink-2)' }
+  }, children);
+}
+function LbChoice({ items, value, onPick, disabled, cols }) {
+  return h('div', { style: { display: 'grid', gridTemplateColumns: `repeat(${cols || items.length},1fr)`, gap: 8, width: '100%', maxWidth: 360 } },
+    items.map(it => h('button', {
+      key: it.id, disabled: disabled || it.off, onClick: () => { SFX.pop(); onPick(it.id); },
+      style: {
+        border: value === it.id ? '3px solid var(--ak-acc-3)' : '3px solid transparent', cursor: 'pointer', borderRadius: 16, padding: '7px 3px',
+        fontFamily: 'var(--ak-body)', background: value === it.id ? 'var(--ak-acc-1)' : 'rgba(255,255,255,.94)', boxShadow: '0 4px 0 rgba(45,27,69,.08)',
+        opacity: (disabled || it.off) && value !== it.id ? 0.55 : 1
+      }
+    }, it.emoji && h('div', { style: { fontSize: 22 } }, it.emoji), h('div', { style: { fontSize: 12.5, fontWeight: 800, color: 'var(--ak-ink)', marginTop: 2, lineHeight: 1.2 } }, it.name))));
+}
+function LbNext({ last, onClick }) {
+  return h('button', { className: 'ak-btn ak-btn--ok ak-pop', style: { width: '100%', maxWidth: 360, flexShrink: 0 }, onClick: () => { SFX.pop(); onClick(); } },
+    last ? 'Уровень пройден →' : 'Следующая задача →');
+}
+function LbReadout({ label, value, children }) {
+  return h('div', { style: { display: 'flex', alignItems: 'center', gap: 12, width: '100%', maxWidth: 360, background: 'rgba(255,255,255,.9)', borderRadius: 18, padding: 8, boxSizing: 'border-box', boxShadow: '0 4px 0 rgba(45,27,69,.06)' } },
+    children,
+    h('div', null,
+      h('div', { style: { fontSize: 11, fontFamily: 'var(--ak-display)', color: 'var(--ak-ink-3)', textTransform: 'uppercase', letterSpacing: 1 } }, label),
+      h('div', { style: { fontFamily: 'var(--ak-display)', fontSize: 17, color: 'var(--ak-ink)', marginTop: 2 } }, value)));
+}
+function LbSlider({ label, value, min, max, step, onChange, left, right }) {
+  return h('div', { style: { width: '100%', maxWidth: 360, background: 'rgba(255,255,255,.85)', borderRadius: 16, padding: '8px 14px 10px', boxSizing: 'border-box' } },
+    h('div', { style: { display: 'flex', justifyContent: 'space-between', fontSize: 12, fontWeight: 800, color: 'var(--ak-ink-2)', marginBottom: 4, fontFamily: 'var(--ak-display)' } },
+      h('span', null, left || ''), h('span', { style: { color: 'var(--ak-ink)' } }, label), h('span', null, right || '')),
+    h('input', { type: 'range', min, max, step: step || 1, value, onChange: e => onChange(+e.target.value) }));
+}
+
+/* ── проверка связи ─────────────────────────────────────── */
+function LbQuiz({ n, title, onDone, onHome }) {
+  const qs = useMemo(() => LB_QUIZ[n].map(q => ({ ...q, opts: window.nooka && window.nooka.shuffled ? window.nooka.shuffled(q.opts) : q.opts })), [n]);
+  const [pick, setPick] = useState([null, null]);
+  const both = qs.every((q, i) => pick[i] != null && q.opts[pick[i]].ok);
+  return h(LbShell, { n, title, onHome },
+    h(LbBody, null,
+      h(TaskBadge, null, 'Проверка связи: два вопроса'),
+      qs.map((q, qi) => h('div', {
+        key: qi, style: { width: '100%', maxWidth: 360, background: 'rgba(255,255,255,.92)', borderRadius: 20, padding: '14px 14px 10px', boxShadow: '0 6px 0 rgba(45,27,69,.06)', flexShrink: 0, boxSizing: 'border-box' }
+      }, h('div', { style: { fontFamily: 'var(--ak-display)', fontSize: 15, color: 'var(--ak-ink)', lineHeight: 1.35, marginBottom: 10 } }, q.q),
+      q.opts.map((o, oi) => {
+        const on = pick[qi] === oi;
+        return h('button', {
+          key: oi, onClick: () => { (o.ok ? SFX.pop : SFX.no)(); setPick(p => { const c = p.slice(); c[qi] = oi; return c; }); },
+          style: {
+            display: 'block', width: '100%', marginBottom: 7, padding: '11px 13px', border: 'none', borderRadius: 14, cursor: 'pointer',
+            textAlign: 'left', fontFamily: 'var(--ak-body)', fontWeight: 700, fontSize: 13.5, color: 'var(--ak-ink)',
+            background: on ? (o.ok ? 'rgba(93,217,160,.28)' : 'rgba(255,122,100,.22)') : 'var(--ak-acc-1)',
+            boxShadow: on ? `inset 0 0 0 2px ${o.ok ? '#3FC685' : '#FF7A64'}` : 'none'
+          }
+        }, o.t);
+      }), pick[qi] != null && h('div', { style: { fontSize: 13, lineHeight: 1.45, color: 'var(--ak-ink-2)', padding: '2px 4px 4px' } }, q.opts[pick[qi]].ok ? q.yes : q.no))),
+      h('button', { className: 'ak-btn ak-btn--ok', style: { width: '100%', maxWidth: 360, flexShrink: 0 }, disabled: !both, onClick: () => { SFX.ok(); onDone(); } },
+        both ? 'Записать в ' + LAB.bookShort + ' ✓' : 'Ответь на оба')));
+}
+
+/* ── главный экран игры: как у наук ─────────────────────── */
+function LbHome({ onSelect, paid }) {
+  const done = new Set(window.nooka ? window.nooka.getCompleted(LAB.key) : []);
+  const [log, setLog] = useState(false);
+  const nextUp = LB_LEVELS.findIndex((l, i) => l.C && !done.has(i + 1)) + 1;
+  return h('div', {
+    className: 'ak',
     style: {
-      fontFamily: 'var(--ak-display)',
-      fontSize: 26,
-      fontWeight: 700,
-      color: 'var(--ak-ink)',
-      marginBottom: 16,
-      textAlign: 'center'
+      height: '100vh', overflowY: 'auto', boxSizing: 'border-box', padding: '40px 18px 32px', display: 'flex', flexDirection: 'column', alignItems: 'center',
+      background: 'radial-gradient(120% 60% at 50% -10%,var(--ak-acc-1) 0%,transparent 60%),linear-gradient(180deg,var(--ak-bg-2),var(--ak-bg))'
     }
-  }, title), bet && /*#__PURE__*/React.createElement("div", {
-    style: { width: '100%', maxWidth: 320, marginBottom: 14 }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: { fontFamily: 'var(--ak-display)', fontSize: 16, color: 'var(--ak-phys-3)', marginBottom: 8, textAlign: 'center', lineHeight: 1.35 }
-  }, '🤔 Спорим? ', bet.q), bet.opts.map((o, i) => /*#__PURE__*/React.createElement("button", {
-    key: i, onClick: () => setPick(i),
-    style: { display: 'block', width: '100%', marginBottom: 7, padding: '11px 14px', borderRadius: 14, cursor: 'pointer', textAlign: 'left', fontFamily: 'var(--ak-body)', fontWeight: 800, fontSize: 14, color: 'var(--ak-ink)', border: 'none',
-      background: pick === i ? 'var(--ak-phys-1)' : 'rgba(255,255,255,.92)', boxShadow: pick === i ? 'inset 0 0 0 3px var(--ak-phys-3)' : '0 3px 0 rgba(45,27,69,.07)' }
-  }, pick === i ? '👉 ' : '', o))), diagram && /*#__PURE__*/React.createElement("div", {
-    style: {
-      width: '100%',
-      maxWidth: 320,
-      marginBottom: 16
-    }
-  }, /*#__PURE__*/React.createElement("canvas", {
-    id: "intro-canvas",
-    width: 320,
-    height: 130,
-    style: {
-      width: '100%',
-      borderRadius: 18,
-      background: 'rgba(255,255,255,.7)',
-      display: 'block'
-    }
-  })), /*#__PURE__*/React.createElement("div", {
-    style: {
-      width: '100%',
-      maxWidth: 320,
-      background: 'rgba(255,255,255,.8)',
-      borderRadius: 20,
-      padding: '14px 18px',
-      marginBottom: 12,
-      boxShadow: 'inset 0 1px 0 #fff, 0 4px 12px -6px rgba(45,27,69,.1)'
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontFamily: 'var(--ak-display)',
-      fontSize: 13,
-      color: 'var(--ak-phys-3)',
-      marginBottom: 6
-    }
-  }, "💡 Правило"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 14,
-      color: 'var(--ak-ink)',
-      lineHeight: 1.6
-    }
-  }, law)), /*#__PURE__*/React.createElement("div", {
-    style: {
-      width: '100%',
-      maxWidth: 320,
-      background: 'rgba(255,210,98,.2)',
-      borderRadius: 14,
-      padding: '10px 16px',
-      marginBottom: 24,
-      fontSize: 13,
-      color: 'var(--ak-ink-2)',
-      lineHeight: 1.5
-    }
-  }, "🎮 ", tip), /*#__PURE__*/React.createElement("button", {
-    className: "ak-btn ak-btn--phys",
-    style: {
-      minWidth: 200,
-      fontSize: 18
-    },
-    disabled: !ready,
-    onClick: () => { if (bet && onBet) onBet(pick); onStart(); }
-  }, ready ? "Начать! ⚡" : "Сначала ставка"));
+  },
+  h('div', { style: { width: 64, height: 64, borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, marginBottom: 10, background: 'linear-gradient(180deg,var(--ak-acc-1),var(--ak-acc-2))', boxShadow: '0 8px 0 var(--ak-acc-3)' } }, LAB.emoji),
+  h('div', { style: { fontFamily: 'var(--ak-display)', fontSize: 30, color: 'var(--ak-ink)' } }, LAB.name),
+  h('div', { style: { fontFamily: 'var(--ak-display)', fontSize: 15, color: 'var(--ak-ink-2)', marginBottom: 18 } },
+    LAB.subject, ' · ', LB_LEVELS.length, ' ', lbWord(LB_LEVELS.length, 'уровень', 'уровня', 'уровней')),
+  LAB.homeCard && h(LAB.homeCard, { done }),
+  h('div', { style: { display: 'flex', flexDirection: 'column', gap: 12, width: '100%', maxWidth: 340 } }, LB_LEVELS.map((l, i) => {
+    const n = i + 1, lock = n > LAB.free && paid === false, ready = !!l.C, ok = done.has(n), up = n === nextUp && !lock;
+    return h('button', {
+      key: n, onClick: () => ready && onSelect(n), disabled: !ready,
+      style: {
+        display: 'flex', alignItems: 'center', gap: 14, background: 'rgba(255,255,255,.9)', borderRadius: 22, padding: '13px 16px', border: 'none', cursor: ready ? 'pointer' : 'default', textAlign: 'left',
+        boxShadow: up ? '0 0 0 3px var(--ak-acc-2),0 6px 0 rgba(45,27,69,.08)' : '0 6px 0 rgba(45,27,69,.08),0 12px 24px -8px rgba(45,27,69,.12),inset 0 2px 0 #fff', opacity: ready ? 1 : 0.55
+      }
+    }, h('div', {
+      style: { width: 50, height: 50, borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, background: `radial-gradient(circle at 35% 30%,#fff,${['var(--ak-acc-1)', 'var(--ak-cta-1)', 'var(--ak-ok-1)'][i % 3]} 70%)`, boxShadow: '0 4px 0 rgba(45,27,69,.08)' }
+    }, l.emoji),
+    h('div', { style: { minWidth: 0 } },
+      h('div', { style: { fontFamily: 'var(--ak-display)', fontSize: 16.5, color: 'var(--ak-ink)' } }, n, '. ', l.t),
+      h('div', { style: { fontFamily: 'var(--ak-display)', fontSize: 13, color: 'var(--ak-ink-2)', marginTop: 2 } }, ready ? l.sub : 'Скоро')),
+    h('div', { style: { marginLeft: 'auto', fontSize: 18, color: 'var(--ak-ink-3)' } }, ok ? '✅' : lock ? '🔒' : '→'));
+  })),
+  h('button', {
+    onClick: () => setLog(!log),
+    style: { marginTop: 18, width: '100%', maxWidth: 340, border: 'none', cursor: 'pointer', textAlign: 'left', borderRadius: 18, padding: '14px 16px', background: 'rgba(255,255,255,.7)', fontFamily: 'var(--ak-display)', fontSize: 15, color: 'var(--ak-ink)', boxSizing: 'border-box', display: 'flex', justifyContent: 'space-between' }
+  }, h('span', null, LAB.bookEmoji, ' ', LAB.book), h('span', { style: { color: 'var(--ak-ink-3)' } }, done.size, ' из ', LB_LEVELS.length, log ? ' ▲' : ' ▼')),
+  log && h('div', { style: { width: '100%', maxWidth: 340, display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 } },
+    LB_LEVELS.map((l, i) => h('div', {
+      key: i, style: { background: done.has(i + 1) ? '#fff' : 'rgba(255,255,255,.45)', borderRadius: 16, padding: '10px 14px', fontSize: 13.5, lineHeight: 1.45, color: done.has(i + 1) ? 'var(--ak-ink)' : 'var(--ak-ink-3)', fontWeight: 700 }
+    }, h('span', { style: { marginRight: 6 } }, l.emoji), done.has(i + 1) ? l.aga : `Уровень ${i + 1}: запись появится после него`))));
+}
+function LbOffline({ onHome }) {
+  return h('div', { className: 'ak', style: { height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24, gap: 14, textAlign: 'center', background: 'var(--ak-bg)' } },
+    h('div', { style: { fontSize: 48 } }, '📡'),
+    h('div', { style: { fontFamily: 'var(--ak-display)', fontSize: 21 } }, 'Нет связи'),
+    h('div', { style: { fontSize: 14, color: 'var(--ak-ink-2)', maxWidth: 300, lineHeight: 1.5 } }, 'Не получилось проверить доступ. Проверь интернет и обнови страницу — доступ на месте.'),
+    h('button', { className: 'ak-btn ak-btn--cta', onClick: () => location.reload() }, 'Обновить'),
+    h('button', { className: 'ak-btn ak-btn--soft ak-btn--sm', onClick: onHome }, 'К уровням'));
+}
+
+/* Уровень → (победа) → проверка связи → миссия. ?n=4 открывает уровень сразу.
+   Уровни после LAB.free — по доступу (ответ сервера через nooka-access). */
+function LbApp() {
+  const first = +new URLSearchParams(location.search).get('n');
+  const [s, setS] = useState('home');
+  const [paid, setPaid] = useState(null);
+  useEffect(() => {
+    const A = window.nookaAccess;
+    if (A) A.ready.then(st => setPaid(!!st.paid));
+    if (first >= 1 && first <= LB_LEVELS.length) open(first);
+  }, []);
+  function open(k) {
+    if (!LB_LEVELS[k - 1] || !LB_LEVELS[k - 1].C) return setS('home');
+    if (k <= LAB.free) return setS('l' + k);
+    const A = window.nookaAccess;
+    if (!A) return setS('home');
+    A.ready.then(st => {
+      setPaid(!!st.paid);
+      if (st.paid) return setS('l' + k);
+      setS('home');
+      if (st.offline) return setS('off');
+      A.paywall({ title: `Уровни ${LAB.free + 1}–${LB_LEVELS.length} — в платной части`, sub: LAB.wall });
+    });
+  }
+  const n = +s.slice(1), L = LB_LEVELS[n - 1], home = () => setS('home');
+  if (n) LB_CUR = n;
+  return h('div', { style: { width: '100%', height: '100vh', maxWidth: 480, margin: '0 auto', position: 'relative', overflow: 'hidden' } },
+    s === 'home' && h(LbHome, { onSelect: open, paid }),
+    s === 'off' && h(LbOffline, { onHome: home }),
+    s[0] === 'l' && L && h(L.C, { key: s, onWin: () => setS('q' + n), onHome: home }),
+    s[0] === 'q' && L && h(LbQuiz, {
+      key: s, n, title: L.t, onHome: home,
+      onDone: () => {
+        const last = n >= LB_LEVELS.length || !LB_LEVELS[n].C;
+        setS('home');
+        if (window.nooka) window.nooka.missionWin(LAB.key + n, 80, { nextLabel: last ? 'К уровням →' : 'Следующий уровень →', onNext: () => { if (!last) open(n + 1); } });
+      }
+    }));
+}
+
+/* ============================================================
+   БиоМир — биология для 8–12. Nooka. Описание уровней —
+   BIOMIR_LEVELS.md. Главная мысль: живое устроено и связано —
+   растёт, питается, даёт потомство, собрано из клеток, питается
+   по цепочкам и меняется за поколения. Каждый уровень бьёт в
+   детское заблуждение («растение ест землю», «вода смывает
+   микробов», «огонь живой»).
+
+   Ребёнок — натуралист: за каждый уровень в «Тетрадь натуралиста»
+   попадает наклейка и запись своими словами.
+   ============================================================ */
+
+/* Светлый луг под каждой сценой */
+function bmDeco(H) {
+  return h('g', { pointerEvents: 'none' },
+    h('defs', null, h('linearGradient', { id: 'bmsky', x1: 0, y1: 0, x2: 0, y2: 1 },
+      h('stop', { offset: 0, stopColor: '#EAF6FF' }), h('stop', { offset: 1, stopColor: '#F5FBEC' }))),
+    h('rect', { width: 340, height: H, fill: 'url(#bmsky)' }));
+}
+const bmT = (x, y, s, size, fill, anchor) => h('text', { x, y, textAnchor: anchor || 'middle', fontSize: size || 11, fontWeight: 900, fill: fill || '#2D1B45', fontFamily: 'var(--ak-body)' }, s);
+
+/* ── герои и предметы (точка 0,0 — низ по центру) ─────────── */
+function BCat({ x, y, k, small }) {
+  const s = (k || 1) * (small ? 0.55 : 1);
+  return h('g', { transform: `translate(${x} ${y}) scale(${s})` },
+    h('ellipse', { cx: 0, cy: -16, rx: 20, ry: 15, fill: '#FFB27A' }),
+    h('path', { d: 'M16 -22 Q34 -30 30 -48', fill: 'none', stroke: '#FFB27A', strokeWidth: 6, strokeLinecap: 'round' }),
+    h('circle', { cx: -14, cy: -36, r: 14, fill: '#FFB27A' }),
+    h('path', { d: 'M-26 -42 L-24 -58 L-14 -48 Z M-2 -42 L-4 -58 L-14 -48 Z', fill: '#FFB27A' }),
+    h('path', { d: 'M-23 -46 L-22 -53 L-17 -48 Z M-5 -46 L-6 -53 L-11 -48 Z', fill: '#FF8FA3' }),
+    h('circle', { cx: -19, cy: -37, r: 2.2, fill: '#2D1B45' }), h('circle', { cx: -9, cy: -37, r: 2.2, fill: '#2D1B45' }),
+    h('path', { d: 'M-15 -32 L-13 -30 L-11 -32', fill: 'none', stroke: '#2D1B45', strokeWidth: 1.4 }),
+    h('path', { d: 'M-8 -20 L-4 -24 M2 -20 L6 -24', stroke: '#E0905A', strokeWidth: 2 }),
+    h('rect', { x: -16, y: -6, width: 7, height: 7, rx: 3, fill: '#FFB27A' }), h('rect', { x: 8, y: -6, width: 7, height: 7, rx: 3, fill: '#FFB27A' }));
+}
+function BTree({ x, y, k }) {
+  return h('g', { transform: `translate(${x} ${y}) scale(${k || 1})` },
+    h('rect', { x: -6, y: -40, width: 12, height: 40, rx: 3, fill: '#A0714A' }),
+    h('circle', { cx: 0, cy: -58, r: 26, fill: '#6CC46A' }), h('circle', { cx: -16, cy: -46, r: 16, fill: '#5DB85B' }), h('circle', { cx: 16, cy: -48, r: 17, fill: '#7ED07B' }));
+}
+function BStone({ x, y, k }) {
+  return h('g', { transform: `translate(${x} ${y}) scale(${k || 1})` },
+    h('path', { d: 'M-26 0 L-20 -20 L-2 -28 L18 -22 L26 0 Z', fill: '#A9A6B8', stroke: '#7E7A90', strokeWidth: 2 }), h('path', { d: 'M-8 -16 L6 -20', stroke: '#7E7A90', strokeWidth: 2 }));
+}
+function BBot({ x, y, k, charge }) {
+  return h('g', { transform: `translate(${x} ${y}) scale(${k || 1})` },
+    h('rect', { x: -16, y: -30, width: 32, height: 26, rx: 6, fill: '#9DB4FF', stroke: '#4B5BD6', strokeWidth: 2 }),
+    h('rect', { x: -12, y: -50, width: 24, height: 18, rx: 6, fill: '#F4F2FA', stroke: '#4B5BD6', strokeWidth: 2 }),
+    h('circle', { cx: -5, cy: -41, r: 3, fill: '#2D1B45' }), h('circle', { cx: 5, cy: -41, r: 3, fill: '#2D1B45' }),
+    h('line', { x1: 0, y1: -50, x2: 0, y2: -57, stroke: '#4B5BD6', strokeWidth: 2 }), h('circle', { cx: 0, cy: -58, r: 2.5, fill: '#FF7A64' }),
+    h('circle', { cx: -9, cy: -2, r: 4, fill: '#4A3B63' }), h('circle', { cx: 9, cy: -2, r: 4, fill: '#4A3B63' }),
+    charge && h('text', { x: 20, y: -24, fontSize: 14 }, '⚡'));
+}
+function BFire({ x, y, k, big }) {
+  const s = (k || 1) * (big ? 1.35 : 1);
+  return h('g', { transform: `translate(${x} ${y}) scale(${s})` },
+    h('rect', { x: -20, y: -6, width: 40, height: 7, rx: 3, fill: '#8A5A3A', transform: 'rotate(8)' }), h('rect', { x: -20, y: -6, width: 40, height: 7, rx: 3, fill: '#A0714A', transform: 'rotate(-8)' }),
+    h('path', { d: 'M0 -46 Q16 -26 12 -10 Q8 0 0 -2 Q-8 0 -12 -10 Q-16 -26 0 -46 Z', fill: '#FF8A3D' }),
+    h('path', { d: 'M0 -30 Q8 -18 6 -10 Q4 -4 0 -5 Q-4 -4 -6 -10 Q-8 -18 0 -30 Z', fill: '#FFD262' }));
+}
+function BMush({ x, y, k, small }) {
+  const s = (k || 1) * (small ? 0.5 : 1);
+  return h('g', { transform: `translate(${x} ${y}) scale(${s})` },
+    h('rect', { x: -6, y: -22, width: 12, height: 22, rx: 4, fill: '#F6EEDF' }),
+    h('path', { d: 'M-24 -20 Q0 -52 24 -20 Z', fill: '#E5484D' }),
+    h('circle', { cx: -8, cy: -30, r: 3.5, fill: '#fff' }), h('circle', { cx: 8, cy: -34, r: 3, fill: '#fff' }), h('circle', { cx: 2, cy: -26, r: 2.5, fill: '#fff' }));
+}
+function BSprout({ x, y, k, pale, wilt }) {
+  const c = pale ? '#D8E6A8' : wilt ? '#B9A15A' : '#5DB85B';
+  return h('g', { transform: `translate(${x} ${y}) scale(${k || 1})` },
+    h('path', { d: wilt ? 'M0 0 Q2 -14 10 -20' : 'M0 0 L0 -26', stroke: c, strokeWidth: 3.5, fill: 'none', strokeLinecap: 'round' }),
+    h('ellipse', { cx: wilt ? 14 : -8, cy: wilt ? -18 : -24, rx: 8, ry: 4, fill: c, transform: `rotate(${wilt ? 40 : -25} ${wilt ? 14 : -8} ${wilt ? -18 : -24})` }),
+    h('ellipse', { cx: wilt ? 12 : 8, cy: wilt ? -12 : -24, rx: 8, ry: 4, fill: c, transform: `rotate(${wilt ? 70 : 25} ${wilt ? 12 : 8} ${wilt ? -12 : -24})` }));
+}
+/* Росток в горшке: g — насколько вырос (0..1), how — 'ok' | 'pale' | 'wilt' */
+function BPot({ x, y, g, how, k }) {
+  const H = 18 + g * (how === 'pale' ? 92 : 70), c = how === 'pale' ? '#D8E6A8' : how === 'wilt' ? '#B9A15A' : '#5DB85B', lean = how === 'wilt' ? 1 : 0;
+  const leaves = Math.round(1 + g * (how === 'pale' ? 2 : 5));
+  return h('g', { transform: `translate(${x} ${y}) scale(${k || 1})` },
+    h('path', { d: lean ? `M0 -26 Q4 ${-26 - H * 0.6} ${H * 0.5} ${-26 - H * 0.55}` : `M0 -26 L0 ${-26 - H}`, stroke: c, strokeWidth: how === 'pale' ? 2.5 : 4, fill: 'none', strokeLinecap: 'round' }),
+    !lean && Array.from({ length: leaves }, (_, i) => { const ly = -26 - H * (i + 1) / (leaves + 0.3), side = i % 2 ? 1 : -1, sz = how === 'pale' ? 5 : 9 + g * 4;
+      return h('ellipse', { key: i, cx: side * sz, cy: ly, rx: sz, ry: sz * 0.45, fill: c, transform: `rotate(${side * -20} ${side * sz} ${ly})` }); }),
+    lean ? h('ellipse', { cx: H * 0.5 + 6, cy: -26 - H * 0.5, rx: 9, ry: 4, fill: c, transform: `rotate(60 ${H * 0.5 + 6} ${-26 - H * 0.5})` }) : null,
+    h('path', { d: 'M-22 -28 L22 -28 L17 0 L-17 0 Z', fill: '#D9805A', stroke: '#B05E3A', strokeWidth: 2 }),
+    h('rect', { x: -24, y: -32, width: 48, height: 7, rx: 2, fill: '#E59570', stroke: '#B05E3A', strokeWidth: 2 }),
+    h('ellipse', { cx: 0, cy: -29, rx: 18, ry: 3, fill: '#6B4A33' }));
+}
+/* Клетки: растения (зелёные зёрнышки) и кожи (без них) */
+function BCell({ x, y, w, hh, plant, hot }) {
+  return h('g', { transform: `translate(${x} ${y})` },
+    h('rect', { x: -w / 2, y: -hh / 2, width: w, height: hh, rx: plant ? 6 : hh / 2.2, fill: plant ? '#C8EFC0' : '#FFD8CC', stroke: plant ? '#5DB85B' : '#E0907A', strokeWidth: plant ? 3 : 2 }),
+    plant && [[-0.3, -0.25], [0.25, -0.3], [0.32, 0.2], [-0.28, 0.25], [0.02, 0.32], [-0.05, -0.05]].map(([dx, dy], i) => h('ellipse', { key: i, cx: dx * w, cy: dy * hh, rx: w * 0.08, ry: hh * 0.06, fill: '#3E9A3C' })),
+    h('circle', { cx: w * 0.12, cy: -hh * 0.05, r: Math.min(w, hh) * 0.16, fill: hot ? '#B48CFF' : '#9C7FD0', stroke: hot ? '#FFD262' : 'none', strokeWidth: hot ? 3 : 0 }));
+}
+
+/* Наклейки тетради натуралиста — по одной за уровень */
+const BM_STICKERS = ['🐱', '🔬', '🌱', '🦊', '🐰', '❤️', '🥪', '🧼', '🧬', '🦋'];
+function BmHomeCard({ done }) {
+  return h('div', { style: { width: '100%', maxWidth: 340, background: 'rgba(255,255,255,.9)', borderRadius: 22, padding: '12px 14px', marginBottom: 14, boxSizing: 'border-box', boxShadow: '0 6px 0 rgba(45,27,69,.06)' } },
+    h('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 } },
+      h('div', { style: { fontFamily: 'var(--ak-display)', fontSize: 16, color: 'var(--ak-ink)' } }, '📗 Тетрадь натуралиста'),
+      h('div', { style: { fontSize: 12, fontWeight: 800, color: 'var(--ak-ink-2)' } }, `наклеек: ${done.size} из 10`)),
+    h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 6 } }, BM_STICKERS.map((s, i) => h('div', {
+      key: i, style: { aspectRatio: '1', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22,
+        background: done.has(i + 1) ? '#E5F6DF' : 'transparent', border: done.has(i + 1) ? 'none' : '2px dashed rgba(62,154,60,.3)', transform: done.has(i + 1) ? `rotate(${(i % 3 - 1) * 5}deg)` : 'none' }
+    }, done.has(i + 1) ? s : ''))));
 }
 
 /* ══════════════════════════════════════════════════════════════
-   LEVEL 1 — ТРАЕКТОРИЯ
-   Cannon + angle → fire → velocity vectors shown on ball → hit stars
+   УРОВЕНЬ 1 — Живое или нет
+   Четыре пробы для предмета: питается? растёт? даёт потомство?
+   из клеток? (микроскоп). Потом — в корзину «Живое» или «Неживое».
+   Хитрые: огонь (ест дрова, растёт, искры — похоже, но клеток нет),
+   робот (заряжается — похоже на еду, но не растёт и не из клеток),
+   гриб (не растение, но живой).
    ══════════════════════════════════════════════════════════════ */
-
-/* ============================================================
-   КодБот — программирование для 8–12. Nooka.
-
-   Один робот на поле из клеток, но в каждом уровне ребёнок делает
-   с программой новое: собирает, экономит, обходит, чинит чужую,
-   повторяет, задаёт правило, собирает свою команду, читает без
-   запуска, пишет одну программу на разные комнаты, ищет самую
-   короткую. После победы — проверка связи: два вопроса, ошибка
-   не наказывает, объяснение и дальше (GAME_SYSTEM_METHOD, п. 7).
-
-   Поля проверены симулятором cbSim: у каждого уровня задуманное
-   решение доходит, а типичная ошибка ведёт туда, куда задумано
-   (в «Если стена» правило «налево» гоняет робота по кругу,
-   в «До стены» «Вперёд ×3» работает только в одной комнате).
-   ============================================================ */
-const CB_BLOCKS = {
-  f: { label: 'Вперёд', c: '#B5A1FF', d: '#7C5FE0' },
-  f3: { label: 'Вперёд ×3', c: '#FFD262', d: '#D4A22B' },
-  l: { label: '⟲ Налево', c: '#8FCAF0', d: '#4A93C9' },
-  r: { label: '⟳ Направо', c: '#FFA17A', d: '#D96D49' },
-  w: { label: 'Вперёд до стены', c: '#7BE0B0', d: '#38B07A' },
-  fn: { label: '★ Моя команда', c: '#FFB8E0', d: '#D9659F' }
+const B1_TESTS = [{ id: 'eat', name: 'Покормить', emoji: '🍽️' }, { id: 'grow', name: 'Подождать неделю', emoji: '⏳' }, { id: 'kids', name: 'Будут детёныши?', emoji: '👶' }, { id: 'cells', name: 'В микроскоп', emoji: '🔬' }];
+/* ответ пробы: 1 — да, 0 — нет, 2 — «похоже, но…» */
+const B1_OBJ = {
+  cat: { name: 'Кот', alive: true, r: { eat: 1, grow: 1, kids: 1, cells: 1 }, say: { eat: 'Ест из миски', grow: 'Котёнок стал котом', kids: 'Котята!', cells: 'Весь из клеток' },
+    yes: 'Кот живой: ест, растёт, у него котята, и он из клеток.' },
+  stone: { name: 'Камень', alive: false, r: { eat: 0, grow: 0, kids: 0, cells: 0 }, say: { eat: 'Не ест', grow: 'Не растёт', kids: 'Камешков не будет', cells: 'Клеток нет — песчинки' },
+    yes: 'Камень неживой: не ест, не растёт и не из клеток.' },
+  tree: { name: 'Дерево', alive: true, r: { eat: 1, grow: 1, kids: 1, cells: 1 }, say: { eat: 'Пьёт воду корнями', grow: 'Подросло', kids: 'Из семечка — росток', cells: 'Весь из клеток' },
+    yes: 'Дерево живое, хоть и не ходит: питается, растёт, даёт семена и собрано из клеток.' },
+  bot: { name: 'Робот', alive: false, r: { eat: 2, grow: 0, kids: 0, cells: 0 }, say: { eat: 'Заряжается — похоже на еду', grow: 'Не растёт', kids: 'Роботов собирают люди', cells: 'Внутри провода, не клетки' },
+    yes: 'Робот неживой: заряжается, но не растёт, не даёт потомства и не из клеток.' },
+  fire: { name: 'Костёр', alive: false, r: { eat: 2, grow: 2, kids: 2, cells: 0 }, say: { eat: 'Съедает дрова — похоже!', grow: 'Разгорается — похоже!', kids: 'Искры зажигают новый — похоже!', cells: 'Клеток нет — горячий газ' },
+    yes: 'Костёр очень похож на живое, но он не из клеток. Значит — неживой.' },
+  mush: { name: 'Гриб', alive: true, r: { eat: 1, grow: 1, kids: 1, cells: 1 }, say: { eat: 'Питается опавшими листьями', grow: 'Вырос за ночь', kids: 'Из пылинок-спор — новые грибы', cells: 'Весь из клеток' },
+    yes: 'Гриб живой — он не растение и не зверь, но ест, растёт, даёт потомство и из клеток.' }
 };
-const CB_FIX_CYCLE = ['f', 'l', 'r'];
-
-const CB_LEVELS = [{
-  n: 1, title: 'Первые шаги', sub: 'Команды по порядку', kind: 'build',
-  bet: { q: 'Команды стоят не в том порядке. Робот догадается, как надо?', opts: ['Да, он умный', 'Нет, сделает ровно то, что написано', 'Иногда догадается'], ok: 1 },
-  grid: 5, start: { x: 2, y: 4, dir: 0 }, stars: [[2, 0]], walls: [],
-  blocks: ['f', 'l', 'r'], limit: 6,
-  task: 'Доведи робота до звезды',
-  intro: { emoji: '🤖', title: 'Первые шаги',
-    law: 'Робот едет туда, куда смотрит его нос. «Налево» и «Направо» — поворот на месте.',
-    tip: 'Касайся блоков внизу. Доведи робота до ⭐' },
-  win: { emoji: '🤖', title: 'Робот ожил!',
-    law: 'Программа — это список команд, которые робот выполняет по порядку',
-    fact: 'Первым программистом в истории была Ада Лавлейс — она писала программы в 1843 году, когда компьютеров ещё не существовало!' },
-  quiz: [
-    { q: 'Робот смотрит вверх. Программа: Вперёд, Вперёд, Налево. Куда он смотрит в конце?',
-      opts: [{ t: 'Влево', ok: true }, { t: 'Вправо' }, { t: 'Вниз' }],
-      yes: 'Да: робот проехал вверх и повернулся на месте налево.',
-      no: 'Представь, что ты сам робот и смотришь вверх. Повернись налево — куда теперь смотришь?' },
-    { q: 'Что будет, если в программе поменять местами две команды?',
-      opts: [{ t: 'Робот придёт в другое место', ok: true }, { t: 'Ничего не изменится' }, { t: 'Робот сам разберётся, что имелось в виду' }],
-      yes: 'Верно. Порядок команд — это и есть программа.',
-      no: 'Робот не догадывается. Он выполняет команды ровно в том порядке, в каком они стоят.' }
-  ]
-}, {
-  n: 2, title: 'Экономная программа', sub: 'Цикл ×3 — экономим блоки', kind: 'build',
-  bet: { q: 'Блок «Вперёд ×3» — это…', opts: ['Робот едет в три раза быстрее', 'Те же три шага, только записано короче', 'Прыжок через три клетки'], ok: 1 },
-  grid: 5, start: { x: 0, y: 4, dir: 0 }, stars: [[4, 0]], walls: [],
-  blocks: ['f', 'f3', 'l', 'r'], limit: 5,
-  task: 'Доведи робота до звезды',
-  intro: { emoji: '📦', title: 'Экономная программа',
-    law: 'Блок «Вперёд ×3» заменяет три «Вперёд». Программа станет короче.',
-    tip: 'В программе всего 5 мест — без ×3 не уложиться' },
-  win: { emoji: '📦', title: 'Кратко и чётко!',
-    law: 'Цикл повторяет команду — программа становится короче',
-    fact: 'Программисты — самые «ленивые» люди на свете: они пишут программы, чтобы за них работали машины. И блок ×3 — первый шаг!' },
-  quiz: [
-    { q: 'Чем «Вперёд ×3» лучше, чем три блока «Вперёд»?',
-      opts: [{ t: 'Программа короче, а делает то же самое', ok: true }, { t: 'Робот едет быстрее' }, { t: 'Ничем, это одно и то же' }],
-      yes: 'Да. Робот делает те же три шага, а программу проще читать.',
-      no: 'Робот проедет те же три клетки. Разница в самой программе: она короче.' },
-    { q: 'Сколько клеток проедет робот: «Вперёд ×3», «Вперёд ×3»?',
-      opts: [{ t: '6', ok: true }, { t: '3' }, { t: '2' }],
-      yes: 'Верно: три и ещё три.',
-      no: 'Каждый блок «×3» — это три шага. Блоков два.' }
-  ]
-}, {
-  n: 3, title: 'Лабиринт', sub: 'Обойди стену, собери всё', kind: 'build',
-  bet: { q: 'Впереди стена. Робот сам её объедет?', opts: ['Да, он же её видит', 'Нет, обход надо написать в программе', 'Объедет, если стена большая'], ok: 1 },
-  grid: 5, start: { x: 0, y: 4, dir: 0 }, stars: [[1, 1], [4, 4]], walls: [[2, 4], [2, 3], [2, 2]],
-  blocks: ['f', 'f3', 'l', 'r'], limit: 8,
-  task: 'Собери 2 звезды одной программой',
-  intro: { emoji: '🧱', title: 'Лабиринт',
-    law: 'Впереди стена. Продумай обход и собери обе звезды за один запуск.',
-    tip: 'Сначала проведи путь глазами, потом собирай' },
-  win: { emoji: '🏆', title: 'Мастер маршрутов!',
-    law: 'Сложная задача = много простых шагов в правильном порядке',
-    fact: 'Марсоход управляется программой, которую пишут на Земле: сигнал летит до Марса 20 минут, поэтому каждый шаг продуман заранее — как у тебя!' },
-  quiz: [
-    { q: 'Робот врезался в стену. Кто виноват?',
-      opts: [{ t: 'Программа: робот делает ровно то, что написано', ok: true }, { t: 'Робот: он плохо смотрит' }, { t: 'Стена: она не на месте' }],
-      yes: 'Да. Робот не видит стену — он просто выполняет команды.',
-      no: 'Робот не решает сам. Если он врезался, значит, так было написано в программе.' },
-    { q: 'Как проще придумать длинный маршрут?',
-      opts: [{ t: 'Разбить на куски: до первой звезды, потом до второй', ok: true }, { t: 'Запускать наугад, пока не повезёт' }, { t: 'Сразу собрать все блоки подряд' }],
-      yes: 'Именно так и работают программисты: большую задачу — на маленькие.',
-      no: 'Так можно долго промучиться. Проще разбить путь на куски и собирать по одному.' }
-  ]
-}, {
-  n: 4, title: 'Найди ошибку', sub: 'Почини чужую программу', kind: 'fix',
-  bet: { q: 'Робот едет вниз, к тебе. Ему говорят «Налево». Куда он свернёт на экране?', opts: ['Налево на экране', 'Направо на экране', 'Развернётся вверх'], ok: 1 },
-  grid: 5, start: { x: 0, y: 4, dir: 0 }, stars: [[3, 0]], walls: [[2, 3], [2, 4]],
-  given: ['f', 'f', 'l', 'f', 'f', 'f', 'l', 'f', 'f'],
-  task: 'Найди и почини неверную команду',
-  /* второй раунд: робот едет вниз — его «налево» на экране справа (частая ошибка детей) */
-  boards: [{}, { start: { x: 0, y: 0, dir: 2 }, stars: [[3, 3]], walls: [], given: ['f', 'f', 'f', 'r', 'f', 'f', 'f'],
-    task: 'Робот едет вниз. Где у него лево? Почини программу' }],
-  intro: { emoji: '🐞', title: 'Найди ошибку',
-    law: 'Программу уже написали, но робот врезается. Найди неверную команду и почини.',
-    tip: 'Касание блока меняет его: Вперёд → Налево → Направо' },
-  win: { emoji: '🐞', title: 'Ошибка поймана!',
-    law: 'Ошибка в программе — это нормально: её ищут шаг за шагом',
-    fact: 'Ошибку в программе называют «баг» — жук. В 1947 году в компьютер залетела настоящая моль и сломала его работу. Её вклеили в журнал с подписью «первый найденный баг».' },
-  quiz: [
-    { q: 'Робот врезался на пятой команде. Где искать ошибку?',
-      opts: [{ t: 'Пройти программу по шагам до места аварии', ok: true }, { t: 'Стереть всё и написать заново' }, { t: 'Только в последней команде' }],
-      yes: 'Да. Идёшь по шагам вместе с роботом — и видишь, где он свернул не туда.',
-      no: 'Ошибка может прятаться раньше, чем авария. Проще пройти по шагам и найти, где робот свернул не туда.' },
-    { q: 'Программист нашёл в программе ошибку. Что это значит?',
-      opts: [{ t: 'Обычное дело: ошибки есть у всех, их ищут и чинят', ok: true }, { t: 'Он плохой программист' }, { t: 'Программу надо выбросить' }],
-      yes: 'Верно. Искать ошибки — половина работы любого программиста.',
-      no: 'Ошибаются все, даже самые опытные. Хороший программист — тот, кто умеет их находить.' }
-  ]
-}, {
-  n: 5, title: 'Повтори', sub: 'Повтор N раз', kind: 'loop',
-  bet: { q: 'Сколько раз повторить «Вперёд, Вперёд, Направо», чтобы нарисовать квадрат?', opts: ['2 раза', '4 раза', '8 раз'], ok: 1 },
-  grid: 5, start: { x: 0, y: 4, dir: 0 }, stars: [[4, 0]], walls: [[2, 4], [3, 4], [4, 4], [3, 3], [4, 3], [4, 2]],
-  blocks: ['f', 'l', 'r'], bodyMax: 4, repMax: 5,
-  task: 'Собери ступеньку и повтори её',
-  /* второй раунд: робот красит клетки, по которым едет — повтор рисует квадрат */
-  boards: [{}, { start: { x: 1, y: 3, dir: 0 }, stars: [], walls: [], paint: [[1, 3], [1, 2], [1, 1], [2, 1], [3, 1], [3, 2], [3, 3], [2, 3]],
-    task: 'Робот-художник: нарисуй квадрат по пунктиру' }],
-  intro: { emoji: '🪜', title: 'Повтори',
-    law: 'Лестница — это одна ступенька много раз. Собери ступеньку и повтори. А потом — нарисуй квадрат.',
-    tip: 'Число в блоке «Повтори» меняется касанием' },
-  win: { emoji: '🪜', title: 'Лестница пройдена!',
-    law: 'Цикл повторяет кусок программы столько раз, сколько скажешь',
-    fact: 'Мультфильм на экране — тоже повтор: компьютер много раз в секунду рисует кадр, чуть сдвигая героя.' },
-  quiz: [
-    { q: 'Повтори 3 раза: Вперёд, Направо. Сколько команд выполнит робот?',
-      opts: [{ t: '6', ok: true }, { t: '3' }, { t: '2' }],
-      yes: 'Да: две команды, три раза.',
-      no: 'Внутри повтора две команды, и выполнятся они три раза.' },
-    { q: 'Когда в программе нужен повтор?',
-      opts: [{ t: 'Когда кусок программы повторяется много раз', ok: true }, { t: 'Когда программа короткая' }, { t: 'Когда робот устал' }],
-      yes: 'Верно. Один раз написать — и повторять сколько нужно.',
-      no: 'Повтор нужен, когда одно и то же надо сделать много раз: ступенька, забор, круг.' }
-  ]
-}, {
-  n: 6, title: 'Если стена', sub: 'Правило «если — иначе»', kind: 'ifelse',
-  bet: { q: 'Можно ли одним правилом пройти три разных лабиринта?', opts: ['Нет, для каждого нужна своя программа', 'Да, если робот проверяет стену на каждом шаге', 'Только если лабиринты одинаковые'], ok: 1 },
-  /* tune-cb6.js: из 9 правил все три лабиринта проходит только «стена → направо, иначе → вперёд» */
-  rooms: [
-    { grid: 5, start: { x: 0, y: 4, dir: 0 }, stars: [[4, 0]], walls: [[1, 4], [1, 3], [1, 2], [1, 1]] },
-    { grid: 5, start: { x: 0, y: 0, dir: 1 }, stars: [[4, 4]], walls: [[0, 1], [1, 1], [2, 1], [3, 1]] },
-    { grid: 5, start: { x: 0, y: 4, dir: 0 }, stars: [[2, 4]], walls: [[1, 4], [1, 3], [1, 2], [1, 1], [3, 0], [3, 1], [3, 2], [3, 3], [3, 4]] }
-  ],
-  task: 'Одно правило на три лабиринта',
-  intro: { emoji: '🚦', title: 'Если стена',
-    law: 'Робот едет сам по правилу: если впереди стена — одна команда, иначе — другая. Подбери правило на три лабиринта.',
-    tip: 'Выбери команду для «стена» и для «нет стены»' },
-  win: { emoji: '🚦', title: 'Робот проверяет правило!',
-    law: 'Условие «если — иначе»: перед каждым шагом робот проверяет, есть ли стена, и выбирает команду. Сам он не думает — правило ему дают люди',
-    fact: 'Робот-пылесос обходит комнату по похожим правилам: упёрся — повернул, свободно — едет дальше.' },
-  quiz: [
-    { q: 'Почему одно правило провело робота через все три лабиринта?',
-      opts: [{ t: 'Робот проверял его на каждом шаге', ok: true }, { t: 'Робот запомнил лабиринт' }, { t: 'Повезло' }],
-      yes: 'Да. Перед каждым шагом робот смотрит: стена? Если да — поворачивает.',
-      no: 'Робот ничего не запоминает. Он перед каждым шагом проверяет условие: стена впереди или нет.' },
-    { q: 'Где ещё работает правило «если… то…»?',
-      opts: [{ t: 'Светофор: если красный — стой', ok: true }, { t: 'Таблица умножения' }, { t: 'Алфавит' }],
-      yes: 'Верно. «Если красный — стой, если зелёный — иди» — это условие.',
-      no: 'Ищи, где решение зависит от того, что происходит. Например, светофор: если красный — стой.' }
-  ]
-}, {
-  n: 7, title: 'Своя команда', sub: 'Собери команду ★', kind: 'func',
-  bet: { q: 'Можно научить робота новой команде?', opts: ['Нет, у него только заводские', 'Да: собрать её из старых и дать имя', 'Только если купить нового робота'], ok: 1 },
-  grid: 5, start: { x: 1, y: 3, dir: 0 }, stars: [[1, 1], [3, 1], [3, 3]], walls: [[2, 2]],
-  blocks: ['f', 'l', 'r'], fnMax: 3, limit: 4,
-  task: 'Обойди квадрат и собери 3 звезды',
-  intro: { emoji: '⭐', title: 'Своя команда',
-    law: 'Собери команду ★ из трёх блоков — и зови её одним блоком.',
-    tip: 'Стрелки собирают ★, а блок ★ встаёт в программу' },
-  win: { emoji: '⭐', title: 'Своя команда работает!',
-    law: 'Своя команда — кусок программы с именем. Пишешь один раз — зовёшь сколько угодно',
-    fact: 'Программы в телефоне собраны из тысяч таких команд: программисты строят новые из готовых, как дом из кирпичей.' },
-  quiz: [
-    { q: 'Зачем давать кусочку программы своё имя?',
-      opts: [{ t: 'Чтобы звать его одним блоком сколько угодно раз', ok: true }, { t: 'Чтобы робот ехал быстрее' }, { t: 'Просто для красоты' }],
-      yes: 'Да. ★ пишется один раз — и дальше хватает одного блока.',
-      no: 'Робот поедет так же. Выигрыш в программе: длинный кусок превращается в один блок.' },
-    { q: '★ = Вперёд, Вперёд, Направо. Программа: ★ ★. Сколько команд выполнит робот?',
-      opts: [{ t: '6', ok: true }, { t: '2' }, { t: '3' }],
-      yes: 'Верно: в каждой ★ три команды, а ★ две.',
-      no: 'Каждая ★ — это три команды. В программе их две.' }
-  ]
-}, {
-  n: 8, title: 'Угадай, где будет', sub: 'Прочитай и угадай', kind: 'predict',
-  bet: { q: 'Можно узнать, куда приедет робот, не запуская программу?', opts: ['Нет, только запуском', 'Да, если пройти её в голове', 'Только с компьютером'], ok: 1 },
-  rounds: [
-    { grid: 5, start: { x: 0, y: 4, dir: 0 }, walls: [], prog: ['f', 'f', 'r', 'f'] },
-    { grid: 5, start: { x: 0, y: 4, dir: 0 }, walls: [], prog: ['f', 'r', 'f', 'f', 'r', 'f'] },
-    { grid: 5, start: { x: 2, y: 2, dir: 0 }, walls: [], prog: [{ rep: 3, body: ['f', 'r'] }] }
-  ],
-  task: 'Где окажется робот? Коснись клетки',
-  intro: { emoji: '🔮', title: 'Угадай, где будет',
-    law: 'Собирать ничего не нужно. Прочитай программу и угадай, где окажется робот.',
-    tip: 'Коснись клетки — потом проверим запуском' },
-  win: { emoji: '🔮', title: 'Читаешь код!',
-    law: 'Программу можно прочитать и понять, не запуская',
-    fact: 'Программисты читают код больше, чем пишут: на одну написанную строчку приходится примерно десять прочитанных.' },
-  quiz: [
-    { q: 'Как узнать, куда приедет робот, не запуская программу?',
-      opts: [{ t: 'Пройти её в голове шаг за шагом', ok: true }, { t: 'Никак, только запуском' }, { t: 'Посчитать, сколько всего блоков' }],
-      yes: 'Да. Это называют «выполнить программу в уме».',
-      no: 'Можно! Иди по командам по одной и двигай робота в голове.' },
-    { q: 'Зачем программисту читать чужую программу?',
-      opts: [{ t: 'Чтобы понять, что она делает, и найти ошибки', ok: true }, { t: 'Чтобы переписать слово в слово' }, { t: 'Незачем' }],
-      yes: 'Верно. Большие программы пишут командой, и все читают код друг друга.',
-      no: 'Большие программы пишут вместе. Чтобы что-то добавить или починить, сначала надо понять, как оно устроено.' }
-  ]
-}, {
-  n: 9, title: 'До стены', sub: 'Одна программа на всё', kind: 'rooms',
-  bet: { q: 'Одна программа подойдёт к комнатам разного размера?', opts: ['Нет, каждой нужна своя', 'Да, если ехать «пока не упрёшься»', 'Только к одинаковым'], ok: 1 },
-  rooms: [
-    { grid: 5, start: { x: 0, y: 4, dir: 0 }, stars: [[4, 0]], walls: [] },
-    { grid: 4, start: { x: 0, y: 3, dir: 0 }, stars: [[3, 0]], walls: [] },
-    { grid: 6, start: { x: 0, y: 5, dir: 0 }, stars: [[5, 0]], walls: [] }
-  ],
-  blocks: ['f', 'f3', 'w', 'l', 'r'], limit: 5,
-  task: 'Одна программа на три комнаты',
-  intro: { emoji: '🏠', title: 'До стены',
-    law: 'Три комнаты разного размера. Одна программа должна сработать во всех.',
-    tip: 'Блок «Вперёд до стены» едет, пока не упрётся' },
-  win: { emoji: '🏠', title: 'Подходит везде!',
-    law: 'Цикл «пока»: повторяй шаг, пока что-то не случится',
-    fact: 'Лифт тоже работает циклом «пока»: едет вверх, пока не доедет до нужного этажа.' },
-  quiz: [
-    { q: 'Почему «Вперёд до стены» сработал во всех комнатах, а «Вперёд ×3» — нет?',
-      opts: [{ t: 'Он шагает, пока не упрётся, — сколько бы ни было клеток', ok: true }, { t: 'Он быстрее' }, { t: 'Комнаты одинаковые' }],
-      yes: 'Да. «×3» — всегда три шага, а «до стены» — сколько понадобится.',
-      no: 'Комнаты разные. «×3» всегда делает три шага, а «до стены» — столько, сколько нужно.' },
-    { q: 'Что из этого — тоже «повторяй, пока…»?',
-      opts: [{ t: 'Мыть тарелки, пока раковина не опустеет', ok: true }, { t: 'Один раз закрыть дверь' }, { t: 'Сказать «привет»' }],
-      yes: 'Верно: моешь по одной, пока не кончатся.',
-      no: 'Ищи дело, которое повторяют, пока что-то не случится. Например, мыть тарелки, пока раковина не опустеет.' }
-  ]
-}, {
-  n: 10, title: 'Короче всех', sub: 'Самая короткая программа', kind: 'short',
-  bet: { q: 'Две программы приводят робота к звезде. Какая лучше?', opts: ['Длинная — она подробнее', 'Короткая и понятная', 'Без разницы'], ok: 1 },
-  grid: 5, start: { x: 0, y: 4, dir: 0 }, stars: [[4, 0]], walls: [[3, 1], [4, 1]], keys: [[0, 0]], doors: [[3, 0]],   // к звезде — только через дверь
-  blocks: ['f', 'f3', 'w', 'l', 'r'], limit: 8, best: 3,
-  task: 'Возьми ключ, открой дверь и забери звезду — короче всех',
-  intro: { emoji: '✂️', title: 'Короче всех',
-    law: 'Звезда за дверью, а ключ в углу. Собери всё программой как можно короче.',
-    tip: 'Самая короткая — всего 3 блока. Своя команда ★ тоже пригодится' },
-  win: { emoji: '✂️', title: 'Короче не бывает!',
-    law: 'Хорошая программа — короткая и понятная',
-    fact: 'Программу для полёта людей на Луну распечатали — и стопка бумаги оказалась ростом со взрослого человека. Каждую строчку там проверяли много раз.' },
-  quiz: [
-    { q: 'Две программы приводят робота к цели. Какая лучше?',
-      opts: [{ t: 'Та, что короче и понятнее', ok: true }, { t: 'Та, что длиннее' }, { t: 'Без разницы' }],
-      yes: 'Да. Делают одно и то же, но короткую легче читать.',
-      no: 'Если результат одинаковый, лучше та, которую проще прочитать и проверить, — короткая.' },
-    { q: 'Почему короткую программу легче проверять?',
-      opts: [{ t: 'В ней меньше мест, где спрячется ошибка', ok: true }, { t: 'Она быстрее печатается' }, { t: 'Короткие программы не ошибаются' }],
-      yes: 'Верно. Меньше команд — меньше мест для ошибки.',
-      no: 'Ошибаться могут и короткие. Но в них меньше мест, где ошибка спрячется.' }
-  ]
-}];
-
-const CB_DIRS = [[0, -1], [1, 0], [0, 1], [-1, 0]];
-
-/* ── программа → шаги; шаги → кадры ─────────────────────── */
-function cbExpand(prog, fn, path) {
-  const out = [];
-  (prog || []).forEach((t, i) => {
-    const p = (path || []).concat(i);
-    if (typeof t === 'string') {
-      if (t === 'f3') out.push({ op: 'f', pc: p }, { op: 'f', pc: p }, { op: 'f', pc: p });
-      else if (t === 'fn') (fn || []).forEach((x, j) => out.push({ op: x === 'f3' ? 'f' : x, pc: p, fi: j }));
-      else out.push({ op: t, pc: p });
-    } else if (t.rep) {
-      for (let k = 0; k < t.rep; k++) cbExpand(t.body, fn, p).forEach(s => out.push(s));
-    }
-  });
-  return out;
+const B1_ROUNDS = [['cat', 'stone', 'tree'], ['bot', 'fire', 'mush']];
+const B1_BIN = { alive: { x: 14, y: 236, w: 140 }, dead: { x: 186, y: 236, w: 140 } };
+function B1Obj({ id, x, y, anim, test }) {
+  const t = anim || 0;
+  const grow = test === 'grow' ? 0.65 + 0.35 * t : 1;
+  if (id === 'cat') return h('g', null, h(BCat, { x, y, k: 1.3 * grow }), test === 'kids' && t > 0.3 && h('g', null, h(BCat, { x: x + 50, y, k: 1.1, small: true }), h(BCat, { x: x - 40, y, k: 1.1, small: true })),
+    test === 'eat' && h('g', null, h('ellipse', { cx: x + 44, cy: y - 4, rx: 16, ry: 6, fill: '#7C9BFF' }), t < 0.7 && h('ellipse', { cx: x + 44, cy: y - 8, rx: 10, ry: 3, fill: '#D9B98F' })));
+  if (id === 'stone') return h(BStone, { x, y, k: 1.6 });
+  if (id === 'tree') return h('g', null, h(BTree, { x, y, k: 1.25 * grow }), test === 'kids' && t > 0.3 && h(BSprout, { x: x + 52, y, k: 0.9 }),
+    test === 'eat' && h('g', null, [0, 1, 2].map(i => h('path', { key: i, d: `M${x - 10 + i * 10} ${y} q-4 14 2 22`, stroke: '#A0714A', strokeWidth: 2, fill: 'none' })), h('text', { x: x - 54, y: y - 2, fontSize: 16 }, '💧')));
+  if (id === 'bot') return h('g', null, h(BBot, { x, y, k: 1.5, charge: test === 'eat' }), test === 'eat' && h('path', { d: `M${x + 24} ${y - 30} L${x + 60} ${y - 30} L${x + 60} ${y}`, stroke: '#2B2838', strokeWidth: 2.5, fill: 'none' }));
+  if (id === 'fire') return h('g', null, h(BFire, { x, y, k: 1.4, big: test === 'grow' && t > 0.4 }), test === 'kids' && t > 0.3 && h('g', null,
+    [[-40, -60], [30, -70], [50, -30]].map(([dx, dy], i) => h('circle', { key: i, cx: x + dx * t, cy: y + dy * t, r: 3, fill: '#FFB347' })), t > 0.8 && h(BFire, { x: x + 64, y, k: 0.6 })));
+  return h('g', null, h(BMush, { x, y, k: 1.5 * grow }), test === 'kids' && t > 0.3 && h('g', null, h(BMush, { x: x + 46, y, small: true, k: 1.4 }), h(BMush, { x: x - 42, y, small: true, k: 1.2 })));
 }
-/* Кадры движения. rule — правило «Если стена»: { a, b } — что делать при
-   стене и без неё ('f' — вперёд, 'l'/'r' — поворот); робот едет сам,
-   ходит по кругу — конец 'loop'. Двери закрыты, пока не взят ключ. */
-function cbSim(L, ops, rule) {
-  const W = new Set((L.walls || []).map(w => w.join(','))), D = new Set((L.doors || []).map(w => w.join(','))), g = new Set(), gk = new Set();
-  let b = { ...L.start };
-  const fr = [{ ...b, got: [], gk: [] }];
-  const free = (x, y) => x >= 0 && y >= 0 && x < L.grid && y < L.grid && !W.has(x + ',' + y) && !(D.has(x + ',' + y) && !gk.size);
-  const take = () => {
-    (L.stars || []).forEach(([sx, sy], i) => { if (sx === b.x && sy === b.y) g.add(i); });
-    (L.keys || []).forEach(([kx, ky], i) => { if (kx === b.x && ky === b.y) gk.add(i); });
+const B1Mini = ({ id, x, y, k }) => h('g', { transform: `translate(${x} ${y}) scale(${k})` }, h(B1Obj, { id, x: 0, y: 0 }));
+function Level1Alive({ onWin, onHome }) {
+  const [phase, setPhase] = useState('intro');
+  const [rd, setRd] = useState(0);
+  const [idx, setIdx] = useState(0);
+  const [res, setRes] = useState({});
+  const [test, setTest] = useState(null);
+  const [anim, setAnim] = useState(0);
+  const [drag, setDrag] = useState(null);
+  const [sorted, setSorted] = useState([]);            // [{id, bin}]
+  const [note, setNote] = useState('');
+  const [solved, setSolved] = useState(false);
+  const svg = useRef(null), A = useRef(null);
+  const list = B1_ROUNDS[rd], id = list[idx], O = B1_OBJ[id];
+  const tested = B1_TESTS.filter(t => res[id + t.id] != null).length;
+  const doTest = tid => { if (A.current || solved) return; SFX.pop(); setTest(tid); A.current = { t: 0 }; setAnim(0); setNote(''); };
+  useLoop(dt => {
+    const a = A.current; if (!a) return;
+    a.t = Math.min(1, a.t + dt / 1.1); setAnim(a.t);
+    if (a.t >= 1) { A.current = null; const r = O.r[test]; setRes(s => ({ ...s, [id + test]: r })); (r === 1 ? SFX.ok : r === 2 ? SFX.tick : SFX.no)(); setNote(O.say[test]); }
+  }, phase === 'play' && !!A.current);
+  const binAt = p => p.y > 222 ? (p.x < 170 ? 'alive' : 'dead') : null;
+  const place = bin => {
+    if (tested < 4) { SFX.no(); setNote('Сначала проведи все четыре пробы.'); return; }
+    const ok = (bin === 'alive') === O.alive;
+    if (!ok) { SFX.no(); setNote(O.alive ? 'Подумай ещё: во всех четырёх пробах ответ «да».' : id === 'fire' ? 'Костёр похож на живое! Но посмотри на пробу микроскопом: клеток нет.' : id === 'bot' ? 'Робот заряжается — будто ест. Но растёт ли он? Есть ли в нём клетки?' : 'Посмотри на пробы ещё раз.'); return; }
+    SFX.ok(); const ns = sorted.concat({ id, bin }); setSorted(ns); setNote(O.yes); setTest(null); setAnim(0);
+    if (idx + 1 < list.length) setIdx(idx + 1);
+    else setSolved(true);
   };
-  const all = () => g.size === (L.stars || []).length;
-  if (rule) {
-    const seen = new Set();
-    for (let n = 0; n < 80; n++) {
-      if (all()) return { end: 'goal', fr };
-      const k = b.x + ',' + b.y + ',' + b.dir;
-      if (seen.has(k)) return { end: 'loop', fr };
-      seen.add(k);
-      const [dx, dy] = CB_DIRS[b.dir], wall = !free(b.x + dx, b.y + dy);
-      if (typeof rule === 'object') {
-        const op = wall ? rule.a : rule.b;
-        if (op === 'f') { if (wall) return { end: 'crash', fr, wall: true }; b = { ...b, x: b.x + dx, y: b.y + dy }; take(); }
-        else b = { ...b, dir: (b.dir + (op === 'r' ? 1 : 3)) % 4 };
-      } else if (!wall) { b = { ...b, x: b.x + dx, y: b.y + dy }; take(); }
-      else b = { ...b, dir: (b.dir + (rule === 'r' ? 1 : 3)) % 4 };
-      fr.push({ ...b, got: [...g], gk: [...gk] });
-    }
-    return { end: 'loop', fr };
-  }
-  for (const s of ops) {
-    if (s.op === 'l') b = { ...b, dir: (b.dir + 3) % 4 };
-    else if (s.op === 'r') b = { ...b, dir: (b.dir + 1) % 4 };
-    else if (s.op === 'w') {
-      for (let c = 0; c < 20; c++) {
-        const [dx, dy] = CB_DIRS[b.dir];
-        if (!free(b.x + dx, b.y + dy)) break;
-        b = { ...b, x: b.x + dx, y: b.y + dy }; take();
-        fr.push({ ...b, got: [...g], gk: [...gk], pc: s.pc, fi: s.fi });
-      }
-      continue;
-    } else {
-      const [dx, dy] = CB_DIRS[b.dir];
-      if (!free(b.x + dx, b.y + dy)) return { end: 'crash', fr, at: s.pc, wall: W.has((b.x + dx) + ',' + (b.y + dy)), door: D.has((b.x + dx) + ',' + (b.y + dy)) };
-      b = { ...b, x: b.x + dx, y: b.y + dy }; take();
-    }
-    fr.push({ ...b, got: [...g], gk: [...gk], pc: s.pc, fi: s.fi });
-  }
-  return { end: all() ? 'goal' : 'done', fr };
-}
-function cbCount(prog) {
-  return prog.reduce((n, t) => n + (typeof t === 'string' ? 1 : 1 + t.body.length), 0);
-}
-
-/* ── поле ─────────────────────────────────────────────────── */
-function CBGrid({ lvl, bot, got, crashed, trail, onCell, guess, mark, max, keys }) {
-  const size = lvl.grid;
-  const turn = useRef(null);
-  if (!turn.current) turn.current = { dir: bot.dir, a: bot.dir * 90 };
-  else if (turn.current.dir !== bot.dir) {
-    let d = (bot.dir - turn.current.dir + 4) % 4;
-    if (d === 3) d = -1;
-    turn.current = { dir: bot.dir, a: turn.current.a + d * 90 };
-  }
-  const rot = turn.current.a;
-  const wallSet = new Set((lvl.walls || []).map(w => w.join(',')));
-  return /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: 'grid', gridTemplateColumns: `repeat(${size},1fr)`, gridTemplateRows: `repeat(${size},1fr)`, gap: 4, width: '100%', maxWidth: max || 320,
-      aspectRatio: '1', background: 'rgba(255,255,255,.55)', borderRadius: 20, padding: 8,
-      boxSizing: 'border-box', boxShadow: '0 6px 0 rgba(45,27,69,.08)', flexShrink: 0
-    }
-  }, Array.from({ length: size * size }, (_, i) => {
-    const x = i % size, y = i / size | 0, k = x + ',' + y;
-    const isWall = wallSet.has(k);
-    const isStar = (lvl.stars || []).some(([sx, sy], si) => sx === x && sy === y && !got.has(si));
-    const isBot = bot.x === x && bot.y === y;
-    const isGuess = guess && guess.x === x && guess.y === y;
-    const isMark = mark && mark.x === x && mark.y === y;
-    const isKey = (lvl.keys || []).some(([kx, ky], ki) => kx === x && ky === y && !(keys && keys.has(ki)));
-    const isDoor = (lvl.doors || []).some(([dx, dy]) => dx === x && dy === y), doorOpen = isDoor && keys && keys.size > 0;
-    const isPaint = (lvl.paint || []).some(([px, py]) => px === x && py === y);
-    return /*#__PURE__*/React.createElement("div", {
-      key: i,
-      onClick: onCell && !isWall ? () => onCell(x, y) : undefined,
-      style: {
-        borderRadius: 8,
-        background: isWall ? '#4A3B63' : isMark ? 'rgba(93,217,160,.55)' : trail && trail.has(k) ? 'rgba(181,161,255,.5)' : 'rgba(229,220,255,.55)',
-        boxShadow: isGuess ? 'inset 0 0 0 3px #FFB020' : isPaint ? 'inset 0 0 0 2px #7C5FE0' : 'none',
-        outline: isPaint && !(trail && trail.has(k)) ? '2px dashed rgba(124,95,224,.55)' : 'none', outlineOffset: -5,
-        cursor: onCell && !isWall ? 'pointer' : 'default',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: size > 5 ? 20 : 24, lineHeight: 1,
-        position: 'relative', transition: 'background .25s', minHeight: 0, overflow: 'visible'
-      }
-    }, isWall ? '🧱' : isStar ? '⭐' : isKey ? '🔑' : isDoor ? (doorOpen ? '' : '🚪') : '', isBot && /*#__PURE__*/React.createElement("div", {
-      className: crashed ? 'ak-shake' : '',
-      style: { position: 'absolute', inset: 2 }
-    },
-    /* Робот — машинка сверху: нос и глаза смотрят по ходу, и она целиком
-       поворачивается на «Налево/Направо». Раньше был эмодзи лицом к зрителю
-       со стрелкой сбоку — «Вперёд» уводил вправо, и было непонятно почему. */
-    /*#__PURE__*/React.createElement("svg", {
-      viewBox: '0 0 40 40',
-      style: { width: '100%', height: '100%', transform: `rotate(${rot}deg)`, transition: 'transform .3s', overflow: 'visible' }
-    },
-      /*#__PURE__*/React.createElement("path", { d: 'M20 0 L26 7 L14 7 Z', fill: '#FFB020', stroke: '#C77F00', strokeWidth: 1 }),
-      /*#__PURE__*/React.createElement("rect", { x: 4, y: 12, width: 6, height: 20, rx: 2.5, fill: '#4A3B63' }),
-      /*#__PURE__*/React.createElement("rect", { x: 30, y: 12, width: 6, height: 20, rx: 2.5, fill: '#4A3B63' }),
-      /*#__PURE__*/React.createElement("rect", { x: 8, y: 8, width: 24, height: 28, rx: 9, fill: '#FFFFFF', stroke: '#7C5FE0', strokeWidth: 2.2 }),
-      /*#__PURE__*/React.createElement("rect", { x: 11.5, y: 11, width: 17, height: 10, rx: 4, fill: '#2D1B45' }),
-      /*#__PURE__*/React.createElement("circle", { cx: 16, cy: 16, r: 2.2, fill: '#7BF0BC' }),
-      /*#__PURE__*/React.createElement("circle", { cx: 24, cy: 16, r: 2.2, fill: '#7BF0BC' }),
-      /*#__PURE__*/React.createElement("rect", { x: 14, y: 26, width: 12, height: 4, rx: 2, fill: '#E4DDF5' }))));
-  }));
-}
-
-/* блок программы: обычный, в повторе, в своей команде */
-function CBChip({ id, on, onClick, small }) {
-  const B = CB_BLOCKS[id];
-  return /*#__PURE__*/React.createElement("button", {
-    onClick: onClick,
-    style: {
-      border: 'none', cursor: onClick ? 'pointer' : 'default', borderRadius: 10,
-      padding: small ? '6px 8px' : '7px 9px', fontSize: small ? 12 : 12.5, fontWeight: 800,
-      fontFamily: 'var(--ak-body)', color: '#2D1B45', background: B.c,
-      boxShadow: on ? '0 0 0 3px #2D1B45' : `0 3px 0 ${B.d}`, transition: 'box-shadow .15s'
-    }
-  }, B.label);
-}
-function CBRow({ label, count, children, hint }) {
-  return /*#__PURE__*/React.createElement("div", { style: { width: '100%', maxWidth: 320 } },
-    /*#__PURE__*/React.createElement("div", {
-      style: { display: 'flex', justifyContent: 'space-between', fontSize: 12, fontWeight: 700, color: 'var(--ak-ink-2)', fontFamily: 'var(--ak-display)', marginBottom: 4 }
-    }, /*#__PURE__*/React.createElement("span", null, label), count != null && /*#__PURE__*/React.createElement("span", null, count)),
-    /*#__PURE__*/React.createElement("div", {
-      style: { minHeight: 44, background: 'rgba(255,255,255,.75)', borderRadius: 14, padding: 6, display: 'flex', gap: 5, flexWrap: 'wrap', alignItems: 'center', boxShadow: 'inset 0 2px 6px rgba(45,27,69,.08)' }
-    }, children, hint && /*#__PURE__*/React.createElement("span", {
-      style: { fontSize: 12.5, color: 'var(--ak-ink-3)', padding: '8px 6px', fontFamily: 'var(--ak-display)' }
-    }, hint)));
-}
-function CBPalette({ blocks, disabled, onAdd }) {
-  return /*#__PURE__*/React.createElement("div", {
-    style: { display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }
-  }, blocks.map(id => /*#__PURE__*/React.createElement("button", {
-    key: id, className: "ak-tap", disabled: disabled, onClick: () => onAdd(id),
-    style: {
-      border: 'none', cursor: 'pointer', borderRadius: 14, padding: blocks.length > 4 ? '9px 11px' : '11px 14px',
-      fontSize: blocks.length > 4 ? 13 : 14, fontWeight: 800,
-      fontFamily: 'var(--ak-body)', color: '#2D1B45', background: CB_BLOCKS[id].c,
-      boxShadow: `0 5px 0 ${CB_BLOCKS[id].d}`, opacity: disabled ? .5 : 1
-    }
-  }, CB_BLOCKS[id].label)));
-}
-
-/* ── проверка связи: два вопроса, ошибку можно поправить ─── */
-function CBQuiz({ lvl, onDone }) {
-  const qs = React.useMemo(() => lvl.quiz.map(q => ({ ...q, opts: window.nooka && window.nooka.shuffled ? window.nooka.shuffled(q.opts) : q.opts })), [lvl]);
-  const [pick, setPick] = useState([null, null]);
-  const both = qs.every((q, i) => pick[i] != null && q.opts[pick[i]].ok);
-  return /*#__PURE__*/React.createElement("div", {
-    style: { flex: 1, display: 'flex', flexDirection: 'column', gap: 12, padding: '6px 16px 20px', overflowY: 'auto', alignItems: 'center' }
-  }, /*#__PURE__*/React.createElement(TaskBadge, null, 'Проверка связи: два вопроса'),
-  qs.map((q, qi) => /*#__PURE__*/React.createElement("div", {
-    key: qi,
-    style: { width: '100%', maxWidth: 340, background: 'rgba(255,255,255,.85)', borderRadius: 20, padding: '14px 14px 10px', boxShadow: '0 6px 0 rgba(45,27,69,.06)' }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: { fontFamily: 'var(--ak-display)', fontWeight: 700, fontSize: 15, color: 'var(--ak-ink)', lineHeight: 1.35, marginBottom: 10 }
-  }, q.q), q.opts.map((o, oi) => {
-    const on = pick[qi] === oi;
-    return /*#__PURE__*/React.createElement("button", {
-      key: oi,
-      onClick: () => setPick(p => { const n = p.slice(); n[qi] = oi; return n; }),
-      style: {
-        display: 'block', width: '100%', marginBottom: 7, padding: '11px 13px', border: 'none', borderRadius: 14,
-        cursor: 'pointer', textAlign: 'left', fontFamily: 'var(--ak-body)', fontWeight: 700, fontSize: 13.5,
-        color: 'var(--ak-ink)',
-        background: on ? (o.ok ? 'rgba(93,217,160,.28)' : 'rgba(255,122,100,.22)') : 'rgba(229,220,255,.45)',
-        boxShadow: on ? `inset 0 0 0 2px ${o.ok ? '#3FC685' : '#FF7A64'}` : 'none'
-      }
-    }, o.t);
-  }), pick[qi] != null && /*#__PURE__*/React.createElement("div", {
-    style: { fontSize: 13, lineHeight: 1.45, color: 'var(--ak-ink-2)', padding: '2px 4px 4px' }
-  }, q.opts[pick[qi]].ok ? q.yes : q.no))),
-  /*#__PURE__*/React.createElement("button", {
-    className: "ak-btn ak-btn--ok", style: { width: '100%', maxWidth: 340 }, disabled: !both, onClick: onDone
-  }, both ? 'Дальше' : 'Ответь на оба'));
-}
-
-/* ── уровень ──────────────────────────────────────────────── */
-/* своя команда ★ из уровня 7 живёт между уровнями */
-function cbSavedFn() { try { const f = JSON.parse(localStorage.getItem('nooka_code_fn')); return Array.isArray(f) ? f : []; } catch (e) { return []; } }
-function CBLevel({ lvl, onWin, onHome }) {
-  const multi = lvl.kind === 'rooms' || lvl.kind === 'ifelse';
-  const first = lvl.kind === 'predict' ? lvl.rounds[0] : multi ? lvl.rooms[0] : lvl.boards ? { ...lvl, ...lvl.boards[0] } : lvl;
-  const [phase, setPhase] = useState('intro'); // intro | edit | run | quiz | win
-  const [prog, setProg] = useState(lvl.kind === 'fix' ? first.given.slice() : []);
-  const [rep, setRep] = useState(2);
-  const [fn, setFn] = useState(() => lvl.kind === 'short' ? cbSavedFn() : []);
-  const [bi, setBi] = useState(0);                 // доска внутри уровня (у «Найди ошибку» и «Повтори» их две)
-  const [rule2, setRule2] = useState({ a: null, b: null });
-  const [keys, setKeys] = useState(new Set());
-  const [betPick, setBetPick] = useState(null);
-  const [okMsg, setOkMsg] = useState('');
-  const [rule, setRule] = useState(null);
-  const [room, setRoom] = useState(0);
-  const [rd, setRd] = useState(0);               // раунд «Угадай»
-  const [guess, setGuess] = useState(null);
-  const [mark, setMark] = useState(null);
-  const [score, setScore] = useState(0);
-  const [bot, setBot] = useState(first.start);
-  const [got, setGot] = useState(new Set());
-  const [trail, setTrail] = useState(new Set());
-  const [fail, setFail] = useState(null);
-  const [crashed, setCrashed] = useState(false);
-  const [pc, setPc] = useState(null);
-  const [fi, setFi] = useState(null);
-  const timer = useRef(null);
-  useEffect(() => () => clearInterval(timer.current), []);
-  /* Поле 320 пикселей плюс программа и блоки не влезали в низкий телефон:
-     «Запуск» уезжал под край, и ребёнок не видел, что нажимать. Поле
-     уменьшается ровно настолько, насколько не хватает места (не меньше 160). */
-  const body = useRef(null);
-  const [gridMax, setGridMax] = useState(320);
-  React.useLayoutEffect(() => {
-    const el = body.current;
-    if (!el) return;
-    const over = el.scrollHeight - el.clientHeight;
-    if (over > 0 && gridMax > 160) setGridMax(m => Math.max(160, m - over));
-  });
-
-  const board = lvl.kind === 'predict' ? lvl.rounds[rd] : multi ? lvl.rooms[room] : lvl.boards ? { ...lvl, ...lvl.boards[bi] } : lvl;
-  const editing = phase === 'edit';
-  const program = lvl.kind === 'loop' ? [{ rep: rep, body: prog }] : lvl.kind === 'predict' ? board.prog : prog;
-
-  const reset = (to) => {
-    clearInterval(timer.current);
-    const b = to || board;
-    setBot(b.start); setGot(new Set()); setTrail(new Set()); setPc(null); setFi(null); setCrashed(false); setKeys(new Set()); setOkMsg('');
-    setPhase('edit');
-  };
-  /* проиграть кадры; done(res) — когда робот остановился */
-  const play = (B, res, done) => {
-    clearInterval(timer.current);
-    setPhase('run'); setCrashed(false);
-    setBot(B.start); setGot(new Set()); setKeys(new Set()); setTrail(new Set([B.start.x + ',' + B.start.y]));
-    let i = 0;
-    timer.current = setInterval(() => {
-      i++;
-      if (i >= res.fr.length) {
-        clearInterval(timer.current);
-        if (res.end === 'crash') setCrashed(true);
-        return done(res);
-      }
-      const f = res.fr[i];
-      setBot({ x: f.x, y: f.y, dir: f.dir }); setGot(new Set(f.got)); setKeys(new Set(f.gk || [])); setPc(f.pc || null); setFi(f.fi == null ? null : f.fi);
-      setTrail(t => { const n = new Set(t); n.add(f.x + ',' + f.y); return n; });
-    }, 380);
-  };
-  const failText = (res) =>
-    res.end === 'crash' ? (res.door ? 'Дверь заперта! Сначала возьми ключ 🔑' : res.wall ? 'Бум! Робот упёрся в стену. Посмотри, на какой команде.' : 'Ой! Робот чуть не упал с поля. Посчитай шаги точнее.')
-      : res.end === 'loop' ? 'Робот ходит по кругу: с этим поворотом лабиринт не пройти. Попробуй другой.'
-        : res.fr[res.fr.length - 1].got.length ? 'Одна звезда есть, но не все! Дособери маршрут.' : 'Робот выполнил программу, но до звезды не дошёл. Подправь команды!';
-
-  /* успех на доске: следующая доска или проверка связи; своя команда ★ запоминается */
-  const goalOrNext = () => {
-    if (lvl.kind === 'func') { try { localStorage.setItem('nooka_code_fn', JSON.stringify(fn)); } catch (e) {} }
-    if (lvl.boards && bi + 1 < lvl.boards.length) {
-      const nb = { ...lvl, ...lvl.boards[bi + 1] };
-      setOkMsg('Получилось! Теперь следующая задача');
-      setTimeout(() => { setBi(bi + 1); setProg(lvl.kind === 'fix' ? nb.given.slice() : []); setRep(2); reset(nb); }, 1100);
-      return;
-    }
-    setPhase('quiz');
-  };
-  const run = () => {
-    if (lvl.kind === 'ifelse') {
-      if (!rule2.a || !rule2.b) return;
-      const go = (k) => {
-        const B = lvl.rooms[k];
-        setRoom(k);
-        play(B, cbSim(B, [], rule2), r => {
-          if (r.end !== 'goal') return setFail(`Лабиринт ${k + 1}: ${r.end === 'crash' ? 'робот поехал прямо в стену' : 'робот ходит по кругу'}. Правило должно сработать во всех трёх.`);
-          if (k + 1 < lvl.rooms.length) setTimeout(() => go(k + 1), 650);
-          else setPhase('quiz');
-        });
-      };
-      return go(0);
-    }
-    if (lvl.kind === 'rule') {
-      if (!rule) return;
-      const res = cbSim(board, [], rule);
-      return play(board, res, r => r.end === 'goal' ? setPhase('quiz') : setFail(failText(r)));
-    }
-    if (lvl.kind === 'rooms') {
-      /* одна программа по очереди во всех комнатах */
-      const go = (k) => {
-        const B = lvl.rooms[k];
-        setRoom(k);
-        const res = cbSim(B, cbExpand(prog));
-        play(B, res, r => {
-          if (r.end !== 'goal') return setFail(`В комнате ${k + 1} робот не дошёл: она ${B.grid === 4 ? 'меньше' : B.grid === 6 ? 'больше' : 'другая'}. Программа должна подходить к любой.`);
-          if (k + 1 < lvl.rooms.length) setTimeout(() => go(k + 1), 650);
-          else setPhase('quiz');
-        });
-      };
-      if (!prog.length) return;
-      return go(0);
-    }
-    if (!cbCount(program) || (lvl.kind === 'func' && !fn.length)) return;
-    const res = cbSim(board, cbExpand(program, fn));
-    /* рисунок: робот должен проехать все клетки по пунктиру */
-    const ok = board.paint ? res.end !== 'crash' && board.paint.every(([x, y]) => res.fr.some(f => f.x === x && f.y === y)) : res.end === 'goal';
-    play(board, res, r => ok ? goalOrNext() : setFail(board.paint && r.end !== 'crash' ? 'Квадрат не дорисован. Сколько раз нужно повторить одну сторону?' : failText(r)));
-  };
-
-  /* «Угадай»: коснулся клетки — запускаем и сравниваем */
-  const tapCell = (x, y) => {
-    if (phase !== 'edit' || lvl.kind !== 'predict' || guess) return;
-    setGuess({ x, y });
-    const res = cbSim(board, cbExpand(board.prog));
-    setTimeout(() => play(board, res, () => {
-      const end = res.fr[res.fr.length - 1];
-      setMark({ x: end.x, y: end.y });
-      if (end.x === x && end.y === y) setScore(s => s + 1);
-      setPhase('edit');
-    }), 350);
-  };
-  const nextRound = () => {
-    if (rd + 1 >= lvl.rounds.length) return setPhase('quiz');
-    const B = lvl.rounds[rd + 1];
-    setRd(rd + 1); setGuess(null); setMark(null);
-    reset(B);
-  };
-
-  const add = id => {
-    if (!editing) return;
-    if (lvl.kind === 'loop') { if (prog.length < lvl.bodyMax) setProg(p => [...p, id]); return; }
-    if (cbCount(prog) < lvl.limit) setProg(p => [...p, id]);
-  };
-  const removeAt = i => { if (editing) setProg(p => p.filter((_, j) => j !== i)); };
-  const cycleAt = i => { if (editing) setProg(p => p.map((t, j) => j === i ? CB_FIX_CYCLE[(CB_FIX_CYCLE.indexOf(t) + 1) % 3] : t)); };
-
-  const n = cbCount(prog);
-  const top = /*#__PURE__*/React.createElement(TopBar, { key: 'top', level: lvl.n, title: lvl.title, onHome: onHome, step: lvl.kind === 'predict' ? rd : lvl.boards ? bi : 1, total: lvl.kind === 'predict' ? lvl.rounds.length : lvl.boards ? lvl.boards.length : 1 });
-  const shell = (kids) => /*#__PURE__*/React.createElement("div", {
-    className: "ak",
-    style: {
-      minHeight: '100vh', height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden',
-      background: 'radial-gradient(120% 60% at 50% -10%,#E5DCFF 0%,transparent 60%),linear-gradient(180deg,var(--ak-bg-2),var(--ak-bg))'
-    }
-  }, kids);
-
-  if (phase === 'quiz' || phase === 'win') {
-    const len = lvl.kind === 'short' ? n : 0;
-    const shortOk = lvl.kind !== 'short' || len <= lvl.best;
-    return shell([top,
-      phase === 'quiz' && /*#__PURE__*/React.createElement(CBQuiz, { key: 'q', lvl: lvl, onDone: () => setPhase('win') }),
-      phase === 'win' && /*#__PURE__*/React.createElement(WinModal, {
-        key: 'w', emoji: lvl.win.emoji,
-        title: shortOk ? (lvl.kind === 'predict' ? `${lvl.win.title} ${score} из ${lvl.rounds.length}` : lvl.win.title) : `Работает — ${len} ${window.nooka ? window.nooka.plural(len, 'блок', 'блока', 'блоков') : 'блоков'}`,
-        law: lvl.win.law,
-        fact: shortOk ? lvl.win.fact : `А можно уложиться в ${lvl.best} блока — попробуй «Вперёд до стены».`,
-        cta: lvl.n < CB_LEVELS.length ? 'Дальше →' : 'На главную →', onNext: onWin, onHome: onHome,
-        extra: lvl.bet && betPick != null ? /*#__PURE__*/React.createElement("div", {
-          style: { background: betPick === lvl.bet.ok ? 'var(--ak-ok-1)' : '#fff', border: '2px dashed ' + (betPick === lvl.bet.ok ? 'var(--ak-ok-2)' : 'var(--ak-phys-2)'), borderRadius: 16, padding: '10px 14px', marginBottom: 12, textAlign: 'left', fontSize: 13.5, lineHeight: 1.45, color: 'var(--ak-ink)' }
-        }, /*#__PURE__*/React.createElement("div", { style: { fontFamily: 'var(--ak-display)', color: betPick === lvl.bet.ok ? 'var(--ak-ok-3)' : 'var(--ak-phys-3)', marginBottom: 2 } }, betPick === lvl.bet.ok ? '🎯 Ставка сыграла!' : '🤔 Ставка и опыт'),
-          'Твоя ставка: «', lvl.bet.opts[betPick], '».', betPick === lvl.bet.ok ? ' Так и есть.' : /*#__PURE__*/React.createElement("span", null, ' На деле: «', /*#__PURE__*/React.createElement("b", null, lvl.bet.opts[lvl.bet.ok]), '».')) : null
-      })]);
-  }
-
-  /* что ставится в «программу» на экране для каждого вида уровня */
-  const lit = (i) => phase === 'run' && pc && pc[0] === i;
-  let editor = null;
-  if (lvl.kind === 'build' || lvl.kind === 'short' || lvl.kind === 'rooms') {
-    editor = [
-      lvl.kind === 'short' && fn.length > 0 && /*#__PURE__*/React.createElement(CBRow, { key: 'fd', label: '★ Твоя команда из уровня 7:' },
-        fn.map((id, i) => /*#__PURE__*/React.createElement(CBChip, { key: i, id, small: true, on: phase === 'run' && fi === i }))),
-      /*#__PURE__*/React.createElement(CBRow, { key: 'p', label: 'Программа', count: n + ' / ' + lvl.limit, hint: prog.length ? null : '← добавь команды снизу' },
-        prog.map((id, i) => /*#__PURE__*/React.createElement(CBChip, { key: i, id: id, on: lit(i), onClick: () => removeAt(i) }))),
-      /*#__PURE__*/React.createElement(CBPalette, { key: 'b', blocks: lvl.kind === 'short' && fn.length ? lvl.blocks.concat('fn') : lvl.blocks, disabled: !editing || n >= lvl.limit, onAdd: add })
-    ];
-  } else if (lvl.kind === 'fix') {
-    editor = [
-      /*#__PURE__*/React.createElement(CBRow, { key: 'p', label: 'Чужая программа · коснись блока, чтобы поменять' },
-        prog.map((id, i) => /*#__PURE__*/React.createElement(CBChip, { key: i, id: id, on: lit(i), onClick: () => cycleAt(i) })))
-    ];
-  } else if (lvl.kind === 'loop') {
-    editor = [
-      /*#__PURE__*/React.createElement(CBRow, { key: 'p', label: 'Программа' },
-        /*#__PURE__*/React.createElement("div", {
-          style: { display: 'flex', flexWrap: 'wrap', gap: 5, alignItems: 'center', padding: '6px 8px', borderRadius: 12, background: 'rgba(255,210,98,.35)', boxShadow: phase === 'run' ? '0 0 0 3px #2D1B45' : 'inset 0 0 0 2px #D4A22B', width: '100%', boxSizing: 'border-box' }
-        }, /*#__PURE__*/React.createElement("button", {
-          onClick: () => editing && setRep(r => r >= lvl.repMax ? 2 : r + 1),
-          style: { border: 'none', cursor: 'pointer', borderRadius: 10, padding: '7px 10px', fontWeight: 900, fontSize: 13, fontFamily: 'var(--ak-body)', color: '#5A3A08', background: '#FFD262', boxShadow: '0 3px 0 #D4A22B' }
-        }, '↻ Повтори ', rep, ' ', window.nooka ? window.nooka.plural(rep, 'раз', 'раза', 'раз') : 'раз'),
-        prog.map((id, i) => /*#__PURE__*/React.createElement(CBChip, { key: i, id: id, small: true, on: phase === 'run' && pc && pc[1] === i, onClick: () => removeAt(i) })),
-        Array.from({ length: lvl.bodyMax - prog.length }, (_, i) => /*#__PURE__*/React.createElement("span", {
-          key: 'e' + i, style: { width: 34, height: 28, borderRadius: 9, border: '2px dashed rgba(212,162,43,.6)', boxSizing: 'border-box' }
-        })))),
-      /*#__PURE__*/React.createElement(CBPalette, { key: 'b', blocks: lvl.blocks, disabled: !editing || prog.length >= lvl.bodyMax, onAdd: add })
-    ];
-  } else if (lvl.kind === 'func') {
-    editor = [
-      /*#__PURE__*/React.createElement(CBRow, { key: 'd', label: '★ Моя команда — это:', count: fn.length + ' / ' + lvl.fnMax, hint: fn.length ? null : 'собери из блоков ниже' },
-        fn.map((id, i) => /*#__PURE__*/React.createElement(CBChip, { key: i, id: id, small: true, on: phase === 'run' && fi === i, onClick: () => editing && setFn(f => f.filter((_, j) => j !== i)) }))),
-      /*#__PURE__*/React.createElement(CBRow, { key: 'p', label: 'Программа', count: n + ' / ' + lvl.limit, hint: prog.length ? null : 'зови ★ блоком ниже' },
-        prog.map((id, i) => /*#__PURE__*/React.createElement(CBChip, { key: i, id: id, on: lit(i), onClick: () => removeAt(i) }))),
-      /* одна палитра: стрелки собирают ★, а сама ★ встаёт в программу */
-      /*#__PURE__*/React.createElement(CBPalette, { key: 'b', blocks: lvl.blocks.concat('fn'), disabled: !editing, onAdd: id => {
-        if (!editing) return;
-        if (id === 'fn') return add(id);
-        if (fn.length < lvl.fnMax) setFn(f => [...f, id]);
-      } })
-    ];
-  } else if (lvl.kind === 'ifelse') {
-    const pickRow = (label, key, ids) => /*#__PURE__*/React.createElement(CBRow, { key },
-      /*#__PURE__*/React.createElement("span", { style: { fontWeight: 800, fontSize: 13.5, color: 'var(--ak-ink)', padding: '0 4px' } }, label),
-      ids.map(id => /*#__PURE__*/React.createElement(CBChip, { key: id, id, on: rule2[key] === id, onClick: () => editing && setRule2(r => ({ ...r, [key]: id })) })));
-    editor = [
-      /*#__PURE__*/React.createElement("div", { key: 'h', style: { fontFamily: 'var(--ak-display)', fontSize: 12, color: 'var(--ak-ink-2)', width: '100%', maxWidth: 320 } }, 'Правило робота · повторяй каждый шаг:'),
-      pickRow('Если впереди стена —', 'a', ['l', 'r', 'f']),
-      pickRow('Иначе —', 'b', ['f', 'l', 'r'])
-    ];
-  } else if (lvl.kind === 'rule') {
-    editor = [
-      /*#__PURE__*/React.createElement(CBRow, { key: 'p', label: 'Правило робота' },
-        /*#__PURE__*/React.createElement("span", { style: { fontWeight: 800, fontSize: 13.5, color: 'var(--ak-ink)', padding: '0 4px' } }, 'Едь вперёд. Если впереди стена —'),
-        ['l', 'r'].map(id => /*#__PURE__*/React.createElement(CBChip, { key: id, id: id, on: rule === id, onClick: () => editing && setRule(id) })))
-    ];
-  } else if (lvl.kind === 'predict') {
-    editor = [
-      /*#__PURE__*/React.createElement(CBRow, { key: 'p', label: 'Программа · раунд ' + (rd + 1) + ' из ' + lvl.rounds.length },
-        board.prog.map((t, i) => typeof t === 'string'
-          ? /*#__PURE__*/React.createElement(CBChip, { key: i, id: t, on: lit(i) })
-          : /*#__PURE__*/React.createElement("div", {
-            key: i, style: { display: 'flex', gap: 5, alignItems: 'center', padding: '5px 7px', borderRadius: 12, background: 'rgba(255,210,98,.35)', boxShadow: lit(i) ? '0 0 0 3px #2D1B45' : 'inset 0 0 0 2px #D4A22B' }
-          }, /*#__PURE__*/React.createElement("b", { style: { fontSize: 12.5, color: '#5A3A08', padding: '0 4px' } }, '↻ Повтори ' + t.rep + ' раза'),
-          t.body.map((id, j) => /*#__PURE__*/React.createElement(CBChip, { key: j, id: id, small: true }))))),
-      mark && /*#__PURE__*/React.createElement("div", {
-        key: 'r', style: { fontFamily: 'var(--ak-display)', fontWeight: 700, fontSize: 15, color: guess && mark.x === guess.x && mark.y === guess.y ? 'var(--ak-ok-3)' : 'var(--ak-ink-2)' }
-      }, guess && mark.x === guess.x && mark.y === guess.y ? 'Точно! Получилось выполнить программу в уме' : 'Робот приехал в зелёную клетку. Пройди по шагам ещё раз')
-    ];
-  }
-
-  const canRun = lvl.kind === 'ifelse' ? !!(rule2.a && rule2.b) : lvl.kind === 'rule' ? !!rule : lvl.kind === 'func' ? fn.length && prog.length : cbCount(program) > 0;
-  return shell([top,
-    phase === 'intro' && /*#__PURE__*/React.createElement(IntroModal, {
-      key: 'i', emoji: lvl.intro.emoji, title: lvl.intro.title, law: lvl.intro.law, diagram: null, tip: lvl.intro.tip,
-      bet: lvl.bet, onBet: setBetPick,
-      onStart: () => setPhase('edit')
+  const down = e => { if (A.current || solved) return; const p = lbPt(svg.current, e); if (Math.abs(p.x - 170) < 70 && p.y > 70 && p.y < 220) { e.currentTarget.setPointerCapture(e.pointerId); setDrag({ x: p.x, y: p.y, x0: p.x, y0: p.y }); } };
+  const move = e => { if (drag) { const p = lbPt(svg.current, e); setDrag(d => ({ ...d, x: p.x, y: p.y })); } };
+  const up = e => { if (!drag) return; const p = lbPt(svg.current, e); const b = binAt(p); setDrag(null); if (b) place(b); };
+  const next = () => { if (rd === 0) { setRd(1); setIdx(0); setSorted([]); setSolved(false); setTest(null); setNote(''); } else setPhase('win'); };
+  const ox = drag ? drag.x : 170, oy = drag ? drag.y + 50 : 190;
+  const mark = r => r === 1 ? { t: '✓', c: '#2BA873', b: '#C8F2DD' } : r === 2 ? { t: '≈', c: '#B5791A', b: '#FFEDA8' } : r === 0 ? { t: '✗', c: '#D9523F', b: '#FFD2C8' } : { t: '?', c: '#A797B8', b: '#F4F2FA' };
+  return h(LbShell, { n: 1, title: 'Живое или нет', step: rd, total: 2, onHome },
+    phase === 'intro' && h(IntroModal, {
+      title: 'Живое или нет', ask: 'Робот живой? А костёр?',
+      task: 'Проведи четыре пробы и положи предмет в нужную корзину.', tip: 'Жми пробы под картинкой, потом тащи предмет в корзину',
+      onStart: () => setPhase('play')
     }),
-    phase !== 'intro' && /*#__PURE__*/React.createElement("div", {
-      key: 'b', ref: body, style: { flex: 1, display: 'flex', flexDirection: 'column', gap: 10, padding: '6px 16px 20px', alignItems: 'center', overflowY: 'auto' }
-    }, /*#__PURE__*/React.createElement(TaskBadge, null, lvl.kind === 'rooms' ? `Комната ${room + 1} из ${lvl.rooms.length} · ${lvl.task}` : lvl.kind === 'ifelse' ? `Лабиринт ${room + 1} из ${lvl.rooms.length} · ${lvl.task}` : okMsg || board.task || lvl.task),
-    /*#__PURE__*/React.createElement(CBGrid, {
-      lvl: board, bot: bot, got: got, crashed: crashed, trail: trail,
-      onCell: lvl.kind === 'predict' && editing && !guess ? tapCell : null, guess: guess, mark: mark, max: gridMax, keys: keys
-    }), editor,
-    lvl.kind === 'predict'
-      ? (mark && phase === 'edit' && /*#__PURE__*/React.createElement("button", {
-        className: "ak-btn ak-btn--ok", style: { width: '100%', maxWidth: 320 }, onClick: nextRound
-      }, rd + 1 < lvl.rounds.length ? 'Следующая программа →' : 'Дальше'))
-      : /*#__PURE__*/React.createElement("div", {
-        style: { display: 'flex', gap: 10, width: '100%', maxWidth: 320 }
-      }, /*#__PURE__*/React.createElement("button", {
-        className: "ak-btn ak-btn--ok", style: { flex: 1 }, disabled: phase === 'run' || !canRun, onClick: run
-      }, "▶ Запуск!"), lvl.kind !== 'fix' && lvl.kind !== 'rule' && lvl.kind !== 'ifelse' && /*#__PURE__*/React.createElement("button", {
-        className: "ak-btn", style: { background: 'rgba(255,255,255,.9)', boxShadow: '0 6px 0 rgba(45,27,69,.12)' },
-        onClick: () => { setRoom(0); reset(lvl.kind === 'rooms' ? lvl.rooms[0] : null); setProg([]); if (lvl.kind !== 'short') setFn([]); }   // в финале своя команда ★ остаётся
-      }, "🗑"))),
-    fail && /*#__PURE__*/React.createElement(FailModal, {
-      key: 'f', tip: fail,
-      onRetry: () => { setFail(null); setRoom(0); reset(multi ? lvl.rooms[0] : null); }
-    })]);
+    phase === 'play' && h(LbBody, null,
+      h(TaskBadge, null, solved ? 'Все разложены!' : `${O.name}: живое или нет? (${idx + 1} из ${list.length})`),
+      h(LbScene, { H: 300, svgRef: svg, onPointerDown: down, onPointerMove: move, onPointerUp: up, onPointerCancel: up },
+        h('ellipse', { cx: 170, cy: 196, rx: 110, ry: 14, fill: 'rgba(62,154,60,.12)' }),
+        !solved && h(B1Obj, { id, x: ox, y: oy, anim, test }),
+        test === 'cells' && anim > 0.2 && !drag && h('g', { opacity: Math.min(1, anim * 2) },
+          h('circle', { cx: 280, cy: 70, r: 46, fill: '#fff', stroke: '#6B5680', strokeWidth: 4 }),
+          O.r.cells ? [[-18, -14], [12, -18], [-14, 14], [16, 12], [0, -2]].map(([dx, dy], i) => h(BCell, { key: i, x: 280 + dx, y: 70 + dy, w: 26, hh: 20, plant: id === 'tree' }))
+            : id === 'fire' ? [0, 1, 2, 3].map(i => h('circle', { key: i, cx: 262 + i * 12, cy: 60 + (i % 2) * 18, r: 6, fill: '#FFB347', opacity: 0.6 }))
+            : id === 'bot' ? h('g', null, h('path', { d: 'M248 60 L312 60 M248 76 L312 76', stroke: '#E5484D', strokeWidth: 3 }), h('path', { d: 'M248 68 L312 68', stroke: '#2B2838', strokeWidth: 3 }))
+            : [0, 1, 2, 3, 4, 5].map(i => h('circle', { key: i, cx: 256 + (i % 3) * 22, cy: 58 + Math.floor(i / 3) * 22, r: 8, fill: '#C9C4DA' }))),
+        /* корзины */
+        ['alive', 'dead'].map(b => { const B = B1_BIN[b]; return h('g', { key: b },
+          h('rect', { x: B.x, y: B.y, width: B.w, height: 56, rx: 14, fill: b === 'alive' ? '#E5F6DF' : '#EEEAF3', stroke: b === 'alive' ? '#5DB85B' : '#A797B8', strokeWidth: 3, strokeDasharray: drag && binAt(drag) === b ? null : '6 4' }),
+          bmT(B.x + B.w / 2, B.y + 22, b === 'alive' ? 'ЖИВОЕ' : 'НЕЖИВОЕ', 13, b === 'alive' ? '#3E9A3C' : '#6B5680'),
+          sorted.filter(s => s.bin === b).map((s, i, all) => h(B1Mini, { key: s.id, id: s.id, x: B.x + B.w / 2 + (i - (all.length - 1) / 2) * 38, y: B.y + 52, k: 0.27 }))); }),
+        /* всё разложено — предметы стоят над своими корзинами */
+        solved && sorted.map(s => { const all = sorted.filter(q => q.bin === s.bin), i = all.indexOf(s), B = B1_BIN[s.bin];
+          return h(B1Mini, { key: 'big' + s.id, id: s.id, x: B.x + B.w / 2 + (i - (all.length - 1) / 2) * 70, y: 192, k: 0.62 }); }),
+        !solved && tested === 4 && !drag && h('g', { transform: 'translate(240 200)' }, h('text', { className: 'lb-hint', fontSize: 24 }, '👆'))),
+      !solved && h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 6, width: '100%', maxWidth: 360 } }, B1_TESTS.map(t => {
+        const r = res[id + t.id], m = mark(r);
+        return h('button', { key: t.id, onClick: () => doTest(t.id), disabled: !!A.current,
+          style: { border: 'none', borderRadius: 14, padding: '7px 2px', background: r != null ? m.b : '#fff', boxShadow: '0 4px 0 rgba(45,27,69,.08)', cursor: 'pointer', fontFamily: 'var(--ak-body)' } },
+          h('div', { style: { fontSize: 20 } }, t.emoji), h('div', { style: { fontSize: 10.5, fontWeight: 900, color: 'var(--ak-ink)', lineHeight: 1.15, minHeight: 24 } }, t.name),
+          h('div', { style: { fontSize: 16, fontWeight: 900, color: m.c } }, m.t));
+      })),
+      h(LbNote, { ok: solved }, note),
+      solved && h(LbNext, { last: rd === 1, onClick: next })),
+    phase === 'win' && h(WinModal, {
+      title: 'Глаз натуралиста!',
+      law: 'Живое питается, растёт, даёт потомство и собрано из клеток — всё сразу. Огонь и робот похожи, но не живые',
+      fact: 'Гриб — не растение и не животное: учёные выделяют грибы в своё, отдельное царство живого.',
+      onNext: onWin, onHome
+    }));
 }
 
-/* ── список уровней игры ─────────────────────────────────── */
-function CBHome({ onSelect }) {
-  const doneSet = new Set(window.nooka ? window.nooka.getCompleted('code') : []);
-  const N = CB_LEVELS.length;
-  return /*#__PURE__*/React.createElement("div", {
-    className: "ak",
-    style: {
-      minHeight: '100vh', height: '100vh', boxSizing: 'border-box', overflowY: 'auto',
-      background: 'radial-gradient(120% 60% at 50% -10%,var(--ak-phys-1) 0%,transparent 60%),linear-gradient(180deg,var(--ak-bg-2),var(--ak-bg))',
-      display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '52px 20px 32px'
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      width: 64, height: 64, borderRadius: 20, background: 'linear-gradient(180deg,var(--ak-phys-1),var(--ak-phys-2))',
-      display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, marginBottom: 10,
-      boxShadow: '0 8px 0 var(--ak-phys-3),0 16px 28px -8px rgba(124,95,224,.35)', flexShrink: 0
-    }
-  }, "🤖"), /*#__PURE__*/React.createElement("div", {
-    style: { fontFamily: 'var(--ak-display)', fontSize: 30, fontWeight: 700, color: 'var(--ak-ink)', marginBottom: 2 }
-  }, "КодБот"), /*#__PURE__*/React.createElement("div", {
-    style: { fontFamily: 'var(--ak-display)', fontSize: 15, color: 'var(--ak-ink-2)', marginBottom: 32 }
-  }, "Программирование · ", N, " ", window.nooka ? window.nooka.plural(N, 'урок', 'урока', 'уроков') : 'уроков'),
-  /* своя команда ★: собирается в уровне 7 и остаётся с роботом */
-  (() => { const f = cbSavedFn(); return /*#__PURE__*/React.createElement("div", {
-    style: { width: '100%', maxWidth: 340, marginTop: -16, marginBottom: 20, padding: '12px 16px', borderRadius: 20, background: 'rgba(255,255,255,.88)', boxShadow: '0 6px 0 rgba(45,27,69,.08)', boxSizing: 'border-box' }
-  }, /*#__PURE__*/React.createElement("div", { style: { fontFamily: 'var(--ak-display)', fontSize: 15, color: 'var(--ak-ink)', marginBottom: 6 } }, '★ Своя команда робота'),
-  f.length ? /*#__PURE__*/React.createElement("div", { style: { display: 'flex', gap: 5, flexWrap: 'wrap', alignItems: 'center' } },
-    f.map((id, i) => /*#__PURE__*/React.createElement(CBChip, { key: i, id, small: true })),
-    /*#__PURE__*/React.createElement("span", { style: { fontSize: 12.5, color: 'var(--ak-ink-2)', fontWeight: 700, marginLeft: 4 } }, 'пригодится в финале'))
-    : /*#__PURE__*/React.createElement("div", { style: { fontSize: 13, color: 'var(--ak-ink-2)', fontWeight: 700 } }, 'Появится в уровне 7: соберёшь её из блоков и дашь роботу')); })(),
-  /*#__PURE__*/React.createElement("div", {
-    style: { display: 'flex', flexDirection: 'column', gap: 12, width: '100%', maxWidth: 340 }
-  }, CB_LEVELS.map(l => /*#__PURE__*/React.createElement("button", {
-    key: l.n, onClick: () => onSelect(l.n),
-    style: {
-      display: 'flex', alignItems: 'center', gap: 14, background: 'rgba(255,255,255,.88)', borderRadius: 22,
-      padding: '15px 18px', border: 'none', cursor: 'pointer', textAlign: 'left', flexShrink: 0,
-      boxShadow: '0 6px 0 rgba(45,27,69,.08),0 12px 24px -8px rgba(45,27,69,.12),inset 0 2px 0 #fff'
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      width: 52, height: 52, borderRadius: '50%', flexShrink: 0, background: `radial-gradient(circle at 35% 30%,#fff,var(--ak-phys-1) 70%)`,
-      display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, boxShadow: '0 4px 0 rgba(45,27,69,.08)'
-    }
-  }, l.intro.emoji), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
-    style: { fontFamily: 'var(--ak-display)', fontSize: 17, fontWeight: 700, color: 'var(--ak-ink)' }
-  }, l.n, ". ", l.title), /*#__PURE__*/React.createElement("div", {
-    style: { fontFamily: 'var(--ak-display)', fontSize: 13, color: 'var(--ak-ink-2)', marginTop: 2 }
-  }, l.sub)), /*#__PURE__*/React.createElement("div", {
-    style: { marginLeft: 'auto', fontSize: 18, color: 'var(--ak-ink-3)' }
-  }, doneSet.has(l.n) ? '✅' : '→')))), /*#__PURE__*/React.createElement("div", {
-    style: {
-      marginTop: 24, padding: '14px 18px', background: 'rgba(255,255,255,.65)', borderRadius: 18, maxWidth: 340,
-      fontFamily: 'var(--ak-display)', fontSize: 13.5, color: 'var(--ak-ink-2)', textAlign: 'center', lineHeight: 1.5
-    }
-  }, "Каждый уровень: составь программу — и робот выполнит её сам!"));
+/* ══════════════════════════════════════════════════════════════
+   УРОВЕНЬ 2 — Микроскоп
+   Ползунок увеличения: лист растёт, потом проступают клетки, потом
+   одна клетка во весь экран — с ядром и зелёными зёрнышками.
+   Найти ядро. Потом образец кожи: чего в её клетках нет?
+   ══════════════════════════════════════════════════════════════ */
+const B2_ROUNDS = [
+  { t: 'Приблизь лист, пока не увидишь клетки', sample: 'leaf' },
+  { t: 'Найди «центр управления» клетки и коснись его', sample: 'leaf' },
+  { t: 'Теперь кожа. Чего нет в клетках кожи?', sample: 'skin' }
+];
+const B2_ANS = [{ id: 'green', name: 'Зелёных зёрнышек' }, { id: 'nuc', name: 'Центра управления' }, { id: 'wall', name: 'Ничего, такие же' }];
+function Level2Scope({ onWin, onHome }) {
+  const [phase, setPhase] = useState('intro');
+  const [rd, setRd] = useState(0);
+  const [z, setZ] = useState(rd ? 90 : 5);
+  const [pick, setPick] = useState(null);
+  const [note, setNote] = useState('');
+  const [solved, setSolved] = useState(false);
+  const [hot, setHot] = useState(false);
+  const R = B2_ROUNDS[rd], plant = R.sample === 'leaf';
+  const C = { x: 170, y: 150 };
+  const s = z < 30 ? 0 : Math.pow((z - 30) / 70, 1.6) * 4.6 + 0.12;   // масштаб клетки
+  const cellsOp = lbClamp((z - 26) / 18, 0, 1), leafOp = 1 - lbClamp((z - 30) / 16, 0, 1), leafK = 1 + z / 6;
+  const onZ = v => {
+    setZ(v);
+    if (rd === 0 && !solved && v >= 62) { setSolved(true); SFX.ok(); setNote('Клетки! Лист собран из них, как стена из кирпичиков.'); }
+  };
+  const tap = e => {
+    if (rd !== 1 || solved) return;
+    const r = e.currentTarget.getBoundingClientRect(), x = (e.clientX - r.left) * 340 / r.width, y = (e.clientY - r.top) * 300 / r.height;
+    const nx = C.x + 36 * s * 0.12, ny = C.y - 26 * s * 0.05, nr = 26 * s * 0.16 + 8;
+    if (s < 2) { SFX.no(); setNote('Приблизь сильнее — пусть одна клетка будет большой.'); return; }
+    if (Math.hypot(x - nx, y - ny) < nr) { setSolved(true); setHot(true); SFX.ok(); setNote('Это ядро — центр управления клеткой. Там хранится инструкция, как ей жить.'); }
+    else { SFX.no(); setNote(Math.abs(x - C.x) < 18 * s && Math.abs(y - C.y) < 13 * s ? 'Это зелёные зёрнышки — кухня клетки. А центр управления — кружок побольше.' : 'Ищи в клетке посередине.'); }
+  };
+  const answer = id => { if (solved) return; setPick(id); if (id === 'green') { setSolved(true); SFX.ok(); setNote('Да! Зелёные зёрнышки — кухня, где лист готовит еду из света. Коже они не нужны: еду ей приносит кровь.'); } else { SFX.no(); setNote(id === 'nuc' ? 'Центр управления у кожи есть — видишь фиолетовый кружок?' : 'Посмотри внимательнее: чего-то зелёного не хватает.'); } };
+  const next = () => { if (rd + 1 < B2_ROUNDS.length) { const n = rd + 1; setRd(n); setSolved(false); setNote(''); setPick(null); setHot(false); setZ(n === 2 ? 92 : z); } else setPhase('win'); };
+  const tw = 40, th = 30;
+  return h(LbShell, { n: 2, title: 'Микроскоп', step: rd, total: B2_ROUNDS.length, onHome },
+    phase === 'intro' && h(IntroModal, {
+      title: 'Микроскоп', ask: 'Из чего сделаны мы с тобой?',
+      task: 'Приближай лист в микроскопе, пока не увидишь, из чего он собран.', tip: 'Двигай ползунок увеличения',
+      onStart: () => setPhase('play')
+    }),
+    phase === 'play' && h(LbBody, null,
+      h(TaskBadge, null, R.t),
+      h('div', { style: { width: '100%', maxWidth: 360, position: 'relative' } },
+        h('svg', { viewBox: '0 0 340 300', onPointerDown: tap, style: { width: '100%', display: 'block', borderRadius: 22, background: '#1E1B2E', boxShadow: '0 6px 0 rgba(45,27,69,.08)', touchAction: 'none' } },
+          h('defs', null,
+            h('clipPath', { id: 'b2eye' }, h('circle', { cx: C.x, cy: C.y, r: 138 })),
+            h('pattern', { id: 'b2cells', width: tw, height: th, patternUnits: 'userSpaceOnUse', patternTransform: `translate(${C.x - s * tw / 2} ${C.y - s * th / 2}) scale(${Math.max(s, 0.01)})` },
+              h('rect', { width: tw, height: th, fill: plant ? '#A8DE9E' : '#F2C2B4' }), h(BCell, { x: tw / 2, y: th / 2, w: 36, hh: 26, plant }))),
+          h('g', { clipPath: 'url(#b2eye)' },
+            h('circle', { cx: C.x, cy: C.y, r: 140, fill: plant ? '#F4FBEF' : '#FFF1EC' }),
+            leafOp > 0 && h('g', { opacity: leafOp, transform: `translate(${C.x} ${C.y}) scale(${leafK})` },
+              plant ? h('g', null, h('path', { d: 'M0 -40 Q36 -20 28 14 Q14 40 0 46 Q-14 40 -28 14 Q-36 -20 0 -40 Z', fill: '#6CC46A', stroke: '#3E9A3C', strokeWidth: 2 }), h('path', { d: 'M0 -38 L0 44 M0 -10 L18 -20 M0 6 L-20 -6 M0 20 L16 12', stroke: '#3E9A3C', strokeWidth: 1.5, fill: 'none' }))
+                : h('g', null, h('path', { d: 'M-34 -30 Q0 -44 34 -30 L30 40 Q0 50 -30 40 Z', fill: '#FFD2BF', stroke: '#E0907A', strokeWidth: 2 }), h('path', { d: 'M-20 -10 Q0 -14 20 -10 M-22 6 Q0 2 22 6 M-20 22 Q0 18 20 22', stroke: '#E0A090', strokeWidth: 1, fill: 'none' }))),
+            cellsOp > 0 && h('rect', { x: 0, y: 0, width: 340, height: 300, fill: 'url(#b2cells)', opacity: cellsOp }),
+            hot && h(BCell, { x: C.x, y: C.y, w: 36 * s, hh: 26 * s, plant, hot: true })),
+          h('circle', { cx: C.x, cy: C.y, r: 139, fill: 'none', stroke: '#4A4658', strokeWidth: 6 }),
+          h('rect', { x: 268, y: 10, width: 62, height: 24, rx: 12, fill: 'rgba(255,255,255,.9)' }),
+          bmT(299, 27, `×${Math.round(1 + z * z / 25)}`, 13, '#2D1B45'))),
+      h(LbSlider, { label: 'Увеличение', value: z, min: 0, max: 100, onChange: onZ, left: 'меньше', right: 'больше' }),
+      rd === 2 && !solved && h(LbChoice, { items: B2_ANS, value: pick, onPick: answer }),
+      h(LbNote, { ok: solved }, note),
+      solved && h(LbNext, { last: rd + 1 === B2_ROUNDS.length, onClick: next })),
+    phase === 'win' && h(WinModal, {
+      title: 'Клетки найдены!',
+      law: 'Всё живое собрано из клеток, как дом из кирпичиков. Первым их увидел Роберт Гук в 1665 году — в кусочке пробки',
+      fact: 'В теле человека около 30 триллионов клеток. Если считать по одной в секунду, не хватит и миллиона лет.',
+      onNext: onWin, onHome
+    }));
 }
 
-/* ── переходы: ?n=4 открывает уровень сразу ──────────────── */
-function App() {
-  const q = new URLSearchParams(location.search);
-  const start = +q.get('n');
-  const [s, setS] = useState(start >= 1 && start <= CB_LEVELS.length ? start : 0);
-  const lvl = s ? CB_LEVELS[s - 1] : null;
-  return /*#__PURE__*/React.createElement("div", {
-    style: { width: '100%', height: '100vh', maxWidth: 480, margin: '0 auto', position: 'relative', overflow: 'hidden' }
-  }, !lvl && /*#__PURE__*/React.createElement(CBHome, { onSelect: n => setS(n) }),
-  lvl && /*#__PURE__*/React.createElement(CBLevel, {
-    key: s, lvl: lvl,
-    onWin: () => {
-      const last = s >= CB_LEVELS.length;
-      setS(last ? 0 : s + 1);
-      if (window.nooka) window.nooka.missionWin('code' + s, s > 3 ? 80 : 60, {
-        nextLabel: last ? 'На главную →' : 'Дальше →',
-        onNext: function () {}
+/* ══════════════════════════════════════════════════════════════
+   УРОВЕНЬ 3 — Чем питается растение
+   Росток: свет (окно / шкаф) и полив (да / нет), «прошла неделя».
+   В темноте — бледный и вытянутый, без воды — вянет, со светом и
+   водой — растёт. Потом ставка на опыт ван Гельмонта: дерево
+   прибавило 74 кг — сколько земли ушло? Весы: всего 57 граммов.
+   ══════════════════════════════════════════════════════════════ */
+const B3_LIGHT = [{ id: 'sun', name: 'На окне', emoji: '☀️' }, { id: 'dark', name: 'В шкафу', emoji: '🌑' }];
+const B3_WATER = [{ id: 'yes', name: 'Поливать', emoji: '💧' }, { id: 'no', name: 'Не поливать', emoji: '🚫' }];
+const B3_BET = [{ id: 'all', name: 'Все 74 кг', emoji: '⚖️' }, { id: 'half', name: 'Примерно половину', emoji: '🌗' }, { id: 'none', name: 'Почти нисколько', emoji: '🪶' }];
+function Level3Plant({ onWin, onHome }) {
+  const [phase, setPhase] = useState('intro');
+  const [rd, setRd] = useState(0);
+  const [light, setLight] = useState(null), [water, setWater] = useState(null);
+  const [g, setG] = useState(0);
+  const [how, setHow] = useState('ok');
+  const [bet, setBet] = useState(null);
+  const [yr, setYr] = useState(0);
+  const [note, setNote] = useState('');
+  const [solved, setSolved] = useState(false);
+  const A = useRef(null), [, kick] = useState(0);
+  const grow = () => {
+    if (!light || !water) return;
+    const hw = water === 'no' ? 'wilt' : light === 'dark' ? 'pale' : 'ok';
+    setHow(hw); setG(0); setNote(''); A.current = { t: 0, hw }; kick(k => k + 1); SFX.pop();
+  };
+  const reveal = id => { if (A.current || solved) return; setBet(id); A.current = { t: 0, rev: true }; kick(k => k + 1); SFX.pop(); };
+  useLoop(dt => {
+    const a = A.current; if (!a) return;
+    a.t = Math.min(1, a.t + dt / 2.6);
+    if (a.rev) setYr(a.t * 5); else setG(a.t);
+    if (a.t >= 1) {
+      A.current = null;
+      if (a.rev) { setSolved(true); SFX.ok(); setNote((bet === 'none' ? 'Угадали! ' : '') + 'Дерево прибавило 74 кг, а земля стала легче всего на 57 граммов. Растение строит себя не из земли!'); }
+      else if (a.hw === 'ok') { setSolved(true); SFX.ok(); setNote('Вырос! Растению нужны свет и вода — из них и воздуха оно само делает себе еду.'); }
+      else if (a.hw === 'pale') { SFX.no(); setNote('В темноте росток вытянулся к свету — бледный и слабый. Без света еду не приготовить.'); }
+      else { SFX.no(); setNote('Без воды росток завял. Вода тоже нужна для еды.'); }
+    }
+  }, phase === 'play' && !!A.current);
+  const next = () => { if (rd === 0) { setRd(1); setSolved(false); setNote(''); } else setPhase('win'); };
+  const running = !!A.current;
+  return h(LbShell, { n: 3, title: 'Чем питается растение', step: rd, total: 2, onHome },
+    phase === 'intro' && h(IntroModal, {
+      title: 'Чем питается растение', ask: 'Растение ест землю?',
+      task: 'Вырасти росток: выбери, где он стоит и поливать ли его.', tip: 'Выбери свет и полив, жми «Прошла неделя»',
+      onStart: () => setPhase('play')
+    }),
+    phase === 'play' && rd === 0 && h(LbBody, null,
+      h(TaskBadge, null, 'Вырасти здоровый росток'),
+      h(LbScene, { H: 270 },
+        light === 'dark'
+          ? h('g', null, h('rect', { x: 60, y: 20, width: 220, height: 240, rx: 10, fill: '#5E4A6E' }), h('rect', { x: 70, y: 30, width: 200, height: 220, rx: 6, fill: '#3B2F48' }), bmT(170, 50, 'в шкафу темно', 11, '#C9B6E6'))
+          : h('g', null, h('rect', { x: 90, y: 20, width: 160, height: 120, rx: 8, fill: '#BFE6FF', stroke: '#fff', strokeWidth: 8 }), h('line', { x1: 170, y1: 20, x2: 170, y2: 140, stroke: '#fff', strokeWidth: 6 }),
+            h('circle', { cx: 222, cy: 52, r: 16, fill: '#FFD262', className: 'ak-pulse' }), h('rect', { x: 70, y: 196, width: 200, height: 12, rx: 4, fill: '#E6D3B8' })),
+        h(BPot, { x: 170, y: 240, g, how: g > 0 ? how : 'ok', k: 1.05 }),
+        water === 'yes' && running && h('text', { x: 214, y: 150, fontSize: 22 }, '🚿'),
+        h('rect', { x: 20, y: 252, width: 300, height: 8, rx: 4, fill: 'rgba(45,27,69,.08)' }),
+        h('rect', { x: 20, y: 252, width: 300 * g, height: 8, rx: 4, fill: '#6CC46A' }),
+        bmT(170, 248, g > 0 ? `день ${Math.max(1, Math.round(g * 7))} из 7` : '', 10, '#6B5680')),
+      h('div', { style: { width: '100%', maxWidth: 360, fontFamily: 'var(--ak-display)', fontSize: 13, color: 'var(--ak-ink-2)' } }, 'Где стоит горшок:'),
+      h(LbChoice, { items: B3_LIGHT, value: light, onPick: id => { setLight(id); setG(0); setNote(''); }, disabled: running || solved }),
+      h('div', { style: { width: '100%', maxWidth: 360, fontFamily: 'var(--ak-display)', fontSize: 13, color: 'var(--ak-ink-2)' } }, 'Полив:'),
+      h(LbChoice, { items: B3_WATER, value: water, onPick: id => { setWater(id); setG(0); setNote(''); }, disabled: running || solved }),
+      h(LbNote, { ok: solved }, note),
+      solved ? h(LbNext, { onClick: next }) : h('button', { className: 'ak-btn ak-btn--acc', style: { width: '100%', maxWidth: 360 }, disabled: running || !light || !water, onClick: grow }, running ? 'Растёт…' : 'Прошла неделя ⏩')),
+    phase === 'play' && rd === 1 && h(LbBody, null,
+      h(TaskBadge, null, 'Ива выросла на 74 кг. Сколько земли она «съела»?'),
+      h(LbScene, { H: 270 },
+        h('g', { transform: 'translate(120 222)' },
+          h(BTree, { x: 0, y: -20, k: 0.5 + yr * 0.25 }),
+          h('path', { d: 'M-46 -22 L46 -22 L38 18 L-38 18 Z', fill: '#A0714A', stroke: '#7E5636', strokeWidth: 2 }), h('ellipse', { cx: 0, cy: -22, rx: 46, ry: 6, fill: '#6B4A33' })),
+        /* весы с землёй */
+        h('g', { transform: 'translate(262 168)' },
+          h('rect', { x: -44, y: 40, width: 88, height: 14, rx: 4, fill: '#8A93B8' }), h('rect', { x: -4, y: 0, width: 8, height: 40, fill: '#8A93B8' }),
+          h('rect', { x: -40, y: -6, width: 80, height: 8, rx: 3, fill: '#5B6585' }),
+          h('path', { d: 'M-30 -6 Q0 -26 30 -6 Z', fill: '#6B4A33' }),
+          h('rect', { x: -40, y: -58, width: 80, height: 30, rx: 8, fill: '#fff', stroke: '#5B6585', strokeWidth: 2 }),
+          bmT(0, -38, yr >= 5 ? '89,94 кг' : '90 кг', 14, '#2D1B45'),
+          bmT(0, 70, 'земля', 11, '#6B5680')),
+        bmT(120, 260, `прошло лет: ${Math.floor(yr)} из 5`, 11, '#6B5680'),
+        yr >= 5 && bmT(262, 92, '−57 граммов!', 13, '#2BA873')),
+      !solved && h(LbChoice, { items: B3_BET, value: bet, onPick: reveal, disabled: running }),
+      h(LbNote, { ok: solved }, running ? 'Растёт пять лет…' : bet ? note : 'Выбери ответ — и посмотрим.'),
+      solved && h(LbNext, { last: true, onClick: next })),
+    phase === 'win' && h(WinModal, {
+      title: 'Тайна растения раскрыта!',
+      law: 'Растение строит себя из воздуха и воды, а силу берёт у света. Из земли — только немного «витаминов»',
+      fact: 'Так в 1648 году описал свой опыт ван Гельмонт: ива за пять лет прибавила 74 кг, а земля в горшке похудела всего на 57 граммов.',
+      onNext: onWin, onHome
+    }));
+}
+
+/* Значки живых существ для цепочек: рисунки, а не эмодзи */
+function BIcon({ kind, x, y, k }) {
+  const g = (...c) => h('g', { transform: `translate(${x} ${y}) scale(${k || 1})` }, ...c);
+  switch (kind) {
+    case 'grass': return g([-14, -6, 2, 10].map((dx, i) => h('path', { key: i, d: `M${dx} 14 Q${dx + 3} -4 ${dx + (i % 2 ? 8 : -4)} -16`, stroke: '#5DB85B', strokeWidth: 4, fill: 'none', strokeLinecap: 'round' })));
+    case 'hare': return g(h('ellipse', { cx: 2, cy: 6, rx: 15, ry: 10, fill: '#C9B9A8' }), h('circle', { cx: -12, cy: -4, r: 8, fill: '#C9B9A8' }),
+      h('ellipse', { cx: -15, cy: -18, rx: 3, ry: 10, fill: '#C9B9A8' }), h('ellipse', { cx: -9, cy: -18, rx: 3, ry: 10, fill: '#C9B9A8' }), h('circle', { cx: -14, cy: -5, r: 1.6, fill: '#2D1B45' }), h('circle', { cx: 17, cy: 4, r: 4, fill: '#fff' }));
+    case 'mouse': return g(h('ellipse', { cx: 2, cy: 6, rx: 11, ry: 7, fill: '#A9A6B8' }), h('circle', { cx: -9, cy: 2, r: 6, fill: '#A9A6B8' }), h('circle', { cx: -9, cy: -5, r: 4, fill: '#C9C4DA' }),
+      h('circle', { cx: -12, cy: 1, r: 1.4, fill: '#2D1B45' }), h('path', { d: 'M13 6 Q22 2 24 10', stroke: '#A9A6B8', strokeWidth: 2, fill: 'none' }));
+    case 'fox': return g(h('ellipse', { cx: 2, cy: 6, rx: 16, ry: 10, fill: '#FF9F5A' }), h('path', { d: 'M14 4 Q30 -4 26 14 Q20 12 14 10 Z', fill: '#FF9F5A' }), h('path', { d: 'M22 6 Q28 4 26 12', fill: '#fff' }),
+      h('path', { d: 'M-22 -2 L-6 -8 L-8 6 Z', fill: '#FF9F5A' }), h('path', { d: 'M-18 -6 L-16 -18 L-10 -8 Z M-10 -8 L-6 -18 L-4 -6 Z', fill: '#E0702A' }), h('circle', { cx: -12, cy: -3, r: 1.5, fill: '#2D1B45' }), h('circle', { cx: -22, cy: -2, r: 1.8, fill: '#2D1B45' }));
+    case 'owl': return g(h('ellipse', { cx: 0, cy: 2, rx: 13, ry: 16, fill: '#A0714A' }), h('circle', { cx: -5, cy: -4, r: 5, fill: '#FFF6DC' }), h('circle', { cx: 5, cy: -4, r: 5, fill: '#FFF6DC' }),
+      h('circle', { cx: -5, cy: -4, r: 2, fill: '#2D1B45' }), h('circle', { cx: 5, cy: -4, r: 2, fill: '#2D1B45' }), h('path', { d: 'M-2 2 L0 6 L2 2 Z', fill: '#FFC83D' }), h('path', { d: 'M-12 -12 L-8 -18 L-4 -12 M4 -12 L8 -18 L12 -12', fill: '#A0714A' }));
+    case 'algae': return g([-10, 0, 10].map((dx, i) => h('path', { key: i, d: `M${dx} 14 Q${dx - 6} 4 ${dx} -4 Q${dx + 6} -12 ${dx} -18`, stroke: '#3E9A3C', strokeWidth: 3.5, fill: 'none', strokeLinecap: 'round' })));
+    case 'shrimp': return g(h('path', { d: 'M-12 4 Q-4 -10 10 -4 Q14 4 6 8 Q-2 10 -12 4 Z', fill: '#FF9E8C' }), h('path', { d: 'M10 -4 L18 -12 M8 -6 L14 -16', stroke: '#E0702A', strokeWidth: 1.5 }), h('circle', { cx: 6, cy: -2, r: 1.5, fill: '#2D1B45' }));
+    case 'fish': return g(h('ellipse', { cx: 0, cy: 0, rx: 16, ry: 9, fill: '#7C9BFF' }), h('path', { d: 'M14 0 L26 -9 L26 9 Z', fill: '#7C9BFF' }), h('circle', { cx: -8, cy: -2, r: 2, fill: '#2D1B45' }));
+    case 'heron': return g(h('ellipse', { cx: 4, cy: 0, rx: 12, ry: 8, fill: '#E4E1EE' }), h('path', { d: 'M-6 -2 Q-12 -14 -8 -22', stroke: '#E4E1EE', strokeWidth: 5, fill: 'none' }), h('circle', { cx: -8, cy: -24, r: 4, fill: '#E4E1EE' }),
+      h('path', { d: 'M-12 -24 L-24 -22', stroke: '#FFC83D', strokeWidth: 2.5 }), h('path', { d: 'M2 8 L0 20 M8 8 L10 20', stroke: '#8A8FA0', strokeWidth: 2 }));
+    default: return g(h('circle', { r: 14, fill: '#FFD262' }));
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   УРОВЕНЬ 4 — Кто кого ест
+   Стрелка тянется от еды к тому, кто её ест. Лес из трёх звеньев,
+   пруд из четырёх. Потом паутина: пропала трава — кого не станет?
+   ══════════════════════════════════════════════════════════════ */
+const B4_N = {
+  grass: { name: 'Трава', kind: 'grass' }, hare: { name: 'Заяц', kind: 'hare' }, fox: { name: 'Лиса', kind: 'fox' }, mouse: { name: 'Мышь', kind: 'mouse' }, owl: { name: 'Сова', kind: 'owl' },
+  algae: { name: 'Водоросли', kind: 'algae' }, shrimp: { name: 'Рачок', kind: 'shrimp' }, fish: { name: 'Рыба', kind: 'fish' }, heron: { name: 'Цапля', kind: 'heron' }
+};
+const B4_ROUNDS = [
+  { t: 'Покажи стрелками, кто кого ест в лесу', nodes: { grass: [60, 236], hare: [170, 150], fox: [282, 70] }, edges: [['grass', 'hare'], ['hare', 'fox']] },
+  { t: 'Теперь пруд: тяни от еды к тому, кто её ест', nodes: { algae: [52, 246], shrimp: [128, 176], fish: [210, 116], heron: [288, 52] }, edges: [['algae', 'shrimp'], ['shrimp', 'fish'], ['fish', 'heron']] },
+  { t: 'Трава пропала. Кого не станет? Отметь всех', web: true, nodes: { grass: [170, 250], hare: [86, 168], mouse: [254, 168], fox: [110, 66], owl: [262, 66] },
+    edges: [['grass', 'hare'], ['grass', 'mouse'], ['hare', 'fox'], ['mouse', 'fox'], ['mouse', 'owl']], gone: ['hare', 'mouse', 'fox', 'owl'] }
+];
+function Level4Chain({ onWin, onHome }) {
+  const [phase, setPhase] = useState('intro');
+  const [rd, setRd] = useState(0);
+  const R = B4_ROUNDS[rd];
+  const [lines, setLines] = useState(R.web ? R.edges : []);
+  const [rub, setRub] = useState(null);
+  const [marked, setMarked] = useState([]);
+  const [note, setNote] = useState('');
+  const [solved, setSolved] = useState(false);
+  const svg = useRef(null), from = useRef(null);
+  const at = p => Object.keys(R.nodes).find(k => Math.hypot(p.x - R.nodes[k][0], p.y - R.nodes[k][1]) < 32);
+  const has = (a, b) => lines.some(l => l[0] === a && l[1] === b);
+  const down = e => {
+    const p = lbPt(svg.current, e), k = at(p); if (!k || solved) return;
+    if (R.web) { if (k === 'grass') return; SFX.pop(); setMarked(m => m.includes(k) ? m.filter(x => x !== k) : m.concat(k)); setNote(''); return; }
+    e.currentTarget.setPointerCapture(e.pointerId); from.current = k; setRub({ x: p.x, y: p.y });
+  };
+  const move = e => { if (from.current) { const p = lbPt(svg.current, e); setRub({ x: p.x, y: p.y }); } };
+  const up = e => {
+    const a = from.current; from.current = null; setRub(null); if (!a) return;
+    const b = at(lbPt(svg.current, e)); if (!b || b === a) return;
+    if (has(a, b)) return;
+    const ok = R.edges.some(x => x[0] === a && x[1] === b), rev = R.edges.some(x => x[0] === b && x[1] === a);
+    if (rev) { SFX.no(); return setNote(`Стрелка идёт от еды к тому, кто ест: ${B4_N[b].name.toLowerCase()} → ${B4_N[a].name.toLowerCase()}.`); }
+    if (!ok) { SFX.no(); return setNote(`${B4_N[b].name} не ест ${B4_N[a].name.toLowerCase() === 'трава' ? 'траву' : B4_N[a].name.toLowerCase()}. Подумай, кто кого ест.`); }
+    const nl = lines.concat([[a, b]]); setLines(nl); SFX.pop(); setNote('');
+    if (nl.length === R.edges.length) { setSolved(true); SFX.ok(); setNote(rd === 0 ? 'Цепочка! Трава берёт силу у Солнца, заяц — у травы, лиса — у зайца.' : 'Четыре звена! Сила Солнца дошла от водорослей до цапли.'); }
+  };
+  const check = () => {
+    const okSet = R.gone.every(k => marked.includes(k)) && marked.length === R.gone.length;
+    if (okSet) { setSolved(true); SFX.ok(); setNote('Всех! Зайцу и мыши нечего есть, а значит, и лисе с совой. Пропало одно звено — пострадала вся цепочка.'); }
+    else { SFX.no(); const miss = R.gone.filter(k => !marked.includes(k)); setNote(`Не только. Посмотри по стрелкам: кто ест тех, кто ест траву? ${miss.length ? 'Ещё ' + miss.length + '.' : ''}`); }
+  };
+  const next = () => { if (rd + 1 < B4_ROUNDS.length) { const n = rd + 1; setRd(n); setLines(B4_ROUNDS[n].web ? B4_ROUNDS[n].edges : []); setMarked([]); setSolved(false); setNote(''); } else setPhase('win'); };
+  const arrow = (a, b, i, dim) => {
+    const A = R.nodes[a], B = R.nodes[b], d = Math.hypot(B[0] - A[0], B[1] - A[1]), ux = (B[0] - A[0]) / d, uy = (B[1] - A[1]) / d;
+    const x1 = A[0] + ux * 30, y1 = A[1] + uy * 30, x2 = B[0] - ux * 32, y2 = B[1] - uy * 32;
+    return h('g', { key: i, opacity: dim ? 0.3 : 1 },
+      h('line', { x1, y1, x2, y2, stroke: '#FFB347', strokeWidth: 5, strokeLinecap: 'round' }),
+      h('line', { x1, y1, x2, y2, stroke: '#FFF3B0', strokeWidth: 2.5, className: 'lb-flow' }),
+      h('path', { d: `M${x2} ${y2} l${-ux * 12 - uy * 8} ${-uy * 12 + ux * 8} l${uy * 16} ${-ux * 16} Z`, fill: '#FFB347' }));
+  };
+  return h(LbShell, { n: 4, title: 'Кто кого ест', step: rd, total: B4_ROUNDS.length, onHome },
+    phase === 'intro' && h(IntroModal, {
+      title: 'Кто кого ест', ask: 'Куда девается сила Солнца?',
+      task: 'Тяни стрелку от еды к тому, кто её ест.', tip: 'От травы — к зайцу, от зайца — к…',
+      onStart: () => setPhase('play')
+    }),
+    phase === 'play' && h(LbBody, null,
+      h(TaskBadge, null, R.t),
+      h(LbScene, { H: 300, svgRef: svg, onPointerDown: down, onPointerMove: move, onPointerUp: up, onPointerCancel: up },
+        h('circle', { cx: 300, cy: 260, r: 22, fill: '#FFD262', opacity: rd === 2 ? 0.3 : 0.9 }), bmT(300, 294, 'Солнце', 10, '#B5791A'),
+        lines.map((l, i) => arrow(l[0], l[1], i, R.web && l[0] === 'grass')),
+        rub && from.current && h('line', { x1: R.nodes[from.current][0], y1: R.nodes[from.current][1], x2: rub.x, y2: rub.y, stroke: '#FF9F5A', strokeWidth: 4, strokeDasharray: '6 5' }),
+        Object.keys(R.nodes).map(k => { const [x, y] = R.nodes[k], gone = R.web && k === 'grass', mk = marked.includes(k);
+          return h('g', { key: k, opacity: gone ? 0.35 : 1 },
+            h('circle', { cx: x, cy: y, r: 30, fill: mk ? '#FFD2C8' : '#fff', stroke: mk ? '#D9523F' : '#8FD3A8', strokeWidth: 3 }),
+            h(BIcon, { kind: B4_N[k].kind, x, y: y - 2, k: 1.05 }),
+            bmT(x, y + 44, B4_N[k].name, 11.5, '#2D1B45'),
+            gone && h('line', { x1: x - 24, y1: y - 24, x2: x + 24, y2: y + 24, stroke: '#D9523F', strokeWidth: 4 }),
+            mk && h('text', { x: x + 20, y: y - 18, fontSize: 16 }, '✖')); }),
+        !lines.length && !R.web && h('g', { transform: `translate(${R.nodes.grass ? R.nodes.grass[0] + 20 : R.nodes.algae[0] + 20} ${R.nodes.grass ? R.nodes.grass[1] - 30 : R.nodes.algae[1] - 30})` }, h('text', { className: 'lb-hint', fontSize: 24 }, '👆'))),
+      h(LbNote, { ok: solved }, note),
+      solved ? h(LbNext, { last: rd + 1 === B4_ROUNDS.length, onClick: next })
+        : R.web && h('button', { className: 'ak-btn ak-btn--acc', style: { width: '100%', maxWidth: 360 }, disabled: !marked.length, onClick: check }, 'Проверить ✓')),
+    phase === 'win' && h(WinModal, {
+      title: 'Цепочка жизни!',
+      law: 'Сила Солнца идёт по цепочке: трава — заяц — лиса. Пропадёт одно звено — пострадают все, кто дальше',
+      fact: 'Почти вся еда на Земле начинается с растений, которые ловят солнечный свет. Даже лиса, по сути, ест солнце — через зайца и траву.',
+      onNext: onWin, onHome
+    }));
+}
+
+/* ══════════════════════════════════════════════════════════════
+   УРОВЕНЬ 5 — Остров
+   Трава, зайцы и лисы на острове, десять лет за 7 секунд.
+   Подбор (tune-island2.js): без лис зайцев в 10 раз больше, трава
+   съедена почти до земли, половина зайцев гибнет; 2–7 лис — все
+   живут 10 лет; 8 и больше — лисы съедают всех зайцев; 1 — мало.
+   ══════════════════════════════════════════════════════════════ */
+const B5_P = { rg: 0.6, eat: 0.4, br: 1.4, dr: 0.4, pr: 0.25, bf: 0.006, df: 0.3 };
+function b5Sim(F0) {
+  let G = 80, R = 20, F = F0, t = 0;
+  const dt = 0.02, pts = [[0, G, R, F]];
+  let minR = 1e9, minF = 1e9, minG = 1e9, maxR = 0;
+  while (t < 10 - 1e-9) {
+    const dG = B5_P.rg * G * (1 - G / 100) - B5_P.eat * R * G / 100;
+    const dR = B5_P.br * R * G / 100 - B5_P.dr * R - B5_P.pr * R * F;
+    const dF = B5_P.bf * R * F - B5_P.df * F;
+    G = Math.max(0, G + dG * dt); R = Math.max(0, R + dR * dt); F = Math.max(0, F + dF * dt); t += dt;
+    if (R < 0.5) R = 0; if (F < 0.3) F = 0;
+    if (t > 0.5) { minR = Math.min(minR, R); minF = Math.min(minF, F); minG = Math.min(minG, G); }
+    maxR = Math.max(maxR, R);
+    if (Math.round(t / dt) % 5 === 0) pts.push([t, G, R, F]);
+  }
+  return { pts, minR, minF, minG, maxR };
+}
+const B5_ROUNDS = [
+  { t: 'Убери всех лис и посмотри, что будет за 10 лет', start: 4 },
+  { t: 'Подбери лис так, чтобы 10 лет жили все: трава, зайцы и лисы', start: 0 }
+];
+function Level5Island({ onWin, onHome }) {
+  const [phase, setPhase] = useState('intro');
+  const [rd, setRd] = useState(0);
+  const [F0, setF0] = useState(B5_ROUNDS[0].start);
+  const [sim, setSim] = useState(null);
+  const [t, setT] = useState(0);
+  const [note, setNote] = useState('');
+  const [solved, setSolved] = useState(false);
+  const A = useRef(null), [, kick] = useState(0);
+  const run = () => {
+    if (rd === 0 && F0 > 0) { SFX.no(); return setNote('Сначала убери всех лис кнопкой «−».'); }
+    const s = b5Sim(F0); setSim(s); setT(0); setNote(''); A.current = { t: 0, s }; kick(k => k + 1); SFX.pop();
+  };
+  useLoop(dt => {
+    const a = A.current; if (!a) return;
+    a.t = Math.min(10, a.t + dt * 1.45); setT(a.t);
+    if (a.t >= 10) {
+      A.current = null; const s = a.s;
+      if (rd === 0) { setSolved(true); SFX.ok(); setNote(`Без лис зайцев стало в ${Math.round(s.maxR / 20)} раз больше. Они съели почти всю траву — и многие умерли от голода.`); }
+      else if (s.minR >= 3 && s.minF >= 1 && s.minG >= 20) { setSolved(true); SFX.ok(); setNote('Остров живёт! Лисы не дают зайцам расплодиться, и травы хватает всем.'); }
+      else if (s.minG < 20) { SFX.no(); setNote('Лис мало — зайцы расплодились и съели траву. Добавь лис.'); }
+      else if (s.minR < 3) { SFX.no(); setNote('Лисы переловили почти всех зайцев — и сами остались без еды. Лис меньше!'); }
+      else { SFX.no(); setNote('Лисы не прижились — их было слишком мало. Добавь ещё.'); }
+    }
+  }, phase === 'play' && !!A.current);
+  const cur = sim ? sim.pts.filter(p => p[0] <= t + 1e-6) : [];
+  const last = cur.length ? cur[cur.length - 1] : [0, 80, 20, F0];
+  const GX = x => 24 + x / 10 * 296, gY = (v, max) => 292 - Math.min(v, max) / max * 96;
+  const line = (i, max, col) => cur.length > 1 && h('polyline', { points: cur.map(p => `${GX(p[0])},${gY(p[i], max)}`).join(' '), fill: 'none', stroke: col, strokeWidth: 3, strokeLinejoin: 'round' });
+  const nR = Math.min(24, Math.round(last[2] / 8)), nF = Math.min(10, Math.round(last[3]));
+  const next = () => { if (rd === 0) { setRd(1); setF0(0); setSim(null); setT(0); setSolved(false); setNote(''); } else setPhase('win'); };
+  const running = !!A.current;
+  return h(LbShell, { n: 5, title: 'Остров', step: rd, total: 2, onHome },
+    phase === 'intro' && h(IntroModal, {
+      title: 'Остров', ask: 'Нужны ли хищники?',
+      task: 'Реши, сколько лис будет на острове, и проживи десять лет.', tip: 'Кнопки «−» и «+», потом «Прожить 10 лет»',
+      onStart: () => setPhase('play')
+    }),
+    phase === 'play' && h(LbBody, null,
+      h(TaskBadge, null, B5_ROUNDS[rd].t),
+      h(LbScene, { H: 300, bg: '#DFF1FF' },
+        h('ellipse', { cx: 170, cy: 100, rx: 150, ry: 78, fill: '#F2DFAE' }),
+        h('ellipse', { cx: 170, cy: 96, rx: 136, ry: 66, fill: spMixLeaf(last[1]) }),
+        Array.from({ length: nR }, (_, i) => h(BIcon, { key: 'r' + i, kind: 'hare', x: 70 + (i * 37) % 200, y: 62 + ((i * 53) % 80), k: 0.55 })),
+        Array.from({ length: nF }, (_, i) => h(BIcon, { key: 'f' + i, kind: 'fox', x: 90 + (i * 61) % 180, y: 80 + ((i * 29) % 60), k: 0.6 })),
+        bmT(170, 190, `год ${Math.min(10, Math.floor(t))} из 10`, 12, '#2D1B45'),
+        /* графики */
+        h('rect', { x: 18, y: 192, width: 308, height: 104, rx: 10, fill: 'rgba(255,255,255,.85)' }),
+        line(1, 100, '#5DB85B'), line(2, 220, '#A8957F'), line(3, 15, '#FF9F5A'),
+        bmT(30, 206, 'трава', 10, '#3E9A3C', 'start'), bmT(80, 206, 'зайцы', 10, '#7E6B57', 'start'), bmT(132, 206, 'лисы', 10, '#D9702B', 'start')),
+      h('div', { style: { display: 'flex', alignItems: 'center', gap: 12, background: 'rgba(255,255,255,.9)', borderRadius: 18, padding: '8px 14px', width: '100%', maxWidth: 360, boxSizing: 'border-box' } },
+        h('button', { className: 'ak-btn ak-btn--soft ak-btn--sm', disabled: running || solved || F0 <= 0, onClick: () => { SFX.tick(); setF0(F0 - 1); setSim(null); setT(0); setNote(''); } }, '−'),
+        h('div', { style: { flex: 1, textAlign: 'center', fontFamily: 'var(--ak-display)', fontSize: 16 } }, `🦊 Лис на острове: ${F0}`),
+        h('button', { className: 'ak-btn ak-btn--soft ak-btn--sm', disabled: running || solved || F0 >= 12, onClick: () => { SFX.tick(); setF0(F0 + 1); setSim(null); setT(0); setNote(''); } }, '+')),
+      h(LbNote, { ok: solved }, note),
+      solved ? h(LbNext, { last: rd === 1, onClick: next }) : h('button', { className: 'ak-btn ak-btn--acc', style: { width: '100%', maxWidth: 360 }, disabled: running, onClick: run }, running ? 'Идут годы…' : 'Прожить 10 лет ⏩')),
+    phase === 'win' && h(WinModal, {
+      title: 'Остров в равновесии!',
+      law: 'Хищники тоже нужны: без них травоядных становится слишком много, они съедают всё и голодают',
+      fact: 'В 1995 году в парк Йеллоустон вернули волков. Олени перестали объедать деревья у рек — и туда вернулись бобры и птицы.',
+      onNext: onWin, onHome
+    }));
+}
+/* Цвет острова по количеству травы: зелёный → выжженный */
+function spMixLeaf(G) {
+  const t = lbClamp(G / 100, 0, 1), a = [214, 196, 140], b = [108, 196, 106];
+  return 'rgb(' + a.map((v, i) => Math.round(v + (b[i] - v) * t)).join(',') + ')';
+}
+
+/* ══════════════════════════════════════════════════════════════
+   УРОВЕНЬ 6 — Сердце-насос
+   Касание — удар сердца: кровь бежит по телу. Мышцам нужен воздух:
+   сидим — хватает спокойного ритма, бежим — нужно чаще. Шкала
+   «воздуха мышцам» растёт, когда ритм поспевает за нуждой.
+   ══════════════════════════════════════════════════════════════ */
+const B6_ROUNDS = [{ t: 'Человечек сидит. Стучи сердцем, чтобы мышцам хватало воздуха', need: 0.9, run: false }, { t: 'Человечек побежал! Мышцам нужно больше', need: 2.0, run: true }];
+function Level6Heart({ onWin, onHome }) {
+  const [phase, setPhase] = useState('intro');
+  const [rd, setRd] = useState(0);
+  const [st, setSt] = useState({ o2: 40, rate: 0, beat: 0, flow: 0, t: 0 });
+  const [note, setNote] = useState('');
+  const [solved, setSolved] = useState(false);
+  const S = useRef({ taps: [], o2: 40, flow: 0, beat: 0, t: 0 });
+  const R = B6_ROUNDS[rd];
+  const pump = () => { if (solved) return; const s = S.current; s.taps.push(performance.now()); s.beat = 1; SFX.tick(); };
+  useLoop(dt => {
+    const s = S.current; s.t += dt;
+    const now = performance.now(); s.taps = s.taps.filter(x => now - x < 3000);
+    const rate = s.taps.length >= 2 ? (s.taps.length - 1) / ((s.taps[s.taps.length - 1] - s.taps[0]) / 1000) * Math.min(1, 1.5 / Math.max(0.5, (now - s.taps[s.taps.length - 1]) / 1000)) : 0;
+    s.flow += dt * (0.3 + rate * 0.9); s.beat = Math.max(0, s.beat - dt * 4);
+    const ok = rate >= R.need * 0.9;
+    s.o2 = lbClamp(s.o2 + (ok ? 22 : -12) * dt, 0, 100);
+    setSt({ o2: s.o2, rate, beat: s.beat, flow: s.flow, t: s.t });
+    if (!solved && s.o2 >= 100) { setSolved(true); SFX.ok(); setNote(rd === 0 ? 'Хватает! Когда сидишь, сердцу хватает спокойного ритма.' : 'Получилось! Бегущим мышцам нужно много воздуха — и сердце стучит чаще.'); }
+  }, phase === 'play' && !solved);
+  const next = () => { if (rd === 0) { setRd(1); setSolved(false); setNote(''); S.current = { taps: [], o2: 40, flow: 0, beat: 0, t: 0 }; } else setPhase('win'); };
+  const leg = R.run ? Math.sin(st.t * 10) * 18 : 0;
+  const loop = 'M150 120 C110 120 96 170 108 220 C118 262 150 262 160 236 M190 120 C230 120 246 170 232 220 C222 262 190 262 180 236';
+  return h(LbShell, { n: 6, title: 'Сердце-насос', step: rd, total: 2, onHome },
+    phase === 'intro' && h(IntroModal, {
+      title: 'Сердце-насос', ask: 'Почему после бега сердце стучит?',
+      task: 'Стучи по сердцу, чтобы кровь несла мышцам воздух.', tip: 'Касайся сердца в ритм — не слишком медленно',
+      onStart: () => setPhase('play')
+    }),
+    phase === 'play' && h(LbBody, null,
+      h(TaskBadge, null, R.t),
+      h(LbScene, { H: 300, onPointerDown: pump },
+        /* человечек */
+        h('g', { transform: `translate(170 ${R.run ? 4 * Math.abs(Math.sin(st.t * 10)) : 0})` },
+          h('circle', { cx: 0, cy: 46, r: 24, fill: '#FFD2BF' }), h('circle', { cx: -8, cy: 44, r: 2.5, fill: '#2D1B45' }), h('circle', { cx: 8, cy: 44, r: 2.5, fill: '#2D1B45' }),
+          h('path', { d: R.run ? 'M-8 56 Q0 62 8 56' : 'M-8 56 Q0 60 8 56', stroke: '#2D1B45', strokeWidth: 2, fill: 'none' }),
+          h('rect', { x: -32, y: 74, width: 64, height: 92, rx: 22, fill: '#9DB4FF' }),
+          h('path', { d: `M-14 162 L${-18 + leg} 236 M14 162 L${18 - leg} 236`, stroke: '#4B5BD6', strokeWidth: 14, strokeLinecap: 'round' }),
+          h('path', { d: `M-30 92 L${-52 - leg * 0.5} 150 M30 92 L${52 + leg * 0.5} 150`, stroke: '#9DB4FF', strokeWidth: 11, strokeLinecap: 'round' })),
+        /* кровь по сосудам */
+        h('g', { transform: 'translate(0 0)' },
+          h('path', { d: loop, fill: 'none', stroke: '#FF9E8C', strokeWidth: 4, opacity: 0.55 }),
+          h('path', { d: loop, fill: 'none', stroke: '#E5484D', strokeWidth: 4, strokeDasharray: '6 10', strokeDashoffset: -st.flow * 60 })),
+        /* сердце */
+        h('g', { transform: `translate(170 112) scale(${1 + st.beat * 0.25})` },
+          h('path', { d: 'M0 14 C-28 -6 -20 -30 0 -18 C20 -30 28 -6 0 14 Z', fill: '#E5484D', stroke: '#B3262B', strokeWidth: 2 })),
+        R.run && h('g', { opacity: 0.5 }, [0, 1, 2].map(i => h('line', { key: i, x1: 80 - i * 14, y1: 120 + i * 22, x2: 110 - i * 14, y2: 120 + i * 22, stroke: '#A797B8', strokeWidth: 3, strokeLinecap: 'round' }))),
+        /* воздух мышцам */
+        h('g', { transform: 'translate(272 70)' },
+          h('rect', { x: 0, y: 0, width: 26, height: 170, rx: 13, fill: 'rgba(45,27,69,.08)' }),
+          h('rect', { x: 0, y: 170 - st.o2 * 1.7, width: 26, height: st.o2 * 1.7, rx: 13, fill: st.o2 > 60 ? '#5DD9A0' : '#FFB347' }),
+          bmT(13, 192, 'воздух', 10, '#2D1B45'), bmT(13, 204, 'мышцам', 10, '#2D1B45')),
+        !st.rate && !solved && h('g', { transform: 'translate(196 128)' }, h('text', { className: 'lb-hint', fontSize: 24 }, '👆'))),
+      h('div', { style: { fontFamily: 'var(--ak-display)', fontSize: 13.5, color: 'var(--ak-ink-2)' } }, st.rate ? (st.rate >= R.need * 0.9 ? 'Ритм поспевает 👍' : 'Слишком редко — мышцам не хватает воздуха') : 'Касайся сердца'),
+      h(LbNote, { ok: solved }, note),
+      solved && h(LbNext, { last: rd === 1, onClick: next })),
+    phase === 'win' && h(WinModal, {
+      title: 'Сердце знает своё дело!',
+      law: 'Сердце — насос: качает кровь, а кровь несёт воздух мышцам. Бегаешь — нужно больше, и сердце стучит чаще',
+      fact: 'За жизнь сердце стучит больше двух миллиардов раз и ни разу не отдыхает. Попрыгай — и положи руку на грудь: почувствуешь, как оно разогналось.',
+      onNext: onWin, onHome
+    }));
+}
+
+/* ══════════════════════════════════════════════════════════════
+   УРОВЕНЬ 7 — Путь бутерброда
+   Ребёнок ведёт кусочек по телу пальцем: рот → пищевод → желудок →
+   кишечник. На каждой остановке видно, что с едой делают. Потом —
+   «чья работа?»: коснуться органа по заданию.
+   ══════════════════════════════════════════════════════════════ */
+const B7_PATH = [[170, 66], [170, 96], [170, 128], [156, 150], [140, 166], [150, 186], [176, 190], [196, 202], [176, 214], [148, 220], [140, 236], [164, 246], [192, 250], [200, 266]];
+const B7_STOPS = [
+  { at: 0, name: 'Рот', say: 'Зубы жуют и перемалывают еду, слюна её размачивает.' },
+  { at: 0.16, name: 'Пищевод', say: 'Трубка-пищевод проталкивает кусочек вниз.' },
+  { at: 0.3, name: 'Желудок', say: 'Желудок растворяет еду в мягкую кашицу.' },
+  { at: 0.55, name: 'Кишечник', say: 'Кишечник впитывает крошечные кусочки еды прямо в кровь.' },
+  { at: 1, name: 'Кровь', say: 'Кровь разносит еду по всему телу — мышцам, мозгу, сердцу.' }
+];
+const B7_ORG = { mouth: { x: 170, y: 64, r: 16, name: 'рот' }, stomach: { x: 150, y: 160, r: 24, name: 'желудок' }, gut: { x: 172, y: 222, r: 34, name: 'кишечник' } };
+const B7_ASK = [{ q: 'Где еду перемалывают?', a: 'mouth' }, { q: 'Где еду растворяют в кашицу?', a: 'stomach' }, { q: 'Где еда впитывается в кровь?', a: 'gut' }];
+function b7Len() { let L = 0; for (let i = 1; i < B7_PATH.length; i++) L += Math.hypot(B7_PATH[i][0] - B7_PATH[i - 1][0], B7_PATH[i][1] - B7_PATH[i - 1][1]); return L; }
+const B7_L = b7Len();
+function b7At(u) { let need = u * B7_L; for (let i = 1; i < B7_PATH.length; i++) { const a = B7_PATH[i - 1], b = B7_PATH[i], d = Math.hypot(b[0] - a[0], b[1] - a[1]); if (need <= d) return [a[0] + (b[0] - a[0]) * need / d, a[1] + (b[1] - a[1]) * need / d]; need -= d; } return B7_PATH[B7_PATH.length - 1]; }
+function b7Proj(p) { let best = { d: 1e9, u: 0 }, acc = 0; for (let i = 1; i < B7_PATH.length; i++) { const a = B7_PATH[i - 1], b = B7_PATH[i], dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy); const t = lbClamp(((p.x - a[0]) * dx + (p.y - a[1]) * dy) / (L * L), 0, 1); const d = Math.hypot(p.x - a[0] - dx * t, p.y - a[1] - dy * t); if (d < best.d) best = { d, u: (acc + L * t) / B7_L }; acc += L; } return best; }
+function Level7Food({ onWin, onHome }) {
+  const [phase, setPhase] = useState('intro');
+  const [rd, setRd] = useState(0);
+  const [u, setU] = useState(0);
+  const [stop, setStop] = useState(0);
+  const [ask, setAsk] = useState(0);
+  const [note, setNote] = useState(B7_STOPS[0].say);
+  const [solved, setSolved] = useState(false);
+  const svg = useRef(null), drag = useRef(false), uRef = useRef(0);
+  const down = e => { if (rd !== 0 || solved) { if (rd === 1) tapOrgan(e); return; } const p = lbPt(svg.current, e), [bx, by] = b7At(uRef.current); if (Math.hypot(p.x - bx, p.y - by) < 34) { drag.current = true; e.currentTarget.setPointerCapture(e.pointerId); } };
+  const move = e => {
+    if (!drag.current) return;
+    const pr = b7Proj(lbPt(svg.current, e));
+    if (pr.d > 40 || pr.u < uRef.current - 0.02 || pr.u > uRef.current + 0.12) return;
+    uRef.current = Math.max(uRef.current, pr.u); setU(uRef.current);
+    const si = B7_STOPS.filter(s => s.at <= uRef.current + 1e-6).length - 1;
+    if (si > stop) { setStop(si); SFX.pop(); setNote(B7_STOPS[si].say); }
+    if (uRef.current >= 0.995 && !solved) { drag.current = false; setStop(4); setSolved(true); SFX.ok(); setNote(B7_STOPS[4].say); }
+  };
+  const up = () => { drag.current = false; };
+  const tapOrgan = e => {
+    if (solved) return;
+    const p = lbPt(svg.current, e), hit = Object.keys(B7_ORG).find(k => Math.hypot(p.x - B7_ORG[k].x, p.y - B7_ORG[k].y) < B7_ORG[k].r + 6);
+    if (!hit) return;
+    if (hit === B7_ASK[ask].a) { SFX.ok(); if (ask + 1 < B7_ASK.length) { setAsk(ask + 1); setNote(`Да, ${B7_ORG[hit].name}!`); } else { setSolved(true); setNote('Все три верно! Рот, желудок и кишечник — одна команда.'); } }
+    else { SFX.no(); setNote(`Это ${B7_ORG[hit].name}. Подумай ещё.`); }
+  };
+  const next = () => { if (rd === 0) { setRd(1); setSolved(false); setNote(''); } else setPhase('win'); };
+  const [bx, by] = b7At(u), bite = stop >= 1 ? (stop >= 2 ? 8 : 11) : 14, mush = stop >= 2;
+  const pathD = 'M' + B7_PATH.map(p => p.join(' ')).join(' L');
+  return h(LbShell, { n: 7, title: 'Путь бутерброда', step: rd, total: 2, onHome },
+    phase === 'intro' && h(IntroModal, {
+      title: 'Путь бутерброда', ask: 'Куда девается еда?',
+      task: 'Проведи кусочек бутерброда пальцем через всё тело.', tip: 'Тащи кусочек вниз по дорожке',
+      onStart: () => setPhase('play')
+    }),
+    phase === 'play' && h(LbBody, null,
+      h(TaskBadge, null, rd === 0 ? 'Проведи кусочек по пути еды' : B7_ASK[ask].q),
+      h(LbScene, { H: 300, svgRef: svg, onPointerDown: down, onPointerMove: move, onPointerUp: up, onPointerCancel: up },
+        /* тело */
+        h('circle', { cx: 170, cy: 46, r: 34, fill: '#FFE1D2' }), h('circle', { cx: 158, cy: 40, r: 3, fill: '#2D1B45' }), h('circle', { cx: 182, cy: 40, r: 3, fill: '#2D1B45' }),
+        h('path', { d: 'M108 96 Q170 80 232 96 L246 290 L94 290 Z', fill: '#FFE1D2' }),
+        /* кровь */
+        h('path', { d: 'M196 196 C250 170 252 120 230 100 M144 196 C96 170 96 120 114 100 M160 250 L120 290 M180 250 L220 290', fill: 'none', stroke: stop >= 3 ? '#E5484D' : '#FFB3A6', strokeWidth: 4, strokeDasharray: stop >= 3 ? '5 6' : null, className: stop >= 3 ? 'lb-flow' : null }),
+        /* органы */
+        h('path', { d: 'M170 76 L170 132', stroke: '#E0907A', strokeWidth: 10, strokeLinecap: 'round' }),
+        h('path', { d: 'M168 132 Q132 136 132 162 Q140 182 168 172 Q182 158 172 140 Z', fill: '#FF9E8C', stroke: '#D9523F', strokeWidth: 2 }),
+        h('path', { d: 'M150 186 Q200 180 196 202 Q192 214 156 214 Q130 218 140 236 Q150 250 196 248 L200 270', fill: 'none', stroke: '#F2B07A', strokeWidth: 12, strokeLinecap: 'round' }),
+        h('path', { d: 'M150 64 Q170 74 190 64', fill: 'none', stroke: '#D9523F', strokeWidth: 3 }),
+        rd === 0 && h('path', { d: pathD, fill: 'none', stroke: '#6B5680', strokeWidth: 2, strokeDasharray: '3 6', opacity: 0.5 }),
+        rd === 0 && B7_STOPS.slice(0, 4).map((s, i) => { const [x, y] = b7At(s.at); return h('g', { key: i }, h('circle', { cx: x, cy: y, r: 5, fill: i <= stop ? '#5DD9A0' : '#fff', stroke: '#6B5680' }), bmT(x < 170 ? x - 52 : x + 50, y + 4, s.name, 10.5, '#6B5680')); }),
+        rd === 0 && !solved && h('g', { transform: `translate(${bx} ${by})` },
+          mush ? h('circle', { r: bite, fill: '#E8C27A', opacity: 0.85 }) : h('g', null, h('rect', { x: -bite, y: -bite * 0.7, width: bite * 2, height: bite * 1.4, rx: 3, fill: '#E8C27A' }), h('rect', { x: -bite, y: -bite * 0.2, width: bite * 2, height: bite * 0.4, fill: '#5DB85B' }))),
+        rd === 0 && u === 0 && h('g', { transform: `translate(${bx + 16} ${by + 20})` }, h('text', { className: 'lb-hint', fontSize: 24 }, '👆')),
+        rd === 1 && Object.keys(B7_ORG).map(k => h('circle', { key: k, cx: B7_ORG[k].x, cy: B7_ORG[k].y, r: B7_ORG[k].r, fill: 'none', stroke: '#7C5FE0', strokeWidth: 2, strokeDasharray: '4 4', className: 'ak-pulse' }))),
+      h(LbNote, { ok: solved }, note),
+      solved && h(LbNext, { last: rd === 1, onClick: next })),
+    phase === 'win' && h(WinModal, {
+      title: 'Путь еды пройден!',
+      law: 'Еда разбирается на крошечные кусочки, и кровь разносит их по всему телу — так мышцы и мозг получают силу',
+      fact: 'Кишечник взрослого длиннее шести метров — он уложен внутри живота петлями, как садовый шланг.',
+      onNext: onWin, onHome
+    }));
+}
+
+/* ══════════════════════════════════════════════════════════════
+   УРОВЕНЬ 8 — Мыло и микробы
+   «Волшебная лампа» показывает микробов. Ребёнок трёт ладони
+   пальцем: одной водой — смываются только плохо прилипшие (около
+   трети), с мылом — почти все. Пена появляется там, где трёшь.
+   ══════════════════════════════════════════════════════════════ */
+const B8_ROUNDS = [{ t: 'Помой руки одной водой — потри ладони', soap: false }, { t: 'Теперь с мылом — потри ладони', soap: true }];
+const B8_NEED = 1400;
+function b8Germs() { let s = 5; const r = () => (s = (s * 16807) % 2147483647) / 2147483647; return Array.from({ length: 46 }, (_, i) => { const left = i % 2 === 0; return { x: (left ? 112 : 228) + (r() - 0.5) * 86, y: 120 + (r() - 0.5) * 140, loose: r() < 0.34, stubborn: r() < 0.06, on: 1, rub: 0 }; }); }
+function Level8Soap({ onWin, onHome }) {
+  const [phase, setPhase] = useState('intro');
+  const [rd, setRd] = useState(0);
+  const R = B8_ROUNDS[rd];
+  const [germs, setGerms] = useState(b8Germs());
+  const [dist, setDist] = useState(0);
+  const [foam, setFoam] = useState([]);
+  const [note, setNote] = useState('');
+  const [solved, setSolved] = useState(false);
+  const svg = useRef(null), last = useRef(null);
+  const left = germs.filter(g => g.on).length, pct = Math.round(left / germs.length * 100);
+  const down = e => { if (dist >= B8_NEED) return; e.currentTarget.setPointerCapture(e.pointerId); last.current = lbPt(svg.current, e); };
+  const move = e => {
+    if (!last.current || dist >= B8_NEED) return;
+    const p = lbPt(svg.current, e), d = Math.hypot(p.x - last.current.x, p.y - last.current.y); last.current = p;
+    if (d < 1) return;
+    const nd = Math.min(B8_NEED, dist + d); setDist(nd);
+    setGerms(gs => gs.map(g => { if (!g.on || Math.hypot(g.x - p.x, g.y - p.y) > 30) return g; const rub = g.rub + d; return { ...g, rub, on: rub > 60 && ((R.soap && !g.stubborn) || g.loose) ? 0 : 1 }; }));
+    if (R.soap && Math.random() < 0.5) setFoam(f => f.concat({ x: p.x + (Math.random() - 0.5) * 20, y: p.y + (Math.random() - 0.5) * 20, r: 4 + Math.random() * 7 }).slice(-90));
+    if (Math.random() < 0.08) SFX.tick();
+    if (nd >= B8_NEED) finish();
+  };
+  const up = () => { last.current = null; };
+  const finish = () => {
+    setTimeout(() => {
+      setGerms(gs => {
+        const lft = gs.map(g => g.on && ((R.soap && !g.stubborn) || g.loose) ? { ...g, on: 0 } : g);
+        const p = Math.round(lft.filter(g => g.on).length / lft.length * 100);
+        setSolved(true); (R.soap ? SFX.ok : SFX.no)();
+        setNote(R.soap ? `Осталось ${p}% микробов — почти никого! Мыло отрывает их от кожи, и вода уносит. Самые упрямые прячутся между пальцами и под ногтями.` : `Осталось ${p}% микробов. Вода смыла только тех, кто плохо держался: остальные прилипли к жирной коже.`);
+        return lft;
       });
-    },
-    onHome: () => setS(0)
-  }));
+    }, 200);
+  };
+  const next = () => { if (rd === 0) { setRd(1); setSolved(false); setGerms(b8Germs()); setDist(0); setFoam([]); setNote(''); } else setPhase('win'); };
+  const palm = x => h('g', { transform: `translate(${x} 128)` },
+    h('rect', { x: -44, y: -54, width: 88, height: 110, rx: 34, fill: '#FFD8C4' }),
+    [-30, -10, 10, 30].map((fx, i) => h('rect', { key: i, x: fx - 8, y: -104 + Math.abs(i - 1.5) * 8, width: 16, height: 60, rx: 8, fill: '#FFD8C4' })),
+    h('rect', { x: x < 170 ? 34 : -58, y: -24, width: 24, height: 44, rx: 12, fill: '#FFD8C4', transform: `rotate(${x < 170 ? -30 : 30} ${x < 170 ? 46 : -46} 0)` }));
+  return h(LbShell, { n: 8, title: 'Мыло и микробы', step: rd, total: 2, onHome },
+    phase === 'intro' && h(IntroModal, {
+      title: 'Мыло и микробы', ask: 'Почему одной воды мало?',
+      task: 'Волшебная лампа показывает микробов. Помой руки — сначала водой, потом с мылом.', tip: 'Три ладони пальцем туда-сюда',
+      onStart: () => setPhase('play')
+    }),
+    phase === 'play' && h(LbBody, null,
+      h(TaskBadge, null, R.t),
+      h(LbScene, { H: 290, bg: '#2B2440', svgRef: svg, onPointerDown: down, onPointerMove: move, onPointerUp: up, onPointerCancel: up },
+        h('rect', { width: 340, height: 290, fill: '#2B2440' }),
+        h('circle', { cx: 300, cy: 30, r: 16, fill: '#B48CFF', opacity: 0.8 }), bmT(300, 60, 'лампа', 10, '#C9B6FF'),
+        h('g', { opacity: 0.92 }, palm(112), palm(228)),
+        germs.map((g, i) => g.on ? h('g', { key: i, transform: `translate(${g.x} ${g.y})` }, h('circle', { r: 7, fill: '#7BF0BC', opacity: 0.25 }), h('circle', { r: 3.5, fill: '#7BF0BC' })) : null),
+        foam.map((f, i) => h('circle', { key: 'f' + i, cx: f.x, cy: f.y, r: f.r, fill: '#fff', opacity: 0.8 })),
+        !R.soap && dist > 0 && dist < B8_NEED && [0, 1, 2].map(i => h('circle', { key: 'w' + i, cx: 70 + i * 100, cy: 250 - (dist / 6 + i * 30) % 80, r: 3, fill: '#8FD0FF' })),
+        h('rect', { x: 20, y: 270, width: 300, height: 8, rx: 4, fill: 'rgba(255,255,255,.15)' }),
+        h('rect', { x: 20, y: 270, width: 300 * dist / B8_NEED, height: 8, rx: 4, fill: R.soap ? '#fff' : '#8FD0FF' }),
+        dist === 0 && h('g', { transform: 'translate(150 150)' }, h('text', { className: 'lb-hint', fontSize: 26 }, '👆'))),
+      h(LbReadout, { label: 'Микробов на руках', value: `${pct}%` }, h('div', { style: { width: 44, height: 44, borderRadius: 12, background: '#2B2440', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 } }, R.soap ? '🧼' : '💧')),
+      h(LbNote, { ok: solved && R.soap }, note || (dist > 0 ? 'Три ещё!' : '')),
+      solved && h(LbNext, { last: rd === 1, onClick: next })),
+    phase === 'win' && h(WinModal, {
+      title: 'Чистые руки!',
+      law: 'Микробы держатся за жирную кожу. Мыло отрывает их, и вода уносит. Одна вода почти не справляется',
+      fact: 'В 1847 году врач Игнац Земмельвейс велел врачам мыть руки перед приёмом — и больных в его больнице стало в разы меньше.',
+      onNext: onWin, onHome
+    }));
 }
-ReactDOM.createRoot(document.getElementById('root')).render(/*#__PURE__*/React.createElement(App, null));
+
+/* ══════════════════════════════════════════════════════════════
+   УРОВЕНЬ 9 — Инструкция в клетке
+   Четыре бусины — четыре признака зверька (уши, окрас, хвост, лапы).
+   В настоящей инструкции тоже всего четыре «буквы»: А, Т, Г, Ц.
+   Собрать зверька с картинки, потом «опечатка»: поменять одну
+   бусину и получить зверька, отличного одним признаком.
+   ══════════════════════════════════════════════════════════════ */
+const B9_LET = ['А', 'Т', 'Г', 'Ц'], B9_BEAD = ['#FF7A64', '#7C9BFF', '#5DD9A0', '#FFC83D'];
+const B9_GENES = [{ name: 'уши', opts: ['круглые', 'острые', 'длинные', 'висячие'] }, { name: 'окрас', opts: ['рыжий', 'серый', 'белый', 'пятнистый'] }, { name: 'хвост', opts: ['пушистый', 'короткий', 'длинный', 'колечком'] }, { name: 'лапы', opts: ['короткие', 'длинные', 'толстые', 'прыгучие'] }];
+const B9_ROUNDS = [
+  { t: 'Собери инструкцию для зверька с картинки', target: [1, 1, 0, 1], start: [0, 0, 0, 0] },
+  { t: 'Опечатка! Поменяй одну букву, чтобы вышел зверёк справа', target: [1, 3, 0, 1], start: [1, 1, 0, 1], one: true }
+];
+function BBeast({ x, y, g, k }) {
+  const fur = ['#FF9F5A', '#A9A6B8', '#F4F2EC', '#F4F2EC'][g[1]], spots = g[1] === 3;
+  const legH = [10, 22, 12, 18][g[3]], legW = [7, 6, 11, 6][g[3]];
+  const ears = [
+    h('g', { key: 'e' }, h('circle', { cx: -22, cy: -36, r: 8, fill: fur, stroke: '#6B5680', strokeWidth: 1.5 }), h('circle', { cx: -2, cy: -38, r: 8, fill: fur, stroke: '#6B5680', strokeWidth: 1.5 })),
+    h('path', { key: 'e', d: 'M-28 -30 L-24 -50 L-16 -34 Z M-8 -34 L-2 -52 L4 -32 Z', fill: fur, stroke: '#6B5680', strokeWidth: 1.5 }),
+    h('g', { key: 'e' }, h('ellipse', { cx: -20, cy: -48, rx: 5, ry: 16, fill: fur, stroke: '#6B5680', strokeWidth: 1.5 }), h('ellipse', { cx: -4, cy: -50, rx: 5, ry: 16, fill: fur, stroke: '#6B5680', strokeWidth: 1.5 })),
+    h('g', { key: 'e' }, h('ellipse', { cx: -26, cy: -22, rx: 6, ry: 13, fill: fur, stroke: '#6B5680', strokeWidth: 1.5 }), h('ellipse', { cx: 2, cy: -22, rx: 6, ry: 13, fill: fur, stroke: '#6B5680', strokeWidth: 1.5 }))][g[0]];
+  const tail = [
+    h('ellipse', { key: 't', cx: 36, cy: -14, rx: 13, ry: 9, fill: fur, stroke: '#6B5680', strokeWidth: 1.5 }),
+    h('circle', { key: 't', cx: 30, cy: -14, r: 5, fill: fur, stroke: '#6B5680', strokeWidth: 1.5 }),
+    h('path', { key: 't', d: 'M26 -10 Q50 -12 56 -34', stroke: '#6B5680', strokeWidth: 4, fill: 'none', strokeLinecap: 'round' }),
+    h('path', { key: 't', d: 'M26 -12 q20 -2 18 -16 q-2 -10 -10 -6 q-6 4 0 8', stroke: '#6B5680', strokeWidth: 4, fill: 'none', strokeLinecap: 'round' })][g[2]];
+  return h('g', { transform: `translate(${x} ${y}) scale(${k || 1})` },
+    tail,
+    [-18, -4, 8, 20].map((lx, i) => h('rect', { key: i, x: lx - legW / 2, y: -6, width: legW, height: legH, rx: 3, fill: fur, stroke: '#6B5680', strokeWidth: 1.5 })),
+    h('ellipse', { cx: 2, cy: -16, rx: 30, ry: 18, fill: fur, stroke: '#6B5680', strokeWidth: 1.5 }),
+    spots && h('g', { fill: '#4A3B63' }, h('circle', { cx: -6, cy: -20, r: 4 }), h('circle', { cx: 12, cy: -12, r: 3 }), h('circle', { cx: 18, cy: -24, r: 3.5 })),
+    ears,
+    h('circle', { cx: -12, cy: -28, r: 15, fill: fur, stroke: '#6B5680', strokeWidth: 1.5 }),
+    h('circle', { cx: -17, cy: -30, r: 2.2, fill: '#2D1B45' }), h('circle', { cx: -7, cy: -30, r: 2.2, fill: '#2D1B45' }), h('circle', { cx: -12, cy: -24, r: 2, fill: '#FF8FA3' }));
+}
+function Level9Code({ onWin, onHome }) {
+  const [phase, setPhase] = useState('intro');
+  const [rd, setRd] = useState(0);
+  const R = B9_ROUNDS[rd];
+  const [code, setCode] = useState(R.start);
+  const [note, setNote] = useState('');
+  const [solved, setSolved] = useState(false);
+  const changed = code.filter((c, i) => c !== R.start[i]).length;
+  const tap = i => {
+    if (solved) return;
+    if (R.one && changed >= 1 && code[i] === R.start[i]) { SFX.no(); return setNote('В опечатке меняется только одна буква. Верни другую бусину назад.'); }
+    SFX.pop(); const c = code.slice(); c[i] = (c[i] + 1) % 4; setCode(c); setNote(`${B9_GENES[i].name}: ${B9_GENES[i].opts[c[i]]}`);
+    if (c.every((v, j) => v === R.target[j])) { setSolved(true); SFX.ok(); setNote(rd === 0 ? 'Зверёк собран! Каждая бусина отвечает за свой признак.' : 'Одна буква — и окрас другой! Остальное не поменялось.'); }
+  };
+  const next = () => { if (rd === 0) { setRd(1); setCode(B9_ROUNDS[1].start); setSolved(false); setNote(''); } else setPhase('win'); };
+  return h(LbShell, { n: 9, title: 'Инструкция в клетке', step: rd, total: 2, onHome },
+    phase === 'intro' && h(IntroModal, {
+      title: 'Инструкция в клетке', ask: 'Откуда клетка знает, каким быть?',
+      task: 'Собери из бусин инструкцию — и получится зверёк с картинки.', tip: 'Касание бусины меняет букву',
+      onStart: () => setPhase('play')
+    }),
+    phase === 'play' && h(LbBody, null,
+      h(TaskBadge, null, R.t),
+      h(LbScene, { H: 250 },
+        h('rect', { x: 14, y: 16, width: 150, height: 140, rx: 16, fill: '#fff', stroke: '#C9E8C0', strokeWidth: 2 }),
+        bmT(89, 36, 'по инструкции', 11, '#6B5680'),
+        h(BBeast, { x: 92, y: 126, g: code, k: 1.25 }),
+        h('rect', { x: 176, y: 16, width: 150, height: 140, rx: 16, fill: solved ? '#E5F6DF' : '#FFF6E0', stroke: solved ? '#5DB85B' : '#FFC83D', strokeWidth: 2 }),
+        bmT(251, 36, 'нужен такой', 11, '#6B5680'),
+        h(BBeast, { x: 254, y: 126, g: R.target, k: 1.25 }),
+        /* нитка с бусинами */
+        h('path', { d: 'M30 206 Q170 180 310 206', stroke: '#A797B8', strokeWidth: 3, fill: 'none' }),
+        code.map((c, i) => h('g', { key: i, transform: `translate(${66 + i * 70} ${198 - Math.sin((i + 0.5) / 4 * Math.PI) * 10})`, onPointerDown: () => tap(i), style: { cursor: 'pointer' } },
+          h('circle', { r: 22, fill: B9_BEAD[c], stroke: '#fff', strokeWidth: 3 }), bmT(0, 7, B9_LET[c], 20, '#fff'),
+          bmT(0, 40, B9_GENES[i].name, 10.5, '#6B5680')))),
+      h(LbNote, { ok: solved }, note),
+      solved && h(LbNext, { last: rd === 1, onClick: next })),
+    phase === 'win' && h(WinModal, {
+      title: 'Инструкция прочитана!',
+      law: 'В каждой клетке лежит инструкция, по которой построено тело. Поменяй одну «букву» — изменится признак',
+      fact: 'Если вытянуть инструкцию из одной клетки в нитку, выйдет около двух метров. А в ней всего четыре «буквы»: А, Т, Г, Ц.',
+      onNext: onWin, onHome
+    }));
+}
+
+/* ══════════════════════════════════════════════════════════════
+   УРОВЕНЬ 10 — Бабочки на коре
+   Ребёнок — птица: 8 секунд ловит бабочек на коре. Заметных съедают
+   и другие птицы, оставшиеся дают потомство (цвет как у родителей
+   плюс немного случайности). Три поколения. Подбор (tune-moth.js):
+   на светлой коре стая светлеет до ~0,15, на тёмной — темнеет до ~0,8,
+   даже если ребёнок почти не ловит.
+   ══════════════════════════════════════════════════════════════ */
+const B10_ROUNDS = [
+  { t: 'Ты — птица! Лови бабочек на светлой берёзе', bark: 0.12, name: 'светлая берёза' },
+  { t: 'Лес у завода: кора чёрная от копоти. Снова лови!', bark: 0.88, name: 'кора в копоти' }
+];
+const B10_N = 16, B10_TIME = 8;
+const b10Col = s => { const a = [244, 242, 236], b = [52, 48, 60]; return 'rgb(' + a.map((v, i) => Math.round(v + (b[i] - v) * s)).join(',') + ')'; };
+function b10Rng(seed) { let s = seed; return () => (s = (s * 16807) % 2147483647) / 2147483647; }
+/* кора: крупный план ствола. Пятна раскиданы случайно, но одинаково при каждом заходе */
+const B10_BARK = (() => {
+  const r = b10Rng(3), light = [], dark = [];
+  for (let i = 0; i < 40; i++) {
+    const w = 6 + r() * 34;
+    light.push({ x: r() * 340 - w / 2, y: 6 + r() * 238, w, hh: 2 + r() * 3.4, o: 0.55 + r() * 0.4 });
+  }
+  for (let i = 0; i < 30; i++) dark.push({ x: r() * 340, y: r() * 250, rx: 10 + r() * 26, ry: 4 + r() * 8, o: 0.5 + r() * 0.45 });
+  const grain = Array.from({ length: 14 }, () => ({ x: r() * 340, y: r() * 250, w: 30 + r() * 90 }));
+  return { light, dark, grain };
+})();
+function B10Bark({ dark }) {
+  const B = B10_BARK, base = dark ? '#4A4550' : '#F2EFE6';
+  return h('g', null,
+    h('defs', null, h('linearGradient', { id: 'b10trunk', x1: 0, x2: 1 },
+      h('stop', { offset: 0, stopColor: '#000', stopOpacity: dark ? 0.35 : 0.16 }),
+      h('stop', { offset: 0.22, stopColor: '#000', stopOpacity: 0 }),
+      h('stop', { offset: 0.78, stopColor: '#000', stopOpacity: 0 }),
+      h('stop', { offset: 1, stopColor: '#000', stopOpacity: dark ? 0.35 : 0.16 }))),
+    h('rect', { width: 340, height: 250, fill: base }),
+    dark ? B.dark.map((d, i) => h('ellipse', { key: i, cx: d.x, cy: d.y, rx: d.rx, ry: d.ry, fill: '#33303A', opacity: d.o }))
+      : B.grain.map((g, i) => h('rect', { key: i, x: g.x - g.w / 2, y: g.y, width: g.w, height: 1.6, rx: 0.8, fill: '#DCD5C6', opacity: 0.8 })),
+    dark ? B.grain.map((g, i) => h('rect', { key: 'g' + i, x: g.x - g.w / 2, y: g.y, width: g.w, height: 1.4, rx: 0.7, fill: '#5A5562', opacity: 0.7 }))
+      : B.light.map((d, i) => h('rect', { key: i, x: d.x, y: d.y, width: d.w, height: d.hh, rx: d.hh / 2, fill: '#2D2A33', opacity: d.o })),
+    h('rect', { width: 340, height: 250, fill: 'url(#b10trunk)', pointerEvents: 'none' }));
+}
+/* бабочка-пяденица: широкие крылья с крапинками, цвет s от светлого к тёмному */
+function B10Moth({ m, onCatch }) {
+  const c = b10Col(m.s), sp = b10Col(Math.min(1, m.s + 0.4));
+  const wing = 'M0,-1 C-6,-9 -18,-10 -21,-4 C-22,2 -15,7 -8,8 C-4,8 -1,5 0,3 Z';
+  return h('g', { transform: `translate(${m.x} ${m.y}) rotate(${m.a})`, onPointerDown: onCatch, style: { cursor: 'pointer' } },
+    h('circle', { r: 22, fill: 'transparent' }),
+    h('path', { d: wing, fill: c, stroke: 'rgba(45,27,69,.22)', strokeWidth: 0.7 }),
+    h('path', { d: wing, fill: c, stroke: 'rgba(45,27,69,.22)', strokeWidth: 0.7, transform: 'scale(-1 1)' }),
+    [[-13, -3], [-9, 3], [-16, 2], [13, -3], [9, 3], [16, 2]].map(([x, y], i) => h('circle', { key: i, cx: x, cy: y, r: 1.3, fill: sp })),
+    h('rect', { x: -1.6, y: -6, width: 3.2, height: 13, rx: 1.6, fill: b10Col(Math.min(1, m.s + 0.25)) }),
+    h('path', { d: 'M-1,-6 L-5,-11 M1,-6 L5,-11', stroke: b10Col(Math.min(1, m.s + 0.25)), strokeWidth: 0.9, fill: 'none' }));
+}
+function b10Place(pop, r) { return pop.map(s => ({ s, x: 30 + r() * 280, y: 34 + r() * 186, a: (r() - 0.5) * 50, on: 1 })); }
+function Level10Moths({ onWin, onHome }) {
+  const [phase, setPhase] = useState('intro');
+  const [rd, setRd] = useState(0);
+  const R = B10_ROUNDS[rd];
+  const rng = useRef(b10Rng(7));
+  const [gen, setGen] = useState(0);
+  const [moths, setMoths] = useState(() => b10Place(Array.from({ length: B10_N }, () => rng.current()), rng.current));
+  const [hist, setHist] = useState([]);
+  const [left, setLeft] = useState(B10_TIME);
+  const [st, setSt] = useState('ready');                // ready | hunt | breed | done
+  const [note, setNote] = useState('');
+  const [solved, setSolved] = useState(false);
+  const T = useRef(null), [, kick] = useState(0);
+  const avg = ms => ms.reduce((a, m) => a + m.s, 0) / ms.length;
+  useEffect(() => { setHist([avg(moths)]); }, [rd]);
+  const hunt = () => { setSt('hunt'); setLeft(B10_TIME); setNote(''); T.current = { t: B10_TIME }; kick(k => k + 1); SFX.pop(); };
+  const catchM = i => { if (st !== 'hunt') return; SFX.bump(); setMoths(ms => ms.map((m, j) => j === i ? { ...m, on: 0 } : m)); };
+  useLoop(dt => {
+    const g = T.current; if (!g) return;
+    g.t -= dt; setLeft(Math.max(0, g.t));
+    if (g.t <= 0) {
+      T.current = null;
+      /* другие птицы съедают самых заметных из оставшихся, остальные дают потомство */
+      setMoths(ms => {
+        let alive = ms.filter(m => m.on).sort((a, b) => Math.abs(b.s - R.bark) - Math.abs(a.s - R.bark));
+        alive = alive.slice(Math.round(alive.length * 0.35));
+        const par = alive.map(m => m.s), r = rng.current;
+        const pop = Array.from({ length: B10_N }, () => lbClamp(par[Math.floor(r() * par.length)] + (r() * 2 - 1) * 0.12, 0, 1));
+        const nm = b10Place(pop, r), a = avg(nm), ng = gen + 1;
+        setHist(hh => hh.concat(a)); setGen(ng);
+        if (ng >= 3) {
+          setSt('done');
+          const ok = rd === 0 ? a < 0.35 : a > 0.65;
+          if (ok) { setSolved(true); SFX.ok(); setNote(rd === 0 ? 'Стая посветлела! Тёмных было видно — их съели, а светлые выжили и дали потомство.' : 'Стая потемнела! На чёрной коре теперь заметны светлые.'); }
+          else setNote('Стая почти не изменилась. Лови самых заметных — и посмотри ещё раз.');
+        } else { setSt('ready'); setNote(`Поколение ${ng + 1}: детёныши похожи на тех, кто выжил.`); }
+        return nm;
+      });
+    }
+  }, phase === 'play' && !!T.current);
+  const next = () => {
+    if (rd === 0) { rng.current = b10Rng(11); const m = b10Place(Array.from({ length: B10_N }, () => rng.current()), rng.current); setRd(1); setGen(0); setMoths(m); setHist([avg(m)]); setSt('ready'); setSolved(false); setNote(''); }
+    else setPhase('win');
+  };
+  const barkCol = R.bark < 0.5 ? '#F2EFE6' : '#4A4550';
+  return h(LbShell, { n: 10, title: 'Бабочки на коре', step: rd, total: 2, onHome },
+    phase === 'intro' && h(IntroModal, {
+      title: 'Бабочки на коре', ask: 'Как меняются живые за много лет?',
+      task: 'Ты — птица. Лови бабочек на коре и смотри, какими станут их детёныши.', tip: 'Касайся бабочек, пока идёт время',
+      onStart: () => setPhase('play')
+    }),
+    phase === 'play' && h(LbBody, null,
+      h(TaskBadge, null, R.t),
+      h(LbScene, { H: 290, bg: barkCol },
+        h(B10Bark, { dark: R.bark > 0.5 }),
+        moths.map((m, i) => m.on ? h(B10Moth, { key: i, m, onCatch: () => catchM(i) }) : null),
+        st === 'hunt' && h('g', null, h('rect', { x: 120, y: 6, width: 100, height: 24, rx: 12, fill: 'rgba(255,255,255,.9)' }), bmT(170, 23, `🐦 ${Math.ceil(left)} с`, 13, '#2D1B45')),
+        /* цвет стаи по поколениям */
+        h('rect', { x: 0, y: 250, width: 340, height: 40, fill: '#FFFDF7' }),
+        bmT(10, 274, 'цвет стаи:', 11, '#6B5680', 'start'),
+        hist.map((a, i) => h('g', { key: i, transform: `translate(${92 + i * 64} 270)` }, h('circle', { r: 11, fill: b10Col(a), stroke: '#6B5680', strokeWidth: 1.5 }), bmT(22, 4, i === 0 ? 'было' : `${i}-е`, 9.5, '#6B5680', 'start')))),
+      h(LbNote, { ok: solved }, note),
+      solved ? h(LbNext, { last: rd === 1, onClick: next })
+        : st !== 'done' ? h('button', { className: 'ak-btn ak-btn--acc', style: { width: '100%', maxWidth: 360 }, disabled: st === 'hunt', onClick: hunt }, st === 'hunt' ? 'Лови!' : `Охота: поколение ${gen + 1} из 3 🐦`)
+        : h('button', { className: 'ak-btn ak-btn--soft', style: { width: '100%', maxWidth: 360 }, onClick: () => { rng.current = b10Rng(rd ? 11 : 7); const m = b10Place(Array.from({ length: B10_N }, () => rng.current()), rng.current); setGen(0); setMoths(m); setHist([avg(m)]); setSt('ready'); setNote(''); } }, 'Заново ↺')),
+    phase === 'win' && h(WinModal, {
+      title: 'Эволюция на глазах!',
+      law: 'Выживают те, кого труднее заметить, и передают свой цвет детёнышам. Так за много поколений меняется весь вид',
+      fact: 'Так было на самом деле: в Англии 1800-х от копоти заводов стволы почернели, и почти все бабочки-пяденицы стали тёмными.',
+      onNext: onWin, onHome
+    }));
+}
+
+/* ── настройки игры для общего ядра ─────────────────────── */
+const LAB = {
+  key: 'bio', name: 'БиоМир', subject: 'Биология', emoji: '🌿', free: 2,
+  book: 'Тетрадь натуралиста', bookShort: 'тетрадь', bookEmoji: '📗',
+  wall: 'Бесплатно открыты первые два уровня БиоМира. Дальше — тайна растения, остров с лисами, сердце и бабочки, которые меняют цвет.',
+  sceneBg: '#F3FAEF', sceneDeco: bmDeco, homeCard: BmHomeCard
+};
+const LB_LEVELS = [
+  { C: Level1Alive, t: 'Живое или нет', emoji: '🐱', sub: 'Робот живой? А костёр?', aga: 'Живое питается, растёт, даёт потомство и собрано из клеток — всё сразу.',
+    bet: { q: 'Что из этого живое: робот, костёр или гриб?', opts: ['Робот — он двигается', 'Костёр — он ест дрова и растёт', 'Гриб'], ok: 2 } },
+  { C: Level2Scope, t: 'Микроскоп', emoji: '🔬', sub: 'Из чего сделаны мы с тобой', aga: 'Всё живое собрано из клеток, как дом из кирпичиков.',
+    bet: { q: 'Из чего сделан лист, если посмотреть очень-очень близко?', opts: ['Из сплошной зелёной массы', 'Из крошечных кирпичиков-клеток', 'Из тонких ниточек'], ok: 1 } },
+  { C: Level3Plant, t: 'Чем питается растение', emoji: '🌱', sub: 'Растение ест землю?', aga: 'Растение строит себя из воздуха и воды, а силу берёт у света — не из земли.',
+    bet: { q: 'Из чего вырастает огромное дерево?', opts: ['Из земли — оно её ест', 'Из воздуха и воды, а силу берёт у света', 'Из камешков в земле'], ok: 1 } },
+  { C: Level4Chain, t: 'Кто кого ест', emoji: '🦊', sub: 'Куда девается сила Солнца', aga: 'Сила Солнца идёт по цепочке: трава — заяц — лиса. Пропадёт звено — пострадают все.',
+    bet: { q: 'В лесу пропала вся трава. Кому станет плохо?', opts: ['Только зайцам', 'Всем по цепочке: и зайцам, и лисам', 'Никому'], ok: 1 } },
+  { C: Level5Island, t: 'Остров', emoji: '🐰', sub: 'Нужны ли хищники', aga: 'Без хищников травоядные съедают всё и голодают. Хищники тоже нужны.',
+    bet: { q: 'С острова убрали всех лис. Зайцам станет лучше?', opts: ['Да, их никто не ловит', 'Сначала да, а потом они съедят всю траву', 'Ничего не изменится'], ok: 1 } },
+  { C: Level6Heart, t: 'Сердце-насос', emoji: '❤️', sub: 'Почему после бега стучит', aga: 'Сердце качает кровь с воздухом. Бегаешь — мышцам нужно больше, и сердце стучит чаще.',
+    bet: { q: 'Почему после бега сердце стучит чаще?', opts: ['Оно испугалось', 'Мышцам нужно больше воздуха, и кровь носит его быстрее', 'Оно устало'], ok: 1 } },
+  { C: Level7Food, t: 'Путь бутерброда', emoji: '🥪', sub: 'Куда девается еда', aga: 'Еда разбирается на крошечные кусочки, и кровь разносит их по телу.',
+    bet: { q: 'Куда девается съеденный бутерброд?', opts: ['Лежит в животе целиком', 'Разбирается на крошки, и кровь разносит их по телу', 'Сразу исчезает'], ok: 1 } },
+  { C: Level8Soap, t: 'Мыло и микробы', emoji: '🧼', sub: 'Почему одной воды мало', aga: 'Мыло отрывает микробов от кожи, одна вода почти не справляется.',
+    bet: { q: 'Хватит одной воды, чтобы отмыть руки от микробов?', opts: ['Да, вода всё смоет', 'Нет, микробы держатся за кожу — нужно мыло', 'Хватит, если вода горячая'], ok: 1 } },
+  { C: Level9Code, t: 'Инструкция в клетке', emoji: '🧬', sub: 'Откуда клетка знает, каким быть', aga: 'В клетке лежит инструкция тела. Одна «буква» — другой признак.',
+    bet: { q: 'Откуда клетка знает, каким вырастет зверёк?', opts: ['Угадывает', 'В ней лежит инструкция', 'Ей подсказывает мама'], ok: 1 } },
+  { C: Level10Moths, t: 'Бабочки на коре', emoji: '🦋', sub: 'Как меняются живые', aga: 'Выживают незаметные и передают цвет детёнышам — так меняется весь вид.',
+    bet: { q: 'Бабочки у завода стали тёмными. Как так вышло?', opts: ['Перекрасились, чтобы спрятаться', 'Светлых съели птицы, а тёмные дали потомство', 'Испачкались сажей'], ok: 1 } }
+];
+const LB_QUIZ = {
+  1: [{ q: 'Костёр ест дрова и растёт. Он живой?',
+    opts: [{ t: 'Нет — он не из клеток', ok: true }, { t: 'Да, раз ест и растёт' }, { t: 'Да, ведь он тёплый' }],
+    yes: 'Да. Костёр похож на живое, но клеток в нём нет.',
+    no: 'Костёр только похож: ест дрова и растёт. Но он не из клеток — значит, неживой.' },
+  { q: 'Дерево не ходит. Оно живое?',
+    opts: [{ t: 'Да: питается, растёт, даёт семена и из клеток', ok: true }, { t: 'Нет, раз не двигается' }, { t: 'Только летом' }],
+    yes: 'Верно. Ходить для жизни не обязательно.',
+    no: 'Двигаться не обязательно. Дерево питается, растёт, даёт семена и собрано из клеток — живое.' }],
+  2: [{ q: 'Из чего собраны и кот, и дерево, и ты?',
+    opts: [{ t: 'Из крошечных клеток', ok: true }, { t: 'Из песчинок' }, { t: 'Из воды и воздуха' }],
+    yes: 'Да. Клетки — кирпичики всего живого.',
+    no: 'Всё живое собрано из клеток — крошечных кирпичиков, которые видно только в микроскоп.' },
+  { q: 'Чего нет в клетках кожи, но есть в клетках листа?',
+    opts: [{ t: 'Зелёных зёрнышек, которые готовят еду из света', ok: true }, { t: 'Центра управления' }, { t: 'Ничего, клетки одинаковые' }],
+    yes: 'Верно. Человек не умеет есть свет — еду коже приносит кровь.',
+    no: 'Центр управления есть у обеих. А зелёные зёрнышки — только у листа: они готовят еду из света.' }],
+  3: [{ q: 'Росток стоял в тёмном шкафу. Каким он стал?',
+    opts: [{ t: 'Бледным и слабым — без света нет еды', ok: true }, { t: 'Сильным и зелёным' }, { t: 'Таким же, как на окне' }],
+    yes: 'Да. Свет растению нужен, чтобы приготовить еду.',
+    no: 'Без света растение не может приготовить еду — оно вытягивается, бледнеет и слабеет.' },
+  { q: 'Из чего дерево строит себя?',
+    opts: [{ t: 'Из воздуха и воды, а силу берёт у света', ok: true }, { t: 'Из земли' }, { t: 'Из камней' }],
+    yes: 'Верно. Из земли — только немного «витаминов».',
+    no: 'Земли за пять лет убыло всего 57 граммов. Дерево строит себя из воздуха и воды, а силу берёт у света.' }],
+  4: [{ q: 'Куда смотрит стрелка в цепочке «трава → заяц»?',
+    opts: [{ t: 'От еды к тому, кто её ест', ok: true }, { t: 'От зайца к траве' }, { t: 'Куда угодно' }],
+    yes: 'Да. Так видно, куда идёт сила Солнца.',
+    no: 'Стрелка идёт от еды к едоку: трава → заяц. Так течёт сила Солнца.' },
+  { q: 'Все зайцы в лесу пропали. Что будет с лисами?',
+    opts: [{ t: 'Им станет нечего есть', ok: true }, { t: 'Им станет лучше' }, { t: 'Ничего' }],
+    yes: 'Верно. Пропало звено — плохо всем, кто дальше по цепочке.',
+    no: 'Лисы едят зайцев. Нет зайцев — нечего есть и лисам.' }],
+  5: [{ q: 'С острова убрали всех хищников. Что случится?',
+    opts: [{ t: 'Зайцы расплодятся, съедят траву и начнут голодать', ok: true }, { t: 'Зайцы будут жить счастливо' }, { t: 'Ничего не изменится' }],
+    yes: 'Да. Хищники не дают травоядным съесть всё.',
+    no: 'Без хищников зайцев станет очень много, трава кончится — и зайцы начнут голодать.' },
+  { q: 'Лис стало слишком много. Что будет?',
+    opts: [{ t: 'Они переловят зайцев и сами останутся без еды', ok: true }, { t: 'Остров станет богаче' }, { t: 'Зайцев станет больше' }],
+    yes: 'Верно. Важен баланс — не мало и не много.',
+    no: 'Много лис — мало зайцев, а потом и лисам нечего есть. Нужен баланс.' }],
+  6: [{ q: 'Почему после бега сердце стучит чаще?',
+    opts: [{ t: 'Мышцам нужно больше воздуха, его несёт кровь', ok: true }, { t: 'Сердце испугалось' }, { t: 'Сердце устало' }],
+    yes: 'Да. Сердце качает быстрее — кровь чаще приносит воздух.',
+    no: 'Работающим мышцам нужно больше воздуха. Его несёт кровь, поэтому сердце качает чаще.' },
+  { q: 'Что делает сердце?',
+    opts: [{ t: 'Качает кровь по телу, как насос', ok: true }, { t: 'Думает' }, { t: 'Переваривает еду' }],
+    yes: 'Верно. Это самый неутомимый насос на свете.',
+    no: 'Думает мозг, переваривает живот. А сердце — насос, который качает кровь.' }],
+  7: [{ q: 'Где еда впитывается в кровь?',
+    opts: [{ t: 'В кишечнике', ok: true }, { t: 'Во рту' }, { t: 'В лёгких' }],
+    yes: 'Да. Оттуда крошки еды уходят в кровь.',
+    no: 'Во рту еду только жуют. Впитывается она в кровь в кишечнике.' },
+  { q: 'Как еда попадает к мышцам ног?',
+    opts: [{ t: 'Её приносит кровь', ok: true }, { t: 'Скатывается по ногам' }, { t: 'Никак' }],
+    yes: 'Верно. Кровь разносит еду по всему телу.',
+    no: 'Крошки еды разносит кровь — до самых пальцев ног.' }],
+  8: [{ q: 'Почему одной водой руки не отмыть?',
+    opts: [{ t: 'Микробы держатся за жирную кожу, вода их не отрывает', ok: true }, { t: 'Вода слишком мокрая' }, { t: 'Микробы умеют плавать' }],
+    yes: 'Да. Мыло отрывает их от кожи, а вода уносит.',
+    no: 'Микробы держатся за жирную кожу. Отрывает их мыло, а вода только уносит.' },
+  { q: 'Где микробы прячутся, даже когда моешь руки?',
+    opts: [{ t: 'Между пальцами и под ногтями', ok: true }, { t: 'На ладони посередине' }, { t: 'Нигде' }],
+    yes: 'Верно. Туда надо тереть особенно старательно.',
+    no: 'На ладони их смыть проще всего. Прячутся они между пальцами и под ногтями.' }],
+  9: [{ q: 'Где лежит инструкция, по которой построено тело?',
+    opts: [{ t: 'В каждой клетке', ok: true }, { t: 'Только в голове' }, { t: 'В книжке у врача' }],
+    yes: 'Да. Копия есть почти в каждой клетке.',
+    no: 'Инструкция лежит почти в каждой клетке — в её центре управления.' },
+  { q: 'В инструкции поменялась одна «буква». Что будет?',
+    opts: [{ t: 'Может измениться один признак', ok: true }, { t: 'Получится совсем другое существо' }, { t: 'Ничего никогда не меняется' }],
+    yes: 'Верно. Окрас стал другим, а всё остальное — прежнее.',
+    no: 'Одна буква меняет один признак — например, окрас. Остальное остаётся прежним.' }],
+  10: [{ q: 'Почему на светлой коре стая бабочек посветлела?',
+    opts: [{ t: 'Тёмных было видно — их съели, а светлые дали потомство', ok: true }, { t: 'Бабочки перекрасились сами' }, { t: 'Их помыл дождь' }],
+    yes: 'Да. Так работает отбор.',
+    no: 'Бабочки не перекрашиваются. Тёмных съели, а светлые выжили и передали свой цвет детёнышам.' },
+  { q: 'Сколько нужно времени, чтобы весь вид изменился?',
+    opts: [{ t: 'Много поколений', ok: true }, { t: 'Одна ночь' }, { t: 'Один день' }],
+    yes: 'Верно. В Англии на это ушли десятилетия.',
+    no: 'Одна бабочка за жизнь не меняется. Вид меняется за много поколений.' }]
+};
+ReactDOM.createRoot(document.getElementById('root')).render(h(LbApp));
 </script>
 </body>
 </html>

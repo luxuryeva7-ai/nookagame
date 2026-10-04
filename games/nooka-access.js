@@ -49,9 +49,9 @@
      передавать нельзя. Если цены разойдутся, сервер скажет об этом в консоль. */
   var PLANS = {
     quarter: { rub: 490,  price: '490 ₽',  title: 'Три месяца', days: 92,
-      note: 'Вторая и третья игры — ещё 20 уровней. Продлевать не нужно: срок вышел — доступ закрылся сам.' },
+      note: 'Весь курс по ИИ и игры по наукам и технологиям — КосмоПорт, РобоЛаб, БиоМир и новые. Продлевать не нужно: срок вышел — доступ закрылся сам.' },
     year:    { rub: 1450, price: '1450 ₽', title: 'Год',        days: 366,
-      note: 'Те же 20 уровней на 12 месяцев плюс все новые игры платформы, которые выйдут за год.' }
+      note: 'То же на 12 месяцев — плюс все новые игры по наукам и технологиям, которые выйдут за год.' }
   };
 
   /* ── предпросмотр: «как видит родитель без оплаты» ─────────
@@ -158,6 +158,7 @@
 
   /* ── экран оплаты ────────────────────────────────────── */
   var PW_CSS =
+    '.nkpw,.nkpw *{box-sizing:border-box}' +
     '.nkpw{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;' +
       'padding:20px;background:rgba(8,5,16,.86);backdrop-filter:blur(10px);' +
       "font-family:'Nunito',system-ui,sans-serif}" +
@@ -195,7 +196,6 @@
   function paywall(opts) {
     opts = opts || {};
     if (document.getElementById('nkpw')) return;
-    if (window.nkGoal) nkGoal('paywall_seen');   // упёрся в платный уровень
     if (window.nkGoal) nkGoal('paywall_seen');   // упёрся в платный уровень
     if (!document.getElementById('nkpw-css')) {
       var st = document.createElement('style');

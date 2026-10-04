@@ -60,7 +60,9 @@
     'молния':       '<path d="M13 2 5 13h6l-1 9 8-11h-6l1-9Z"/>',
     'джойстик':     '<rect x="2.5" y="7.5" width="19" height="11" rx="4"/><path d="M7 11v4M5 13h4"/><circle cx="16" cy="12" r="1.1"/><circle cx="18.5" cy="14.5" r="1.1"/>',
     'победа':       '<path d="M8 4h8v4a4 4 0 0 1-8 0V4Z"/><path d="M8 5H5v2a3 3 0 0 0 3 3M16 5h3v2a3 3 0 0 1-3 3"/><path d="M12 12v4M9 20h6M10 17h4"/>',
-    'тренировка':   '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1"/>'
+    'тренировка':   '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1"/>',
+    'робот':        '<rect x="5" y="8" width="14" height="11" rx="3"/><path d="M12 8V5"/><circle cx="12" cy="4" r="1"/><circle cx="9.5" cy="13" r="1"/><circle cx="14.5" cy="13" r="1"/><path d="M3 12v3M21 12v3"/>',
+    'лист':         '<path d="M5 19C5 10 10 5 20 4c0 10-5 15-14 15"/><path d="M5 19l8-8"/>'
   };
   function icon(name, size) { return ICONS[name] ? svg(ICONS[name], size) : ''; }
 
