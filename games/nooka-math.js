@@ -185,5 +185,20 @@
     });
   }
 
-  window.nookaMath = { el: el, dots: dots, bond: bond, sparks: sparks, hand: hand, course: COURSE, hub: hub };
+  /* После уровня — следующий уровень курса, после последнего — карта курса.
+     Раньше с восьми уровней кидало в Арену, и ребёнок терял нить курса
+     (Артём, 05.10: «так делать не надо точно»). Арена — отдельной кнопкой на карте. */
+  function after(mid) {
+    var L = COURSE.levels, i = -1;
+    L.forEach(function (lv, k) { if (lv.mid === mid) i = k; });
+    var nx = i >= 0 ? L[i + 1] : null;
+    return nx && nx.href ? { label: 'Дальше: ' + nx.t + ' →', href: nx.href } : { label: 'К уровням →', href: 'math.html' };
+  }
+  function finishLevel(mid, xp) {
+    var n = after(mid);
+    if (window.nooka) window.nooka.missionWin(mid, xp, { nextLabel: n.label, onNext: function () { location.href = n.href; } });
+    else location.href = n.href;
+  }
+
+  window.nookaMath = { el: el, dots: dots, bond: bond, sparks: sparks, hand: hand, course: COURSE, hub: hub, after: after, finishLevel: finishLevel };
 })();

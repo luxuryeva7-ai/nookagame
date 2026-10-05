@@ -258,8 +258,7 @@
     stage.appendChild(end);
     again.onclick = function () { end.remove(); round = 0; startRound(); };
     next.onclick = function () {
-      if (window.nooka) window.nooka.missionWin('ma5', 60, { nextLabel: 'В Арену →', onNext: function () { location.href = 'math-arena.html'; } });
-      else location.href = 'math-arena.html';
+      M.finishLevel('ma5', 60);
     };
   }
 

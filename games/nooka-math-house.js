@@ -428,8 +428,7 @@
     album.style.display = 'none';
     again.onclick = function () { end.remove(); album.style.display = ''; round = 0; allFound = []; startRound(); };
     next.onclick = function () {
-      if (window.nooka) window.nooka.missionWin('ma2', 60, { nextLabel: 'Дальше: Рамка десяти →', onNext: function () { location.href = 'math-frame.html'; } });
-      else location.href = 'math-frame.html';
+      M.finishLevel('ma2', 60);
     };
   }
 
