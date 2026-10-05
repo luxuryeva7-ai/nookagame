@@ -1,0 +1,552 @@
+/* ============================================================
+   NOOKA МАТЕМАТИКА — общие стили курса (6–9 лет)
+
+   Сцена — сгенерированная картинка 9:16 во весь экран телефона.
+   Всё интерактивное лежит поверх неё в процентах от сцены, поэтому
+   на любом экране зверёк садится ровно на нарисованный пол.
+   Числа — шрифтом Nooka поверх картинки: нейросеть цифры рисует плохо.
+   ============================================================ */
+/* nooka-ui.css заканчивается тёмной темой ИИ-курса и перекрашивает всю палитру
+   (текст, «верно», «неверно», солнце) в тёмные тона. Математика светлая —
+   возвращаем светлую палитру целиком, иначе карточки «верно/неверно» темнеют. */
+.mh,.mhub{--nk-ink:#2D1B45;--nk-ink-2:#6B5680;--nk-ink-3:#A797B8;--nk-surface:#FFFDF8;
+  --nk-bg:#FFF4E4;--nk-bg-2:#FFE9CF;
+  --nk-pri-0:#F3EEFF;--nk-pri-1:#E4D9FF;--nk-pri-2:#A98BFF;--nk-pri-3:#7B4FF2;--nk-pri-4:#5836BD;
+  --nk-sun-1:#FFF1B4;--nk-sun-2:#FFD84D;--nk-sun-3:#E8AE1F;
+  --nk-ok-1:#C9F4DE;--nk-ok-2:#4ED99B;--nk-ok-3:#1FA76E;
+  --nk-warn-1:#FFD6CC;--nk-warn-2:#FF7A64;--nk-warn-3:#D94A34;}
+.mh{
+  position:fixed;inset:0;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;
+  background:#8CC46A;font-family:var(--nk-display);color:var(--nk-ink);}
+/* размытая копия фона закрывает поля на высоких и широких экранах */
+.mh__fill{position:absolute;left:-6%;top:-6%;width:112%;height:112%;object-fit:cover;
+  filter:blur(22px) saturate(1.05);pointer-events:none;}
+.mh__stage{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:min(100vw,56.25dvh,480px);aspect-ratio:9/16;}
+.mh__bg{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;
+  border-radius:0;}
+@media (min-width:481px){.mh__bg{border-radius:28px;box-shadow:0 30px 70px -20px rgba(45,27,69,.45);}}
+
+/* верхняя полоса: назад + чему учимся */
+.mh__top{position:absolute;left:3%;right:3%;top:2%;display:flex;align-items:center;gap:8px;z-index:30;}
+.mh__back{width:40px;height:40px;border:none;border-radius:14px;cursor:pointer;flex:none;
+  background:rgba(255,253,248,.82);color:var(--nk-ink);font-weight:900;font-size:18px;
+  box-shadow:0 3px 0 rgba(45,27,69,.14);backdrop-filter:blur(6px);}
+.mh__goal{padding:8px 14px;border-radius:999px;background:rgba(255,253,248,.82);backdrop-filter:blur(6px);
+  font-weight:900;font-size:13px;color:var(--nk-ink-2);box-shadow:0 3px 0 rgba(45,27,69,.1);}
+.mh__steps{margin-left:auto;display:flex;gap:5px;}
+.mh__steps i{width:9px;height:9px;border-radius:50%;background:rgba(255,253,248,.7);box-shadow:inset 0 0 0 1.5px rgba(45,27,69,.18);}
+.mh__steps i.on{background:var(--nk-pri-3);box-shadow:none;}
+.mh__steps i.done{background:var(--nk-ok-2);box-shadow:none;}
+
+/* число на крыше: цифра + те же точки, что у схемы */
+.mh__roof{position:absolute;transform:translate(-50%,-50%);z-index:12;display:flex;flex-direction:column;
+  align-items:center;gap:3px;padding:7px 14px 8px;border-radius:20px;
+  background:linear-gradient(180deg,#FFFDF8,#F3EEFF);box-shadow:0 5px 0 #CBB9F5,0 14px 24px -10px rgba(45,27,69,.45);}
+.mh__roof b{font-family:var(--nk-brand);font-weight:700;font-size:clamp(26px,8vw,38px);line-height:1;color:var(--nk-pri-4);}
+.mh__roof.pulse{animation:mhPulse .9s ease-in-out 3;}
+@keyframes mhPulse{50%{transform:translate(-50%,-50%) scale(1.14);}}
+
+/* точки числа: ряды по пять, как на пальцах */
+.mh-dots{display:grid;grid-template-columns:repeat(5,var(--d,7px));gap:3px;justify-content:center;}
+.mh-dots i{width:var(--d,7px);height:var(--d,7px);border-radius:50%;background:var(--c,#7B4FF2);}
+.mh-dots i.off{background:transparent;box-shadow:inset 0 0 0 1.5px var(--c,#7B4FF2);opacity:.45;}
+
+/* пол этажа: невидимая зона + счётчик сбоку */
+.mh__floor{position:absolute;z-index:6;border-radius:18px;transition:background .2s,box-shadow .2s;}
+.mh__floor.hot{background:rgba(255,236,150,.28);box-shadow:inset 0 0 0 3px rgba(255,216,77,.9);}
+.mh__floor.full{animation:mhGlow 1.2s ease-out;}
+@keyframes mhGlow{0%{box-shadow:inset 0 0 0 0 rgba(255,216,77,0);}30%{box-shadow:inset 0 0 40px 10px rgba(255,236,150,.8);}100%{box-shadow:inset 0 0 0 0 rgba(255,216,77,0);}}
+.mh__count{position:absolute;z-index:13;transform:translate(-50%,-50%);min-width:48px;padding:6px 8px 7px;
+  border-radius:16px;background:#FFFDF8;display:flex;flex-direction:column;align-items:center;gap:3px;
+  box-shadow:0 4px 0 rgba(45,27,69,.14),0 10px 18px -8px rgba(45,27,69,.35);}
+.mh__count b{font-family:var(--nk-brand);font-size:22px;line-height:1;color:var(--nk-ink);}
+.mh__count.bump{animation:mhBump .35s cubic-bezier(.3,1.6,.5,1);}
+@keyframes mhBump{40%{transform:translate(-50%,-50%) scale(1.25);}}
+
+/* зверята */
+.mh-pal{position:absolute;z-index:20;width:13.5%;transform:translate(-50%,-88%);touch-action:none;cursor:grab;
+  transition:left .38s cubic-bezier(.3,1.3,.5,1),top .38s cubic-bezier(.3,1.3,.5,1),width .3s;}
+.mh-pal img{display:block;width:100%;height:auto;pointer-events:none;
+  filter:drop-shadow(0 6px 5px rgba(45,27,69,.28));transform-origin:50% 100%;animation:mhIdle 2.6s ease-in-out infinite;}
+.mh-pal.in{width:11%;}
+.mh-pal.carry{z-index:40;transition:none;cursor:grabbing;}
+.mh-pal.carry img{animation:none;transform:scale(1.18) rotate(-6deg);filter:drop-shadow(0 16px 10px rgba(45,27,69,.3));}
+.mh-pal.hop img{animation:mhHop .5s cubic-bezier(.3,1.4,.5,1);}
+.mh-pal.nope img{animation:mhNope .45s ease-in-out;}
+.mh-pal.sleep{cursor:default;}
+.mh-pal.sleep img{animation:none;filter:drop-shadow(0 6px 5px rgba(45,27,69,.28)) saturate(.6) brightness(.95);}
+.mh-pal.sleep::after{content:'z z';position:absolute;right:-6%;top:-4%;font-weight:900;font-size:13px;color:#7B6AA0;
+  animation:mhZ 2.2s ease-in-out infinite;}
+@keyframes mhIdle{0%,100%{transform:scale(1,1);}50%{transform:scale(1.03,.97);}}
+@keyframes mhHop{0%{transform:scale(1.15,.85);}45%{transform:translateY(-22%) scale(.92,1.1);}100%{transform:none;}}
+@keyframes mhNope{25%{transform:rotate(-9deg);}75%{transform:rotate(9deg);}}
+@keyframes mhZ{0%,100%{opacity:.3;transform:translateY(0);}50%{opacity:1;transform:translateY(-6px);}}
+
+/* большая схема: выскакивает над травой, потом улетает в альбом */
+.mh__big{position:absolute;left:50%;top:74%;z-index:48;margin:-62px 0 0 -62px;width:124px;height:124px;
+  border-radius:32px;background:#FFFDF8;display:flex;align-items:center;justify-content:center;pointer-events:none;
+  box-shadow:0 8px 0 rgba(45,27,69,.12),0 24px 40px -14px rgba(45,27,69,.45);animation:mhBig .45s cubic-bezier(.3,1.6,.5,1);}
+.mh__big .mh-bond{transform:scale(1.9);}
+@keyframes mhBig{0%{transform:scale(.2);opacity:0;}100%{transform:scale(1);opacity:1;}}
+
+/* альбом найденных способов */
+.mh__album{position:absolute;left:3%;right:3%;bottom:2.2%;z-index:30;display:flex;justify-content:center;gap:8px;}
+.mh-slot{width:62px;height:66px;border-radius:18px;background:rgba(255,253,248,.55);backdrop-filter:blur(6px);
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;}
+.mh-slot.got{background:#FFFDF8;box-shadow:0 4px 0 rgba(45,27,69,.14);animation:mhPop .5s cubic-bezier(.3,1.6,.5,1);}
+.mh-slot.again{animation:mhFlash .6s ease-in-out 2;}
+@keyframes mhPop{0%{transform:scale(.4);}100%{transform:scale(1);}}
+@keyframes mhFlash{50%{background:#FFF1B4;transform:scale(1.12);}}
+
+/* состав числа — школьный «домик»: крыша с числом, две клетки-этажа */
+.mh-bond{position:relative;width:52px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:22px 24px;gap:0;}
+.mh-bond span{display:flex;align-items:center;justify-content:center;font-family:var(--nk-brand);font-weight:700;font-size:13px;
+  color:var(--nk-pri-4);background:#F3EEFF;box-shadow:inset 0 0 0 1.5px #CBB9F5;}
+.mh-bond .w{grid-column:1 / 3;align-items:flex-end;padding-bottom:1px;color:#fff;background:var(--nk-pri-3);box-shadow:none;
+  clip-path:polygon(50% 0,100% 100%,0 100%);}
+.mh-bond .a{border-radius:0 0 0 6px;}
+.mh-bond .b{border-radius:0 0 6px 0;}
+
+/* Нейро-проводник */
+.mh__neuro{position:absolute;z-index:18;width:24%;left:4%;bottom:12%;pointer-events:none;
+  filter:drop-shadow(0 10px 10px rgba(45,27,69,.3));animation:mhFloat 3.4s ease-in-out infinite;}
+.mh__neuro.cheer{animation:mhCheer .7s cubic-bezier(.3,1.5,.5,1) 2;}
+@keyframes mhFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-5px);}}
+@keyframes mhCheer{50%{transform:translateY(-18px) rotate(-6deg);}}
+
+/* призрачная рука-подсказка */
+.mh__hand{position:absolute;z-index:45;width:13%;pointer-events:none;opacity:0;transform:translate(-30%,-10%);
+  filter:drop-shadow(0 6px 8px rgba(45,27,69,.35));}
+.mh__hand.go{opacity:1;}
+
+/* искры */
+.mh-spark{position:absolute;z-index:26;width:10px;height:10px;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,#FFF 0%,#FFE27A 40%,rgba(255,216,77,0) 70%);animation:mhSpark .9s ease-out forwards;}
+@keyframes mhSpark{0%{transform:translate(0,0) scale(.4);opacity:1;}100%{transform:translate(var(--x),var(--y)) scale(1.3);opacity:0;}}
+
+/* финальная карточка уровня */
+.mh__end{position:absolute;left:5%;right:5%;bottom:5%;z-index:50;padding:18px 18px 16px;border-radius:26px;
+  background:#FFFDF8;box-shadow:var(--nk-shadow-float);text-align:center;animation:mhUp .5s cubic-bezier(.3,1.3,.5,1);}
+.mh__end h2{margin:0 0 4px;font-family:var(--nk-brand);font-weight:700;font-size:20px;}
+.mh__end p{margin:0 0 12px;font-weight:800;font-size:14px;color:var(--nk-ink-2);}
+.mh__end .mh__all{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-bottom:14px;}
+@keyframes mhUp{from{transform:translateY(40px);opacity:0;}to{transform:none;opacity:1;}}
+
+@media (prefers-reduced-motion: reduce){.mh *{animation:none !important;transition:none !important;}}
+
+/* тёмная тема ИИ-курса красит мягкую кнопку в тёмный — возвращаем светлую */
+.mh .nk-btn--soft{color:#2D1B45;background:linear-gradient(180deg,#fff,#FFF6E9);
+  box-shadow:0 5px 0 rgba(45,27,69,.12),0 10px 20px -8px rgba(45,27,69,.14),inset 0 0 0 1.5px rgba(45,27,69,.08);}
+
+/* ============================================================
+   АРЕНА: монстрик Ням, облачко-желание, корзинки, ягоды, питомец
+   ============================================================ */
+.ma-nyam{position:absolute;z-index:14;width:46%;transform:translate(-50%,-88%);pointer-events:none;
+  transition:opacity .6s, transform .6s;}
+.ma-nyam img{display:block;width:100%;height:auto;transform-origin:50% 100%;
+  filter:drop-shadow(0 14px 12px rgba(45,27,69,.3));animation:mhIdle 2.8s ease-in-out infinite;}
+.ma-nyam.near img{transform:scale(1.06);animation:none;}
+.ma-nyam.chew img{animation:maChew .26s ease-in-out;}
+.ma-nyam.full img{animation:maFull .9s ease-in-out;}
+.ma-nyam.leave{opacity:0;transform:translate(-50%,-88%) scale(.7);}
+@keyframes maChew{50%{transform:scale(1.07,.93);}}
+@keyframes maFull{20%{transform:scale(1.12,.94) rotate(-4deg);}50%{transform:scale(1.08,.96) rotate(4deg);}}
+
+.ma-wish{position:absolute;z-index:16;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;
+  gap:4px;padding:10px 16px 11px;border-radius:24px;background:#FFFDF8;
+  box-shadow:0 5px 0 rgba(45,27,69,.12),0 16px 28px -12px rgba(45,27,69,.45);}
+.ma-wish::after{content:'';position:absolute;left:12px;bottom:-9px;width:18px;height:18px;border-radius:50%;background:#FFFDF8;
+  box-shadow:-10px 12px 0 -4px #FFFDF8;}
+.ma-wish b{font-family:var(--nk-brand);font-weight:700;font-size:clamp(30px,9vw,42px);line-height:1;color:#D9402E;}
+.ma-wish b.expr{font-size:clamp(24px,7vw,32px);white-space:nowrap;}
+.ma-wish.ask{animation:mhPulse .8s ease-in-out 2;}
+
+.ma-basket{position:absolute;z-index:30;width:26%;transform:translate(-50%,-50%);touch-action:none;cursor:grab;}
+.ma-basket img{display:block;width:100%;pointer-events:none;filter:drop-shadow(0 10px 8px rgba(45,27,69,.3));}
+.ma-basket.carry{z-index:46;cursor:grabbing;}
+.ma-basket.locked{cursor:default;}
+.ma-basket.gone{opacity:0;transition:opacity .4s;}
+.ma-basket__n{position:absolute;right:-4%;top:-14%;min-width:30px;height:30px;padding:0 6px;border-radius:15px;
+  display:flex;align-items:center;justify-content:center;background:var(--nk-pri-3);color:#fff;
+  font-family:var(--nk-brand);font-weight:700;font-size:15px;box-shadow:0 3px 0 var(--nk-pri-4);}
+.ma-basket__n:empty{display:none;}
+
+.ma-berry{position:absolute;z-index:32;width:8.5%;transform:translate(-50%,-80%);cursor:pointer;touch-action:none;
+  transition:left .3s cubic-bezier(.3,1.3,.5,1), top .3s cubic-bezier(.3,1.3,.5,1), width .3s;}
+.ma-berry img{display:block;width:100%;pointer-events:none;filter:drop-shadow(0 4px 3px rgba(45,27,69,.3));}
+.ma-berry.in{width:6.6%;}
+.ma-berry.eaten{transition:left .35s ease-in, top .35s ease-in, opacity .35s, width .35s;opacity:0;width:3%;}
+
+.ma-egg{position:absolute;z-index:35;width:24%;transform:translate(-50%,-80%);cursor:pointer;touch-action:none;
+  animation:mhPop .6s cubic-bezier(.3,1.6,.5,1);}
+.ma-egg img{display:block;width:100%;pointer-events:none;filter:drop-shadow(0 10px 10px rgba(123,79,242,.45));}
+.ma-egg.knock img{animation:maKnock .35s ease-in-out;}
+@keyframes maKnock{25%{transform:rotate(-10deg);}75%{transform:rotate(10deg);}}
+
+.ma-pet{position:absolute;z-index:17;width:17%;transform:translate(-50%,-85%) scale(var(--grow,1));transform-origin:50% 100%;
+  pointer-events:none;transition:transform .5s cubic-bezier(.3,1.6,.5,1);}
+.ma-pet img{display:block;width:100%;filter:drop-shadow(0 8px 6px rgba(45,27,69,.3));animation:mhFloat 3s ease-in-out infinite;}
+.ma-pet.born img{animation:maBorn .8s cubic-bezier(.3,1.6,.5,1);}
+.ma-pet__bar{height:6px;margin:4px 12% 0;border-radius:3px;background:rgba(255,253,248,.7);overflow:hidden;}
+.ma-pet__bar i{display:block;height:100%;border-radius:3px;background:var(--nk-ok-2);}
+@keyframes maBorn{0%{transform:scale(.2) translateY(20%);}70%{transform:scale(1.15);}100%{transform:none;}}
+
+.ma-stars{margin-left:auto;display:flex;gap:4px;}
+.ma-stars i{width:22px;height:22px;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
+  background:rgba(255,253,248,.75);}
+.ma-stars i.on{background:linear-gradient(180deg,#FFE27A,#FFC63F);animation:mhPop .5s cubic-bezier(.3,1.6,.5,1);}
+.ma-wish:empty{display:none;}
+
+/* колокольчик загадки «Домика»: позвонить, когда решил, что хватит */
+.mh__bell{position:absolute;z-index:33;width:60px;height:60px;margin:-30px 0 0 -30px;padding:10px;border:none;border-radius:50%;
+  cursor:pointer;background:linear-gradient(180deg,#FFF1B4,#FFD84D 60%,#FFC53A);
+  box-shadow:0 5px 0 var(--nk-sun-3),0 12px 22px -8px rgba(45,27,69,.45);transition:transform .15s;}
+.mh__bell[hidden]{display:none;}
+.mh__bell svg{display:block;width:100%;height:100%;}
+.mh__bell:active{transform:translateY(3px);box-shadow:0 2px 0 var(--nk-sun-3);}
+.mh__bell.ready{animation:mhBellWave 1.8s ease-in-out infinite;}
+.mh__bell.ding svg{animation:mhDing .5s ease-in-out;}
+@keyframes mhBellWave{0%,70%,100%{transform:none;}80%{transform:rotate(-12deg);}90%{transform:rotate(10deg);}}
+@keyframes mhDing{20%{transform:rotate(-22deg);}40%{transform:rotate(18deg);}60%{transform:rotate(-12deg);}80%{transform:rotate(6deg);}}
+/* ячейка-вопрос: цель загадки видна заранее */
+.mh-slot.ask{background:#FFFDF8;box-shadow:0 0 0 3px var(--nk-sun-2),0 4px 0 rgba(45,27,69,.14);}
+.mh-slot.ask .b{background:var(--nk-sun-2);color:var(--nk-ink);}
+
+/* ============================================================
+   РАМКА ДЕСЯТИ: лавочка на десять мест, облако, карточки
+   ============================================================ */
+.mf-frame{position:absolute;z-index:8;border-radius:26px;
+  background:linear-gradient(180deg,#D39460,#AE6E3B);
+  box-shadow:0 7px 0 #7A4A22,0 20px 32px -12px rgba(45,27,69,.55),inset 0 2px 0 rgba(255,255,255,.35);}
+/* два ряда по пять: полоска-разделитель между рядами */
+.mf-frame::after{content:'';position:absolute;left:4%;right:4%;top:50%;height:3px;border-radius:2px;background:rgba(122,74,34,.55);}
+.mf-frame i{position:absolute;width:13%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;
+  background:radial-gradient(circle at 50% 40%,#FFF6E5,#EBD2AE);box-shadow:inset 0 3px 6px rgba(90,50,20,.3);transition:box-shadow .3s;}
+.mf-frame.hot{box-shadow:0 7px 0 #7A4A22,0 0 0 4px rgba(255,216,77,.9),0 20px 32px -12px rgba(45,27,69,.55);}
+.mf-frame.five i:nth-child(-n+5){box-shadow:inset 0 3px 6px rgba(90,50,20,.3),0 0 0 4px #FFD84D,0 0 18px 4px rgba(255,216,77,.7);}
+.mf-cloud{position:absolute;z-index:24;border-radius:26px;display:flex;align-items:center;justify-content:center;
+  background:rgba(255,253,248,.94);backdrop-filter:blur(10px);box-shadow:0 12px 30px -10px rgba(45,27,69,.45);
+  animation:mhPop .4s cubic-bezier(.3,1.4,.5,1);}
+.mf-cloud[hidden]{display:none;}
+.mf-cloud b{font-family:var(--nk-brand);font-weight:700;font-size:56px;color:var(--nk-pri-3);}
+.mf-cards{position:absolute;left:6%;right:6%;top:61%;z-index:30;display:flex;gap:14px;justify-content:center;}
+.mf-cards[hidden]{display:none;}
+.mf-card{width:86px;height:86px;border:none;border-radius:26px;cursor:pointer;background:#FFFDF8;
+  box-shadow:0 6px 0 rgba(45,27,69,.16),0 16px 26px -10px rgba(45,27,69,.45);animation:mhPop .45s cubic-bezier(.3,1.5,.5,1);}
+.mf-card b{font-family:var(--nk-brand);font-weight:700;font-size:40px;color:var(--nk-ink);}
+.mf-card:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(45,27,69,.16);}
+.mf-card.ok{background:var(--nk-ok-1);box-shadow:0 6px 0 var(--nk-ok-3);}
+.mf-card.bad{background:var(--nk-warn-1);animation:mhNope .45s ease-in-out;}
+
+/* ============================================================
+   СТРАНИЦА КУРСА «Числа-друзья»
+   ============================================================ */
+/* nooka-ui.css запирает html и body (overflow:hidden) — для игр; страница курса длинная,
+   поэтому прокручивается сам body высотой в экран */
+body.mhub-body{background:linear-gradient(180deg,#DDEFF6,#FFF4E4 45%);height:100vh;height:100dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.mhub{--nk-ink:#2D1B45;--nk-ink-2:#6B5680;--nk-ink-3:#A797B8;max-width:520px;margin:0 auto;padding:22px 16px 40px;
+  font-family:var(--nk-display);color:var(--nk-ink);}
+.mhub__head{display:flex;gap:12px;align-items:center;margin-bottom:18px;}
+.mhub__neuro{width:92px;flex:none;filter:drop-shadow(0 10px 10px rgba(45,27,69,.25));}
+.mhub__chip{display:inline-block;padding:5px 11px;border-radius:999px;background:rgba(255,253,248,.85);
+  font-weight:900;font-size:11.5px;color:var(--nk-ink-2);}
+.mhub h1{margin:6px 0 4px;font-family:var(--nk-brand);font-weight:700;font-size:28px;line-height:1.1;}
+.mhub__head p{margin:0;font-weight:700;font-size:14px;line-height:1.4;color:var(--nk-ink-2);}
+.mhub__list{display:flex;flex-direction:column;gap:10px;}
+.mhub__lv{display:flex;align-items:center;gap:12px;padding:10px 14px 10px 10px;border-radius:22px;text-decoration:none;
+  color:var(--nk-ink);background:#FFFDF8;box-shadow:0 5px 0 rgba(45,27,69,.08),0 14px 24px -14px rgba(45,27,69,.35);}
+.mhub__shot{width:74px;height:74px;flex:none;border-radius:16px;overflow:hidden;background:linear-gradient(135deg,#E4D9FF,#F3EEFF);}
+.mhub__shot img{width:100%;height:100%;object-fit:cover;object-position:50% 45%;}
+.mhub__tx{flex:1;min-width:0;}
+.mhub__tx i{display:block;font-style:normal;font-weight:900;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--nk-ink-3);}
+.mhub__tx b{display:block;margin:2px 0;font-family:var(--nk-brand);font-weight:700;font-size:17px;}
+.mhub__tx span{display:block;font-weight:700;font-size:13px;line-height:1.35;color:var(--nk-ink-2);}
+.mhub__go{flex:none;min-width:38px;height:38px;padding:0 8px;border-radius:19px;display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:17px;color:#fff;background:var(--nk-pri-3);box-shadow:0 3px 0 var(--nk-pri-4);}
+.mhub__lv--soon{opacity:.55;box-shadow:none;background:rgba(255,253,248,.6);}
+.mhub__lv--soon .mhub__go{background:transparent;box-shadow:none;color:var(--nk-ink-3);font-size:12px;}
+.mhub__lv--lock .mhub__shot{filter:saturate(.55);}
+.mhub__lv--lock .mhub__go{font-size:16px;}
+.mhub__lv--arena{background:linear-gradient(135deg,#F3EEFF,#FFFDF8);box-shadow:0 0 0 2px var(--nk-pri-2),0 14px 24px -14px rgba(45,27,69,.35);}
+.mhub__lv--arena .mhub__shot{background:#DCCFF9;}
+.mhub__lv--arena .mhub__shot img{object-fit:contain;object-position:50% 100%;}
+.mh-pal.seat{width:14.5%;}
+
+/* ============================================================
+   СВЕТЛЯЧКИ: спящий светлячок, свечение по касанию, номер
+   ============================================================ */
+.mff-bug{position:absolute;z-index:20;width:18%;padding:0;border:none;background:none;cursor:pointer;
+  transform:translate(-50%,-50%);transition:left .7s cubic-bezier(.4,0,.2,1),top .7s cubic-bezier(.4,0,.2,1),width .5s;
+  -webkit-tap-highlight-color:transparent;}
+.mff-bug__in{position:relative;display:block;}
+.mff-bug img{position:relative;display:block;width:100%;pointer-events:none;filter:brightness(.55) saturate(.7);
+  transition:filter .4s;}
+/* летают только спящие: посчитанный замирает — видно, кого уже считал */
+.mff-fly .mff-bug:not(.lit) .mff-bug__in{animation:mffDrift var(--d,4s) ease-in-out var(--delay,0s) infinite alternate;}
+@keyframes mffDrift{0%{transform:translate(-8px,4px);}50%{transform:translate(6px,-8px);}100%{transform:translate(9px,5px);}}
+.mff-glow{position:absolute;left:4%;top:42%;width:58%;aspect-ratio:1;border-radius:50%;opacity:0;
+  background:radial-gradient(circle,rgba(255,240,170,1) 0%,rgba(255,214,92,.85) 35%,rgba(255,190,60,0) 70%);
+  transition:opacity .4s, transform .4s;transform:scale(.6);}
+.mff-bug.lit img{filter:brightness(1.12) saturate(1.05) drop-shadow(0 0 10px rgba(255,214,92,.9));}
+.mff-bug.lit .mff-glow{opacity:1;transform:scale(1.5);animation:mffPulse 1.8s ease-in-out infinite;}
+@keyframes mffPulse{50%{transform:scale(1.75);opacity:.8;}}
+.mff-num{position:absolute;left:50%;top:-34%;transform:translateX(-50%) scale(0);font-family:var(--nk-brand);font-weight:700;
+  font-size:30px;line-height:1;color:#FFE27A;text-shadow:0 0 12px rgba(255,200,60,.9),0 2px 0 rgba(0,0,0,.25);
+  transition:transform .35s cubic-bezier(.3,1.6,.5,1);}
+.mff-bug.lit .mff-num{transform:translateX(-50%) scale(1);}
+.mff-bug.pop .mff-bug__in{animation:mffPop .45s cubic-bezier(.3,1.6,.5,1);}
+.mff-bug.hint .mff-num{animation:mffHint .5s ease-in-out 3;}
+@keyframes mffPop{0%{transform:scale(.8);}60%{transform:scale(1.18);}100%{transform:none;}}
+@keyframes mffHint{50%{transform:translateX(-50%) scale(1.5);}}
+.mff-bug.home{width:9%;z-index:13;}
+.mff-bug.home .mff-num{opacity:0;}
+.mff-badge{min-width:84px;}
+.mff-badge.on{background:linear-gradient(180deg,#FFF6D2,#FFE89A);box-shadow:0 5px 0 #E8AE1F,0 0 30px rgba(255,214,92,.65);}
+
+/* ============================================================
+   ГОЛОДНЫЙ КРОКОДИЛ: крокодил, кучки яблок, запись «3 < 6»
+   ============================================================ */
+.mcr-croc{position:absolute;z-index:22;width:46%;transform:translate(-50%,-80%);touch-action:none;cursor:grab;
+  transition:left .45s cubic-bezier(.3,1.2,.5,1);}
+.mcr-croc img{display:block;width:100%;pointer-events:none;filter:drop-shadow(0 12px 10px rgba(30,60,30,.35));
+  transform-origin:50% 100%;}
+.mcr-croc.left img{transform:scaleX(-1);}
+.mcr-croc.nope img{animation:mcrNope .55s ease-in-out;}
+.mcr-croc.left.nope img{animation:mcrNopeL .55s ease-in-out;}
+.mcr-croc.full img{animation:mcrFull .6s cubic-bezier(.3,1.5,.5,1);}
+.mcr-croc.left.full img{animation:mcrFullL .6s cubic-bezier(.3,1.5,.5,1);}
+@keyframes mcrNope{25%{transform:rotate(-7deg);}75%{transform:rotate(7deg);}}
+@keyframes mcrNopeL{25%{transform:scaleX(-1) rotate(-7deg);}75%{transform:scaleX(-1) rotate(7deg);}}
+@keyframes mcrFull{40%{transform:scale(1.1,.92);}}
+@keyframes mcrFullL{40%{transform:scaleX(-1.1) scaleY(.92);}}
+.mcr-pile{position:absolute;z-index:18;width:30%;height:16%;transform:translate(-50%,-50%);transition:opacity .4s;}
+.mcr-pile.shake{animation:mhNope .45s ease-in-out;}
+.mcr-pile.gone{opacity:0;}
+.mcr-apple{position:absolute;width:23%;transform:translateX(-50%);filter:drop-shadow(0 4px 3px rgba(45,27,69,.3));
+  transition:transform .35s ease-in, opacity .35s;}
+.mcr-apple.gone{transform:translateX(-50%) scale(.2) translateY(160%);opacity:0;}
+.mcr-pile--digit{display:flex;align-items:center;justify-content:center;width:26%;height:auto;aspect-ratio:1.15;border-radius:22px;
+  background:linear-gradient(180deg,#D39460,#AE6E3B);box-shadow:0 6px 0 #7A4A22,0 16px 26px -12px rgba(45,27,69,.5);}
+.mcr-pile--digit b{font-family:var(--nk-brand);font-weight:700;font-size:54px;color:#FFF6E5;text-shadow:0 2px 0 rgba(90,50,20,.4);}
+.mcr-strip{position:absolute;left:50%;top:14%;z-index:30;transform:translateX(-50%) scale(.6);opacity:0;display:flex;gap:12px;
+  align-items:center;padding:10px 20px;border-radius:24px;background:#FFFDF8;box-shadow:0 6px 0 rgba(45,27,69,.12),0 16px 28px -12px rgba(45,27,69,.45);
+  transition:transform .4s cubic-bezier(.3,1.6,.5,1),opacity .3s;}
+.mcr-strip.on{transform:translateX(-50%) scale(1);opacity:1;}
+.mcr-strip span{font-family:var(--nk-brand);font-weight:700;font-size:38px;color:var(--nk-ink);}
+.mcr-strip i{font-style:normal;font-family:var(--nk-brand);font-weight:700;font-size:44px;color:var(--nk-ok-3);}
+
+/* ============================================================
+   ПРЫЖКИ КУЗНЕЧИКА: числа на кувшинках, кузнечик, задание
+   ============================================================ */
+.mhp-pad{position:absolute;z-index:12;aspect-ratio:2.4;transform:translate(-50%,-50%);border:none;border-radius:50%;
+  background:transparent;padding:0;cursor:default;display:flex;align-items:center;justify-content:center;}
+/* номер — сбоку от кувшинки, столбиком справа: дальние кувшинки тесно, по центру цифры слиплись бы */
+.mhp-pad b{position:absolute;left:100%;top:50%;font-family:var(--nk-brand);font-weight:700;font-size:calc(var(--f,1) * 17px);line-height:1;color:#FFFDF8;
+  padding:.18em .45em;border-radius:999px;background:rgba(30,80,40,.6);transform:translate(4px,-50%);transition:transform .3s,background .3s;}
+.mhp-pad.on b{background:#FFD84D;color:var(--nk-ink);transform:translate(4px,-50%) scale(1.25);}
+.mhp-pad.tap{cursor:pointer;box-shadow:inset 0 0 0 2px rgba(255,255,255,.5);animation:mhpTap 1.6s ease-in-out infinite;}
+.mhp-pad.pick{box-shadow:inset 0 0 0 4px #FFD84D;animation:none;}
+.mhp-pad.miss{box-shadow:inset 0 0 0 4px #FF7A64;}
+@keyframes mhpTap{50%{box-shadow:inset 0 0 0 3px rgba(255,255,255,.85);}}
+.mhp-hop{position:absolute;z-index:25;transform:translate(-50%,-92%);touch-action:none;cursor:grab;
+  transition:left .38s ease-out, top .38s cubic-bezier(.3,1.3,.5,1), width .38s;}
+.mhp-hop img{display:block;width:100%;pointer-events:none;filter:drop-shadow(0 8px 6px rgba(20,60,30,.35));}
+.mhp-hop.jump img{animation:mhpJump .42s ease-out;}
+@keyframes mhpJump{0%{transform:scale(1.1,.85);}45%{transform:translateY(-55%) scale(.95,1.08);}100%{transform:none;}}
+.mhp-flag{position:absolute;z-index:11;aspect-ratio:1;transform:translate(-50%,-80%);pointer-events:none;}
+.mhp-flag[hidden]{display:none;}
+.mhp-flag span{position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(circle,#FFF6D2 0 22%,#FF9EC4 23% 46%,#FF6FA6 47% 60%,transparent 61%);
+  filter:drop-shadow(0 4px 4px rgba(45,27,69,.3));animation:mhpFlag 1.4s ease-in-out infinite;}
+.mhp-flag.got span{animation:mhPop .5s cubic-bezier(.3,1.6,.5,1);}
+@keyframes mhpFlag{50%{transform:scale(1.15) rotate(10deg);}}
+.mhp-card{position:absolute;left:50%;top:13%;z-index:30;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:5px;
+  padding:9px 18px 10px;border-radius:22px;background:#FFFDF8;box-shadow:0 5px 0 rgba(45,27,69,.12),0 14px 26px -12px rgba(45,27,69,.45);}
+.mhp-card b{font-family:var(--nk-brand);font-weight:700;font-size:30px;line-height:1;color:var(--nk-ink);white-space:nowrap;}
+.mhp-card.ok{background:var(--nk-ok-1);box-shadow:0 5px 0 var(--nk-ok-3);}
+.mhp-card.try{background:var(--nk-sun-1);}
+.mhp-card.pulse{animation:mhPulseC .8s ease-in-out 2;}
+@keyframes mhPulseC{50%{transform:translateX(-50%) scale(1.12);}}
+.mhp-cards{top:auto;bottom:6%;}
+
+/* ============================================================
+   УБЕЖАВШИЕ ЗАЙЦЫ: зайцы на огороде, меловая черта, следы
+   ============================================================ */
+.mz-hare{position:absolute;z-index:20;width:14%;transform:translate(-50%,-94%);pointer-events:none;
+  transition:left .7s cubic-bezier(.4,0,.6,1), top .7s cubic-bezier(.4,0,.6,1), width .7s, opacity .35s;}
+.mz-hare img{display:block;width:100%;filter:drop-shadow(0 8px 6px rgba(40,70,30,.3));
+  animation:mzBreath 2.4s ease-in-out infinite;animation-delay:var(--delay,0s);transform-origin:50% 100%;}
+@keyframes mzBreath{50%{transform:scale(1.03,.97);}}
+.mz-hare.run{width:17%;z-index:24;}
+.mz-hare.run img{animation:mzRun .3s ease-in-out infinite;}
+.mz-hare.run.left img{transform:scaleX(-1);animation-name:mzRunL;}
+@keyframes mzRun{50%{transform:translateY(-14%);}}
+@keyframes mzRunL{0%,100%{transform:scaleX(-1);}50%{transform:scaleX(-1) translateY(-14%);}}
+.mz-hare.away{opacity:0;width:7%;}
+.mz-hare.nope img{animation:mhNope .45s ease-in-out;}
+.mz-hare.hop img{animation:mzHop .5s cubic-bezier(.3,1.4,.5,1);}
+@keyframes mzHop{40%{transform:translateY(-22%) scale(1.04);}}
+/* следы на месте убежавшего: пустой кружок, как зачёркнутое в тетради */
+.mz-spot{position:absolute;z-index:19;width:10%;aspect-ratio:2.2;transform:translate(-50%,-50%);border-radius:50%;
+  border:3px dashed rgba(255,253,248,.9);background:rgba(60,90,40,.18);pointer-events:none;}
+.mz-spot.hop{animation:mzSpot .5s ease-in-out;}
+@keyframes mzSpot{50%{transform:translate(-50%,-50%) scale(1.35);border-color:#FFD84D;}}
+.mz-ink{position:absolute;inset:0;width:100%;height:100%;z-index:26;pointer-events:none;overflow:visible;}
+.mz-ink polyline{fill:none;stroke:#FFFDF8;stroke-width:7;stroke-linecap:round;stroke-linejoin:round;
+  filter:drop-shadow(0 2px 2px rgba(45,27,69,.35));transition:opacity .5s;}
+.mz-ink polyline.fade{opacity:0;}
+
+/* ============================================================
+   ЧЕРЕЗ ДЕСЯТОК: вагоны-рамки, кнопка «держи», разложение 10 + …
+   ============================================================ */
+.mt-wagon{position:absolute;z-index:8;border-radius:22px 22px 14px 14px;
+  background:linear-gradient(180deg,#C2AEFF,#8E6BEE);
+  box-shadow:0 6px 0 #5836BD,0 20px 30px -12px rgba(45,27,69,.5),inset 0 3px 0 rgba(255,255,255,.45);
+  transition:transform .85s cubic-bezier(.3,1.05,.5,1),box-shadow .3s;}
+.mt-wagon::after{content:'';position:absolute;left:4%;right:4%;top:50%;height:3px;border-radius:2px;background:rgba(58,36,140,.35);}
+.mt-wagon.away{transform:translateX(125%);}
+.mt-wagon i{position:absolute;width:13%;aspect-ratio:1.1;transform:translate(-50%,-50%);border-radius:30%;
+  background:linear-gradient(180deg,#E9F6FF,#C9E3F5);box-shadow:inset 0 3px 6px rgba(40,50,110,.3);}
+.mt-wagon.full{box-shadow:0 6px 0 #5836BD,0 0 0 4px #FFD84D,0 0 26px 6px rgba(255,216,77,.6),inset 0 3px 0 rgba(255,255,255,.45);}
+.mt-wagon.ring{animation:mtRing .6s ease-in-out 2;}
+@keyframes mtRing{50%{transform:translateY(-4px) rotate(-1deg);}}
+.mt-wheel{position:absolute;bottom:-11%;left:10%;width:9%;aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle,#8C7BB0 0 28%,#3A2A5C 30%);box-shadow:0 3px 0 rgba(0,0,0,.25);}
+.mt-wheel--r{left:auto;right:10%;}
+.mt-chip{position:absolute;right:-1%;top:-18%;z-index:2;min-width:40px;padding:5px 11px;border-radius:999px;text-align:center;
+  font-family:var(--nk-brand);font-weight:700;font-size:22px;line-height:1;color:var(--nk-ink);background:#FFD84D;
+  box-shadow:0 4px 0 #E8AE1F;}
+.mt-chip:empty{display:none;}
+.mt-chip.pulse{animation:mtChip .8s ease-in-out 2;}
+@keyframes mtChip{50%{transform:scale(1.3);}}
+.mh-pal.mt-pal{width:12%;cursor:default;}
+.mh-pal.mt-pal.in{width:9.5%;z-index:9;}
+.mt-card{top:9.5%;}
+.mt-card small{font-family:var(--nk-brand);font-weight:700;font-size:17px;color:var(--nk-ink-2);}
+.mt-go{position:absolute;left:51%;top:91%;z-index:30;width:19%;aspect-ratio:1;transform:translate(-50%,-50%);border:none;border-radius:50%;
+  cursor:pointer;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
+  background:radial-gradient(circle at 50% 35%,#FFF1B4,#FFD84D 55%,#FFC53A);
+  box-shadow:0 7px 0 #E8AE1F,0 16px 24px -10px rgba(45,27,69,.45);display:flex;align-items:center;justify-content:center;
+  transition:transform .12s,box-shadow .12s;}
+.mt-go[hidden]{display:none;}
+.mt-go svg{width:52%;pointer-events:none;}
+.mt-go.on{transform:translate(-50%,-50%) translateY(5px);box-shadow:0 2px 0 #E8AE1F,0 0 0 6px rgba(255,216,77,.45),0 0 0 14px rgba(255,216,77,.2);
+  animation:mtHold .65s ease-in-out infinite;}
+@keyframes mtHold{50%{box-shadow:0 2px 0 #E8AE1F,0 0 0 10px rgba(255,216,77,.5),0 0 0 22px rgba(255,216,77,.15);}}
+
+/* ============================================================
+   БЛИЗНЕЦЫ: зеркало, запотевшее стекло, горки и пары
+   ============================================================ */
+.mm-mirror{position:absolute;z-index:10;transform:translate(-50%,-100%);touch-action:none;cursor:grab;}
+.mm-mirror img{display:block;width:100%;pointer-events:none;filter:drop-shadow(0 14px 12px rgba(45,27,69,.35));}
+.mm-mirror.wipe img{animation:mmWipe .22s ease-out;}
+@keyframes mmWipe{50%{transform:rotate(.8deg);}}
+/* запотевшее стекло: ребёнок стирает его пальцем */
+.mm-fog,.mm-glow{position:absolute;left:15%;right:15%;top:14%;bottom:13%;border-radius:50%;pointer-events:none;}
+.mm-fog{background:radial-gradient(ellipse at 40% 35%,rgba(255,255,255,.96),rgba(214,222,236,.94) 60%,rgba(190,198,220,.92));
+  box-shadow:inset 0 0 18px rgba(255,255,255,.9);transition:opacity .2s;}
+.mm-glow{opacity:0;background:radial-gradient(ellipse,rgba(255,255,255,.95) 0,rgba(214,200,255,.55) 45%,rgba(169,139,255,0) 72%);transition:opacity .4s;}
+.mm-mirror.lit .mm-glow{opacity:1;animation:mmGlow 1.6s ease-in-out infinite;}
+@keyframes mmGlow{50%{opacity:.55;}}
+.mm-item{position:absolute;z-index:14;transform:translate(-50%,-100%);pointer-events:none;
+  filter:drop-shadow(0 5px 4px rgba(45,27,69,.3));
+  transition:left .6s cubic-bezier(.3,1.2,.5,1),top .6s cubic-bezier(.3,1.2,.5,1),opacity .3s,transform .3s;}
+.mm-item.fly{opacity:0;transform:translate(-50%,-100%) scale(.3);}
+.mm-item.hop{animation:mmHop .5s cubic-bezier(.3,1.4,.5,1);}
+@keyframes mmHop{40%{transform:translate(-50%,-128%) scale(1.06);}}
+.mm-item.paired{filter:drop-shadow(0 0 7px rgba(169,139,255,.95)) drop-shadow(0 5px 4px rgba(45,27,69,.3));}
+/* тот, у кого нет близнеца, светится жёлтым */
+.mm-item.extra{filter:drop-shadow(0 0 10px #FFD84D) drop-shadow(0 0 4px #FFD84D);animation:mmExtra 1.1s ease-in-out infinite;}
+@keyframes mmExtra{50%{transform:translate(-50%,-112%) scale(1.12);}}
+.mm-pair{position:absolute;z-index:13;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;
+  border:3px solid rgba(169,139,255,.95);box-shadow:0 0 12px rgba(169,139,255,.7);animation:mmPair .4s cubic-bezier(.3,1.4,.5,1);}
+@keyframes mmPair{0%{transform:translate(-50%,-50%) scale(.4);}100%{transform:translate(-50%,-50%) scale(1);}}
+/* карточки ответа — на пустой стене, чтобы не закрывать горки на столе */
+.mm-cards{top:31%;bottom:auto;}
+
+/* ============================================================
+   ЗАГАДКА ВЕСОВ: коромысло, чаши, гирьки на столе
+   ============================================================ */
+.ms-base,.ms-beam,.ms-pan{position:absolute;pointer-events:none;}
+.ms-base{z-index:9;}
+.ms-pan{z-index:11;}
+.ms-beam{z-index:12;transform-origin:50% 22%;}
+.ms-base img,.ms-beam img,.ms-pan>img{display:block;width:100%;pointer-events:none;filter:drop-shadow(0 8px 8px rgba(45,27,69,.28));}
+.ms-beam.even img{filter:drop-shadow(0 0 10px #FFD84D) drop-shadow(0 8px 8px rgba(45,27,69,.28));}
+.ms-it{position:absolute;width:20%;transform:translateX(-50%);border:none;background:none;padding:0;margin:0;pointer-events:none;}
+.ms-it img{display:block;width:100%;pointer-events:none;filter:drop-shadow(0 3px 2px rgba(45,27,69,.3));}
+/* добавленные гирьки светятся — их и считаем; касание снимает обратно */
+.ms-it.added{pointer-events:auto;cursor:pointer;}
+.ms-it.added img{filter:drop-shadow(0 0 6px #FFD84D) drop-shadow(0 0 3px #FFC53A);}
+.ms-it.pop{animation:msPop .38s cubic-bezier(.3,1.5,.5,1);}
+@keyframes msPop{0%{transform:translateX(-50%) translateY(-90%) scale(.6);opacity:.4;}100%{transform:translateX(-50%);opacity:1;}}
+.ms-it.hop{animation:msHop .5s cubic-bezier(.3,1.4,.5,1);}
+@keyframes msHop{40%{transform:translateX(-50%) translateY(-35%);}}
+.ms-badge{position:absolute;left:50%;top:100%;transform:translateX(-50%);margin-top:4px;padding:3px 12px;border-radius:999px;
+  font-family:var(--nk-brand);font-weight:700;font-size:20px;line-height:1.2;color:var(--nk-ink);background:#FFFDF8;
+  box-shadow:0 3px 0 rgba(45,27,69,.12);}
+.ms-tray{position:absolute;left:0;right:0;top:90%;height:0;z-index:20;transition:opacity .3s;}
+.ms-tray .ms-spare{width:9%;bottom:0;pointer-events:auto;cursor:pointer;}
+.ms-tray .ms-spare:active{transform:translateX(-50%) scale(.92);}
+.ms-tray.dim{opacity:.5;}
+
+/* ============================================================
+   ЛАВКА: продавец, товар с ценником, тарелочка, монеты
+   ============================================================ */
+.ml-seller{position:absolute;z-index:12;left:77%;top:62%;width:27%;transform:translate(-50%,-100%);pointer-events:none;
+  filter:drop-shadow(0 10px 10px rgba(45,27,69,.3));transform-origin:50% 100%;}
+.ml-seller.cheer{animation:mlCheer .6s cubic-bezier(.3,1.5,.5,1);}
+@keyframes mlCheer{40%{transform:translate(-50%,-100%) translateY(-10%) scale(1.06);}}
+.ml-item{position:absolute;z-index:16;width:16%;transform:translate(-50%,-100%);pointer-events:none;}
+.ml-item img{display:block;width:100%;filter:drop-shadow(0 6px 5px rgba(45,27,69,.3));}
+.ml-item.sold img{animation:mlSold .9s cubic-bezier(.3,1.4,.5,1);}
+@keyframes mlSold{35%{transform:translateY(-30%) scale(1.15) rotate(-6deg);}}
+.ml-tag{position:absolute;right:-30%;top:-8%;padding:3px 10px;border-radius:9px;transform:rotate(9deg);
+  font-family:var(--nk-brand);font-weight:700;font-size:22px;line-height:1.2;color:var(--nk-ink);background:#FFFDF8;
+  box-shadow:0 3px 0 rgba(45,27,69,.15);}
+.ml-dish{position:absolute;z-index:18;width:34%;aspect-ratio:2.6;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 40%,#FFFFFF,#ECE6F5 60%,#CFC4E2);box-shadow:0 6px 0 #B3A6CC,0 14px 20px -8px rgba(45,27,69,.4);}
+.ml-dish b{position:absolute;right:-6%;top:-38%;min-width:40px;padding:5px 11px;border-radius:999px;text-align:center;
+  font-family:var(--nk-brand);font-weight:700;font-size:22px;line-height:1;color:var(--nk-ink);background:#FFD84D;box-shadow:0 4px 0 #E8AE1F;}
+.ml-dish b:empty{display:none;}
+.ml-dish.shake{animation:mhNope .45s ease-in-out;}
+.ml-coin{position:absolute;z-index:22;aspect-ratio:1;transform:translate(-50%,-50%);border:none;padding:0;border-radius:50%;cursor:pointer;
+  touch-action:none;background:url(math/coin.webp) center/contain no-repeat;display:flex;align-items:center;justify-content:center;
+  filter:drop-shadow(0 5px 4px rgba(45,27,69,.35));
+  transition:left .45s cubic-bezier(.3,1.1,.5,1),top .45s cubic-bezier(.3,1.1,.5,1),transform .15s;}
+.ml-coin b{font-family:var(--nk-brand);font-weight:700;font-size:clamp(16px,5.4vw,24px);line-height:1;color:#8A5A0A;
+  text-shadow:0 1px 0 rgba(255,255,255,.7);pointer-events:none;}
+.ml-coin--10 b{font-size:clamp(16px,5vw,23px);}
+.ml-coin.in{z-index:21;transform:translate(-50%,-50%) scale(.8);cursor:default;}
+.ml-coin.grab{transition:none;}
+.ml-coin.nope{animation:mlNope .4s ease-in-out;}
+@keyframes mlNope{25%{transform:translate(-50%,-50%) translateX(-5px);}75%{transform:translate(-50%,-50%) translateX(5px);}}
+.ml-card b{display:flex;align-items:center;gap:8px;}
+.ml-coin-ico{width:28px;height:28px;border-radius:50%;background:url(math/coin.webp) center/contain no-repeat;}
+.ml-slots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:300px;}
+.ml-slots i{min-width:36px;height:26px;padding:0 8px;border-radius:10px;border:2px dashed #C9B8E8;font-style:normal;
+  font-family:var(--nk-brand);font-weight:700;font-size:13px;line-height:22px;color:var(--nk-ink);white-space:nowrap;}
+.ml-slots i.on{border:2px solid var(--nk-ok-3);background:var(--nk-ok-1);}
+.ml-slots i.wink{animation:mtChip .8s ease-in-out 2;}
+/* светлячки разлетелись: номера гаснут (сохранение числа) */
+.mff-bug.hidnum .mff-num{opacity:0;transition:opacity .4s}
+/* крокодил: номера над яблоками после ловушки «длинный ряд» */
+.mcr-num{position:absolute;z-index:20;transform:translate(-50%,0) scale(0);font-family:var(--nk-brand);font-weight:700;font-size:15px;line-height:1;
+  color:#fff;background:rgba(45,27,69,.78);border-radius:8px;padding:3px 6px;animation:mcrNum .35s cubic-bezier(.3,1.6,.5,1) forwards;}
+@keyframes mcrNum{to{transform:translate(-50%,0) scale(1);}}
+/* домик: зеркальные способы «3 и 2» и «2 и 3» — переставили, а число то же */
+.mh-slot{position:relative;}
+.mh-slot.twin{box-shadow:0 0 0 3px var(--nk-sun-2),0 4px 0 rgba(45,27,69,.14);animation:mhPop .5s cubic-bezier(.3,1.6,.5,1);}
+.mh-twin{position:absolute;left:-13px;top:50%;transform:translateY(-50%);width:20px;height:20px;border-radius:50%;background:var(--nk-sun-2);
+  color:var(--nk-ink);font-style:normal;font-weight:900;font-size:13px;line-height:20px;text-align:center;box-shadow:0 2px 0 rgba(45,27,69,.18);z-index:2;}
+/* весы, раунд «поровну»: вторая часть слагаемого — зелёные яблоки */
+.ms-it--green img{filter:hue-rotate(95deg) saturate(1.15) brightness(1.05);}
+/* лавка, «Кто купит?»: два кошелька — ставка касанием */
+.ml-purse{position:absolute;z-index:20;width:38%;height:11%;transform:translate(-50%,-50%);border:none;border-radius:22px;cursor:pointer;
+  background:rgba(255,253,248,.55);box-shadow:inset 0 0 0 3px rgba(212,162,43,.6);-webkit-tap-highlight-color:transparent;}
+.ml-purse.chosen{background:rgba(255,226,122,.55);box-shadow:inset 0 0 0 4px #D4A22B;}
+.ml-mark{position:absolute;z-index:30;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:22px;color:#fff;animation:mhPop .4s cubic-bezier(.3,1.6,.5,1);}
+.ml-mark.ok{background:#3FC685;} .ml-mark.no{background:#FF7A64;}
+.ml-who{font-weight:800;font-size:13px;color:var(--nk-ink-2);margin-left:8px;}

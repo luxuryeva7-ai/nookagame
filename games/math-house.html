@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="theme-color" content="#CFE6F2">
+<title>Домик для числа — Nooka</title>
+<meta name="robots" content="noindex">
+<link href="/fonts/nooka-fonts.css" rel="stylesheet">
+<link rel="stylesheet" href="nooka-ui.css">
+<link rel="stylesheet" href="nooka-math.css">
+<link rel="preload" as="image" href="math/house-bg.webp">
+<script src="/metrika.js" defer></script>
+</head>
+<body>
+<div class="mh">
+  <img class="mh__fill" src="math/house-bg.webp" alt="">
+  <div class="mh__stage" id="stage">
+    <img class="mh__bg" src="math/house-bg.webp" alt="">
+    <div class="mh__top">
+      <button class="mh__back" id="back" type="button" aria-label="Назад">←</button>
+      <span class="mh__goal">Число из двух частей</span>
+      <span class="mh__steps"><i></i><i></i><i></i></span>
+    </div>
+  </div>
+</div>
+<script src="nooka-core.js"></script>
+<script src="nooka-account.js"></script>
+<script src="nooka-access.js"></script>
+<script src="nooka-math.js"></script>
+<script src="nooka-math-house.js"></script>
+</body>
+</html>

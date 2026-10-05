@@ -502,7 +502,7 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
   <section class="wrap section" id="subjects">
     <div class="nk-chip sec-head-chip">Ещё игры</div>
     <h2 class="nk-t-h1 sec-h">Науки, которые <span>можно потрогать</span></h2>
-    <p class="nk-t-body sec-sub">Физика, химия и программирование — бесплатно. КосмоПорт, РобоЛаб и БиоМир — первые два уровня бесплатно.</p>
+    <p class="nk-t-body sec-sub">Математика «Числа-друзья» для 6–9 лет — первые три уровня бесплатно. Физика, химия и программирование — бесплатно. КосмоПорт, РобоЛаб и БиоМир — первые два уровня бесплатно.</p>
     <div class="grid-cards" id="planets"></div>
   </section>
 
@@ -540,7 +540,7 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
         <div class="price-why">163 ₽ в месяц — дешевле одного занятия с репетитором</div>
         <div class="pf">
           <div><span class="ok">✓</span> <span class="pt"><b>Весь курс: ещё <span id="pfPaid">30 уровней и три мастерские</span></b></span></div>
-          <div><span class="ok">✓</span> <span class="pt">Игры по наукам и технологиям — <b>КосмоПорт, РобоЛаб, БиоМир</b> и новые</span></div>
+          <div><span class="ok">✓</span> <span class="pt">Математика «Числа-друзья» и игры по наукам — <b>КосмоПорт, РобоЛаб, БиоМир</b> и новые</span></div>
           <div><span class="ok">✓</span> <span class="pt">Один доступ на <b>всю семью</b>, а не на одного ребёнка</span></div>
           <div><span class="ok">✓</span> <span class="pt">Отчёт родителю: что ребёнок освоил и о чём его спросить</span></div>
           <div><span class="ok">✓</span> <span class="pt">Карта не привязывается, <b>списывать нечего</b></span></div>
@@ -556,7 +556,7 @@ footer{border-top:2px solid rgba(123,79,242,.12);background:#FFF6E9}
         <div class="pf">
           <div><span class="ok">✓</span> <span class="pt">Тот же курс, <span id="pfPaidYear">30 уровней</span>, но <b>на 12 месяцев</b></span></div>
           <div><span class="ok">✓</span> <span class="pt">Плюс каждая игра, которая выйдет в течение года</span></div>
-          <div><span class="ok">✓</span> <span class="pt">Игры по наукам и технологиям — КосмоПорт, РобоЛаб, БиоМир и все новые, <b>доплачивать не нужно</b></span></div>
+          <div><span class="ok">✓</span> <span class="pt">Математика и игры по наукам — КосмоПорт, РобоЛаб, БиоМир и все новые, <b>доплачивать не нужно</b></span></div>
           <div><span class="ok">✓</span> <span class="pt">Не подошло, <b>вернём деньги</b> за 14 дней</span></div>
         </div>
         <button class="nk-btn nk-btn--cta" style="width:100%" data-buy="year">Взять на год</button>
@@ -617,6 +617,7 @@ var WAITLIST_URL = 'https://t.me/NookaGame';
 var V = '?v=202610051000';
 
 var PLANETS = [
+  {key:'math',  icon:'math', coin:'nk-coin--warn', subject:'Математика · 6–9 лет',    name:'Числа-друзья',   desc:'Светлячки, крокодил и весы: считать, складывать и вычитать руками. Плюс Арена с монстриком Нямом.', active:true,  levels:10, free:3, img:'screenshots/math.jpg',   src:'games/math.html'},
   {key:'phys',  icon:'phys', coin:'nk-coin--sun',  subject:'Физика',                  name:'КвантУм',        desc:'Пушка, качели, струна и кораблик: угадай, а потом проверь руками.', active:true,  levels:11,  img:'screenshots/phys.jpg',   src:'games/physics.html'},
   {key:'chem',  icon:'chem', coin:'nk-coin--ok',   subject:'Химия',                   name:'Хемо Лаб',       desc:'Лёд и пар, капустное зелье, невидимый газ: угадай, а потом проверь опытом.', active:true,  levels:11,  img:'screenshots/chem.jpg',   src:'games/chemistry.html'},
   {key:'code',  icon:'code', coin:'',              subject:'Программирование',        name:'КодБот',         desc:'Программы из блоков: робот рисует, ищет ключ и учит свою команду.', active:true,  levels:10,  img:'screenshots/code.jpg',   src:'games/code.html'},
@@ -624,7 +625,6 @@ var PLANETS = [
   {key:'robo',  icon:'robo', coin:'',              subject:'Робототехника',           name:'РобоЛаб',        desc:'Моторы, датчики и плата-мозг: собери своего робота и придумай ему правила.', active:true,  levels:10, free:2, img:'screenshots/robo.jpg',  src:'games/robo.html'},
   {key:'bio',   icon:'bio', coin:'nk-coin--ok',   subject:'Биология',                name:'БиоМир',         desc:'Микроскоп, остров с лисами, сердце-насос и бабочки, которые меняют цвет.', active:true,  levels:10, free:2, img:'screenshots/bio.jpg',   src:'games/bio.html'},
   {key:'eco',   icon:'eco', coin:'nk-coin--ok',   subject:'Экология и энергия',      name:'ЭкоСфера',       desc:'Запитай целый город чистой энергией — и не устрой блэкаут.', active:false, levels:6,  img:'screenshots/eco.svg'},
-  {key:'math',  icon:'math', coin:'nk-coin--warn', subject:'Математика',              name:'Цифрариум',      desc:'Числа, фигуры и шифры: головоломки, за которые берёшься сам.', active:false, levels:10, img:'screenshots/math.svg'},
   {key:'geo',   icon:'geo', coin:'',              subject:'География',               name:'ГеоАтлас',       desc:'Материки, климаты, страны: квесты по всей планете.', active:false, levels:7,  img:'screenshots/geo.svg'}
 ];
 
