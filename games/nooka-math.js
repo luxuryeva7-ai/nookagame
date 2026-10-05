@@ -94,6 +94,10 @@
      ни в подсчёты на главной, ни на стену оплаты. */
   var COURSE = {
     name: 'Числа-друзья',
+    /* Бесплатны первые три уровня, как в ИИ-курсе (Артём, 05.10.2026).
+       Арена открыта всем: новые просьбы Няма в ней открывают пройденные
+       уровни — играя в Арену, ребёнок сам хочет следующий уровень. */
+    free: 3,
     levels: [
       { n: 1, t: 'Светлячки', aha: 'последнее число — это сколько всего', href: 'math-fireflies.html', mid: 'ma1', img: 'math/night-bg.webp' },
       { n: 2, t: 'Домик для числа', aha: 'число — это домик из двух частей', href: 'math-house.html', mid: 'ma2', img: 'math/house-bg.webp' },
@@ -108,6 +112,41 @@
     ],
     arena: { t: 'Арена', aha: 'накорми Няма и вырасти питомца', href: 'math-arena.html', img: 'math/nyam-idle.webp' },
   };
+
+  /* ── доступ: уровни после COURSE.free — по оплате ──────────
+     Математика живёт вне реестра ИИ-курса, поэтому общий сторож из
+     nooka-access.js её не видит — сторожим здесь, тем же экраном оплаты. */
+  function levelHere() {
+    var f = (location.pathname.split('/').pop() || '').toLowerCase();
+    var hit = null;
+    COURSE.levels.forEach(function (lv) { if (lv.href && lv.href.toLowerCase() === f) hit = lv; });
+    return hit;
+  }
+  function wall(lv, onClose) {
+    var A = window.nookaAccess;
+    if (!A) return;
+    A.paywall({
+      title: 'Этот уровень — в платной части',
+      sub: '«' + lv.t + '» из курса «' + COURSE.name + '». Бесплатно открыты первые ' + COURSE.free +
+        ' уровня и Арена.',
+      onClose: onClose
+    });
+  }
+  function guard() {
+    var A = window.nookaAccess, lv = levelHere();
+    if (!A || !lv || lv.n <= COURSE.free || A.openAll) return;
+    /* пока сервер не ответил, уровень не показываем — иначе ребёнок начнёт
+       играть и получит стену посреди дела */
+    document.documentElement.style.visibility = 'hidden';
+    A.ready.then(function (st) {
+      document.documentElement.style.visibility = '';
+      if (st.paid) return;
+      if (st.offline && A.offlineWall) return A.offlineWall({ hub: 'math.html' });
+      wall(lv, function () { location.href = 'math.html'; });
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', guard);
+  else setTimeout(guard, 0);
 
   /* Страница курса: уровни по порядку, готовые — со ссылкой, остальные «скоро» */
   function hub(box) {
@@ -130,6 +169,20 @@
     ready.forEach(function (lv) { box.appendChild(card(lv)); });
     box.appendChild(card(COURSE.arena, true));
     soon.forEach(function (lv) { box.appendChild(card(lv)); });
+
+    /* Замки на платных уровнях — когда сервер ответил, что доступа нет */
+    var A = window.nookaAccess;
+    if (A && !A.openAll) A.ready.then(function (st) {
+      if (st.paid) return;
+      [].forEach.call(box.querySelectorAll('.mhub__lv'), function (a, i) {
+        var lv = ready[i];
+        if (!lv || lv.n <= COURSE.free) return;
+        a.classList.add('mhub__lv--lock');
+        var go = a.querySelector('.mhub__go');
+        if (go && go.textContent !== '✓') go.innerHTML = '🔒';
+        a.addEventListener('click', function (e) { e.preventDefault(); wall(lv); });
+      });
+    });
   }
 
   window.nookaMath = { el: el, dots: dots, bond: bond, sparks: sparks, hand: hand, course: COURSE, hub: hub };

@@ -266,6 +266,8 @@ body.mhub-body{background:linear-gradient(180deg,#DDEFF6,#FFF4E4 45%);height:100
   font-weight:900;font-size:17px;color:#fff;background:var(--nk-pri-3);box-shadow:0 3px 0 var(--nk-pri-4);}
 .mhub__lv--soon{opacity:.55;box-shadow:none;background:rgba(255,253,248,.6);}
 .mhub__lv--soon .mhub__go{background:transparent;box-shadow:none;color:var(--nk-ink-3);font-size:12px;}
+.mhub__lv--lock .mhub__shot{filter:saturate(.55);}
+.mhub__lv--lock .mhub__go{font-size:16px;}
 .mhub__lv--arena{background:linear-gradient(135deg,#F3EEFF,#FFFDF8);box-shadow:0 0 0 2px var(--nk-pri-2),0 14px 24px -14px rgba(45,27,69,.35);}
 .mhub__lv--arena .mhub__shot{background:#DCCFF9;}
 .mhub__lv--arena .mhub__shot img{object-fit:contain;object-position:50% 100%;}
