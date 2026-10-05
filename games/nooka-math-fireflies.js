@@ -241,8 +241,7 @@
     stage.appendChild(end);
     again.onclick = function () { end.remove(); round = 0; startRound(); };
     next.onclick = function () {
-      if (window.nooka) window.nooka.missionWin('ma1', 50, { nextLabel: 'Дальше: Домик для числа →', onNext: function () { location.href = 'math-house.html'; } });
-      else location.href = 'math-house.html';
+      M.finishLevel('ma1', 50);
     };
   }
 

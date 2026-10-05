@@ -518,7 +518,7 @@ body.mhub-body{background:linear-gradient(180deg,#DDEFF6,#FFF4E4 45%);height:100
 .ml-coin b{font-family:var(--nk-brand);font-weight:700;font-size:clamp(16px,5.4vw,24px);line-height:1;color:#8A5A0A;
   text-shadow:0 1px 0 rgba(255,255,255,.7);pointer-events:none;}
 .ml-coin--10 b{font-size:clamp(16px,5vw,23px);}
-.ml-coin.in{z-index:21;transform:translate(-50%,-50%) scale(.8);cursor:default;}
+.ml-coin.in{z-index:21;transform:translate(-50%,-50%) scale(.8);cursor:pointer;}
 .ml-coin.grab{transition:none;}
 .ml-coin.nope{animation:mlNope .4s ease-in-out;}
 @keyframes mlNope{25%{transform:translate(-50%,-50%) translateX(-5px);}75%{transform:translate(-50%,-50%) translateX(5px);}}

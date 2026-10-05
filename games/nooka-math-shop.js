@@ -103,7 +103,16 @@
   function bind(c) {
     var start = null, t0 = 0;
     c.el.addEventListener('pointerdown', function (e) {
-      if (busy || c.dish) return;
+      if (busy) return;
+      /* Монету с тарелки можно забрать обратно касанием. Раньше она там
+         застревала: положил 1 и 1 за цену 3 — в кошельке остались 2 и 5,
+         любая даёт перебор, и уровень вставал (нашёл Артём, 05.10). */
+      if (c.dish) {
+        e.preventDefault();
+        stopHint();
+        back(c); drawDish(); idle(2200);
+        return;
+      }
       e.preventDefault();
       try { c.el.setPointerCapture(e.pointerId); } catch (x) {}
       start = [e.clientX, e.clientY]; t0 = Date.now();
@@ -138,8 +147,26 @@
     setTimeout(function () { drawDish(); check(c); }, 420);
   }
 
+  /* можно ли оставшимися монетами добрать ровно need */
+  function reachable(need) {
+    var can = { 0: true };
+    coins.filter(function (c) { return !c.dish; }).forEach(function (c) {
+      Object.keys(can).map(Number).sort(function (a, b) { return b - a; }).forEach(function (k) {
+        if (k + c.v <= need) can[k + c.v] = true;
+      });
+    });
+    return !!can[need];
+  }
+
   function check(last) {
     var t = cur(), s = sum();
+    if (s < t.price && !reachable(t.price - s)) {
+      /* тупик: ровно уже не набрать — продавец задумывается и возвращает всё */
+      busy = true;
+      face('think');
+      dish.classList.remove('shake'); void dish.offsetWidth; dish.classList.add('shake');
+      return setTimeout(function () { inDish().forEach(back); busy = false; drawDish(); idle(2200); }, 1100);
+    }
     if (s < t.price) return idle(2600);
     busy = true;
     if (s > t.price) {
@@ -325,8 +352,7 @@
     stage.appendChild(end);
     again.onclick = function () { end.remove(); round = 0; startRound(); };
     next.onclick = function () {
-      if (window.nooka) window.nooka.missionWin('ma10', 60, { nextLabel: 'В Арену →', onNext: function () { location.href = 'math-arena.html'; } });
-      else location.href = 'math-arena.html';
+      M.finishLevel('ma10', 60);
     };
   }
 

@@ -374,8 +374,7 @@
     stage.appendChild(end);
     again.onclick = function () { end.remove(); album.style.display = ''; round = 0; startRound(); };
     next.onclick = function () {
-      if (window.nooka) window.nooka.missionWin('ma3', 60, { nextLabel: 'В Арену →', onNext: function () { location.href = 'math-arena.html'; } });
-      else location.href = 'math-arena.html';
+      M.finishLevel('ma3', 60);
     };
   }
 
