@@ -378,7 +378,11 @@ html,body{height:100%;background:var(--bg);overflow-x:hidden}
 .ws-maze .arena-wrap{margin-top:10px;display:flex;flex-direction:column;align-items:center}
 .ws-maze .hud{width:100%;max-width:360px;display:flex;justify-content:space-between;align-items:center; font-weight:800;font-size:14px;color:var(--ink2);padding:4px 2px 7px;font-variant-numeric:tabular-nums}
 .ws-maze .hud span{display:inline-flex;align-items:center;gap:4px}
-.ws-maze canvas{border-radius:18px;box-shadow:var(--sh);touch-action:none;display:block;background:#E8DCC8}
+.ws-maze canvas{border-radius:18px;box-shadow:var(--sh);display:block;background:#E8DCC8}
+/* Палец по игровому полю ведёт героя, поэтому страница под ним не листается.
+   Остальные картинки — обложка, кадры «до/после», превью — просто картинки:
+   с них страница должна прокручиваться, иначе паспорт не долистать. */
+.ws-maze #cv{touch-action:none}
 .ws-maze .rulebar{width:100%;max-width:360px;margin-top:7px;font-size:13.5px;font-weight:700;color:var(--ink3);text-align:center;min-height:16px}
 .ws-maze .sheet{position:fixed;left:0;right:0;margin:0 auto;max-width:480px;bottom:0;max-height:70dvh;background:var(--bg); border-radius:22px 22px 0 0;z-index:41;display:none;flex-direction:column;box-shadow:0 -8px 30px rgba(90,50,10,.18)}
 .ws-maze .sheet-t{font-family:'Unbounded','Nunito',sans-serif;font-weight:700;font-size:17px}
@@ -455,7 +459,9 @@ html,body{height:100%;background:var(--bg);overflow-x:hidden}
 .ws-maze .dk-l{font-size:11px}
 .ws-maze .dock-play{display:flex;gap:8px;padding:8px 12px 0}
 .ws-maze .dock-play .btn{min-height:46px;font-size:14.5px;border-radius:23px}
-.ws-maze .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:#fff; padding:12px 20px;border-radius:999px;font-weight:800;font-size:14px;z-index:60;animation:up .25s ease}
+.ws .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:#fff; padding:12px 20px;border-radius:999px;font-weight:800;font-size:14px;z-index:60;animation:up .25s ease;
+ /* плашка висит над кнопками: без этого палец попадал в неё, а не в кнопку */
+ pointer-events:none;max-width:calc(100% - 28px);text-align:center}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 
 /* ── Профессия будущего ── */
@@ -670,42 +676,208 @@ html,body{height:100%;background:var(--bg);overflow-x:hidden}
 .ws-prof .rulerow:last-of-type{border-bottom:0}
 .ws-prof .rulen{flex:none;width:26px;height:26px;border-radius:50%;background:var(--acc);color:#fff;font-weight:900;font-size:14px;display:flex;align-items:center;justify-content:center}
 
-/* ── палитра мастерских = токены дизайн-системы (тёмная тема курса ИИ) ── */
-.ws{--bg:var(--nk-bg);--card:var(--nk-surface);--ink:var(--nk-ink);--ink2:var(--nk-ink-2);--ink3:var(--nk-ink-3);
- --acc:var(--nk-sun-2);--accbg:rgba(255,214,10,.13);--line:rgba(255,255,255,.12);
- --ok:var(--nk-ok-2);--okbg:rgba(6,214,160,.16);--bad:var(--nk-warn-2);
- --pic:#4A90D9;--snd:#B57BFF;--num:var(--nk-ok-2);--txt:var(--nk-sun-2);
- --sh:0 0 0 1.5px #1A2D48,0 10px 24px -12px rgba(0,0,0,.8);color-scheme:dark}
-body.ws{background:var(--nk-bg)}
-/* nooka-ui.css прячет прокрутку документа (у уровней свой скроллер) — мастерские листаются как страница */
+/* ═══════════════════════════════════════════════════════════════════
+   ОБЛИК МАСТЕРСКИХ = облик курса (games/game.html)
+
+   Мастерские рисовались как бумажная мастерская: светлый фон, коричневые
+   линии, жёлтая кнопка. Рядом с игрой курса это выглядело чужой страницей.
+   Здесь весь корпус страницы переведён на язык курса — фиолетовый космос,
+   объёмные карточки со светлой гранью, сиреневая главная кнопка, —
+   а рисованные детали остаются тёплыми: они внутри рамки, как картина
+   на тёмной стене. Ломать механики при этом не требуется: меняется
+   только оформление.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── палитра: та же, что в хабе игры ── */
+.ws{
+  --bg:#0A0714;
+  --card:rgba(255,255,255,.055);
+  --card-2:rgba(255,255,255,.085);
+  --ink:#F3EEFF;--ink2:#A896C9;--ink3:#6E5C90;
+  --acc:#A98BFF;--acc-d:#7B4FF2;--accbg:rgba(169,139,255,.15);
+  --ok:#4ED99B;--okbg:rgba(78,217,155,.15);--bad:#FF6B6B;
+  --sun:#FFD84D;
+  --line:rgba(255,255,255,.1);
+  --pic:#8FC2FF;--snd:#C9A8FF;--num:#4ED99B;--txt:#FFD84D;
+  --brand:'Unbounded','Nunito',system-ui,sans-serif;
+  --sh:inset 0 0 0 1px rgba(255,255,255,.08),0 18px 38px -22px rgba(0,0,0,.9);
+  color-scheme:dark;
+}
+
+/* ── фон: фиолетовая туманность и звёздная пыль, как на карте игры ── */
 html,body.ws{overflow:visible;overflow-x:clip;height:auto;min-height:100%}
-/* overflow-x:hidden превращал body в скролл-контейнер, и липкий футер уезжал в конец страницы (бот: «всё под нижним краем») */
-.ws .st-n{color:var(--ink)}.ws .st-s{color:var(--ink3)}
-.ws-story .tbl-title span,.ws-prof .floor-t span{color:var(--ink3)}
-.ws-prof .floor-t{color:var(--ink)}.ws-story .bw{color:var(--ink2)}
-.ws .foot{background:linear-gradient(180deg,rgba(8,12,24,0),var(--nk-bg) 38%)}
-.ws .prog{background:rgba(255,255,255,.08)}
-.ws .hdr-back{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.08);color:#D8E3F6;box-shadow:inset 0 0 0 1px rgba(255,255,255,.17)}
-.ws .hdr-t{color:var(--ink)}
-.ws .st.done{background:rgba(6,214,160,.10)}
-.ws .st-num,.ws .rulen{color:#1B1430}
-.ws .say-b{box-shadow:inset 0 0 0 1px rgba(255,255,255,.09)}
-.ws .sheet{box-shadow:0 -10px 40px rgba(0,0,0,.6);overflow:hidden}
-.ws .sheet-l{min-height:0}
-.ws .sheet.on{animation-duration:.16s}  /* шторка успевает выехать до того, как ребёнок (и бот) тянется к нижнему ряду */  /* flex-элемент не ужимался ниже контента, и хвост шторки уходил под экран (бот: «не достать даже прокруткой») */
-.ws .filmwrap{background:#0D1427}
-.ws .toast{background:var(--nk-sun-2);color:#1B1430}
-/* кнопки — компоненты .nk-btn; .btn остаётся только как раскладка */
+body.ws{
+  background:
+    radial-gradient(1200px 600px at 50% -10%,rgba(123,79,242,.28),transparent 62%),
+    radial-gradient(700px 420px at 88% 18%,rgba(78,217,155,.10),transparent 60%),
+    linear-gradient(180deg,#141026 0%,#0D0A1A 46%,#08060F 100%) #0A0714;
+  background-attachment:fixed;
+}
+body.ws::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.5;
+  background-image:
+    radial-gradient(1.4px 1.4px at 12% 14%,#fff,transparent),
+    radial-gradient(1.2px 1.2px at 74% 8%,#fff,transparent),
+    radial-gradient(1.6px 1.6px at 33% 42%,#E9DFFF,transparent),
+    radial-gradient(1.1px 1.1px at 88% 55%,#fff,transparent),
+    radial-gradient(1.3px 1.3px at 58% 76%,#FFE9B8,transparent),
+    radial-gradient(1px 1px at 22% 88%,#fff,transparent),
+    radial-gradient(1.5px 1.5px at 95% 88%,#D9CCFF,transparent);}
+.ws .root{background:none;position:relative;z-index:1;max-width:520px}
+
+/* ── шапка ── */
+.ws .hdr{height:56px;padding:0 14px;background:rgba(10,7,20,.72);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  box-shadow:0 1px 0 rgba(255,255,255,.07)}
+.ws .hdr-back{width:36px;height:36px;border-radius:50%;font-size:17px;
+  background:rgba(255,255,255,.07);color:#E9DFFF;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+.ws .hdr-back:active{transform:scale(.94)}
+.ws .hdr-t{font-family:var(--brand);font-weight:700;font-size:15px;color:var(--ink);letter-spacing:-.01em}
+.ws .hdr-r{color:var(--ink3);font-size:12.5px}
+.ws .prog{height:3px;top:56px;background:rgba(255,255,255,.08)}
+.ws .prog i{height:3px;background:linear-gradient(90deg,#7B4FF2,#A98BFF 60%,#C9A8FF)}
+.ws .body{padding:4px 14px 10px}
+.ws .foot{padding:10px 14px calc(14px + env(safe-area-inset-bottom));
+  background:linear-gradient(180deg,rgba(10,7,20,0),#0A0714 42%)}
+
+/* ── заголовки и текст ── */
+.ws .h1{font-family:var(--brand);font-weight:700;font-size:25px;line-height:1.16;
+  letter-spacing:-.015em;color:var(--ink);text-wrap:balance}
+.ws .lead{color:var(--ink2);font-size:15px;line-height:1.5}
+.ws .lead b,.ws .progline b,.ws .need-t b{color:var(--acc);font-weight:900}
+.ws .mini,.ws .note,.ws .pzgoal-t,.ws .cmp-cap{color:var(--ink3)}
+.ws .rowlbl,.ws .need-t,.ws .shelf-t,.ws .dial-l,.ws .tbl-title span{
+  font-size:11.5px;font-weight:900;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3)}
+.ws .st-n,.ws .sumv,.ws .dk-v,.ws .mn-v{color:var(--ink)}
+.ws .st-s,.ws .sumk,.ws .dk-l,.ws .mn-k,.ws .rail-lbl,.ws .bw,.ws .ask-sub{color:var(--ink2)}
+.ws-prof .floor-t{color:var(--ink)}
+.ws-prof .floor-t span,.ws-story .tbl-title span{color:var(--ink3)}
+
+/* ── Нейро говорит ── */
+.ws .say-b{background:var(--card);border-radius:18px;padding:12px 14px;color:var(--ink2);
+  box-shadow:var(--sh);font-size:14.5px;line-height:1.45}
+.ws .say-b b{color:var(--acc)}
+
+/* ── карточки ── */
+.ws .card,.ws .pcard,.ws .pzgoal,.ws .result,.ws .abcard,.ws .howp,.ws .minep,.ws .lastp,
+.ws .bench-res,.ws .ab-res,.ws .gait-read,.ws .explain,.ws .pz,.ws .live,.ws .duo,.ws .tally{
+  background:var(--card);border-radius:20px;box-shadow:var(--sh);color:var(--ink)}
+.ws .pcard{font-size:15px;line-height:1.45;padding:13px 15px;color:var(--ink)}
+.ws .result-big{font-family:var(--brand);font-weight:700;color:var(--ink)}
+.ws .result-sub{color:var(--ink2)}
+.ws .hintbar{background:var(--accbg);color:var(--acc);border-radius:999px;
+  padding:11px 16px;text-align:center;font-weight:800;font-size:14px}
+
+/* ── выбор: плитки, чипы, варианты ── */
+.ws .cell,.ws .opt,.ws .fork,.ws .chip,.ws .tool,.ws .f5,.ws .szb,.ws .dk,.ws .patch,.ws .nd,.ws .seat{
+  background:var(--card);color:var(--ink);border:none;border-radius:16px;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);transition:transform .12s,box-shadow .18s,background .18s}
+.ws .cell:active,.ws .opt:active,.ws .fork:active,.ws .chip:active,.ws .tool:active,.ws .dk:active{transform:scale(.97)}
+.ws .cell-n,.ws .opt-n,.ws .fork,.ws .chip{color:var(--ink)}
+.ws .cell.on,.ws .opt.on,.ws .fork.on,.ws .chip.on,.ws .tool.on,.ws .f5.on,.ws .szb.on,.ws .nd.has,.ws .seat.on{
+  background:linear-gradient(180deg,rgba(169,139,255,.26),rgba(123,79,242,.14));
+  color:#fff;box-shadow:inset 0 0 0 1.5px rgba(169,139,255,.6),0 10px 26px -14px rgba(123,79,242,.9)}
+.ws .chip.on,.ws .opt.on{border-color:transparent}
+.ws .opt.rare{background:linear-gradient(180deg,rgba(255,216,77,.2),rgba(255,216,77,.07));
+  box-shadow:inset 0 0 0 1.5px rgba(255,216,77,.45)}
+.ws .slot{background:rgba(169,139,255,.16);color:var(--ink);border:none;border-radius:10px;
+  box-shadow:inset 0 0 0 1px rgba(169,139,255,.4);padding:3px 9px;min-height:34px}
+.ws .slot.todo{background:rgba(255,255,255,.06);color:var(--ink3);border:1.5px dashed rgba(255,255,255,.22);box-shadow:none}
+
+/* ── поля ввода ── */
+.ws .field{background:rgba(255,255,255,.05);color:var(--ink);border:none;border-radius:16px;
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.12);font-family:inherit}
+.ws .field::placeholder{color:var(--ink3)}
+.ws .field:focus{outline:none;box-shadow:inset 0 0 0 2px var(--acc),0 0 0 4px rgba(169,139,255,.18)}
+
+/* ── станции на столе и в цеху ── */
+.ws .st{background:var(--card);border-radius:20px;box-shadow:var(--sh);color:var(--ink)}
+.ws .st.next{box-shadow:inset 0 0 0 1.5px rgba(169,139,255,.6),0 16px 34px -18px rgba(123,79,242,.85)}
+.ws .st.done{background:linear-gradient(180deg,rgba(78,217,155,.14),rgba(78,217,155,.05));
+  box-shadow:inset 0 0 0 1px rgba(78,217,155,.35)}
+.ws .st.done::after{color:var(--ok)}
+.ws .st-num,.ws .rulen{color:#1B0F30;background:#CBB8FF}
+.ws .st-badge{background:rgba(255,255,255,.08);color:var(--ink2)}
+
+/* ── кнопки: главная — сиреневая, как «Играть» в игре ── */
 .ws .btn{width:100%;min-height:54px;white-space:normal;line-height:1.15;padding:12px 18px}
 .ws .btn.nk-btn--sm{min-height:48px;font-size:15.5px;padding:10px 12px}
 .ws .btnrow .btn{flex:1}
-.ws .nk-btn--cta{color:#2A1A08}
-/* «бумага»: рисованные детали остаются светлыми, и текст на них — тёмный */
+.ws .nk-btn{font-family:var(--brand);font-weight:700;letter-spacing:-.01em}
+.ws .nk-btn--cta{color:#fff;background:linear-gradient(180deg,#9B78FF,#7B4FF2 60%,#6E41E4);
+  box-shadow:0 6px 0 #3D2688,0 16px 30px -12px rgba(123,79,242,.75),inset 0 2px 0 rgba(255,255,255,.3)}
+.ws .nk-btn--cta:active{transform:translateY(4px);box-shadow:0 2px 0 #3D2688}
+.ws .nk-btn--soft{color:var(--ink);background:rgba(255,255,255,.07);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.13),0 5px 0 rgba(0,0,0,.35)}
+.ws .nk-btn--soft:active{transform:translateY(3px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.13),0 2px 0 rgba(0,0,0,.35)}
+.ws .nk-btn--ok{color:#06281C;background:linear-gradient(180deg,#77E9B3,#4ED99B 60%,#38C687);
+  box-shadow:0 6px 0 #1F7A58,0 16px 30px -12px rgba(78,217,155,.6),inset 0 2px 0 rgba(255,255,255,.45)}
+.ws .nk-btn:disabled{filter:saturate(.2) brightness(.8);opacity:.5}
+.ws .txtbtn{color:var(--acc)}
+
+/* ── шторка выбора ── */
+.ws .ovl{background:rgba(6,4,14,.66)}
+.ws .sheet{background:linear-gradient(180deg,#171230,#0D0A1A);border-radius:26px 26px 0 0;
+  box-shadow:0 -12px 44px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.1);overflow:hidden}
+.ws .sheet-h::before{background:rgba(255,255,255,.22)}
+.ws .sheet-t{font-family:var(--brand);font-weight:700;color:var(--ink)}
+.ws .sheet-x{background:rgba(255,255,255,.08);color:var(--ink2);border-radius:50%}
+/* flex-элемент не ужимался ниже содержимого, и хвост шторки уходил под экран */
+.ws .sheet-l{min-height:0}
+/* шторка успевает выехать до того, как ребёнок тянется к нижнему ряду */
+.ws .sheet.on{animation-duration:.16s}
+
+/* ── плашка «что произошло» ── */
+.ws .toast{background:linear-gradient(180deg,#9B78FF,#7B4FF2);color:#fff;
+  box-shadow:0 14px 30px -12px rgba(123,79,242,.8)}
+
+/* ── рисованное: тёплая бумага в рамке, как картина на тёмной стене ──
+   Сами рисунки остаются светлыми (они так задуманы и так читаются),
+   но получают грань и тень, чтобы не висеть на фоне случайным пятном. */
+.ws .paper,.ws .ill,.ws .scene,.ws .cover,.ws .mini-scene,.ws .stage-wrap,.ws .charpv,
+.ws .numgrid,.ws .drum,.ws .dial,.ws .handbox,.ws .chair,.ws .shelf,.ws .bowl,.ws .bench,
+.ws .glasswrap,.ws .beltwrap,.ws .gaitwrap,.ws .memwrap,.ws .filmwrap,.ws .passwrap,.ws .arena-wrap canvas{
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.14),0 20px 44px -26px rgba(0,0,0,.95)}
 .ws .paper,.ws-story .scene,.ws-story .opt-ic,.ws-story .gst-b,.ws-story .cover,.ws-story .paw,.ws-story .nd,.ws-story .stage-wrap,
 .ws-story .rail-lbl,.ws-story .bowl,.ws-story .shelf,.ws-story .bi,.ws-story .bin,.ws-story .breath,.ws-story .hole,.ws-story .patch,.ws-story .mini-scene,.ws-story .sl,
 .ws-maze .pp-story,.ws-maze .gst-b,
 .ws-prof .numgrid,.ws-prof .drum,.ws-prof .dial,.ws-prof .tool,.ws-prof .handbox,.ws-prof .chair,.ws-prof .shelf,.ws-prof .mesrc,.ws-prof .charpv,.ws-prof .ill{
  --ink:#2B2118;--ink2:#5C4A38;--ink3:#8A7A68;--acc:#E65C00;--accbg:#FFF1E4;--line:rgba(180,110,40,.16);--ok:#2E9E5B;--okbg:#DFF5EA;--bad:#D93030;color:var(--ink)}
-.ws-story .opt.rare{background:var(--card)}
 .ws-prof .mesrc{background:#FFF1E4}
+.ws .filmwrap{background:#0D0A1A;border-radius:14px;padding:6px}
+.ws .film-bar{background:rgba(255,255,255,.12)}
+.ws .film-bar i{background:linear-gradient(90deg,#7B4FF2,#A98BFF)}
 
+/* ── паспорт и книжка ── */
+.ws .passport,.ws .bookwrap{background:var(--card);border-radius:22px;box-shadow:var(--sh)}
+.ws .pp-title,.ws .cover-t,.ws .sumttl{font-family:var(--brand);font-weight:700;color:var(--ink)}
+.ws .pp-by,.ws .cover-a,.ws .pp-foot,.ws .uniq-f,.ws .honest{color:var(--ink3)}
+.ws .pp-rule,.ws .sumrow,.ws .rulerow,.ws .mn{box-shadow:inset 0 -1px 0 rgba(255,255,255,.07)}
+.ws .pp-rule b{color:var(--ink3)}
+.ws .pp-own{box-shadow:inset 0 0 0 1.5px rgba(169,139,255,.45);border-radius:14px}
+.ws .pp-lesson,.ws .minep-f{color:var(--ink2)}
+.ws .pp-lesson b,.ws .minep-f b{color:var(--acc)}
+.ws .dot{background:rgba(255,255,255,.22)}
+.ws .dot.on{background:var(--acc)}
+
+/* ── мелочи ── */
+.ws .rulebar{color:var(--ink3)}
+.ws .hud{color:var(--ink2)}
+.ws .progline{color:var(--ink2)}
+.ws .mytag{background:var(--accbg);color:var(--acc)}
+.ws .gst.on .gst-b{background:var(--accbg);color:var(--acc)}
+.ws .gst.done .gst-b{background:var(--acc);color:#1B0F30}
+.ws .explbtn{background:var(--accbg);color:var(--acc)}
+.ws .askrow,.ws .ask-t{color:var(--ink)}
+
+/* ── плашка-представление на входе: та же, что в шапке игры курса ── */
+.ws .kick{display:inline-flex;align-items:center;gap:8px;margin-bottom:12px;
+  padding:6px 13px;border-radius:999px;font-weight:800;font-size:11.5px;
+  letter-spacing:.04em;text-transform:uppercase;color:#E9DFFF;
+  background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
+/* время, которое ребёнок ещё не выбирал, не выдаём за выбранное */
+.ws .rail-lbl.off{opacity:.55;font-weight:700}
+/* короткий экран не прижимается к шапке: пустота уходит поровну вверх и вниз,
+   длинный — просто листается, как раньше */
+.ws .body{display:flex;flex-direction:column}
+.ws .body>.center{margin:auto 0}
