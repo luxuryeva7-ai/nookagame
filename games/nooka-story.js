@@ -159,6 +159,9 @@ function svgHero(h,mood,seed,style,acc,scale){
            small:'M100 96 q28 0 28 36 q0 28 -28 28 q-28 0 -28 -28 q0 -36 28 -36z',
            egg:'M100 84 q36 0 36 50 q0 34 -36 34 q-36 0 -36 -34 q0 -50 36 -50z',
            shell:'M100 92 q44 0 44 40 q0 34 -44 34 q-44 0 -44 -34 q0 -40 44 -40z'};
+  /* ручки: короткие мягкие лапки по бокам. Рисуем ДО тела — они выглядывают
+     из-за него, силуэт остаётся чистым, а герой перестаёт быть столбиком. */
+  o+=`<ellipse cx="60" cy="150" rx="9" ry="12" fill="${lite}" ${sw}/><ellipse cx="140" cy="150" rx="9" ry="12" fill="${lite}" ${sw}/>`;
   o+=`<path d="${B[h.body]||B.round}" fill="${main}" ${sw}/>`;
   // живот
   if(h.body!=='box'&&h.body!=='shell')o+=`<ellipse cx="100" cy="142" rx="20" ry="24" fill="${belly}" opacity=".85"/>`;
@@ -186,30 +189,72 @@ function svgHero(h,mood,seed,style,acc,scale){
   if(h.ears==='ant'){o+=`<line x1="100" y1="${hy-34}" x2="100" y2="${hy-20}" stroke="${dark}" stroke-width="3"/><circle cx="100" cy="${hy-38}" r="5" fill="${style&&style.id==='comic'?'#E65C00':'#E8863C'}"/>`}
 
   const HH={box:`<rect x="68" y="${hy-30}" width="64" height="60" rx="12" fill="${main}" ${sw}/>`,
-            default:`<circle cx="100" cy="${hy}" r="34" fill="${main}" ${sw}/>`};
+            default:`<circle cx="100" cy="${hy}" r="40" fill="${main}" ${sw}/>`};
   o+=h.body==='box'?HH.box:HH.default;
+  /* мягкий блик сверху: плоская заливка рядом с глянцевым Нейро выглядела дёшево */
+  if(h.body!=='box')o+=`<ellipse cx="88" cy="${hy-20}" rx="19" ry="12" fill="#fff" opacity=".16" transform="rotate(-18 88 ${hy-20})"/>`;
+  o+=`<ellipse cx="84" cy="112" rx="14" ry="20" fill="#fff" opacity=".10" transform="rotate(-12 84 112)"/>`;
   // морда
-  if(h.body!=='box')o+=`<ellipse cx="100" cy="${hy+13}" rx="16" ry="12" fill="${belly}" opacity=".7"/>`;
+  if(h.body!=='box')o+=`<ellipse cx="100" cy="${hy+14}" rx="17" ry="12.5" fill="${belly}" opacity=".85"/>`;
 
-  // глаза
-  const ey=hy-4, ex=13;
+  /* ── лицо ──────────────────────────────────────────────────────
+     Было: маленькие глаза-точки и толстые прямые брови «домиком вниз» —
+     герой смотрел исподлобья и выглядел злым даже в «смелом» настроении.
+     Стало: крупные глаза с бликом, мягкие брови только там, где настроение
+     без них не читается, щёки и носик. */
+  const ey=hy-3, ex=13;
+  const pair=(mk)=>mk(100-ex,1)+mk(100+ex,-1);
+  const white=(rx,ry)=>pair((cx)=>`<ellipse cx="${cx}" cy="${ey}" rx="${rx}" ry="${ry}" fill="#fff"/>`);
+  const pupil=(dx,dy,r2)=>pair((cx,s2)=>`<circle cx="${cx+dx*s2}" cy="${ey+dy}" r="${r2}" fill="#2A2320"/>`);
+  const shine=(dx,dy,r2)=>pair((cx,s2)=>`<circle cx="${cx+dx*s2}" cy="${ey+dy}" r="${r2||2.3}" fill="#fff" opacity=".95"/>`);
+  /* brow: lift — насколько поднята, tilt — куда смотрит внутренний конец
+     (плюс — вверх, «удивлён»; минус — вниз, «серьёзен») */
+  /* tilt: плюс — внутренний конец выше (удивление, грусть), минус — ниже.
+     Раньше знак был перепутан, и «грустный» получался злым. */
+  const brow=(lift,tilt)=>pair((cx,s2)=>
+    `<path d="M${cx-8*s2} ${ey-10-lift} q${8*s2} -4 ${16*s2} ${-tilt}" stroke="${ink}" stroke-width="2.1" fill="none" stroke-linecap="round" opacity=".72"/>`);
+  /* На тёмной шерсти чёрные штрихи сливаются: у панды мордочка пропадала.
+     Берём светлую линию, когда голова тёмная. */
+  const lum=(()=>{const m=/^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(main||'');
+    if(!m)return 1;return (0.299*parseInt(m[1],16)+0.587*parseInt(m[2],16)+0.114*parseInt(m[3],16))/255})();
+  const ink=lum<0.42?'#F6F1EA':'#2A2320';
+  const lash=()=>pair((cx,s2)=>`<path d="M${cx-8} ${ey-1} q8 7 16 0" stroke="${ink}" stroke-width="2.8" fill="none" stroke-linecap="round"/>`);
+
   const E={
-    brave:`<circle cx="${100-ex}" cy="${ey}" r="7" fill="#fff"/><circle cx="${100+ex}" cy="${ey}" r="7" fill="#fff"/><circle cx="${100-ex+1}" cy="${ey+1}" r="4" fill="#22201E"/><circle cx="${100+ex+1}" cy="${ey+1}" r="4" fill="#22201E"/><path d="M${100-ex-8} ${ey-10} l15 4 M${100+ex+8} ${ey-10} l-15 4" stroke="#22201E" stroke-width="2.6" stroke-linecap="round"/>`,
-    wide: `<circle cx="${100-ex}" cy="${ey}" r="10" fill="#fff"/><circle cx="${100+ex}" cy="${ey}" r="10" fill="#fff"/><circle cx="${100-ex}" cy="${ey}" r="4.6" fill="#22201E"/><circle cx="${100+ex}" cy="${ey}" r="4.6" fill="#22201E"/><circle cx="${100-ex-2}" cy="${ey-2}" r="1.7" fill="#fff"/><circle cx="${100+ex-2}" cy="${ey-2}" r="1.7" fill="#fff"/>`,
-    sly:  `<path d="M${100-ex-8} ${ey} q8 -7 16 0 q-8 4 -16 0z" fill="#fff"/><path d="M${100+ex-8} ${ey} q8 -7 16 0 q-8 4 -16 0z" fill="#fff"/><circle cx="${100-ex}" cy="${ey-1}" r="3.2" fill="#22201E"/><circle cx="${100+ex}" cy="${ey-1}" r="3.2" fill="#22201E"/><path d="M${100-ex-9} ${ey-9} l17 5 M${100+ex+9} ${ey-9} l-17 5" stroke="#22201E" stroke-width="2.4" stroke-linecap="round"/>`,
-    sleepy:`<path d="M${100-ex-8} ${ey} q8 6 16 0" stroke="#22201E" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M${100+ex-8} ${ey} q8 6 16 0" stroke="#22201E" stroke-width="3" fill="none" stroke-linecap="round"/>`,
-    sad:  `<circle cx="${100-ex}" cy="${ey+1}" r="7.5" fill="#fff"/><circle cx="${100+ex}" cy="${ey+1}" r="7.5" fill="#fff"/><circle cx="${100-ex}" cy="${ey+3}" r="4" fill="#22201E"/><circle cx="${100+ex}" cy="${ey+3}" r="4" fill="#22201E"/><path d="M${100-ex-9} ${ey-8} q8 -5 17 -1 M${100+ex+9} ${ey-8} q-8 -5 -17 -1" stroke="#22201E" stroke-width="2.4" fill="none" stroke-linecap="round"/>`,
+    /* смелый — просто большие добрые глаза, без бровей */
+    brave: white(8.6,9.4)+pupil(0.6,0.8,4.6)+shine(-2.4,-2.8),
+    /* удивлён/испуган — глаза шире, брови высоко */
+    wide:  white(10,10.8)+pupil(0,0.4,4.8)+shine(-2.8,-3.2)+brow(5,2.5),
+    /* хитрый — прищур: верхнее веко опущено, уголок приподнят */
+    /* хитрый — подмигивает: один глаз открыт, другой закрыт дугой.
+       Приспущенные веки на обоих глазах читались как злой прищур. */
+    sly:   `<ellipse cx="${100-ex}" cy="${ey}" rx="8.6" ry="9.4" fill="#fff"/>`+
+           `<circle cx="${100-ex+0.8}" cy="${ey+0.6}" r="4.4" fill="#2A2320"/>`+
+           `<circle cx="${100-ex-2.2}" cy="${ey-2.6}" r="2.3" fill="#fff" opacity=".95"/>`+
+           `<path d="M${100+ex-8} ${ey-1} q8 7 16 0" stroke="${ink}" stroke-width="2.8" fill="none" stroke-linecap="round"/>`,
+    /* сонный — закрытые глаза мягкой дугой */
+    sleepy:lash(),
+    /* грустный — зрачки ниже, брови уголками вверх к вискам */
+    sad:   white(8.2,9)+pupil(0,2.6,4.2)+shine(-2.2,0,2)+brow(2,3.2),
   };
-  o+=E[M.eye]||E.wide;
+  o+=E[M.eye]||E.brave;
 
-  // рот
-  const my=hy+17;
-  const MO={grin:`<path d="M${100-11} ${my} q11 10 22 0" stroke="#22201E" stroke-width="2.8" fill="none" stroke-linecap="round"/>`,
-    o:`<ellipse cx="100" cy="${my+2}" rx="7" ry="9" fill="#5A3428"/>`,
-    smirk:`<path d="M${100-10} ${my+2} q12 6 20 -4" stroke="#22201E" stroke-width="2.8" fill="none" stroke-linecap="round"/>`,
-    small:`<path d="M${100-6} ${my} q6 4 12 0" stroke="#22201E" stroke-width="2.6" fill="none" stroke-linecap="round"/>`,
-    frown:`<path d="M${100-10} ${my+5} q10 -9 20 0" stroke="#22201E" stroke-width="2.8" fill="none" stroke-linecap="round"/>`};
+  /* носик: без него мордочка читалась как плоское пятно */
+  const my=hy+18;
+  o+=`<ellipse cx="100" cy="${my-8}" rx="3.6" ry="2.8" fill="${ink}" opacity=".82"/>`;
+
+  const MO={
+    /* открытая улыбка с язычком вместо тонкой дуги-ухмылки */
+    grin:`<path d="M${100-11} ${my-1} q11 13 22 0 q-11 6 -22 0z" fill="${lum<0.42?'#4A2E2A':'#6E3A32'}"/>`+
+         `<path d="M${100-5} ${my+5.5} q5 5 10 0 q-5 2.5 -10 0z" fill="#E4857C"/>`,
+    o:`<ellipse cx="100" cy="${my+2}" rx="6" ry="7.5" fill="#6E3A32"/><ellipse cx="100" cy="${my+4}" rx="3" ry="3.4" fill="#E4857C"/>`,
+    smirk:`<path d="M${100-10} ${my} q11 9 20 -3" stroke="${ink}" stroke-width="2.6" fill="none" stroke-linecap="round"/>`,
+    small:`<path d="M${100-6} ${my} q6 5 12 0" stroke="${ink}" stroke-width="2.6" fill="none" stroke-linecap="round"/>`,
+    frown:`<path d="M${100-9} ${my+4} q9 -7 18 0" stroke="${ink}" stroke-width="2.4" fill="none" stroke-linecap="round"/>`};
   o+=MO[M.mouth]||MO.grin;
+
+  /* щёки: тёплые пятнышки — главный признак «своего» персонажа у детей */
+  o+=pair((cx,s2)=>`<ellipse cx="${cx+9*s2}" cy="${my-5}" rx="6.5" ry="4.2" fill="#F08A82" opacity=".38"/>`);
 
   // аксессуар
   if(acc){
@@ -802,8 +847,8 @@ function render(){
       <div id="pzbody" style="position:relative">${puzzleHTML(CUR)}</div>
       <div class="pznote" id="pznote"></div>`;
     F().innerHTML=`<div class="btnrow">
-      <button class="btn nk-btn nk-btn--soft nk-btn--sm" onclick="stopPuzzle();CUR=null;go('table')">На стол</button>
-      <button class="btn nk-btn nk-btn--cta nk-btn--sm" onclick="finishPuzzle('${CUR}')">Хватит, на стол</button></div>`;
+      <button class="btn nk-btn nk-btn--soft nk-btn--sm" onclick="stopPuzzle();CUR=null;go('table')">Назад</button>
+      <button class="btn nk-btn nk-btn--cta nk-btn--sm" onclick="finishPuzzle('${CUR}')">Готово</button></div>`;
     setTimeout(()=>bindPuzzle(CUR),60);
     return;
   }

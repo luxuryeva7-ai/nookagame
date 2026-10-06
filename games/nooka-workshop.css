@@ -263,14 +263,17 @@ html,body{height:100%;background:var(--bg);overflow-x:hidden}
 .ws-story .bin u{display:block;font-size:12px;font-weight:800;color:var(--ink3);text-decoration:none; margin-top:2px;line-height:1.1}
 .ws-story .pznote{margin-top:12px;background:var(--accbg);border-radius:14px;padding:11px 14px; font-size:16px;font-weight:700;color:var(--ink2);min-height:20px;line-height:1.4}
 .ws-story .bench{margin-top:10px;background:var(--card);border-radius:18px;box-shadow:var(--sh);padding:12px}
-.ws-story .bowl{min-height:70px;border-radius:14px;background:linear-gradient(160deg,#E8C89A,#C9A46E); box-shadow:inset 0 3px 10px rgba(90,60,25,.35);display:flex;align-items:center;justify-content:center; gap:8px;font-size:30px;margin-bottom:10px}
+/* место склейки: подпись раньше упиралась в край и обрезалась */
+.ws-story .bowl{min-height:76px;border-radius:16px;background:linear-gradient(160deg,#F0D7AE,#D8B583); box-shadow:inset 0 3px 10px rgba(90,60,25,.3);display:flex;align-items:center;justify-content:center; gap:8px;font-size:30px;margin-bottom:10px;padding:10px 14px;text-align:center}
 .ws-story .bowl-h{font-size:13.5px;font-weight:800;color:rgba(70,45,15,.5)}
 .ws-story .bw{animation:pop .3s cubic-bezier(.2,.8,.3,1);font-size:15.5px;font-weight:800;color:#4A3418; text-align:center;line-height:1.25;padding:0 8px}
 .ws-story .shelf-t{font-size:12px;font-weight:900;letter-spacing:.07em;text-transform:uppercase; color:var(--ink3);margin:9px 0 5px}
 .ws-story .shelf{display:flex;flex-wrap:wrap;gap:7px;background:#F6EEE2;border-radius:12px;padding:9px; box-shadow:inset 0 -3px 0 rgba(150,110,60,.18)}
 .ws-story .shelf-e{font-size:13.5px;color:var(--ink3);font-weight:700}
-.ws-story .bi{cursor:grab;touch-action:none;user-select:none;transition:transform .12s; width:56px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 2px; border-radius:11px;background:#FFFDF8;box-shadow:0 1px 0 rgba(120,80,30,.18)}
-.ws-story .bi b{font-size:12px;font-weight:800;color:var(--ink3);line-height:1.05;text-align:center; max-width:52px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ws-story .bi{cursor:grab;touch-action:none;user-select:none;transition:transform .12s; width:66px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 3px; border-radius:13px;background:#FFFDF8;box-shadow:0 1px 0 rgba(120,80,30,.18)}
+/* название детали переносится, а не обрезается: было «остро…», «кругл…»,
+   и ребёнок не понимал, что он тащит */
+.ws-story .bi b{font-size:10.5px;font-weight:800;color:var(--ink3);line-height:1.12;text-align:center; max-width:60px;white-space:normal;overflow-wrap:anywhere;hyphens:auto}
 .ws-story .bi svg{pointer-events:none}
 .ws-story .bi.hot{transform:scale(1.22);filter:drop-shadow(0 0 8px rgba(230,92,0,.8))}
 .ws-story .bi.ghost{position:fixed;z-index:99;pointer-events:none;transform:translate(-50%,-50%) scale(1.3);opacity:.9}
@@ -307,11 +310,12 @@ html,body{height:100%;background:var(--bg);overflow-x:hidden}
 .ws-story .hp{display:inline-block;transition:transform .1s;line-height:0}
 .ws-story .patch-t{font-size:12px;font-weight:900;letter-spacing:.07em;text-transform:uppercase; color:var(--ink3);margin:12px 0 6px}
 .ws-story .patches{display:flex;gap:8px;flex-wrap:wrap}
-.ws-story .patch{width:66px;background:#F6EEE2;border-radius:12px;padding:8px 4px;text-align:center; cursor:grab;touch-action:none;box-shadow:inset 0 0 0 1.5px rgba(150,110,60,.28)}
+.ws-story .patch{width:74px;background:#F6EEE2;border-radius:13px;padding:8px 5px;text-align:center; cursor:grab;touch-action:none;box-shadow:inset 0 0 0 1.5px rgba(150,110,60,.28)}
 .ws-story .patch.pick{box-shadow:inset 0 0 0 2.5px var(--acc);background:var(--accbg)}
 .ws-story .patch span{font-size:24px;display:block;transition:transform .1s;line-height:0}
 .ws-story .patch span svg,.ws-story .hp svg{display:block;margin:0 auto}
-.ws-story .patch small{font-size:12px;font-weight:800;color:var(--ink3);display:block;margin-top:3px;line-height:1.1}
+/* длинные названия («мультфильм», «аппликация») налезали друг на друга */
+.ws-story .patch small{font-size:10.5px;font-weight:800;color:var(--ink3);display:block;margin-top:4px;line-height:1.12;overflow-wrap:anywhere;hyphens:auto}
 .ws-story .duo{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}
 .ws-story .duo-c{background:var(--card);border-radius:16px;box-shadow:var(--sh);padding:8px}
 .ws-story .duo-l{font-size:12px;font-weight:900;letter-spacing:.07em;text-transform:uppercase; color:var(--ink3);text-align:center;padding-bottom:6px}
