@@ -386,16 +386,16 @@ document.getElementById('route').innerHTML = G.levels.map(function (lv) {
     '</div></div>' +
   '</div>';
 }).join('') +
-/* Финальная мастерская: стоит последней карточкой маршрута, но номера не
-   имеет — пройти её нельзя, там нет правильного ответа. Отмечается
-   сделанной, когда ребёнок поселил в мир троих. */
+/* Мастерские: стоят последними карточками маршрута, но номеров не имеют —
+   пройти их нельзя, правильного ответа там нет. Песочница отмечается
+   сделанной по делу (поселил троих), большая мастерская — когда дошёл до
+   конца. Список — nookaLevels.shopsOf. */
 (function () {
-  var sb = G.sandbox;
-  if (!sb) return '';
-  var done = nookaLevels.isDone(sb);
   /* доступ как у последнего уровня игры: своего номера у мастерской нет,
      а с выдуманным большим она оказывалась запертой даже в бесплатной игре */
   var lock = !nookaAccess.canPlay(key, G.levels.length);
+  return nookaLevels.shopsOf(G).map(function (sb) {
+  var done = nookaLevels.isDone(sb);
   return '<div class="st st--work' + (done ? ' st--done' : lock ? ' st--lock' : '') + '">' +
     '<button class="st__hd">' +
       '<span class="st__no st__no--work">' + ico('g-star') + '</span>' +
@@ -411,6 +411,7 @@ document.getElementById('route').innerHTML = G.levels.map(function (lv) {
           (done ? (sb.back || 'Вернуться в мастерскую') : 'Открыть мастерскую') + '</a>') +
     '</div></div>' +
   '</div>';
+  }).join('');
 })();
 
 /* аккордеон: открыт один уровень */
@@ -432,11 +433,12 @@ G.levels.forEach(function (lv) {
   used[lv.idea] = (used[lv.idea] || 0) + 1;
   if (lv.art) { arts++; if (nookaLevels.isDone(lv)) artsDone++; }
 });
-/* вещь из финальной мастерской тоже попадает в коллекцию — значит и в счёт */
-if (G.sandbox && G.sandbox.art) {
+/* вещь из мастерской тоже попадает в коллекцию — значит и в счёт */
+nookaLevels.shopsOf(G).forEach(function (sb) {
+  if (!sb.art) return;
   arts++;
-  if (nookaLevels.isDone(G.sandbox)) artsDone++;
-}
+  if (nookaLevels.isDone(sb)) artsDone++;
+});
 var ideaRows = Object.keys(used).sort().map(function (k) {
   return '<div class="idea"><span>' + IDEAS[k] + '</span><u></u><b>' + used[k] + '</b></div>';
 }).join('');

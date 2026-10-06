@@ -386,16 +386,18 @@
         var f = String(lv.href || '').split(/[?#]/)[0].toLowerCase();
         if (f === file) out.push({ game: g, level: lv });
       });
-      /* Финальные мастерские живут не в levels, но доступ у них общий с игрой:
-         без этой строки платная мастерская открывалась прямой ссылкой мимо
-         пейволла. Номер берём как у последнего уровня — он и решает доступ. */
-      if (g.sandbox && g.sandbox.href) {
-        var sf = String(g.sandbox.href).split(/[?#]/)[0].toLowerCase();
-        if (sf === file) {
-          var last = g.levels.length;
-          out.push({ game: g, shop: true, level: { n: last, t: g.sandbox.t, href: g.sandbox.href, mid: g.sandbox.mid } });
-        }
-      }
+      /* Мастерские живут не в levels, но доступ у них общий с игрой: без этой
+         строки платная мастерская открывалась прямой ссылкой мимо пейволла.
+         Номер берём как у последнего уровня — он и решает доступ. Сравниваем
+         по имени файла: большие мастерские лежат в projects/, и в реестре у
+         них путь с ../, который с именем файла сам не совпадёт. */
+      (window.nookaLevels.shopsOf ? window.nookaLevels.shopsOf(g) : [g.sandbox]).forEach(function (sb) {
+        if (!sb || !sb.href) return;
+        var sf = String(sb.href).split(/[?#]/)[0].split('/').pop().toLowerCase();
+        if (sf !== file) return;
+        var last = g.levels.length;
+        out.push({ game: g, shop: true, level: { n: last, t: sb.t, href: sb.href, mid: sb.mid } });
+      });
     });
     return out;
   }
@@ -433,7 +435,9 @@
     ready.then(function () {
       show();
       if (S.paid) return;
-      var hub = 'game.html?g=' + cur.game.key;
+      /* Путь от корня: мастерские лежат в projects/, и относительный
+         'game.html' увёл бы ребёнка на несуществующую страницу. */
+      var hub = '/games/game.html?g=' + cur.game.key;
       if (S.offline) return offlineWall({ hub: hub });
       /* В игре, которая начинается бесплатно, говорим про «эту игру», а не
          повторяем её название дважды */

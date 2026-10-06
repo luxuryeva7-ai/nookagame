@@ -46,7 +46,13 @@
       (g.extras || []).forEach(function (e) {
         out.push({ game: g.name, n: '★', t: e.t, href: e.href, kind: 'level' });
       });
-      if (g.sandbox) out.push({ game: g.name, n: '◆', t: g.sandbox.t, href: g.sandbox.href, kind: 'sandbox' });
+      /* Мастерские игры — и песочница курса, и большая мастерская из
+         projects/. Список берём из реестра, чтобы новая мастерская
+         попадала под проверку сама. */
+      var shops = window.nookaLevels.shopsOf ? window.nookaLevels.shopsOf(g) : [g.sandbox];
+      shops.forEach(function (sb) {
+        if (sb) out.push({ game: g.name, n: '◆', t: sb.t, href: sb.href, kind: 'sandbox' });
+      });
     });
     if (ONLY.length) out = out.filter(function (e) {
       return ONLY.some(function (w) { return e.href.indexOf(w) > -1; });
