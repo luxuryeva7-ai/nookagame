@@ -11,6 +11,9 @@ function cap(s){return s?s.charAt(0).toUpperCase()+s.slice(1):''}
    и напечатанное пропадало. A() — экранирование значения атрибута. */
 const A=v=>(window.nooka&&nooka.attr?nooka.attr(v):String(v==null?'':v));
 const E=v=>(window.nooka&&nooka.esc?nooka.esc(v):String(v==null?'':v));
+/* склонение при числе: «21 единиц» и «5 тычка» читаются как брак */
+const plural=(n,one,few,many)=>(window.nooka&&nooka.plural?nooka.plural(n,one,few,many)
+  :(()=>{const a=Math.abs(n)%100,b=a%10;return a>10&&a<20?many:b>1&&b<5?few:b===1?one:many})());
 const $=id=>document.getElementById(id);
 const B=()=>$('body'), F=()=>$('foot');
 const INK='#3A2A18', W1='#F2E4CC', W2='#D9BE94', ACC1='#E08A3C', ACC2='#6E9E7A';
@@ -35,7 +38,7 @@ const MEANING={
           aha:'Вот так и нейросеть: делать умеет только то, что ей показали. Зачем — знаешь ты.'},
  chair:  {n:5,title:'Кто решает',         act:'Посади себя в цепь',
           before:'Собери себя. Потом сядь в цепь: спорное будет ждать тебя.',
-          dur:['Собери себя. Лицо, одежда, вещь в руке. Я так не умею.','Сел. Спорное ждёт тебя. Во мне ничего не изменилось.'],
+          dur:['Собери себя. Лицо, одежда, вещь в руке. Я так не умею.','Сел на {node}. Спорное ждёт тебя. Во мне ничего не изменилось.'],
           aha:'Вот так и с любым ИИ: видит, помнит, считает. Решает человек. Где ему сидеть — выбрал ты.'},
  run:    {n:6,title:'Как ИИ работает целиком', act:'Дёрни рычаг',
           before:'Пять деталей на месте. Одна живая. Стукни темп и дёргай.',
@@ -271,7 +274,13 @@ const S={step:'intro',child:'',age:'',seed:4821,
   done:{eye:0,memory:0,decider:0,hand:0,chair:0}};
 let CUR=null, T={aha:null,shown:{}};
 const STEPS=['intro','floor','birth','pz','name','run','rules','pass','end'];
-function pct(){const i=STEPS.indexOf(S.step);return Math.max(0,Math.round(i/(STEPS.length-1)*100))}
+/* Полоска не едет назад: она показывает, как далеко ребёнок дошёл, а не на
+   каком экране стоит. Возврат в цех раньше откатывал её на треть. */
+function pct(){
+  const i=STEPS.indexOf(S.step);
+  if(i>(S.far||0))S.far=i;
+  return Math.max(0,Math.round((S.far||0)/(STEPS.length-1)*100));
+}
 function go(step){S.step=step;render();window.scrollTo({top:0});save()}
 
 /* автосохранение: звонок посреди урока — норма */
@@ -370,7 +379,10 @@ function render(){
   }
 
   if(st==='pz'){
+    /* Экран детали без выбранной детали (возврат по кнопке, старое
+       сохранение) раньше валил рендер и оставлял пустой экран. */
     const m=MEANING[CUR], stn=STATIONS.find(x=>x.id===CUR);
+    if(!m||!stn){CUR=null;go('floor');return}
     $('htitle').textContent=stn.n;
     B().innerHTML=`<div class="pzgoal"><div class="pzgoal-t">Уровень ${m.n} из 5</div><div class="pzgoal-r">${m.title}</div>
         <button class="explbtn" onclick="toggleExplain()">Что это значит?</button><div class="explain" id="explain">${EXPLAIN[CUR]}</div></div>
@@ -538,7 +550,9 @@ function eyeCheck(){
   const f=S.feats||{cnt:0}, ok=f.cnt>=8&&(S.thingName||'').length>=2;
   if(f.cnt>=8){S.thing=Uint8Array.from(PIX.cells);CH.thing=null}
   enableDone(ok);
-  if(ok&&!T.shown.eyeNote){T.shown.eyeNote=1;setNote('Для тебя — '+S.thingName+'. Для меня — '+f.cnt+' единиц и '+(100-f.cnt)+' нулей. Оба правы.')}
+  if(ok&&!T.shown.eyeNote){T.shown.eyeNote=1;
+    setNote('Для тебя — '+S.thingName+'. Для меня — '+f.cnt+' '+plural(f.cnt,'единица','единицы','единиц')
+      +' и '+(100-f.cnt)+' '+plural(100-f.cnt,'ноль','ноля','нулей')+'. Оба правы.')}
 }
 
 /* ── 2. ПАМЯТЬ — тащишь карточки на полки, полки остаются ── */
@@ -557,7 +571,10 @@ function memBind(){
   for(let i=0;i<2;i++)deck.push({v:decoy(i,r),truth:0});
   deck.push({v:hardDecoy(S.thing,r),truth:0});
   for(let i=deck.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]]}
-  MEM.deck=deck;MEM.i=0;S.mem={pos:[],neg:[]};S.memDone=0;
+  MEM.deck=deck;MEM.i=0;
+  /* Повторный вход не стирает разложенное: ребёнок возвращался посмотреть,
+     уходил — и примеры исчезали, а без них не открывался «Решатель». */
+  if(!S.memDone){S.mem={pos:[],neg:[]}}
   const th=$('shelfth'); if(th)th.appendChild(thumb(22));
   memRender();
 }
@@ -623,11 +640,15 @@ function decBind(){
   const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
   DEC.ctx=ctx;DEC.w=w;DEC.h=h;DEC.pool=decMakeItems();DEC.pi=0;DEC.items=[];DEC.t=0;DEC.spawn=600;DEC.seen=0;S.tally={ok:0,miss:0,fa:0};DEC.bins={yes:[],no:[]};DEC.start=performance.now();
   DEC.th=thumb(28);
-  const d=$('dial'); let down=false;
-  const setThr=e=>{const r=d.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
-    let a=Math.atan2(e.clientY-cy,e.clientX-cx)*180/Math.PI+90;a=((a%360)+360)%360;if(a>180)a-=360;a=Math.max(-135,Math.min(135,a));
+  const d=$('dial'); let down=false, grab=0;
+  /* Диск крутится ОТНОСИТЕЛЬНО места, где его взяли: раньше угол считался
+     абсолютно, и от первого касания черта прыгала в случайное место. */
+  const angOf=e=>{const r=d.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
+    let a=Math.atan2(e.clientY-cy,e.clientX-cx)*180/Math.PI+90;a=((a%360)+360)%360;if(a>180)a-=360;return a};
+  const thrAng=()=>(S.thr-0.25)/0.65*270-135;
+  const setThr=e=>{let a=angOf(e)-grab;a=Math.max(-135,Math.min(135,a));
     S.thr=0.25+(a+135)/270*0.65;decDial();decRejudge()};
-  d.onpointerdown=e=>{e.preventDefault();try{d.setPointerCapture(e.pointerId)}catch(_){}down=true;setThr(e)};
+  d.onpointerdown=e=>{e.preventDefault();try{d.setPointerCapture(e.pointerId)}catch(_){}down=true;grab=angOf(e)-thrAng()};
   d.onpointermove=e=>{if(down){e.preventDefault();setThr(e)}};
   const end=()=>{down=false};d.onpointerup=end;d.onpointercancel=end;d.onlostpointercapture=end;
   decDial();
@@ -727,7 +748,7 @@ function hgJudge(){
   p.forEach(q=>{if(q.x<minx)minx=q.x;if(q.x>maxx)maxx=q.x;if(q.y<miny)miny=q.y;if(q.y>maxy)maxy=q.y});
   const closed=Math.hypot(p[0].x-p[p.length-1].x,p[0].y-p[p.length-1].y)<40&&len>220;
   const feats=[];let g;
-  if(taps>=3&&len<taps*25){g='fix';feats.push(taps+' тычка',' коротко')}
+  if(taps>=3&&len<taps*25){g='fix';feats.push(taps+' '+plural(taps,'тычок','тычка','тычков'),' коротко')}
   else if(rev>=4){g='clean';feats.push('туда-сюда '+(rev+1)+' раз',len>300?'размашисто':'коротко')}
   else if(closed){g='find';feats.push('обвёл кругом','замкнул линию')}
   else if(len<40&&dur>700){g='heal';feats.push('держал '+Math.round(dur/100)/10+' с','почти не двигал')}
@@ -946,7 +967,7 @@ ${roleLine()}</div></div>
     const b=$('bars');if(b){const mx=Math.max(400,...iv);b.innerHTML=iv.map(v=>`<i style="height:${Math.max(6,Math.round(v/mx*60))}px"></i>`).join('')}
     if(RUN.taps.length>=4){const mean=iv.reduce((a,b)=>a+b,0)/iv.length,sd=Math.sqrt(iv.reduce((a,b)=>a+(b-mean)*(b-mean),0)/iv.length),cv=sd/mean;
       const tempo=mean<380?'быстро':mean>800?'медленно':'спокойно',even=cv<0.28?'ровно':'рвано';S.beat={iv,mean,cv};S.beatKind=tempo+', '+even;
-      const fe=$('earfeat');if(fe)fe.innerHTML=[`${iv.length} промежутка`,`средний ${Math.round(mean)} мс`,tempo,even].map(x=>'<span>'+x+'</span>').join('');
+      const fe=$('earfeat');if(fe)fe.innerHTML=[`${iv.length} ${plural(iv.length,'промежуток','промежутка','промежутков')}`,`средний ${Math.round(mean)} мс`,tempo,even].map(x=>'<span>'+x+'</span>').join('');
       const lb=$('leverBtn');if(lb)lb.disabled=false;
       if(RUN.taps.length===4)setNote2('Музыку я не услышал. Услышал паузы: '+tempo+', '+even+'. С таким темпом и поедем.')}
     if(RUN.taps.length===1)setNote2('Удар. Записал не звук — тишину до следующего.');
@@ -1217,7 +1238,7 @@ async function passDraw(cv){
   const th=document.createElement('canvas');drawVec(th,S.thing,200);ctx.drawImage(th,60,386,200,200);ctx.strokeStyle='#2B2118';ctx.lineWidth=3;ctx.strokeRect(60,386,200,200);
   ctx.fillStyle='#2B2118';ctx.font='800 34px Nunito, sans-serif';ctx.fillText(cap(S.thingName||''),290,430);
   ctx.fillStyle='#8A7A68';ctx.font='700 22px Nunito, sans-serif';const f=pixFeats(Array.from(S.thing));
-  ['глаз видит: '+f.cnt+' единиц из 100','память: '+(S.mem.pos.length+S.mem.neg.length)+' примеров, ответы — '+(S.child||'мои'),'черта решателя: '+thrWord()+' · роль: '+(ROLE[S.human]||'—'),'рука: '+(S.actionPhrase||S.gest.n)+' · темп: '+(S.beatKind||'—'),'мир смены: '+WORLDS[worldOf()].n+' (выбрал костюм)'].forEach((l,i)=>ctx.fillText(l,290,470+i*34));
+  ['глаз видит: '+f.cnt+' '+plural(f.cnt,'единица','единицы','единиц')+' из 100','память: '+(S.mem.pos.length+S.mem.neg.length)+' примеров, ответы — '+(S.child||'мои'),'черта решателя: '+thrWord()+' · роль: '+(ROLE[S.human]||'—'),'рука: '+(S.actionPhrase||S.gest.n)+' · темп: '+(S.beatKind||'—'),'мир смены: '+WORLDS[worldOf()].n+' (выбрал костюм)'].forEach((l,i)=>ctx.fillText(l,290,470+i*34));
   ctx.fillStyle='#8A7A68';ctx.font='800 20px Nunito, sans-serif';ctx.fillText('ЦЕПЬ',60,660);
   const xs=[0,1,2,3].map(i=>110+i*270);ctx.fillStyle='#8A6D46';ctx.fillRect(100,740,W-200,10);
   for(const [i,id] of CHAIN_IDS.entries()){const x=xs[i],me=S.human===id;
