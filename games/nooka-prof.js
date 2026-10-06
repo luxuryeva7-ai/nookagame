@@ -497,6 +497,7 @@ function bindLevel(id){
 }
 function stopLevel(id){
   if(id==='decider')decStop();
+  if(id==='eye')eyeScanStop();
   if(id==='hand'){HG.gen=(HG.gen||0)+1;if(HG.raf)cancelAnimationFrame(HG.raf);HG.raf=0}
 }
 function demoHand(kind){
@@ -517,6 +518,8 @@ function eyeHTML(){
    +`<div class="pz"><div class="pixcenter"><canvas id="pixcv"></canvas></div>
       <div class="feat" id="feat"></div>
       <div class="rowlbl">Что вижу я — сто чисел</div><div class="numgrid" id="numgrid"></div>
+      <div class="scanline" id="scanline"></div>
+      <button class="btn nk-btn nk-btn--soft nk-btn--sm" id="scanbtn" style="margin-top:8px" onclick="eyeScan()">Прочитать, как машина</button>
       <div class="pixbtns"><button class="btn nk-btn nk-btn--soft nk-btn--sm" onclick="pixMirror()">Зеркало</button><button class="btn nk-btn nk-btn--soft nk-btn--sm" onclick="pixClear()">Стереть</button></div>
       <input class="field" id="thingname" maxlength="18" placeholder="Что это? Одним словом" value="${A(S.thingName)}" oninput="S.thingName=this.value.trim();eyeCheck()"></div>`;
 }
@@ -549,6 +552,36 @@ function eyeUpdate(){
   if(f.cnt>=8&&f.sym>=70&&!T.shown.eyeSym){T.shown.eyeSym=1;setNote(MEANING.eye.dur[2])}
   eyeCheck();
 }
+/* Машина читает рисунок строчка за строчкой — ребёнок видит сам процесс:
+   вот эта строка, вот её десять чисел, вот сколько в ней единиц.
+   Раньше сто чисел просто лежали рядом, и было непонятно, что с ними делают. */
+function eyeScan(){
+  const g=$('numgrid'), out=$('scanline'); if(!g||!out)return;
+  const cells=[...g.children];
+  PIX.scan=(PIX.scan||0)+1; const my=PIX.scan;
+  const btn=$('scanbtn'); if(btn)btn.disabled=true;
+  let row=0, total=0;
+  const stepRow=()=>{
+    if(my!==PIX.scan)return;
+    cells.forEach(c=>c.classList.remove('scan'));
+    if(row>=10){
+      out.innerHTML='<b>Всё. '+total+' '+plural(total,'единица','единицы','единиц')+' из 100.</b> Больше я о твоём рисунке ничего не знаю.';
+      if(btn)btn.disabled=false;
+      return;
+    }
+    const vals=[];
+    for(let x=0;x<10;x++){const i=row*10+x; cells[i].classList.add('scan'); vals.push(PIX.cells[i]?1:0)}
+    const ones=vals.reduce((a,b)=>a+b,0); total+=ones;
+    out.innerHTML='Строка '+(row+1)+': <code>'+vals.join(' ')+'</code> — '
+      +(ones?ones+' '+plural(ones,'единица','единицы','единиц'):'пусто');
+    row++;
+    PIX.scanT=setTimeout(stepRow,360);
+  };
+  stepRow();
+}
+function eyeScanStop(){PIX.scan=(PIX.scan||0)+1;clearTimeout(PIX.scanT);
+  const g=$('numgrid'); if(g)[...g.children].forEach(c=>c.classList.remove('scan'));}
+
 function eyeCheck(){
   const f=S.feats||{cnt:0}, ok=f.cnt>=8&&(S.thingName||'').length>=2;
   if(f.cnt>=8){S.thing=Uint8Array.from(PIX.cells);CH.thing=null}
@@ -563,8 +596,8 @@ const MEM={deck:[],i:0};
 function memHTML(){
   if(!S.thing)return say('Сначала нарисуй что-нибудь на уровне 1 — иначе мне нечего копировать.','oops');
   return say(MEANING.memory.before,'think')
-   +`<div class="pz"><div class="shelves"><div class="shelf yes" id="shelfyes"><div class="shelf-t"><span class="shelf-th" id="shelfth"></span>моё</div><div class="shelf-r" id="shelfry"></div></div>
-      <div class="shelf no" id="shelfno"><div class="shelf-t">чужое</div><div class="shelf-r" id="shelfrn"></div></div></div>
+   +`<div class="pz"><div class="shelves"><div class="shelf yes" id="shelfyes"><div class="shelf-t"><span class="shelf-th" id="shelfth"></span>моё<b class="shelf-n" id="shelfny"></b></div><div class="shelf-r" id="shelfry"></div></div>
+      <div class="shelf no" id="shelfno"><div class="shelf-t">чужое<b class="shelf-n" id="shelfnn"></b></div><div class="shelf-r" id="shelfrn"></div></div></div>
       <div class="stack" id="stack"></div></div>`;
 }
 function memBind(){
@@ -579,7 +612,24 @@ function memBind(){
      уходил — и примеры исчезали, а без них не открывался «Решатель». */
   if(!S.memDone){S.mem={pos:[],neg:[]}}
   const th=$('shelfth'); if(th)th.appendChild(thumb(22));
+  memShelves();
   memRender();
+}
+/* Полка загорается, когда примеров на ней хватает для сравнения: ребёнок
+   видит, что его работа уже чего-то стоит, а не просто считает карточки. */
+const MEM_ENOUGH=3;
+function memShelves(){
+  [['shelfyes','shelfny',(S.mem.pos||[]).length],['shelfno','shelfnn',(S.mem.neg||[]).length]].forEach(([sid,nid,n])=>{
+    const sh=$(sid), lb=$(nid); if(!sh)return;
+    if(lb)lb.textContent=n?n+' '+plural(n,'пример','примера','примеров'):'';
+    const was=sh.classList.contains('ready');
+    sh.classList.toggle('ready',n>=MEM_ENOUGH);
+    if(!was&&n>=MEM_ENOUGH){
+      sh.classList.add('lit'); setTimeout(()=>sh.classList.remove('lit'),900);
+      if(!T.shown['memReady_'+sid]){T.shown['memReady_'+sid]=1;
+        setNote('Этой полке уже есть с чем сравнивать. Вторую тоже наполни — без «чужого» я не различу.');}
+    }
+  });
 }
 function memRender(){
   const st=$('stack'); if(!st)return; st.innerHTML='';
@@ -605,6 +655,7 @@ function memDrag(el,c){
       if(S.memDone===1)setNote(MEANING.memory.dur[0]);
       if(S.memDone===4)setNote(MEANING.memory.dur[1]);
       if(lab!==c.truth&&!T.shown.memWarn){T.shown.memWarn=1;setNote(MEANING.memory.dur[2])}
+      memShelves();
       MEM.i++;setTimeout(memRender,280);
       if(MEM.i>=MEM.deck.length){enableDone(true);setNote('Восемь примеров. Мало. Большие нейросети учат на миллионах.')}
     }else{el.style.transform=''}

@@ -860,3 +860,16 @@ body.ws{
 .ws-story .bw{display:inline-flex;flex-direction:column;align-items:center;gap:2px}
 .ws-story .bw-p{display:block;width:72px;height:78px}
 .ws-story .bw-p svg{width:100%;height:100%;display:block}
+/* «Прочитать, как машина»: строка, которую глаз читает прямо сейчас */
+.ws-prof .numgrid i.scan{outline:2px solid var(--acc);outline-offset:-1px}
+.ws-prof .scanline{margin-top:8px;font-size:13px;line-height:1.5;color:var(--ink2);min-height:20px}
+.ws-prof .scanline code{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:var(--ink);background:var(--accbg);border-radius:6px;padding:2px 6px}
+.ws-prof .scanline b{color:var(--acc)}
+/* полка «набралась»: примеров хватает, чтобы сравнивать */
+.ws-prof .shelf-n{display:block;font-size:11px;font-weight:800;color:var(--ink3);margin-top:2px}
+.ws-prof .shelf.ready{background:#EFF9F2;box-shadow:inset 0 0 0 2px rgba(46,158,91,.55)}
+.ws-prof .shelf.ready .shelf-n{color:#2E9E5B}
+.ws-prof .shelf.lit{animation:shelflit .9s ease}
+@keyframes shelflit{0%{box-shadow:inset 0 0 0 2px rgba(46,158,91,.55)}
+  40%{box-shadow:inset 0 0 0 3px rgba(46,158,91,.9),0 0 22px rgba(46,158,91,.45)}
+  100%{box-shadow:inset 0 0 0 2px rgba(46,158,91,.55)}}

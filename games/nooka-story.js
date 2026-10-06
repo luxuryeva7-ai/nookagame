@@ -1888,6 +1888,7 @@ function glassStart(){
   cv.width=w*dpr; cv.height=h*dpr; cv.style.width=w+'px'; cv.style.height=h+'px';
   const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
   GLASS.ctx=ctx; GLASS.w=w; GLASS.h=h; GLASS.budget=1; GLASS.used=0; GLASS.toldDry=0; GLASS.ahaShown=0;
+  GLASS.hero=null; GLASS.heroAsked=0; GLASS.showHero=0;
   const r=rng(S.seed*41+9);
   const sh=PLACES.slice(); for(let i=sh.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[sh[i],sh[j]]=[sh[j],sh[i]]}
   GLASS.places=sh.slice(0,4);
@@ -1999,7 +2000,33 @@ function glassDraw(){
     tctx.drawImage(GLASS.masks[i].cv,0,0);
     ctx.drawImage(tmp,0,0,w,h);   // БЕЗ w,h буфер w*dpr рисуется вдвое больше холста
   }
+  /* Как только из тумана проступило место — в него выходит герой. Раньше
+     ребёнок протирал стекло и видел пустой пейзаж: место «его», а живого
+     в нём нет. Теперь видно, что это декорация для своего героя. */
+  if(GLASS.hero&&GLASS.showHero){
+    const hh=Math.max(54,Math.round(h*0.42)), hw=Math.round(hh*0.88);
+    const hx=Math.round(w*0.72-hw/2), hy=h-hh-Math.round(h*0.06);
+    ctx.save();
+    ctx.fillStyle='rgba(60,40,20,.18)';
+    ctx.beginPath();ctx.ellipse(hx+hw/2,hy+hh-3,hw*0.3,hh*0.05,0,0,7);ctx.fill();
+    ctx.drawImage(GLASS.hero,hx,hy,hw,hh);
+    ctx.restore();
+  }
 }
+/* Герой выходит в проявленное место: растрируем его один раз и дальше просто
+   дорисовываем поверх стёкол. */
+function glassHeroIn(){
+  if(!S.hero||GLASS.heroAsked)return;
+  GLASS.heroAsked=1;
+  const svg=`<svg viewBox="58 74 92 104" preserveAspectRatio="xMidYMid meet">`
+    +svgHero(S.hero,(S.mood&&S.mood.id)||'brave',S.seed,S.style,S.acc)+`</svg>`;
+  rasterize(svg,176,200).then(im=>{
+    const oc=document.createElement('canvas'); oc.width=176; oc.height=200;
+    oc.getContext('2d').drawImage(im,0,0,176,200);
+    GLASS.hero=oc; GLASS.showHero=1; glassDraw();
+  }).catch(()=>{});
+}
+
 /* Что РЕАЛЬНО видно на экране: для каждой точки — самое верхнее непротёртое стекло.
    Раньше считался самый СТЁРТЫЙ слой, то есть место, которое ребёнок как раз убрал из кадра. */
 function glassVisible(){
@@ -2031,6 +2058,7 @@ function glassLive(){
 function glassPick(){
   const v=glassVisible();
   S.place=GLASS.places[v.best]||PLACES[0];
+  glassHeroIn();
   const g=$('glassres');
   if(g)g.textContent='Шаг '+(v.best+1)+' из 4 · проявляется: '+S.place.n;
   if(!GLASS.ahaShown){GLASS.ahaShown=1; setNote(MEANING.glass.aha)}   // «ага» сразу после первого мазка
