@@ -393,9 +393,11 @@ document.getElementById('route').innerHTML = G.levels.map(function (lv) {
 (function () {
   /* доступ как у последнего уровня игры: своего номера у мастерской нет,
      а с выдуманным большим она оказывалась запертой даже в бесплатной игре */
-  var lock = !nookaAccess.canPlay(key, G.levels.length);
+  var paidLock = !nookaAccess.canPlay(key, G.levels.length);
   return nookaLevels.shopsOf(G).map(function (sb) {
   var done = nookaLevels.isDone(sb);
+  /* мастерская с free открыта всем — её показываем и до покупки */
+  var lock = sb.free ? false : paidLock;
   return '<div class="st st--work' + (done ? ' st--done' : lock ? ' st--lock' : '') + '">' +
     '<button class="st__hd">' +
       '<span class="st__no st__no--work">' + ico('g-star') + '</span>' +

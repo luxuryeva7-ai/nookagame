@@ -392,7 +392,7 @@
          по имени файла: большие мастерские лежат в projects/, и в реестре у
          них путь с ../, который с именем файла сам не совпадёт. */
       (window.nookaLevels.shopsOf ? window.nookaLevels.shopsOf(g) : [g.sandbox]).forEach(function (sb) {
-        if (!sb || !sb.href) return;
+        if (!sb || !sb.href || sb.free) return;   // открытая мастерская стену не зовёт
         var sf = String(sb.href).split(/[?#]/)[0].split('/').pop().toLowerCase();
         if (sf !== file) return;
         var last = g.levels.length;
