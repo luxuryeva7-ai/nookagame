@@ -141,10 +141,21 @@ function drawHero(ctx,x,y,r,h,gray){
   if(E==='ant'){ctx.strokeStyle=d;ctx.lineWidth=r*.12;ctx.beginPath();ctx.moveTo(0,-r*.7);ctx.lineTo(0,-r*1.2);ctx.stroke();ctx.beginPath();ctx.arc(0,-r*1.32,r*.16,0,7);ctx.fill()}
   // тело
   ctx.fillStyle=c;ctx.beginPath();ctx.arc(0,0,r,0,7);ctx.fill();
-  // глаза
+  /* блик сверху — шарик перестаёт быть плоским кружком */
+  ctx.save();ctx.globalAlpha=.16;ctx.fillStyle='#fff';
+  ctx.beginPath();ctx.ellipse(-r*.3,-r*.42,r*.42,r*.26,-0.5,0,7);ctx.fill();ctx.restore();
+  /* ЛИЦО: глаза с бликом, улыбка и щёки. Раньше это были две чёрные точки —
+     герой выходил безучастным кружком, а за него ещё и переживать надо. */
   if(!gray){
-    ctx.fillStyle='#fff';[-1,1].forEach(s=>{ctx.beginPath();ctx.arc(s*r*.34,-r*.1,r*.26,0,7);ctx.fill()});
-    ctx.fillStyle='#22201E';[-1,1].forEach(s=>{ctx.beginPath();ctx.arc(s*r*.34,-r*.08,r*.14,0,7);ctx.fill()});
+    ctx.fillStyle='#fff';[-1,1].forEach(s=>{ctx.beginPath();ctx.ellipse(s*r*.34,-r*.1,r*.27,r*.3,0,0,7);ctx.fill()});
+    ctx.fillStyle='#2A2320';[-1,1].forEach(s=>{ctx.beginPath();ctx.arc(s*r*.34,-r*.05,r*.145,0,7);ctx.fill()});
+    ctx.fillStyle='#fff';[-1,1].forEach(s=>{ctx.beginPath();ctx.arc(s*r*.34-r*.07,-r*.14,r*.06,0,7);ctx.fill()});
+    // улыбка
+    ctx.strokeStyle='#2A2320';ctx.lineWidth=Math.max(1.2,r*.075);ctx.lineCap='round';
+    ctx.beginPath();ctx.arc(0,r*.18,r*.26,0.35*Math.PI,0.65*Math.PI);ctx.stroke();
+    // щёки
+    ctx.save();ctx.globalAlpha=.34;ctx.fillStyle='#F0736A';
+    [-1,1].forEach(s=>{ctx.beginPath();ctx.ellipse(s*r*.62,r*.16,r*.16,r*.11,0,0,7);ctx.fill()});ctx.restore();
   }
   ctx.restore();
 }
@@ -177,8 +188,14 @@ function drawObst(ctx,x,y,r,o,tick){
     for(let i=0;i<sp*2;i++){const a=i*Math.PI/sp,rr=i%2?r*.55:r;ctx.lineTo(Math.cos(a)*rr,Math.sin(a)*rr)}
     ctx.closePath();ctx.fill()}
   else{ctx.beginPath();ctx.arc(0,0,r,0,7);ctx.fill();
-    ctx.fillStyle='rgba(255,255,255,.85)';[-1,1].forEach(s=>{ctx.beginPath();ctx.arc(s*r*.32,-r*.08,r*.18,0,7);ctx.fill()});
-    ctx.fillStyle='#22201E';[-1,1].forEach(s=>{ctx.beginPath();ctx.arc(s*r*.32,-r*.06,r*.09,0,7);ctx.fill()})}
+    /* Помеха раньше выглядела так же, как герой: кружок с двумя глазами.
+       Теперь у неё своё лицо — вредное, но не страшное: прищур, бровки
+       домиком и ровный рот. Ребёнок с одного взгляда понимает, кто есть кто. */
+    ctx.fillStyle='rgba(255,255,255,.9)';[-1,1].forEach(s=>{ctx.beginPath();ctx.ellipse(s*r*.32,-r*.04,r*.2,r*.15,0,0,7);ctx.fill()});
+    ctx.fillStyle='#22201E';[-1,1].forEach(s=>{ctx.beginPath();ctx.arc(s*r*.32,-r*.02,r*.1,0,7);ctx.fill()});
+    ctx.strokeStyle='#22201E';ctx.lineWidth=Math.max(1.2,r*.09);ctx.lineCap='round';
+    [-1,1].forEach(s=>{ctx.beginPath();ctx.moveTo(s*r*.56,-r*.34);ctx.lineTo(s*r*.12,-r*.18);ctx.stroke()});
+    ctx.beginPath();ctx.moveTo(-r*.22,r*.34);ctx.lineTo(r*.22,r*.34);ctx.stroke()}
   ctx.restore();
 }
 function drawHelp(ctx,x,y,r,h,tick){

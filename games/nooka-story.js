@@ -1715,7 +1715,7 @@ function gaitStart(){
   cv.onlostpointercapture=end;
   GAIT.run=1; gaitDraw();
 }
-function gaitStop(){ GAIT.run=0; if(GAIT.raf)cancelAnimationFrame(GAIT.raf); GAIT.raf=0; }
+function gaitStop(){ GAIT.run=0; GAIT.replay=0; GAIT.gen=(GAIT.gen||0)+1; if(GAIT.raf)cancelAnimationFrame(GAIT.raf); GAIT.raf=0; }
 function gaitSpan(){
   if(GAIT.pts.length<2)return 0;
   let mn=1e9,mx=-1e9; GAIT.pts.forEach(p=>{if(p.x<mn)mn=p.x;if(p.x>mx)mx=p.x});
@@ -1784,9 +1784,46 @@ function gaitAccept(){
     hx:50+((q.x/GAIT.w)-0.5)*66, hy:64+((q.y/GAIT.h)-0.5)*26, t:q.t}))),40);
   syncStrip();
   const box=$('gtread');
-  if(box)box.innerHTML=`<div class="gr-ok">✓ Характер: ${S.hero&&S.hero.sex==='f'?S.mood.f:S.mood.n}.<br>Походку я забрал в мультик — он пойдёт именно так.</div>`;
+  if(box)box.innerHTML=`<div class="gr-ok">✓ Характер: ${S.hero&&S.hero.sex==='f'?S.mood.f:S.mood.n}.<br>Смотри, он уже пошёл — твоей походкой.</div>`;
+  gaitReplay();
+}
+/* Ребёнок провёл пальцем — и герой тут же идёт этой походкой по кругу.
+   Раньше он об этом только читал («забрал в мультик»), а увидеть мог
+   через три занятия. Самое приятное в станции — вот этот момент. */
+function gaitReplay(){
+  const pts=GAIT.pts; if(!pts||pts.length<4)return;
+  const t0=pts[0].t, span=Math.max(400,pts[pts.length-1].t-t0);
+  GAIT.run=1; GAIT.replay=1; const my=(GAIT.gen=(GAIT.gen||0)+1);
+  const start=performance.now();
+  const step=now=>{
+    if(!GAIT.run||my!==GAIT.gen||!GAIT.ctx)return;
+    const k=((now-start)%(span+700))/span;     // пауза между проходами
+    const at=Math.min(1,Math.max(0,k));
+    const idx=Math.min(pts.length-1,Math.floor(at*(pts.length-1)));
+    gaitDrawAt(pts[idx],at<1);
+    GAIT.raf=requestAnimationFrame(step);
+  };
+  GAIT.raf=requestAnimationFrame(step);
+}
+/* Тот же кадр, что рисует gaitDraw, но герой стоит в заданной точке пути */
+function gaitDrawAt(pt,walking){
+  const save=GAIT.pts;
+  gaitDraw();
+  const ctx=GAIT.ctx, w=GAIT.w, h=GAIT.h; if(!ctx||!GAIT.hero||!pt)return;
+  const gy=h-34;
+  const hx=Math.max(34,Math.min(w-34,pt.x));
+  const lift=Math.max(0,Math.min(30,(gy-46)-pt.y));
+  const bob=walking?Math.abs(Math.sin(performance.now()/90))*3:0;
+  const top=Math.max(2,gy-74-lift-bob);
+  ctx.save();
+  ctx.fillStyle='rgba(58,42,24,.16)';
+  ctx.beginPath(); ctx.ellipse(hx,gy+4,22,5,0,0,7); ctx.fill();
+  ctx.drawImage(GAIT.hero,hx-33,top,66,75);
+  ctx.restore();
+  GAIT.pts=save;
 }
 function gaitAgain(){
+  GAIT.replay=0; GAIT.gen=(GAIT.gen||0)+1; if(GAIT.raf)cancelAnimationFrame(GAIT.raf); GAIT.raf=0;
   GAIT.pts=[]; GAIT.read=null;
   const box=$('gtread'); if(box)box.innerHTML='';
   const hn=$('gthint'); if(hn){hn.style.opacity='1';
@@ -1817,7 +1854,8 @@ function gaitDraw(){
     ctx.beginPath(); ctx.moveTo(GAIT.pts[0].x,GAIT.pts[0].y);
     GAIT.pts.forEach(q=>ctx.lineTo(q.x,q.y)); ctx.stroke();
   }
-  if(GAIT.hero){
+  /* во время проигрывания героя ставит gaitDrawAt — иначе он двоился */
+  if(GAIT.hero&&!GAIT.replay){
     const last=GAIT.pts.length?GAIT.pts[GAIT.pts.length-1]:null;
     const hx=Math.max(34,Math.min(w-34,last?last.x:46));
     // ноги всегда на земле, а высота пальца читается как подскок — так это и выглядит ходьбой

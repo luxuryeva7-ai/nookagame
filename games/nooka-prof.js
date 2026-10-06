@@ -495,7 +495,10 @@ function bindLevel(id){
   ({eye:eyeBind,memory:memBind,decider:decBind,hand:handBind,chair:chairBind}[id])();
   if(!T.shown[id]){T.shown[id]=1;setTimeout(()=>demoHand(id),400)}
 }
-function stopLevel(id){if(id==='decider')decStop()}
+function stopLevel(id){
+  if(id==='decider')decStop();
+  if(id==='hand'){HG.gen=(HG.gen||0)+1;if(HG.raf)cancelAnimationFrame(HG.raf);HG.raf=0}
+}
 function demoHand(kind){
   const box=$('pzbody'); if(!box)return;
   const h=document.createElement('div');
@@ -727,7 +730,9 @@ function handBind(){
   const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
   HG.ctx=ctx;HG.w=w;HG.h=h;HG.pts=[];HG.th=thumb(120);
   const pos=e=>{const r=cv.getBoundingClientRect();return {x:e.clientX-r.left,y:e.clientY-r.top,t:performance.now()}};
-  cv.onpointerdown=e=>{e.preventDefault();try{cv.setPointerCapture(e.pointerId)}catch(_){}HG.down=true;HG.pts=[pos(e)];HG.t0=performance.now();clearTimeout(HG.tm);hgDraw()};
+  cv.onpointerdown=e=>{e.preventDefault();try{cv.setPointerCapture(e.pointerId)}catch(_){}
+    HG.gen=(HG.gen||0)+1;if(HG.raf)cancelAnimationFrame(HG.raf);HG.raf=0;   // гасим повтор жеста
+    HG.down=true;HG.pts=[pos(e)];HG.t0=performance.now();clearTimeout(HG.tm);hgDraw()};
   cv.onpointermove=e=>{if(!HG.down)return;e.preventDefault();let pts=[e];if(e.getCoalescedEvents){const c=e.getCoalescedEvents();if(c&&c.length)pts=c}pts.forEach(p=>HG.pts.push(pos(p)));hgDraw()};
   const end=()=>{if(!HG.down)return;HG.down=false;HG.pts.push(Object.assign({},HG.pts[HG.pts.length-1],{t:performance.now(),up:1}));HG.taps=(HG.taps||0)+1;clearTimeout(HG.tm);HG.tm=setTimeout(hgJudge,700);hgDraw()};
   cv.onpointerup=end;cv.onpointercancel=end;cv.onlostpointercapture=end;
@@ -752,13 +757,38 @@ function hgJudge(){
   else if(rev>=4){g='clean';feats.push('туда-сюда '+(rev+1)+' раз',len>300?'размашисто':'коротко')}
   else if(closed){g='find';feats.push('обвёл кругом','замкнул линию')}
   else if(len<40&&dur>700){g='heal';feats.push('держал '+Math.round(dur/100)/10+' с','почти не двигал')}
-  else{g='carry';feats.push('протянул '+Math.round(len)+' px','в одну сторону')}
+  else{g='carry';feats.push(len>HG.w*0.7?'протянул через весь рисунок':len>HG.w*0.35?'протянул до середины':'протянул коротко','в одну сторону')}
   const G=GESTURES.find(x=>x.id===g); S.gest=G;
   const fe=$('hgfeat'); if(fe)fe.innerHTML=feats.map(t=>'<span>'+t+'</span>').join('');
   const rd=$('hgread'); if(rd)rd.textContent='Я измерил: '+feats.join(', ')+'. Похоже, рука «'+G.n+'». Не так — напиши своё слово ниже.';
   const ph=$('hgphrase'); if(ph)ph.style.display='';
   const tx=$('hgtext'); if(tx&&!S.actionPhrase){tx.value=G.n;S.actionPhrase=G.n}
   HG.taps=0; handCheck();
+  hgReplay();
+}
+/* Показал жест — и рука тут же повторяет его сама, по кругу. Раньше ребёнок
+   только читал, что машина «измерила»; увидеть работу руки он мог лишь в цеху. */
+function hgReplay(){
+  const pts=(HG.pts||[]).filter(p=>!p.up);
+  if(pts.length<3||!HG.ctx)return;
+  const my=(HG.gen=(HG.gen||0)+1);
+  const start=performance.now(), span=Math.max(600,pts[pts.length-1].t-pts[0].t);
+  const step=now=>{
+    if(my!==HG.gen||HG.down||!HG.ctx)return;
+    const k=((now-start)%(span+600))/span;
+    const at=Math.min(1,Math.max(0,k));
+    const p=pts[Math.min(pts.length-1,Math.floor(at*(pts.length-1)))];
+    hgDraw();
+    const {ctx}=HG;
+    ctx.save();
+    ctx.globalAlpha=.9;
+    ctx.font='34px system-ui,"Apple Color Emoji","Segoe UI Emoji"';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('☝️',p.x,p.y-4);
+    ctx.restore();
+    HG.raf=requestAnimationFrame(step);
+  };
+  HG.raf=requestAnimationFrame(step);
 }
 function handCheck(){enableDone(!!(S.gest&&(S.actionPhrase||'').length>=3));if(S.gest&&!T.shown.handNote){T.shown.handNote=1;setNote(MEANING.hand.dur[0].replace('делает одно и то же','умеет только «'+S.gest.n+'»'))}}
 
