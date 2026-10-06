@@ -484,6 +484,10 @@ function makeStory(st){
 }
 
 /* ═══════════════ ЭКРАНЫ ═══════════════ */
+/* Слова ребёнка обратно в поле: кавычка в названии обрубала value="…"
+   и напечатанное пропадало. A() — экранирование значения атрибута. */
+const A=v=>(window.nooka&&nooka.attr?nooka.attr(v):String(v==null?'':v));
+const E=v=>(window.nooka&&nooka.esc?nooka.esc(v):String(v==null?'':v));
 const $=id=>document.getElementById(id);
 const B=()=>$('body'), F=()=>$('foot');
 
@@ -665,7 +669,70 @@ function reroll(){S.seed=1000+Math.floor(Math.random()*9000);
   const sr=document.querySelector('.seedrow span');if(sr)sr.textContent='Зерно #'+S.seed;}
 
 /* ── шаги ── */
-function go(s){S.step=s;render();window.scrollTo({top:0,behavior:'smooth'})}
+function go(s){S.step=s;render();window.scrollTo({top:0,behavior:'smooth'});save()}
+
+/* ═══════════ АВТОСОХРАНЕНИЕ ═══════════
+   Книжка собирается больше получаса, а телефон у ребёнка в любой момент
+   уходит на звонок и выбрасывает вкладку из памяти. Поэтому складываем
+   работу на каждом переходе: детали — по их id, кадры и подписи как есть.
+
+   Возвращаем не в тот же миг, а на спокойный экран — середина занятия
+   после перезагрузки показала бы сломанную картинку. И только по кнопке:
+   ребёнок сам решает, продолжить или начать заново. */
+const SAVE_KEY='nooka_m1';
+/* Поля, в которых лежат детали из библиотек: храним только id */
+const SAVE_PICKS=[['hero',()=>HEROES],['place',()=>PLACES],['time',()=>TIMES],['mood',()=>MOODS],
+ ['prop',()=>PROPS],['style',()=>STYLES],['acc',()=>ACCS],['angle',()=>ANGLES],
+ ['fA',()=>FORK_A],['fB',()=>FORK_B],['fC',()=>FORK_C]];
+/* Куда вернуть ребёнка с каждого экрана. Занятия и мультик сами не
+   восстанавливаются — отправляем к столу и к готовой книжке. */
+const SAFE_STEP={table:'table',name:'name',build:'build',title:'title',line:'line',
+ author:'author',art:'art',reveal:'reveal',end:'end',film:'art',
+ pz:'table',show:'table',cmp:'table',hunt:'table',joke:'table',s3:'table',s4:'table'};
+/* Экраны после стола собираются только из полного набора деталей */
+const SAFE_WHOLE={build:1,title:1,line:1,author:1,art:1,reveal:1,end:1};
+let saveAt=0;
+function save(){
+  if(S.shared)return;                       // чужая книжка не затирает свою работу
+  const now=Date.now();
+  if(now-saveAt<400)return;                 // не пишем на каждый перерисовок
+  saveAt=now;
+  try{
+    const o={};
+    Object.keys(S).forEach(k=>{if(S[k]===null||typeof S[k]!=='object')o[k]=S[k]});
+    o.ids={};
+    SAVE_PICKS.forEach(([k,arr])=>{o.ids[k]=S[k]?S[k].id:null});
+    o.shots=S.shots||null;o.frames=S.frames||null;o.gaps=S.gaps||null;
+    o.shot1=null;o.pages=null;              // пересобираются сами, а места занимают много
+    o.at=now;
+    localStorage.setItem(SAVE_KEY,JSON.stringify(o));
+  }catch(e){}
+}
+function load(){
+  try{
+    const o=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');
+    if(!o||!o.step||o.step==='intro')return false;        // ничего не начато
+    if(o.at&&Date.now()-o.at>30*24*3600*1000)return false;   // слишком старое
+    const step=SAFE_STEP[o.step];if(!step)return false;
+    const picks={};
+    for(const [k,arr] of SAVE_PICKS){
+      const id=(o.ids||{})[k];
+      if(id==null){picks[k]=null;continue}
+      const v=arr().find(x=>x.id===id);
+      if(!v)return false;                                 // библиотека изменилась
+      picks[k]=v;
+    }
+    const whole=picks.hero&&picks.place&&picks.time&&picks.mood&&picks.prop&&picks.style
+      &&picks.fA&&picks.fB&&picks.fC;
+    if(SAFE_WHOLE[step]&&!whole)return false;
+    Object.keys(o).forEach(k=>{if(k!=='ids'&&k!=='at'&&k!=='step'&&k!=='shared')S[k]=o[k]});
+    Object.assign(S,picks);
+    S.shots=o.shots||[];S.frames=o.frames||[];S.gaps=o.gaps||null;
+    S.pages=null;S.shot1=null;S.shared=false;S.step=step;
+    return true;
+  }catch(e){return false}
+}
+function wipe(){try{localStorage.removeItem(SAVE_KEY)}catch(e){}}
 function doGen(next){generate(()=>{go(next)})}
 
 function render(){
@@ -679,6 +746,7 @@ function render(){
   if(st==='intro'){
     B().innerHTML=`<div class="center">
       <div style="width:150px;height:150px;margin-bottom:6px">${'<svg viewBox="0 0 300 200" style="width:100%;height:100%;border-radius:20px">'+svgBG(PLACES[0],TIMES[0],9,false,null)+'</svg>'}</div>
+      <div class="kick">Мастерская Nooka · 8–12 лет</div>
       <h1 class="h1">Твоя история</h1>
       <p class="lead">Мы сделаем книжку с картинками.\nНо все детали для неё я разобрал —\nони лежат на столе.</p>
       <div class="card" style="text-align:left">
@@ -742,7 +810,7 @@ function render(){
 
   if(st==='name'){
     B().innerHTML=say(`У него есть всё. Кроме имени.\nИмя я придумать не могу — я не знаю, какой он на самом деле. Знаешь только ты.`)
-      +`<input class="field" id="fn" maxlength="16" placeholder="Как его зовут?" value="${S.name}" autocomplete="off">
+      +`<input class="field" id="fn" maxlength="16" placeholder="Как его зовут?" value="${A(S.name)}" autocomplete="off">
         <button class="txtbtn" onclick="suggestName()">Не придумывается</button>`;
     F().innerHTML=`<button class="btn nk-btn nk-btn--cta" onclick="saveName()">Дальше</button>`;
     setTimeout(()=>{const f=$('fn');if(f){f.oninput=()=>{};f.focus()}},120);
@@ -790,7 +858,7 @@ function render(){
   if(st==='title'){
     const sug=titleSuggest();
     B().innerHTML=say('Как называется?')
-      +`<input class="field" id="ft" maxlength="40" placeholder="Название книжки" value="${S.title}" autocomplete="off">
+      +`<input class="field" id="ft" maxlength="40" placeholder="Название книжки" value="${A(S.title)}" autocomplete="off">
         <div class="card"><div class="mini" style="margin-bottom:9px;font-weight:800">Подскажи</div>
         ${sug.map(t=>`<button class="opt" style="min-height:46px;font-size:14.5px" onclick="setTitle(this)">${t}</button>`).join('')}</div>`;
     F().innerHTML=`<button class="btn nk-btn nk-btn--cta" onclick="S.title=($('ft').value||sugFallback());go('line')">Дальше</button>`;
@@ -800,16 +868,16 @@ function render(){
   if(st==='line'){
     B().innerHTML=`<div class="scene">${scene(S,{angle:'close',seed:S.seed+3*17})}</div>`
       +say('Один вопрос, и я отстану. В самый страшный момент — что твой герой сказал?')
-      +`<input class="field" id="fl" maxlength="60" placeholder="Например: «Я не боюсь»" value="${S.line}" autocomplete="off">`;
+      +`<input class="field" id="fl" maxlength="60" placeholder="Например: «Я не боюсь»" value="${A(S.line)}" autocomplete="off">`;
     F().innerHTML=`<button class="btn nk-btn nk-btn--cta" onclick="S.line=$('fl').value;go('author')">Дальше</button>`;
     setTimeout(()=>$('fl')&&$('fl').focus(),120);return;
   }
 
   if(st==='author'){
     B().innerHTML=say('И последнее. Кто это сделал?')
-      +`<input class="field" id="fa" maxlength="20" placeholder="Твоё имя" value="${S.author}" autocomplete="off">
-        <input class="field" id="fg" maxlength="2" inputmode="numeric" placeholder="Сколько тебе лет" value="${S.age}">
-        <input class="field" id="fw" maxlength="30" placeholder="Для кого эта история? (можно пропустить)" value="${S.forwho}">`;
+      +`<input class="field" id="fa" maxlength="20" placeholder="Твоё имя" value="${A(S.author)}" autocomplete="off">
+        <input class="field" id="fg" maxlength="2" inputmode="numeric" placeholder="Сколько тебе лет" value="${A(S.age)}">
+        <input class="field" id="fw" maxlength="30" placeholder="Для кого эта история? (можно пропустить)" value="${A(S.forwho)}">`;
     F().innerHTML=`<button class="btn nk-btn nk-btn--cta" onclick="finishBook()">Собрать книжку</button>`;
     return;
   }
@@ -905,12 +973,12 @@ function renderArt(){
   let html=`<div class="bookwrap"><div class="pages" id="pgs">`;
   // обложка
   html+=`<div class="page"><div class="cover"><div class="scene">${scene(S,{angle:'cover'})}</div>
-    <div class="cover-b"><div class="cover-t">${S.title||'Моя история'}</div>
-    <div class="cover-a">Автор: ${S.author}${S.age?', '+S.age+' лет':''} · ${dstr}</div></div></div></div>`;
+    <div class="cover-b"><div class="cover-t">${E(S.title||'Моя история')}</div>
+    <div class="cover-a">Автор: ${E(S.author)}${S.age?', '+E(S.age)+' лет':''} · ${dstr}</div></div></div></div>`;
   // страницы
   pages.forEach((p,i)=>{
     html+=`<div class="page"><div class="scene">${scene(S,{seed:S.seed+i*17,compose:(S.shots||[])[i]||null,angle:(S.shots||[])[i]&&S.shots[i].done?'full':(i===1?'close':i===4?'far':'full')})}</div>
-      <div class="page-txt">${p}${(S.shots||[])[i]&&S.shots[i].note&&S.shots[i].note.trim()?'<span class="mytag">твои слова</span>':''}${i===3&&S.line?`<div style="margin-top:10px;background:var(--accbg);border-radius:13px;padding:9px 13px;font-weight:800;color:var(--acc)">— ${S.line}</div>`:''}</div></div>`;
+      <div class="page-txt">${p}${(S.shots||[])[i]&&S.shots[i].note&&S.shots[i].note.trim()?'<span class="mytag">твои слова</span>':''}${i===3&&S.line?`<div style="margin-top:10px;background:var(--accbg);border-radius:13px;padding:9px 13px;font-weight:800;color:var(--acc)">— ${E(S.line)}</div>`:''}</div></div>`;
   });
   // разворот «как придумал»
   html+=`<div class="page"><div class="howp"><div class="howp-h">Как я это придумал</div>
@@ -937,7 +1005,7 @@ function renderArt(){
   </div></div>`;
   // последняя
   html+=`<div class="page"><div class="lastp">
-    ${S.forwho?`<div class="forwho">Для ${S.forwho}</div>`:''}
+    ${S.forwho?`<div class="forwho">Для ${E(S.forwho)}</div>`:''}
     <div class="uniq">Таких историй, как твоя:<br>1 из ${comb}</div>
     <div class="uniq-f">12 героев × 8 мест × 6 времён × 6 настроений × 14 вещей × 8 стилей × 6 × 6 × 6 поворотов</div>
     <div class="honest">Иллюстрации собраны из библиотеки Nooka.<br>Историю придумал автор.</div>
@@ -953,10 +1021,12 @@ function renderArt(){
     ? `<button class="btn nk-btn nk-btn--cta" onclick="location.href=location.pathname">Сделать свою историю</button>`
     : `<div class="btnrow"><button class="btn nk-btn nk-btn--soft nk-btn--sm" onclick="savePoster()">Картинка</button><button class="btn nk-btn nk-btn--cta nk-btn--sm" onclick="go('film')">Мультик</button><button class="btn nk-btn nk-btn--soft nk-btn--sm" onclick="go('reveal')">Дальше</button></div>`;
   $('htitle').textContent=S.shared?('Книжка · '+(S.author||'друг')):'Моя книжка';
+  posterToGallery();
 }
 
-/* постер в PNG — то, что ребёнок реально уносит и показывает */
-function savePoster(){
+/* постер — то, что ребёнок реально уносит и показывает. Собираем его
+   отдельно от сохранения: тот же холст уходит и в коллекцию ребёнка. */
+function buildPoster(done){
   const W=1080,H=1080,IMGH=720;
   const cv=document.createElement('canvas'); cv.width=W; cv.height=H;
   const cx=cv.getContext('2d');
@@ -981,16 +1051,28 @@ function savePoster(){
       let l=S.line; if(l.length>32)l=l.slice(0,31)+'…'; cx.fillText('« '+l+' »',W/2,IMGH+218)}
     cx.fillStyle='#C4B4A2'; cx.font='700 26px Nunito, system-ui, sans-serif';
     cx.fillText('Мастерская Nooka · nookagame.ru',W/2,IMGH+308);
-    cv.toBlob(b=>{
-      const a=document.createElement('a');
-      a.href=URL.createObjectURL(b);
-      a.download=(S.title||'moya-istoriya').replace(/[^\wа-яА-ЯёЁ -]/g,'')+'.png';
-      document.body.appendChild(a); a.click();
-      setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove()},1500);
-    },'image/png');
+    done(cv);
   };
-  img.onerror=()=>alert('Не получилось сохранить картинку');
+  img.onerror=()=>done(null);
   img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+}
+/* Кнопка «Картинка»: на iPhone ссылка с download молча не качает ничего,
+   поэтому отдаём через общий nookaShare и честно говорим, что вышло. */
+function savePoster(){
+  buildPoster(cv=>{
+    if(!cv){nookaShare.toast('Картинка не собралась. Сними экран — она тоже останется.');return}
+    nookaShare.saveCanvasAndSay(cv,{name:S.title,def:'moya-istoriya',title:S.title||'Моя история'});
+  });
+}
+/* Книжка попадает в коллекцию ребёнка сама — он ничего не нажимает.
+   Повторно не ляжет: nookaShare.toGallery проверяет, нет ли уже такой. */
+function posterToGallery(){
+  if(S.shared)return;
+  buildPoster(cv=>{
+    if(!cv)return;
+    nookaShare.toGallery(cv,{kind:'poster',game:'Твоя история',
+      title:S.title||'Моя история',note:'Историю придумал сам — от героя до последней строки'});
+  });
 }
 function share(){
   const enc=[S.hero.id,S.place.id,S.time.id,S.mood.id,S.prop.id,S.style.id,
@@ -1033,7 +1115,7 @@ function renderReveal(){
 }
 function startTable(){
   S.seed=1000+Math.floor(Math.random()*9000);
-  S.step='table'; render();
+  S.step='table';save(); render();
 }
 /* из стола — в книжку. Чего не собрал, Нейро закрывает своим перекосом */
 function toBook(){
@@ -1139,7 +1221,7 @@ function tableHTML(){
     <div class="rail" id="rail">
       <div class="rail-arc"></div>
       <div class="rail-cart" id="cart">☀️</div>
-      <div class="rail-lbl" id="raillbl">${cap(T6.n)}</div>
+      <div class="rail-lbl${S.time?'':' off'}" id="raillbl">${S.time?cap(S.time.n):'время не выбрано'}</div>
     </div>
     ${needHTML()}
     <div class="filmwrap">
@@ -2156,25 +2238,9 @@ function filmMime(){
 function filmCanRecord(){
   return !!(typeof MediaRecorder!=='undefined'&&HTMLCanvasElement.prototype.captureStream&&filmMime());
 }
-async function filmDeliver(blob){
-  const ext=(blob.type||'').indexOf('mp4')>=0?'mp4':'webm';
-  const fname=((S.title||'moy-multik').replace(/[^\wа-яА-ЯёЁ -]/g,'').trim()||'multik')+'.'+ext;
-  try{
-    if(navigator.canShare&&window.File){
-      const file=new File([blob],fname,{type:blob.type||'video/mp4'});
-      if(navigator.canShare({files:[file]})){
-        await navigator.share({files:[file],title:S.title||'Мой мультик'});
-        return 'share';
-      }
-    }
-  }catch(e){}
-  try{
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a'); a.href=url; a.download=fname;
-    document.body.appendChild(a); a.click();
-    setTimeout(()=>{URL.revokeObjectURL(url);a.remove()},2000);
-    return 'download';
-  }catch(e){return 'fail'}
+/* Отдаём мультик через общий nookaShare — он решает, поделиться или скачать. */
+function filmDeliver(blob){
+  return nookaShare.saveBlob(blob,{name:S.title,def:'multik',kind:'video',title:S.title||'Мой мультик'});
 }
 
 function filmPlay(canvas,record,onTime){
@@ -2240,8 +2306,7 @@ function filmShow(record){
       if(blob&&blob.size){
         if(st)st.textContent='Сохраняю…';
         filmDeliver(blob).then(how=>{
-          if(st)st.textContent=how==='share'?'Отправил — выбери «Сохранить видео».'
-            :how==='download'?'Мультик скачан.':'Сохранить не вышло, но посмотреть можно сколько угодно.';
+          if(st)st.textContent=nookaShare.word(how,'video');
           filmButtons();
         });
       }else{ if(st)st.textContent=''; filmButtons(); }
@@ -2285,7 +2350,7 @@ function studioHTML(){
       <div class="frames5">${[0,1,2,3,4].map(k=>
         `<button class="f5${k===i?' on':''}${S.shots&&S.shots[k]&&S.shots[k].done?' has':''}" onclick="studioGo(${k})">${k+1}</button>`).join('')}</div>
       <input class="field" id="shotnote" maxlength="60" placeholder="Что здесь происходит? Твоими словами"
-        value="${(sh.note||'').replace(/"/g,'&quot;')}" oninput="shotOf(${i}).note=this.value;shotOf(${i}).done=true">
+        value="${A(sh.note||'')}" oninput="shotOf(${i}).note=this.value;shotOf(${i}).done=true">
       <div class="bench-res">Твоих кадров: ${(S.shots||[]).filter(x=>x&&x.done).length} из 5</div>
     </div>`;
 }
@@ -2319,7 +2384,7 @@ function studioBind(){
   });
 }
 function openPuzzle(id){
-  CUR=id; S.step='pz'; render();
+  CUR=id; S.step='pz';save(); render();
 }
 function refreshPuzzle(){
   const box=$('pzbody'); if(!box||!CUR)return;
@@ -2348,7 +2413,7 @@ function finishPuzzle(id){
   T.done[id]=1; T.aha=id;
   stopPuzzle(); CUR=null;
   dropJunkQueued=id;
-  S.step='table'; render();
+  S.step='table';save(); render();
 }
 let dropJunkQueued=null;
 /* планка кадров обновляется прямо во время пазла */
@@ -2384,14 +2449,22 @@ function openShared(){
     S.fA=a1;S.fB=b1;S.fC=c1;
     S.seed=parseInt(P[9],10)||4821;
     S.living=P[10]==='1';
-    S.name=q.get('n')||cap(h.n);
-    S.title=q.get('t')||'История';
-    S.author=q.get('by')||'';
+    /* Чужие строки из адреса идут в разметку как есть, поэтому угловые
+       скобки и кавычки вырезаем: по ссылке нельзя подсунуть разметку. */
+    const fromLink=(v,max)=>String(v||'').replace(/[<>&"'`]/g,'').trim().slice(0,max);
+    S.name=fromLink(q.get('n'),24)||cap(h.n);
+    S.title=fromLink(q.get('t'),40)||'История';
+    S.author=fromLink(q.get('by'),24);
     S.shared=true;
     S.pages=makeStory(S);
-    S.step='art';
+    S.step='art';save();
     return true;
   }catch(e){return false}
 }
-openShared();
-render();
+/* Порядок важен: чужая книжка по ссылке главнее своей сохранённой работы,
+   и своя при этом остаётся в хранилище — её не затирают. */
+if(!openShared()&&load()){
+  const was=S.step;S.step='intro';render();
+  F().innerHTML=`<div class="btnrow"><button class="btn nk-btn nk-btn--soft nk-btn--sm" onclick="wipe();location.href=location.pathname">Заново</button>`
+    +`<button class="btn nk-btn nk-btn--cta nk-btn--sm" onclick="go('${was}')">Продолжить</button></div>`;
+}else render();

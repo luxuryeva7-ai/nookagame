@@ -7,6 +7,10 @@ function rng(s){let x=s>>>0;return()=>{x=(x+0x6D2B79F5)>>>0;let t=x;t=Math.imul(
 function pick(r,a){return a[Math.floor(r()*a.length)]}
 function rint(r,a,b){return a+Math.floor(r()*(b-a+1))}
 function cap(s){return s?s.charAt(0).toUpperCase()+s.slice(1):''}
+/* Слова ребёнка обратно в поле: кавычка в названии обрубала value="…"
+   и напечатанное пропадало. A() — экранирование значения атрибута. */
+const A=v=>(window.nooka&&nooka.attr?nooka.attr(v):String(v==null?'':v));
+const E=v=>(window.nooka&&nooka.esc?nooka.esc(v):String(v==null?'':v));
 const $=id=>document.getElementById(id);
 const B=()=>$('body'), F=()=>$('foot');
 const INK='#3A2A18', W1='#F2E4CC', W2='#D9BE94', ACC1='#E08A3C', ACC2='#6E9E7A';
@@ -272,7 +276,7 @@ function go(step){S.step=step;render();window.scrollTo({top:0});save()}
 
 /* автосохранение: звонок посреди урока — норма */
 function save(){try{const o=Object.assign({},S);o.thing=S.thing?Array.from(S.thing):null;o.mem={pos:S.mem.pos.map(v=>Array.from(v)),neg:S.mem.neg.map(v=>Array.from(v))};o.shift=null;localStorage.setItem('nooka_m3',JSON.stringify(o))}catch(e){}}
-function load(){try{const o=JSON.parse(localStorage.getItem('nooka_m3')||'null');if(!o||!o.child)return false;
+function load(){try{const o=JSON.parse(localStorage.getItem('nooka_m3')||'null');if(!o||!o.step||o.step==='intro')return false;   // имя необязательно: судим по шагу, а не по имени
   Object.assign(S,o);S.thing=o.thing?Uint8Array.from(o.thing):null;S.mem={pos:(o.mem.pos||[]).map(v=>Uint8Array.from(v)),neg:(o.mem.neg||[]).map(v=>Uint8Array.from(v))};S.step='floor';return true}catch(e){return false}}
 function wipe(){try{localStorage.removeItem('nooka_m3')}catch(e){}}
 
@@ -329,9 +333,10 @@ function render(){
   if(st==='intro'){
     B().innerHTML=`<div class="center">
       <div class="ill">${illCeh()}</div>
+      <div class="kick">Мастерская Nooka · 8–12 лет</div>
       <h1 class="h1">Профессия будущего</h1>
       <p class="lead">Соберём цех — цепь из деталей ИИ.\nОна работает сама. А ты решишь, где в ней место человеку.</p>
-      <input class="field" id="fn" maxlength="14" placeholder="Как тебя зовут?" value="${S.child}" oninput="S.child=this.value" autocomplete="off">
+      <input class="field" id="fn" maxlength="14" placeholder="Как тебя зовут?" value="${A(S.child)}" oninput="S.child=this.value" autocomplete="off">
       <div class="chips" style="justify-content:center">${[8,9,10,11,12].map(a=>`<button class="chip${S.age==a?' on':''}" onclick="S.age=${a};render()">${a}</button>`).join('')}</div></div>`;
     F().innerHTML=`<button class="btn nk-btn nk-btn--cta" onclick="startIt()">Заступить на смену</button>`;
     return;
@@ -383,7 +388,7 @@ function render(){
   if(st==='pass'){renderPass();return}
   if(st==='end'){
     B().innerHTML=say('Внутри ИИ — не волшебство. Цепь из деталей, каждую из которых ты собрал руками.\nИ одно место, где сидит человек. Ты сам его выбрал.','happy')
-      +`<div class="pz"><div class="rowlbl" style="margin-top:0">Что ты собрал</div>${[['Глаз',S.thingName||'—'],['Память',(S.mem.pos.length+S.mem.neg.length)+' примеров'],['Решатель','черта — '+(S.thr<0.45?'мягко':S.thr>0.72?'строго':'посередине')],['Рука',S.actionPhrase||(S.gest&&S.gest.n)||'—'],['Стул',S.human?NODEN[S.human].toLowerCase():'—'],['Роль',S.human?ROLE[S.human]:'—'],['Мир',WORLDS[worldOf()].n],['Напарник',S.botName||'—']].map(([k,v])=>`<div class="sumrow"><span class="sumk">${k}</span><span class="sumv">${v}</span></div>`).join('')}${rulesHTML()}${S.title?`<div class="sumttl">«${S.title}»${S.name?' · '+S.name:''}</div>`:''}</div>
+      +`<div class="pz"><div class="rowlbl" style="margin-top:0">Что ты собрал</div>${[['Глаз',E(S.thingName)||'—'],['Память',(S.mem.pos.length+S.mem.neg.length)+' примеров'],['Решатель','черта — '+(S.thr<0.45?'мягко':S.thr>0.72?'строго':'посередине')],['Рука',E(S.actionPhrase)||(S.gest&&S.gest.n)||'—'],['Стул',S.human?NODEN[S.human].toLowerCase():'—'],['Роль',S.human?ROLE[S.human]:'—'],['Мир',WORLDS[worldOf()].n],['Напарник',E(S.botName)||'—']].map(([k,v])=>`<div class="sumrow"><span class="sumk">${k}</span><span class="sumv">${v}</span></div>`).join('')}${rulesHTML()}${S.title?`<div class="sumttl">«${E(S.title)}»${S.name?' · '+E(S.name):''}</div>`:''}</div>
       <div class="lead" style="text-align:center;margin-top:18px">Мастерская Nooka · «Профессия будущего»</div><div style="text-align:center;margin-top:6px"><button class="txtbtn" onclick="location.href=WS_HUB">В мастерскую</button></div>`;
     F().innerHTML=`<div class="btnrow" style="margin-bottom:8px"><button class="btn nk-btn nk-btn--soft nk-btn--sm" onclick="go('pass')">К паспорту</button><button class="btn nk-btn nk-btn--soft nk-btn--sm" onclick="wipe();location.reload()">Всё заново</button></div><button class="btn nk-btn nk-btn--cta" onclick="go('run')">Дёрнуть рычаг снова</button>`;
     return;
@@ -498,7 +503,7 @@ function eyeHTML(){
       <div class="feat" id="feat"></div>
       <div class="rowlbl">Что вижу я — сто чисел</div><div class="numgrid" id="numgrid"></div>
       <div class="pixbtns"><button class="btn nk-btn nk-btn--soft nk-btn--sm" onclick="pixMirror()">Зеркало</button><button class="btn nk-btn nk-btn--soft nk-btn--sm" onclick="pixClear()">Стереть</button></div>
-      <input class="field" id="thingname" maxlength="18" placeholder="Что это? Одним словом" value="${S.thingName}" oninput="S.thingName=this.value.trim();eyeCheck()"></div>`;
+      <input class="field" id="thingname" maxlength="18" placeholder="Что это? Одним словом" value="${A(S.thingName)}" oninput="S.thingName=this.value.trim();eyeCheck()"></div>`;
 }
 function eyeBind(){
   const cv=$('pixcv'); if(!cv)return;
@@ -692,7 +697,7 @@ function handHTML(){
       <div class="feat" id="hgfeat"></div>
       <div class="note" id="hgread" style="min-height:0"></div>
       <div id="hgphrase" style="display:none"><div class="rowlbl">Что делает рука — твоими словами</div>
-        <input class="field" id="hgtext" maxlength="30" placeholder="например: чистит зубы" value="${S.actionPhrase}" oninput="S.actionPhrase=this.value.trim();handCheck()" style="margin-top:0"></div></div>`;
+        <input class="field" id="hgtext" maxlength="30" placeholder="например: чистит зубы" value="${A(S.actionPhrase)}" oninput="S.actionPhrase=this.value.trim();handCheck()" style="margin-top:0"></div></div>`;
 }
 function handBind(){
   const cv=$('hgcv'); if(!cv)return;
@@ -791,22 +796,22 @@ function toName(){fillGaps();go('name')}
 function titleDraft(){return ROLE[S.human]+' нейросети, которая '+(S.actionPhrase||S.gest.n)}
 function chainLine(){
   const a=S.actionPhrase||S.gest.n;
-  if(S.human==='hand')return `Машина видит ${S.thingName}, помнит примеры и режет по черте. А ${a} — ты.`;
-  return `Машина видит ${S.thingName}, помнит примеры, режет по черте и ${a}. Одна деталь в цепи живая — ${NODEN[S.human].toLowerCase()}. Это ты.`;
+  if(S.human==='hand')return `Машина видит ${E(S.thingName)}, помнит примеры и режет по черте. А ${a} — ты.`;
+  return `Машина видит ${E(S.thingName)}, помнит примеры, режет по черте и ${a}. Одна деталь в цепи живая — ${NODEN[S.human].toLowerCase()}. Это ты.`;
 }
 function renderName(){
   $('htitle').textContent='Как называется';
   B().innerHTML=say(S.gaps&&S.gaps.length?'Чего не собрал — я добрал сам: '+S.gaps.join(', ')+'.\nНазвать профессию могу только с тобой.':(S.botName?S.botName+' готов. ':'Цепь готова. ')+'Назвать профессию могу только с тобой.','think')
     +`<div class="pz"><div class="rowlbl" style="margin-top:0">Профессия — любое слово, хоть смешное</div>
-      <input class="field" id="ptitle" maxlength="34" placeholder="Как называется?" value="${S.title}" oninput="S.title=this.value" style="margin-top:0">
+      <input class="field" id="ptitle" maxlength="34" placeholder="Как называется?" value="${A(S.title)}" oninput="S.title=this.value" style="margin-top:0">
       <div class="mini" style="margin-top:6px">Черновик машины: <button class="txtbtn" style="display:inline;padding:0 4px;font-size:15px" onclick="S.title=titleDraft();$('ptitle').value=S.title">${titleDraft()}</button></div>
       <div class="rowlbl">Что делаю я, чего машина не умеет</div>
-      <input class="field" id="pmine" maxlength="60" placeholder="Одна строка" value="${S.mine}" oninput="S.mine=this.value" style="margin-top:0">
+      <input class="field" id="pmine" maxlength="60" placeholder="Одна строка" value="${A(S.mine)}" oninput="S.mine=this.value" style="margin-top:0">
       <div class="rowlbl">Имя героя</div>
-      <input class="field" id="pname" maxlength="14" placeholder="Как его зовут?" value="${S.name}" oninput="S.name=this.value" style="margin-top:0">
+      <input class="field" id="pname" maxlength="14" placeholder="Как его зовут?" value="${A(S.name)}" oninput="S.name=this.value" style="margin-top:0">
       <button class="txtbtn" onclick="S.name=pick(rng(performance.now()|0),NAMES);$('pname').value=S.name">Дай случайное</button>
       <div class="rowlbl">Что он говорит, заступая на смену</div>
-      <input class="field" id="pline" maxlength="40" placeholder="Одна фраза" value="${S.line}" oninput="S.line=this.value" style="margin-top:0">
+      <input class="field" id="pline" maxlength="40" placeholder="Одна фраза" value="${A(S.line)}" oninput="S.line=this.value" style="margin-top:0">
       <div class="mini" style="margin-top:12px;text-align:center">${chainLine()}</div></div>`;
   F().innerHTML=`<button class="btn nk-btn nk-btn--cta" onclick="if(!S.title)S.title=titleDraft();if(!S.name)S.name=pick(rng(S.seed),NAMES);go('run')">К рычагу</button>`;
 }
@@ -1104,15 +1109,14 @@ function filmSave(){
       ctx.fillStyle='#C4B4A2';ctx.font='700 16px Nunito, sans-serif';ctx.fillText('Мастерская Nooka · nookagame.ru',FW/2,FH*0.87)}
     const b=$('fbar');if(b)b.style.width=Math.round(t/(total+3200)*100)+'%';
     if(t>=total+3200){FILM.on=0;RUN.items=saveItems;RUN.seated=saveSeated;RUN.waiting=saveWait;RUN.phase='fin';
-      const fin=blob=>{if(blob&&blob.size)filmDeliver(blob).then(how=>{if(st)st.textContent=how==='share'?'Отправил — выбери «Сохранить видео».':how==='download'?'Ролик скачан.':'Сохранить не вышло.';runFinish()});else{if(st)st.textContent='';runFinish()}};
+      const fin=blob=>{if(blob&&blob.size)filmDeliver(blob).then(how=>{if(st)st.textContent=nookaShare.word(how,'video');runFinish()});else{if(st)st.textContent='';runFinish()}};
       if(rec&&rec.state!=='inactive'){rec.onstop=()=>fin(new Blob(chunks,{type:filmMime()}));rec.stop()}else fin(null);return}
     requestAnimationFrame(loop)};
   requestAnimationFrame(loop);
 }
-async function filmDeliver(blob){
-  const ext=(blob.type||'').indexOf('mp4')>=0?'mp4':'webm',fname=((S.title||'moy-ceh').replace(/[^\wа-яА-ЯёЁ -]/g,'').trim()||'ceh')+'.'+ext;
-  try{if(navigator.canShare&&window.File){const f=new File([blob],fname,{type:blob.type||'video/mp4'});if(navigator.canShare({files:[f]})){await navigator.share({files:[f],title:S.title});return 'share'}}}catch(e){}
-  try{const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=fname;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(u);a.remove()},2000);return 'download'}catch(e){return 'fail'}
+/* Отдаём ролик через общий nookaShare — он же решает, поделиться или скачать. */
+function filmDeliver(blob){
+  return nookaShare.saveBlob(blob,{name:S.title,def:'ceh',kind:'video',title:S.title||'Мой цех'});
 }
 
 /* ═══ НАПАРНИК: рождение робота из деталей и три правила ═══ */
@@ -1157,7 +1161,7 @@ function renderBirth(){
       ${ids.map((id,i)=>{const [l,t]=BSLOT[id];return `<div class="bpart" style="left:${l}px;top:${t}px;--dx:${startX[i]-22-l}px;--dy:${308-t}px;animation-delay:${(.25+i*.4).toFixed(2)}s">${toolGlyph(id,44)}</div>`}).join('')}
       <div class="bbot" id="bbot">${svgBot({id:'b'})}</div></div>
     <div class="botsay" id="botsay"></div>
-    <div id="bname" style="display:none"><div class="rowlbl">Как его зовут?</div><input class="field" id="botname" maxlength="14" placeholder="Имя напарника" value="${S.botName||''}" oninput="S.botName=this.value.trim();botNameCheck()" style="margin-top:0" autocomplete="off"><button class="txtbtn" onclick="S.botName=pick(rng(performance.now()|0),BOTNAMES);$('botname').value=S.botName;botNameCheck()">Дай случайное</button></div></div>
+    <div id="bname" style="display:none"><div class="rowlbl">Как его зовут?</div><input class="field" id="botname" maxlength="14" placeholder="Имя напарника" value="${A(S.botName||'')}" oninput="S.botName=this.value.trim();botNameCheck()" style="margin-top:0" autocomplete="off"><button class="txtbtn" onclick="S.botName=pick(rng(performance.now()|0),BOTNAMES);$('botname').value=S.botName;botNameCheck()">Дай случайное</button></div></div>
     <div class="note" id="pznote"></div>`;
   F().innerHTML=`<button class="btn nk-btn nk-btn--cta" id="birthBtn" onclick="birthDone()" disabled>Познакомились →</button>`;
   setTimeout(()=>{const b=$('bbot');if(!b)return;b.classList.add('on');[...document.querySelectorAll('.bpart')].forEach(p=>p.classList.add('gone'));botSpeak()},2600);
@@ -1192,7 +1196,7 @@ function renderRules(){
 function rulePick(el,k){[...document.querySelectorAll('.opt')].forEach(o=>o.classList.remove('on'));el.classList.add('on');RULE.pick=RQ[RULE.i].opts[k];const f=$('ruleown');if(f)f.value='';const b=$('ruleBtn');if(b)b.disabled=false}
 function ruleOwn(v){v=v.trim();const b=$('ruleBtn');if(v.length>=3){[...document.querySelectorAll('.opt')].forEach(o=>o.classList.remove('on'));RULE.pick=v;if(b)b.disabled=false}else if(!document.querySelector('.opt.on')){RULE.pick='';if(b)b.disabled=true}}
 function ruleSave(){if(!RULE.pick)return;S.rules[RULE.i]=RULE.pick;save();renderRules()}
-function rulesHTML(){return (S.rules&&S.rules.length)?`<div class="rowlbl">Правила для напарника${S.botName?' · '+S.botName:''}</div>${S.rules.map((r,i)=>`<div class="rulerow"><span class="rulen">${i+1}</span><span>${r}</span></div>`).join('')}`:''}
+function rulesHTML(){return (S.rules&&S.rules.length)?`<div class="rowlbl">Правила для напарника${S.botName?' · '+E(S.botName):''}</div>${S.rules.map((r,i)=>`<div class="rulerow"><span class="rulen">${i+1}</span><span>${E(r)}</span></div>`).join('')}`:''}
 function renderRulesDone(){
   B().innerHTML=sayBot('Запомнил. Теперь у меня есть то, чего не было: зачем.')
     +`<div class="pz">${rulesHTML()}<button class="txtbtn" onclick="S.rules=[];save();renderRules()">Переписать</button></div>
@@ -1241,8 +1245,11 @@ function renderPass(){wsDone();
   B().innerHTML=say('Вот твой паспорт. Здесь всё, что ты собрал руками — и место, которое оставил себе.','happy')+`<div class="passwrap"><canvas id="pcv"></canvas></div>`;
   F().innerHTML=`<div class="btnrow"><button class="btn nk-btn nk-btn--soft nk-btn--sm" onclick="savePass()">Картинка</button><button class="btn nk-btn nk-btn--cta nk-btn--sm" onclick="go('end')">Дальше</button></div>`;
   passDraw($('pcv'));
+  /* паспорт уходит в коллекцию ребёнка — его видят и он, и родители */
+  nookaShare.toGallery($('pcv'),{kind:'item',game:'Профессия будущего',
+    title:S.title||'Моя профессия',note:'Придумал профессию и собрал себе напарника'});
 }
-function savePass(){const cv=$('pcv');if(!cv)return;cv.toBlob(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=(S.title||'passport').replace(/[^\wа-яА-ЯёЁ -]/g,'')+'.png';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500)},'image/png')}
+function savePass(){const cv=$('pcv');if(!cv)return;nookaShare.saveCanvasAndSay(cv,{name:S.title,def:'passport',title:S.title||'Паспорт профессии'})}
 
 /* ═══════════════ НАВИГАЦИЯ И СТАРТ ═══════════════ */
 $('back').onclick=()=>{

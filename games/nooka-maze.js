@@ -49,6 +49,9 @@ const ITEMS=[
  {id:'coin',n:'монета',a:'монету',ap:'монеты',c:'#F2C337',sh:'circ'},
  {id:'box',n:'деревянная коробка',a:'деревянную коробку',ap:'деревянные коробки',c:'#B08A56',sh:'box'},
 ];
+/* Беглец для цели «Догнать». В списке ITEMS его нет: ребёнок его не выбирает,
+   он появляется сам, когда цель — догнать. */
+const RUNNER={id:'runner',n:'беглец',a:'беглеца',ap:'беглецов',c:'#F2A33C',sh:'run'};
 const OBST=[
  {id:'drone',n:'сторожевой дрон',g:'сторожевого дрона',ic:'🛸',mode:'patrol',sp:.8,c:'#8A6BC4'},
  {id:'spike',n:'колючий шар',g:'колючего шара',ic:'💥',mode:'bounce',sp:1,c:'#D14545'},
@@ -103,16 +106,21 @@ const PALETTES=[
 const S={step:'s0',name:'',hero:null,goal:null,world:null,item:null,obst:null,help:null,
  tempo:'normal',scoreRule:SCORE_RULES[0],loseRule:LOSE_RULES[0],ifCond:null,ifThen:null,
  title:'',palette:PALETTES[0],cover:'start',seed:1234,record:0,lastScore:0,lastGot:0,
-abRound:0,abPair:null,abResults:{},decisions:0,frames:{},story:'',ending:'',runs:0,tab:'in'};
+abRound:0,abPair:null,abResults:{},decisions:0,frames:{},story:'',ending:'',runs:0,tab:'in',
+ shared:false,author:'',authorRecord:0};
 const STEPS=['s0','s1','s2','s3','s4','s5','s6'];
 
 /* ═══════════ УТИЛИТЫ ═══════════ */
+/* Слова ребёнка обратно в поле: кавычка в названии обрубала value="…"
+   и напечатанное пропадало. A() — экранирование значения атрибута. */
+const A=v=>(window.nooka&&nooka.attr?nooka.attr(v):String(v==null?'':v));
+const E=v=>(window.nooka&&nooka.esc?nooka.esc(v):String(v==null?'':v));
 const $=id=>document.getElementById(id);
 const B=()=>$('body'), F=()=>$('foot');
 function rng(seed){let s=seed>>>0;return()=>{s=(s+0x6D2B79F5)>>>0;let t=s;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
 function rint(r,a,b){return a+Math.floor(r()*(b-a+1))}
 function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
-function toast(t){const e=document.createElement('div');e.className='toast';e.textContent=t;document.body.appendChild(e);setTimeout(()=>e.remove(),2200)}
+function toast(t){nookaShare.toast(t)}   // плашка одна на все мастерские — games/nooka-share.js
 
 
 /* ═══════════ РИСОВАНИЕ СПРАЙТОВ ═══════════ */
@@ -154,6 +162,10 @@ function drawItem(ctx,x,y,r,it){
   else if(S1==='shard'){ctx.beginPath();ctx.moveTo(-r*.6,-r);ctx.lineTo(r*.7,-r*.4);ctx.lineTo(r*.3,r);ctx.lineTo(-r*.5,r*.3);ctx.closePath();ctx.fill()}
   else if(S1==='feath'){ctx.beginPath();ctx.ellipse(0,0,r*.45,r,0,0,7);ctx.fill()}
   else if(S1==='lamp'){ctx.fillRect(-r*.35,-r*.3,r*.7,r*1.1);ctx.beginPath();ctx.moveTo(-r*.6,-r*.3);ctx.lineTo(r*.6,-r*.3);ctx.lineTo(r*.3,-r*.85);ctx.lineTo(-r*.3,-r*.85);ctx.closePath();ctx.fill()}
+  else if(S1==='run'){   // беглец: кругляш с глазами, смотрит прочь от героя
+    ctx.beginPath();ctx.arc(0,0,r,0,7);ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,.9)';[-1,1].forEach(k=>{ctx.beginPath();ctx.arc(k*r*.3,-r*.12,r*.2,0,7);ctx.fill()});
+    ctx.fillStyle='#2B2118';[-1,1].forEach(k=>{ctx.beginPath();ctx.arc(k*r*.3,-r*.1,r*.1,0,7);ctx.fill()})}
   ctx.restore();
 }
 function drawObst(ctx,x,y,r,o,tick){
@@ -220,6 +232,26 @@ function bfsDist(g,from){
 
 /* ═══════════ ИГРОВОЙ ДВИЖОК ═══════════ */
 const G={raf:0,run:0,acc:0,last:0,tick:0,onEnd:null};
+/* ═══════════ ЧТО ЛЕЖИТ НА КАРТЕ ═══════════
+   Предметы раньше появлялись при любой цели — даже когда цель про них не
+   говорит. Нарисованы они не были (рисование шло только при выбранном
+   предмете), но очки давали и могли закончить забег сами собой.
+   Теперь каждая цель говорит, что на карте и сколько. */
+function itemOf(cfg){
+  const g=cfg.goal?cfg.goal.id:'collect';
+  if(g==='chase')return RUNNER;
+  if(g==='survive'||g==='escape')return null;
+  /* «Набрать очки» живёт за счёт предметов, но свой предмет ребёнок там не
+     выбирает — кладём монеты. */
+  return cfg.item||ITEMS.find(i=>i.id==='coin')||ITEMS[0];
+}
+function itemsFor(cfg,asked){
+  if(cfg.gray)return 0;
+  const g=cfg.goal?cfg.goal.id:'collect';
+  if(g==='survive'||g==='escape')return 0;     // там цель не про предметы
+  if(g==='chase')return 3;                     // трое убегающих — догнать можно за минуту
+  return asked;
+}
 function startGame(cfg){
   stopGame();
   const wrap=$('arena');if(!wrap)return;
@@ -229,7 +261,7 @@ function startGame(cfg){
   const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
   const cell=size/VIEW;   // клетка считается от окна обзора, а не от всей карты
   const W=cfg.world||WORLDS[0], H=cfg.hero, T=TEMPO[cfg.tempo||'normal'];
-  const itemCount=cfg.gray?0:(cfg.itemCount!==undefined?cfg.itemCount:14);
+  const itemCount=itemsFor(cfg,cfg.gray?0:(cfg.itemCount!==undefined?cfg.itemCount:14));
   const lvl=cfg.gray?{grid:emptyGrid(),start:{x:5,y:5},items:[],exit:null,help:null,free:[]}
                     :genLevel(cfg.seed||1234,itemCount);
   if(!lvl)return;
@@ -356,8 +388,20 @@ function step(dt){
 
   // сбор предметов
   const pull=st.ruleFired&&cfg.ifThen&&cfg.ifThen.id==='pull';
+  const chasing=cfg.goal&&cfg.goal.id==='chase';
   st.items.forEach(it=>{
     if(it.got)return;
+    /* Беглец отбегает, пока видит героя; у стены сворачивает в сторону. */
+    if(chasing){
+      const d=Math.hypot(it.x-st.p.x,it.y-st.p.y);
+      if(d<5.5&&d>.05){
+        const sp=(T.sp/30)*.52;
+        if(!moveWithWalls(it,(it.x-st.p.x)/d*sp,(it.y-st.p.y)/d*sp,lvl.grid)){
+          it.a=(it.a||Math.random()*6.283)+1.9;
+          moveWithWalls(it,Math.cos(it.a)*sp,Math.sin(it.a)*sp,lvl.grid);
+        }
+      }
+    }
     if(pull||(cfg.help&&cfg.help.id==='magnet')){
       const d=Math.hypot(it.x-st.p.x,it.y-st.p.y);
       if(d<(pull?99:2.2)&&d>.05){it.x+=(st.p.x-it.x)/d*.09;it.y+=(st.p.y-it.y)/d*.09}}
@@ -405,6 +449,9 @@ function step(dt){
   const goal=cfg.goal?cfg.goal.id:'collect';
   if(goal==='collect'&&st.items.length&&st.items.every(i=>i.got))endGame(1);
   if(goal==='score'&&st.score>=100)endGame(1);
+  /* Раньше у «Догнать» условия победы не было вообще: забег всегда
+     заканчивался проигрышем по времени. */
+  if(goal==='chase'&&st.items.length&&st.items.every(i=>i.got))endGame(1);
   if((goal==='escape'||goal==='deliver')&&st.exit){
     const ok=goal==='escape'||st.carried>0;
     if(ok&&Math.hypot(st.exit.x-st.p.x,st.exit.y-st.p.y)<.7)endGame(1);
@@ -480,7 +527,6 @@ function endGame(win){
   if(st.over)return;
   st.over=1;st.win=win?1:0;
   if(cfg.scoreRule&&cfg.scoreRule.id==='time'&&win)st.score+=Math.floor(st.left)*5;
-  if(win)
   G.run=0;
   captureFrame('finish');
   setTimeout(()=>{stopGame();G.onEnd&&G.onEnd(st)},420);
@@ -534,15 +580,16 @@ function draw(){
     ctx.font=Math.round(cell*.6)+'px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.fillText('🚪',st.exit.x*cell,st.exit.y*cell);
   }
-  // предметы
-  if(cfg.item)st.items.forEach((it,k)=>{if(it.got)return;
+  // предметы (или беглецы — смотря какая цель)
+  const IT=itemOf(cfg);
+  if(IT)st.items.forEach((it,k)=>{if(it.got)return;
     const ph=G.tick*.055+k*1.3;
     const bob=Math.sin(ph)*cell*.07;
     ctx.save();
-    ctx.globalAlpha=.28;ctx.fillStyle=cfg.item.c;
+    ctx.globalAlpha=.28;ctx.fillStyle=IT.c;
     ctx.beginPath();ctx.ellipse(it.x*cell,it.y*cell+cell*.24,cell*.2,cell*.07,0,0,7);ctx.fill();
     ctx.globalAlpha=1;
-    drawItem(ctx,it.x*cell,it.y*cell+bob,cell*.28*(1+Math.sin(ph)*.05),cfg.item);
+    drawItem(ctx,it.x*cell,it.y*cell+bob,cell*.28*(1+Math.sin(ph)*.05),IT);
     ctx.restore()});
   // помощник
   if(st.help&&!st.help.got&&cfg.help)drawHelp(ctx,st.help.x*cell,st.help.y*cell,cell*.3,cfg.help,G.tick);
@@ -586,16 +633,19 @@ function draw(){
   if(!cfg.gray&&!st.over&&st.intro<=0){
     let best=null,bd=1e9;
     st.items.forEach(it=>{if(it.got)return;const d=Math.hypot(it.x-st.p.x,it.y-st.p.y);if(d<bd){bd=d;best=it}});
+    /* «Найти выход» — всегда к двери. «Донести» — к двери, когда вещь уже
+       в руках, и к ближайшей вещи, пока рук пустые. */
     if(st.exit&&cfg.goal&&(cfg.goal.id==='escape'||cfg.goal.id==='deliver')){
-      const d=Math.hypot(st.exit.x-st.p.x,st.exit.y-st.p.y);
-      if(!best||(cfg.goal.id==='escape'))({}); if(!best||d<bd){bd=d;best=st.exit}
+      if(cfg.goal.id==='escape'||st.carried>0){
+        best=st.exit;bd=Math.hypot(st.exit.x-st.p.x,st.exit.y-st.p.y);
+      }
     }
     if(best&&bd>VIEW*0.42){
       const hx=size/2, hy=size/2;
       const a=Math.atan2(best.y-st.p.y,best.x-st.p.x);
       const rad=size*0.4;
       ctx.save();ctx.translate(hx+Math.cos(a)*rad,hy+Math.sin(a)*rad);ctx.rotate(a);
-      ctx.globalAlpha=.75;ctx.fillStyle=cfg.item?cfg.item.c:'#F2C337';
+      ctx.globalAlpha=.75;ctx.fillStyle=(best===st.exit)?'#4ED99B':((itemOf(cfg)||{c:'#F2C337'}).c);
       ctx.beginPath();ctx.moveTo(cell*.34,0);ctx.lineTo(-cell*.2,cell*.2);ctx.lineTo(-cell*.2,-cell*.2);
       ctx.closePath();ctx.fill();ctx.restore();
     }
@@ -710,8 +760,66 @@ function assemble(after){
 }
 
 /* ═══════════ ЭКРАНЫ ═══════════ */
-function go(s){S.step=s;stopGame();render();window.scrollTo({top:0,behavior:'smooth'})}
-function pct(){return Math.round(STEPS.indexOf(S.step)/(STEPS.length-1)*100)}
+function go(s){S.step=s;stopGame();render();window.scrollTo({top:0,behavior:'smooth'});save()}
+function pct(){return Math.max(0,Math.round(STEPS.indexOf(S.step)/(STEPS.length-1)*100))}
+
+/* ═══════════ АВТОСОХРАНЕНИЕ ═══════════
+   Мастерская идёт больше получаса, а телефон у ребёнка в любой момент
+   уходит на звонок и выбрасывает вкладку из памяти. Поэтому на каждом шаге
+   складываем состояние: предметы — по их id, остальное как есть.
+
+   Восстанавливаемся не в тот же миг, а на спокойный экран: середина
+   анимации или запущенная игра после перезагрузки дают сломанный вид.
+   И только по кнопке — ребёнок сам решает, продолжить или начать заново. */
+const SAVE_KEY='nooka_m2';
+/* Куда можно вернуть ребёнка с каждого шага. Экраны сборки и забеги
+   сами по себе не восстанавливаются — отправляем на ближайший устойчивый. */
+const SAFE_STEP={s0:'s0',s1:'s1',s2:'s2',s3:'s3',s4:'s4',s5:'s5',s6:'s6',
+ v0:'s1',v1:'s2',v2:'s3',tempo:'s3',howto:'s3',
+ abplay:'s4',abnext:'s4',abpick:'s4',s4b:'s4',ifthen:'s4',ruletest:'s4',ruledone:'s4',
+ play:'free',played:'free',free:'free',story:'free'};
+function save(){
+  if(S.shared)return;                      // чужая игра не затирает свою работу
+  try{
+    const o={};
+    Object.keys(S).forEach(k=>{if(S[k]===null||typeof S[k]!=='object')o[k]=S[k]});
+    o.ids={};
+    LINK_FIELDS.forEach(f=>{o.ids[f.k]=S[f.k]?S[f.k].id:null});
+    o.frames=S.frames||{};
+    o.abResults=S.abResults||{};
+    o.at=Date.now();
+    localStorage.setItem(SAVE_KEY,JSON.stringify(o));
+  }catch(e){
+    /* место кончилось — кадры самые тяжёлые, пробуем без них */
+    try{const o=JSON.parse(localStorage.getItem(SAVE_KEY)||'{}');o.frames={};
+      localStorage.setItem(SAVE_KEY,JSON.stringify(o))}catch(e2){}
+  }
+}
+function load(){
+  try{
+    const o=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');
+    if(!o||!o.step||o.step==='s0')return false;          // ничего не начато
+    if(o.at&&Date.now()-o.at>30*24*3600*1000)return false;  // слишком старое
+    const step=SAFE_STEP[o.step];if(!step)return false;
+    const found={};
+    for(const f of LINK_FIELDS){
+      const id=(o.ids||{})[f.k];
+      if(id==null){found[f.k]=null;continue}
+      const v=f.arr().find(x=>x.id===id);
+      if(!v)return false;                                 // список деталей изменился
+      found[f.k]=v;
+    }
+    /* «Мастерская» и паспорт собираются только из полного набора */
+    const whole=found.hero&&found.world&&found.goal&&found.scoreRule&&found.loseRule;
+    if((step==='free'||step==='s5'||step==='s6')&&!whole)return false;
+    Object.keys(o).forEach(k=>{if(k!=='ids'&&k!=='at'&&k!=='step'&&k!=='shared')S[k]=o[k]});
+    Object.assign(S,found);
+    S.frames=o.frames||{};S.abResults=o.abResults||{};S.abPair=null;
+    S.step=step;S.shared=false;
+    return true;
+  }catch(e){return false}
+}
+function wipe(){try{localStorage.removeItem(SAVE_KEY)}catch(e){}}
 
 function arenaHTML(rule,live){
   return `<div class="arena-wrap" id="arena">
@@ -797,7 +905,7 @@ function cfgNow(extra){
 
 function render(){
   $('pbar').style.width=pct()+'%';
-  $('back').style.visibility=S.step==='s0'?'hidden':'visible';
+  $('back').style.visibility=(S.step==='s0'||S.step==='shared')?'hidden':'visible';
   const st=S.step;
 
   if(st==='s0'){
@@ -807,9 +915,10 @@ function render(){
         <svg viewBox="0 0 150 150" style="position:absolute;inset:0;width:100%;height:100%"><g fill="none" stroke="#3A2A18" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20 h110 v110 h-110 z"/><path d="M50 20 v60 M50 80 h30 M80 50 v60 M110 50 v50 h-30 M20 110 h30"/></g><circle cx="128" cy="128" r="9" fill="#2E9E5B" stroke="#2B2118" stroke-width="3"/></svg>
         <div style="position:absolute;width:26px;height:26px;border-radius:50%;background:#E65C00;border:3px solid #2B2118;top:22px;left:22px;animation:drift 3.4s ease-in-out infinite alternate"></div>
       </div>
+      <div class="kick">Мастерская Nooka · 8–12 лет</div>
       <h1 class="h1">Мастерская: своя игра</h1>
       <p class="lead">Сегодня ты не игрок.\nСегодня ты тот, кто игру <b>заказывает</b>.</p>
-      <input class="field" id="nm" maxlength="16" placeholder="Как тебя зовут?" value="${S.name}">
+      <input class="field" id="nm" maxlength="16" placeholder="Как тебя зовут?" value="${A(S.name)}">
     </div>
     <style>@keyframes drift{from{transform:translate(0,0)}to{transform:translate(0,58px)}}</style>`;
     F().innerHTML=`<button class="btn nk-btn nk-btn--cta" onclick="S.name=($('nm').value||'Автор').trim();go('s1')">Я готов</button>`;
@@ -928,6 +1037,18 @@ function render(){
     return;
   }
 
+  /* Игра, пришедшая по ссылке: сначала говорим, чья она и по каким правилам,
+     и только потом даём играть — иначе ребёнок не понимает, во что попал. */
+  if(st==='shared'){
+    $('htitle').textContent='Игра друга';
+    B().innerHTML=say(S.author?('Это игра '+S.author+'. Называется «'+S.title+'».')
+                              :('Это чужая игра. Называется «'+S.title+'».'))
+      +`<div class="pcard" style="font-size:14.5px;line-height:1.5">${promptText()}</div>`
+      +(S.authorRecord?`<div class="result" style="margin-top:10px">Рекорд автора: <b style="color:var(--acc)">${S.authorRecord}</b></div>`:'');
+    F().innerHTML=`<button class="btn nk-btn nk-btn--cta" onclick="runV3()">▶ Играть</button>
+      <button class="txtbtn" onclick="location.href=location.pathname">Собрать свою игру</button>`;
+    return;
+  }
   if(st==='play'){
     $('htitle').textContent='Твоя игра';
     B().innerHTML=arenaHTML(S.ifCond&&S.ifThen?('Твоё правило: когда '+S.ifCond.when):'',true);
@@ -937,10 +1058,21 @@ function render(){
   if(st==='played'){
     $('htitle').textContent='Результат';
     const best=Math.max(S.record,S.lastScore);S.record=best;
+    /* В чужой игре сравниваем с рекордом автора, а не со своим: ребёнок
+       только что прочитал его на входе и ждёт именно это сравнение. */
     B().innerHTML=`<div class="result"><div class="result-big">${S.lastScore}</div>
-      <div class="result-sub">${S.lastWin?'Получилось!':'Не успел'} · рекорд ${best}</div></div>`
-      +say(S.lastWin?'Твоя игра работает. И правила в ней — твои.':'Попробуй ещё. Или оставь как есть — это твоя игра.');
-    F().innerHTML=`<div class="btnrow"><button class="btn nk-btn nk-btn--soft nk-btn--sm" onclick="runV3()">Ещё раз</button>
+      <div class="result-sub">${S.lastWin?'Получилось!':'Не успел'} · ${S.shared
+        ? (S.authorRecord?'рекорд автора '+S.authorRecord:'твой лучший '+best)
+        : 'рекорд '+best}</div></div>`
+      +say(S.shared
+        ? (S.lastWin?'Получилось! Правила тут придумал не ты — попробуй собрать свою игру.'
+                    :'Не успел. Правила тут чужие — собери свою игру и задай их сам.')
+        : (S.lastWin?'Твоя игра работает. И правила в ней — твои.'
+                    :'Попробуй ещё. Или оставь как есть — это твоя игра.'));
+    F().innerHTML=S.shared
+      ? `<div class="btnrow"><button class="btn nk-btn nk-btn--soft nk-btn--sm" onclick="runV3()">Ещё раз</button>
+      <button class="btn nk-btn nk-btn--cta nk-btn--sm" onclick="location.href=location.pathname">Собрать свою игру</button></div>`
+      : `<div class="btnrow"><button class="btn nk-btn nk-btn--soft nk-btn--sm" onclick="runV3()">Ещё раз</button>
       <button class="btn nk-btn nk-btn--cta nk-btn--sm" onclick="go('free')">Что-нибудь поменять</button></div>`
       +`<button class="txtbtn" onclick="go('s5')">Готово, хочу паспорт →</button>`;
     return;
@@ -978,7 +1110,7 @@ function render(){
     $('htitle').textContent='Название';
     B().innerHTML=say('Игре нужно имя.\nВозьми готовое или напиши своё.')
       +`<div class="chips">${titles().map(t=>`<button class="chip${S.title===t?' on':''}" onclick="S.title='${t.replace(/'/g,"\\'")}';S.decisions++;render()">${t}</button>`).join('')}</div>`
-      +`<input class="field" id="tt" maxlength="24" placeholder="…или своё название" value="${S.title}">`
+      +`<input class="field" id="tt" maxlength="24" placeholder="…или своё название" value="${A(S.title)}">`
       +`<div style="margin-top:16px;font-size:11px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3)">Рамка</div>
         <div class="chips">${PALETTES.map((p,i)=>`<button class="chip${S.palette.id===p.id?' on':''}" onclick="S.palette=PALETTES[${i}];render()" style="border-color:${p.ac}">${['Тёплая','Ночная','Мятная','Ягодная'][i]}</button>`).join('')}</div>`;
     F().innerHTML=`<button class="btn nk-btn nk-btn--cta" onclick="S.title=($('tt').value||titles()[0]).trim();go('s6')">Сделать паспорт</button>`;
@@ -1185,9 +1317,9 @@ function renderPassport(){wsDone();
   B().innerHTML=`<div class="passport">
     <div class="pp-cover" style="background:${P.bg}">
       <canvas id="cover" width="360" height="240"></canvas>
-      <div class="pp-title">${S.title}</div>
+      <div class="pp-title">${E(S.title)}</div>
     </div>
-    <div class="pp-by">Автор: ${S.name}</div>
+    <div class="pp-by">Автор: ${E(S.name)}</div>
     <div class="pp-then">
       <div class="pp-fr"><canvas id="fr0" width="92" height="92"></canvas><span>2 слова</span></div>
       <div class="pp-ar">→</div>
@@ -1212,6 +1344,9 @@ function renderPassport(){wsDone();
       <button class="btn nk-btn nk-btn--soft nk-btn--sm" onclick="go('free')">Доработать</button>
       <button class="btn nk-btn nk-btn--soft nk-btn--sm" onclick="savePng()">Сохранить картинку</button></div>`;
   drawCover();
+  /* обложка уходит в коллекцию ребёнка — её видят и он, и родители */
+  nookaShare.toGallery($('cover'),{kind:'item',game:'Своя игра',
+    title:S.title||'Моя игра',note:'Собрал игру сам: герой, мир и правила'});
 }
 function drawCover(){
   const c=$('cover');if(!c)return;
@@ -1232,16 +1367,42 @@ function drawCover(){
     if(S.item)drawItem(b,70,66,9,S.item);
     drawHero(b,46,50,17,S.hero)}
 }
+/* ═══════════ ССЫЛКА ДРУГУ ═══════════
+   Игра укладывается в 12 символов. Упаковка и распаковка идут по одной
+   таблице: две разные таблицы разъезжаются, и ссылка начинает открывать
+   не ту игру. В алфавите ровно 32 символа — пять бит на символ без потерь
+   (в прежнем алфавите их было 31, и каждый шестнадцатый набор бит портился).
+   Поля со флагом opt кодируют «нет» нулём: игра без помехи так и останется
+   без помехи, а не получит первую помеху из списка. */
+const LINK_ALPHA='23456789abcdefghjkmnpqrstuvwxyz1';
+const LINK_VER=2;
+const TEMPO_KEYS=['calm','normal','fast'];
+const LINK_FIELDS=[
+ {k:'hero',     bits:4, arr:()=>HEROES},
+ {k:'world',    bits:3, arr:()=>WORLDS},
+ {k:'goal',     bits:3, arr:()=>GOALS},
+ {k:'item',     bits:4, arr:()=>ITEMS,       opt:1},
+ {k:'obst',     bits:3, arr:()=>OBST,        opt:1},
+ {k:'help',     bits:3, arr:()=>HELP,        opt:1},
+ {k:'scoreRule',bits:2, arr:()=>SCORE_RULES},
+ {k:'loseRule', bits:2, arr:()=>LOSE_RULES},
+ {k:'ifCond',   bits:3, arr:()=>IF_COND,     opt:1},
+ {k:'ifThen',   bits:3, arr:()=>IF_THEN,     opt:1},
+ {k:'palette',  bits:2, arr:()=>PALETTES},
+];
 function encode(){
-  const idx=(arr,v)=>Math.max(0,arr.findIndex(a=>a.id===(v&&v.id)));
-  const bits=[[1,4],[idx(HEROES,S.hero),4],[idx(WORLDS,S.world),3],[idx(GOALS,S.goal),3],
-    [idx(ITEMS,S.item),4],[idx(OBST,S.obst),4],[idx(HELP,S.help),3],
-    [idx(SCORE_RULES,S.scoreRule),2],[idx(LOSE_RULES,S.loseRule),2],
-    [{calm:0,normal:1,fast:2}[S.tempo],2],[idx(IF_COND,S.ifCond),3],[idx(IF_THEN,S.ifThen),3],
-    [S.seed&4095,12],[Math.min(1023,S.record),10]];
-  let s='';bits.forEach(([v,n])=>{s+=(v>>>0).toString(2).padStart(n,'0')});
-  const A='23456789abcdefghjkmnpqrstuvwxyz';
-  let out='';for(let i=0;i<s.length;i+=5)out+=A[parseInt(s.slice(i,i+5).padEnd(5,'0'),2)%31];
+  let bits='';
+  const put=(v,n)=>{bits+=(Math.max(0,v|0)>>>0).toString(2).padStart(n,'0').slice(-n)};
+  put(LINK_VER,4);
+  LINK_FIELDS.forEach(f=>{
+    const arr=f.arr(),cur=S[f.k],i=arr.findIndex(a=>a.id===(cur&&cur.id));
+    put(f.opt?(i<0?0:i+1):Math.max(0,i),f.bits);
+  });
+  put(Math.max(0,TEMPO_KEYS.indexOf(S.tempo)),2);
+  put(S.seed&4095,12);
+  put(Math.min(1023,S.record||0),10);
+  let out='';
+  for(let i=0;i<bits.length;i+=5)out+=LINK_ALPHA[parseInt(bits.slice(i,i+5).padEnd(5,'0'),2)];
   return out;
 }
 function share(){
@@ -1251,20 +1412,65 @@ function share(){
   else if(navigator.clipboard){navigator.clipboard.writeText(u);toast('Ссылка скопирована')}
   else toast('Скопируй адрес из строки браузера');
 }
+function decode(str){
+  const t=String(str||'').toLowerCase();
+  let bits='';
+  for(let i=0;i<t.length;i++){const k=LINK_ALPHA.indexOf(t[i]);if(k<0)return null;bits+=k.toString(2).padStart(5,'0')}
+  let p=0;
+  const take=n=>{const part=bits.slice(p,p+n);if(part.length<n)throw 0;p+=n;return parseInt(part,2)};
+  try{
+    if(take(4)!==LINK_VER)return null;            // ссылка другого формата
+    const out={};
+    LINK_FIELDS.forEach(f=>{
+      const arr=f.arr(),v=take(f.bits);
+      if(f.opt){out[f.k]=v===0?null:(arr[v-1]||null)}
+      else{const o=arr[v];if(!o)throw 0;out[f.k]=o}
+    });
+    out.tempo=TEMPO_KEYS[take(2)]||'normal';
+    out.seed=take(12)||1234;
+    out.authorRecord=take(10);
+    return out;
+  }catch(e){return null}
+}
+/* Чужое название из адреса: в разметку оно идёт как есть, поэтому угловые
+   скобки и кавычки вырезаем — по ссылке нельзя подсунуть разметку. */
+function fromLink(v,max){return String(v||'').replace(/[<>&"'`]/g,'').trim().slice(0,max||40)}
+/* Игра, открытая по ссылке друга. Не восстановится — молча начинаем свою:
+   ребёнку нужен рабочий экран, а не сообщение об ошибке. */
+function openShared(){
+  try{
+    const q=new URLSearchParams(location.search);
+    const g=q.get('g');if(!g)return false;
+    const d=decode(g);if(!d)return false;
+    Object.assign(S,d);
+    S.title=fromLink(q.get('n'),40)||titles()[0];
+    S.author=fromLink(q.get('by'),16);
+    S.record=0;S.runs=0;S.decisions=0;
+    S.shared=true;S.step='shared';
+    return true;
+  }catch(e){return false}
+}
+/* Через общий nookaShare: на телефоне Apple ссылка с download молча ничего
+   не делает, а раньше мы при этом писали «Сохранено». */
 function savePng(){
   const c=$('cover');if(!c)return;
-  try{c.toBlob(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);
-    a.download=(S.title||'moya-igra')+'.png';a.click();
-    setTimeout(()=>URL.revokeObjectURL(a.href),3000);toast('Сохранено')})}
-  catch(e){toast('Сделай скриншот — так быстрее')}
+  nookaShare.saveCanvasAndSay(c,{name:S.title,def:'moya-igra',title:S.title||'Моя игра'});
 }
 
 /* ═══════════ НАВИГАЦИЯ ═══════════ */
 $('back').onclick=()=>{
   stopGame();
+  if(S.shared){S.step='shared';render();return}
   const map={v0:'s1',s2:'s1',v1:'s2',s3:'s2',v2:'s3',tempo:'s3',howto:'s3',s4:'s4',free:'played',story:'free',
     abplay:'s4',abnext:'s4',abpick:'s4',ifthen:'s4',ruletest:'ifthen',ruledone:'ifthen',
     play:'ifthen',played:'ifthen',s5:'played',s6:'s5',s1:'s0'};
   const p=map[S.step]||'s0';S.step=p;render();
 };
-render();
+/* Порядок важен: ссылка друга главнее своей сохранённой работы, но своя
+   работа при этом не теряется — она остаётся в хранилище. */
+if(!openShared()&&load()){
+  const was=S.step;S.step='s0';render();
+  $('htitle').textContent='Своя игра';
+  F().innerHTML=`<div class="btnrow"><button class="btn nk-btn nk-btn--soft nk-btn--sm" onclick="wipe();location.href=location.pathname">Заново</button>`
+    +`<button class="btn nk-btn nk-btn--cta nk-btn--sm" onclick="go('${was}')">Продолжить</button></div>`;
+}else render();
