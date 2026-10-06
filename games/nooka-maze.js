@@ -777,6 +777,12 @@ function assemble(after){
 }
 
 /* ═══════════ ЭКРАНЫ ═══════════ */
+/* Забег идёт до 45 секунд, и всё это время в липком футере не было ни одной
+   кнопки: ребёнку, который уже понял или просто хочет дальше, некуда нажать.
+   «Пропустить» заканчивает забег тем же путём, что и время, — экран результата
+   и переход дальше остаются прежними. */
+function skipRun(){if(G.run&&G.st&&!G.st.over)endGame(0)}
+const SKIP_BTN='<button class="btn nk-btn nk-btn--soft nk-btn--sm" onclick="skipRun()">Пропустить</button>';
 function go(s){S.step=s;stopGame();render();window.scrollTo({top:0,behavior:'smooth'});save()}
 function pct(){return Math.max(0,Math.round(STEPS.indexOf(S.step)/(STEPS.length-1)*100))}
 
@@ -1006,7 +1012,7 @@ function render(){
     $('htitle').textContent=S.abRound===0?'Очки':'Проигрыш';
     const r=S.abPair[S.abIdx];
     B().innerHTML=arenaHTML('Правило '+(S.abIdx?'B':'A')+': '+r.n);
-    F().innerHTML='';
+    F().innerHTML=SKIP_BTN;
     return;
   }
   if(st==='abpick'){
@@ -1018,7 +1024,8 @@ function render(){
           <div class="ab-rule">${i?'B':'A'} — ${r.n}</div>
           <div class="ab-res">твой результат: ${S.abResults[i]!==undefined?S.abResults[i]+' очков':'—'}</div>
         </div>`).join('')}</div>`;
-    F().innerHTML='';
+    /* здесь забега нет — выбирают карточкой, кнопке «Пропустить» нечего делать */
+    F().innerHTML='<div class="hintbar">Выбери правило — тапни карточку</div>';
     return;
   }
 
@@ -1040,7 +1047,7 @@ function render(){
   if(st==='ruletest'){
     $('htitle').textContent='Проверка правила';
     B().innerHTML=arenaHTML('Твоё правило: когда '+S.ifCond.when+' — '+S.ifThen.then);
-    F().innerHTML='';
+    F().innerHTML=SKIP_BTN;
     return;
   }
   if(st==='ruledone'){
@@ -1069,7 +1076,7 @@ function render(){
   if(st==='play'){
     $('htitle').textContent='Твоя игра';
     B().innerHTML=arenaHTML(S.ifCond&&S.ifThen?('Твоё правило: когда '+S.ifCond.when):'',true);
-    F().innerHTML='';
+    F().innerHTML=SKIP_BTN;
     return;
   }
   if(st==='played'){
@@ -1249,7 +1256,7 @@ function runV1(){
   assemble(()=>{
     S.step='play1';S.step='v1';
     $('htitle').textContent='Твоя игра v1';
-    B().innerHTML=arenaHTML('');F().innerHTML='';
+    B().innerHTML=arenaHTML('');F().innerHTML=SKIP_BTN;
     $('pbar').style.width='42%';
     setTimeout(()=>startGame(cfgNow({obst:null,help:null,dur:40,onEnd:(st)=>{
       S.lastScore=st.score;S.lastGot=st.got;S.lastWin=st.win;
@@ -1264,7 +1271,7 @@ function runV1(){
 function runV2(){
   assemble(()=>{
     S.step='v2';$('htitle').textContent='Твоя игра v2';
-    B().innerHTML=arenaHTML('');F().innerHTML='';
+    B().innerHTML=arenaHTML('');F().innerHTML=SKIP_BTN;
     setTimeout(()=>startGame(cfgNow({dur:45,onEnd:(st)=>{
       S.lastScore=st.score;S.lastGot=st.got;go('tempo');
     }})),60);
