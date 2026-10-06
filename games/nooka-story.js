@@ -1332,7 +1332,7 @@ function initLamp(){
       c.style.textShadow=`${dx.toFixed(1)}px 3px 5px rgba(43,33,24,.32)`;
     });
   };
-  l.onpointerdown=e=>{drag=true;l.setPointerCapture(e.pointerId);e.preventDefault()};
+  l.onpointerdown=e=>{drag=true;try{l.setPointerCapture(e.pointerId)}catch(_){};e.preventDefault()};
   l.onpointermove=e=>{if(drag)move(e.clientX)};
   l.onpointerup=()=>{drag=false};
   move(($('tbl').getBoundingClientRect().left)+T.lamp);
@@ -1341,7 +1341,7 @@ function initLamp(){
 function initClutter(){
   document.querySelectorAll('.cl').forEach(el=>{
     let drag=false,ox=0,oy=0;
-    el.onpointerdown=e=>{drag=true;el.setPointerCapture(e.pointerId);
+    el.onpointerdown=e=>{drag=true;try{el.setPointerCapture(e.pointerId)}catch(_){};
       ox=e.clientX-parseFloat(el.style.left); oy=e.clientY-parseFloat(el.style.top);
       el.style.zIndex=30; el.style.transform='scale(1.18) rotate(-6deg)'; e.preventDefault()};
     el.onpointermove=e=>{if(!drag)return;
@@ -1376,7 +1376,7 @@ function initRail(){
     });
   };
   let drag=false;
-  const down=e=>{drag=true;rail.setPointerCapture(e.pointerId);set(e.clientX);e.preventDefault()};
+  const down=e=>{drag=true;try{rail.setPointerCapture(e.pointerId)}catch(_){};set(e.clientX);e.preventDefault()};
   rail.onpointerdown=down;
   rail.onpointermove=e=>{if(drag)set(e.clientX)};
   rail.onpointerup=()=>{drag=false};
@@ -1497,7 +1497,7 @@ function benchHTML(){
   return say(MEANING.bench.before,'idle')
    +`<div class="bench">
       <div class="bowl" id="bowl">${BENCH.bowl.length
-        ? BENCH.bowl.map(b=>`<span class="bw">${b.n||''}</span>`).join('')
+        ? BENCH.bowl.map(b=>`<span class="bw">${b.svg?`<i class="bw-p">${b.svg}</i>`:''}${b.n||''}</span>`).join('')
         : '<span class="bowl-h">брось сюда — или прямо одну деталь на другую</span>'}</div>
       ${rows.map(([k,t])=>`<div class="shelf-t">${t}</div>
         <div class="shelf" data-k="${k}">${BENCH.items.filter(i=>i.kind===k).map(i=>
@@ -1509,7 +1509,7 @@ function benchBind(){
   let drag=null,ghost=null;
   document.querySelectorAll('.bi').forEach(el=>{
     el.onpointerdown=e=>{
-      e.preventDefault(); el.setPointerCapture(e.pointerId);
+      e.preventDefault(); try{el.setPointerCapture(e.pointerId)}catch(_){};
       drag={el,id:el.dataset.id,x:e.clientX,y:e.clientY};
       ghost=el.cloneNode(true); ghost.className='bi ghost';
       document.body.appendChild(ghost); moveGhost(e.clientX,e.clientY);
@@ -1577,7 +1577,10 @@ function benchMerge(idA,idB){
   if(rec){
     const h=HEROES.find(x=>x.id===rec.hero);
     S.hero=h; BENCH.hero=h;
-    result={e:'🐾',n:h.n}; msg='Получился '+h.n+'. Хвост я помню словом «пушистый» — само слово, не картинку.';
+    /* Показываем, кто получился, рисунком: склеил две детали — и вот он,
+       живой. Раньше в миске была лапка-эмодзи и слово. */
+    result={e:'🐾',n:h.n,svg:`<svg viewBox="30 40 140 150">${svgHero(h,'brave',S.seed,S.style,null,1)}</svg>`};
+    msg=(h.sex==='f'?'Получилась ':'Получился ')+h.n+'. Хвост я помню словом «пушистый» — само слово, не картинку.';
   }
   // вещь + вещь → волшебный предмет
   const mg=MAGIC.find(r=>(r.a===idA&&r.b===idB)||(r.a===idB&&r.b===idA));
@@ -1922,7 +1925,7 @@ function glassStart(){
     GLASS.dirty=true;
     glassLive();
   };
-  cv.onpointerdown=e=>{drag=true;cv.setPointerCapture(e.pointerId);
+  cv.onpointerdown=e=>{drag=true;try{cv.setPointerCapture(e.pointerId)}catch(_){};
     GLASS.strokeLayer=null; GLASS.last={x:0,y:0,on:false};
     const r2=cv.getBoundingClientRect(); rub(e.clientX-r2.left,e.clientY-r2.top); e.preventDefault()};
   cv.onpointermove=e=>{if(!drag)return;
@@ -2376,8 +2379,16 @@ function shotOf(i){
 }
 function studioHTML(){
   const i=STUDIO.frame, sh=shotOf(i);
-  if(!(S.hero&&S.place))return say('Сначала найди героя и место — потом поставим кадр.','oops')
-    +'<div class="pznote">Загляни в Верстак и Стёкла.</div>';
+  /* Пустой экран без выхода — худшее, что может увидеть ребёнок:
+     даём кнопку прямо туда, где недостающее собирают. */
+  if(!(S.hero&&S.place)){
+    const need=!S.hero?'bench':'glass';
+    const nm=(STATIONS.find(x=>x.id===need)||{}).n||'занятие';
+    return say(!S.hero?'Сначала собери героя — без него кадр не поставить.'
+                      :'Герой есть, а места нет. Протри стёкла — и поставим кадр.','oops')
+      +`<div class="pznote">Нужно: ${!S.hero?'герой из «Верстака»':'место из «Стёкол»'}.</div>`
+      +`<button class="btn nk-btn nk-btn--cta" style="margin-top:12px" onclick="openPuzzle('${need}')">Открыть «${nm}» →</button>`;
+  }
   return say(i===0?MEANING.studio.before
                   :'Кадр '+(i+1)+' из 5. Ставь как хочешь.','happy')
    +`<div class="studio">
@@ -2414,7 +2425,7 @@ function studioBind(){
   [['dragh','h'],['dragp','p']].forEach(([id,kind])=>{
     const el=$(id); if(!el)return;
     let drag=false;
-    el.onpointerdown=e=>{drag=true;el.setPointerCapture(e.pointerId);el.classList.add('grab');e.preventDefault()};
+    el.onpointerdown=e=>{drag=true;try{el.setPointerCapture(e.pointerId)}catch(_){};el.classList.add('grab');e.preventDefault()};
     el.onpointermove=e=>{
       if(!drag)return;
       const r=wrap.getBoundingClientRect();
@@ -2446,7 +2457,10 @@ function bindPuzzle(id){
   if(id==='fresco')frescoBind();
   if(id==='studio')studioBind();
   if(!T.shown){T.shown={}}
-  if(!T.shown[id]){T.shown[id]=1; setTimeout(()=>demoHand(id),350)}
+  /* Подсказка-жест только там, где жест действительно нужен: на экране
+     «сначала собери герою место» она показывала, как двигать то, чего нет. */
+  const ready=id!=='studio'||(S.hero&&S.place);
+  if(!T.shown[id]&&ready){T.shown[id]=1; setTimeout(()=>demoHand(id),350)}
 }
 function stopPuzzle(){
   gaitStop();

@@ -245,8 +245,14 @@ html,body{height:100%;background:var(--bg);overflow-x:hidden}
 .ws-story .minep-f b{color:var(--acc)}
 .ws-story .minep-g{margin-top:11px;text-align:center;font-size:13.5px;font-weight:700;color:var(--ink3);line-height:1.45}
 .ws-story .mytag{display:inline-block;margin-left:7px;padding:2px 8px;border-radius:8px;background:var(--accbg); color:var(--acc);font-size:12px;font-weight:900;letter-spacing:.3px;text-transform:uppercase;vertical-align:middle}
-/* подсказка-рука висела у самого низа и зрительно накрывала кнопки */
+/* Подсказка-рука висела у нижнего края занятия — на телефоне это ровно
+   там, где кнопки, и казалось, что она их накрывает. Теперь она стоит
+   сверху, у самого места действия. Станции с анимацией руки (походка,
+   фреска) ставят её по-своему — их не трогаем. */
 .ws-story .demohand{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);z-index:40; pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:6px; transition:opacity .3s}
+/* В «Верстаке» занятие длинное: подсказка у нижнего края попадала ровно на
+   кнопки. Там поднимаем её к месту склейки. */
+.ws-story .demohand.bench{top:6px;bottom:auto;flex-direction:column-reverse}
 .ws-story .dh-f{font-size:38px;animation:handmove 1.9s ease-in-out infinite; filter:drop-shadow(0 3px 6px rgba(60,40,10,.4))}
 .ws-story .dh-t{background:rgba(43,33,24,.92);color:#fff;font-size:14px;font-weight:800; padding:7px 14px;border-radius:999px;white-space:nowrap;box-shadow:0 8px 20px -10px rgba(43,33,24,.8)}
 .ws-story .demohand.belt .dh-f{animation:handswipe 1.6s ease-in-out infinite}
@@ -843,6 +849,14 @@ body.ws{
 .ws .pp-lesson b,.ws .minep-f b{color:var(--acc)}
 /* время, которое ребёнок ещё не выбирал, не выдаём за выбранное */
 .ws .rail-lbl.off{opacity:.55;font-weight:700}
-/* короткий экран не прижимается к шапке: пустота уходит поровну вверх и вниз */
+/* Короткий экран не прижимается к шапке: свободное место делится поровну
+   сверху и снизу. Длинный экран не трогает — когда места нет, auto-отступы
+   обращаются в ноль, и ничего не уезжает за верхний край. */
 .ws .body{display:flex;flex-direction:column}
-.ws .body>.center{margin:auto 0}
+.ws .body>*:first-child{margin-top:auto}
+.ws .body>*:last-child{margin-bottom:auto}
+/* в миске «Верстака» показываем, что склеилось, рисунком — ребёнок видит
+   результат, а не слово */
+.ws-story .bw{display:inline-flex;flex-direction:column;align-items:center;gap:2px}
+.ws-story .bw-p{display:block;width:72px;height:78px}
+.ws-story .bw-p svg{width:100%;height:100%;display:block}

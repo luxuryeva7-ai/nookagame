@@ -979,7 +979,9 @@ function runStart(){
   B().innerHTML=say(MEANING.run.dur[0],'happy')+`<div class="filmwrap"><canvas id="fcv"></canvas><div class="film-bar"><i id="fbar"></i></div><div class="film-st" id="fst">Запускаю…</div></div><div class="askrow" id="askrow"></div>${S.human==='decider'?`<div class="dialrow" id="dialrow"><button class="txtbtn" onclick="runThr(-0.1)">← мягче</button><span id="thrword">черта: ${thrWord()}</span><button class="txtbtn" onclick="runThr(0.1)">строже →</button></div>`:''}
     <div class="switchrow"><label class="switch"><input type="checkbox" id="leaveSw" onchange="runLeave(this.checked)"><span></span></label><span class="switch-l">А без тебя?</span><span class="switch-c" id="errline"></span></div>
     <div class="note" id="pznote"></div>`;
-  F().innerHTML='';
+  /* Смена идёт до минуты, и всё это время в футере не было ни одной кнопки:
+     ребёнку, который захотел выйти, некуда было нажать. */
+  F().innerHTML=`<button class="btn nk-btn nk-btn--soft nk-btn--sm" onclick="stopRun();go('pass')">Остановить смену</button>`;
   const cv=$('fcv');cv.width=FW;cv.height=FH;if(S.human==='hand')runHandBind(cv);if(S.human==='eye')runEyeBind(cv);
   runAssets().then(A=>{RUN.A=A;RUN.items=runItems();RUN.beat=Math.max(650,Math.min(1600,S.beat?S.beat.mean:1000));RUN.phase='go';runLoop()}).catch(()=>{const st=$('fst');if(st)st.textContent='Не получилось запустить. Паспорт — дальше.';F().innerHTML=`<button class="btn nk-btn nk-btn--cta" onclick="go('pass')">К паспорту</button>`});
 }
