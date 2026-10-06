@@ -245,9 +245,10 @@ html,body{height:100%;background:var(--bg);overflow-x:hidden}
 .ws-story .minep-f b{color:var(--acc)}
 .ws-story .minep-g{margin-top:11px;text-align:center;font-size:13.5px;font-weight:700;color:var(--ink3);line-height:1.45}
 .ws-story .mytag{display:inline-block;margin-left:7px;padding:2px 8px;border-radius:8px;background:var(--accbg); color:var(--acc);font-size:12px;font-weight:900;letter-spacing:.3px;text-transform:uppercase;vertical-align:middle}
-.ws-story .demohand{position:absolute;left:50%;bottom:-4px;transform:translateX(-50%);z-index:40; pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:6px; transition:opacity .3s}
+/* подсказка-рука висела у самого низа и зрительно накрывала кнопки */
+.ws-story .demohand{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);z-index:40; pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:6px; transition:opacity .3s}
 .ws-story .dh-f{font-size:38px;animation:handmove 1.9s ease-in-out infinite; filter:drop-shadow(0 3px 6px rgba(60,40,10,.4))}
-.ws-story .dh-t{background:rgba(43,33,24,.92);color:#fff;font-size:15px;font-weight:800; padding:7px 14px;border-radius:999px;white-space:nowrap}
+.ws-story .dh-t{background:rgba(43,33,24,.92);color:#fff;font-size:14px;font-weight:800; padding:7px 14px;border-radius:999px;white-space:nowrap;box-shadow:0 8px 20px -10px rgba(43,33,24,.8)}
 .ws-story .demohand.belt .dh-f{animation:handswipe 1.6s ease-in-out infinite}
 .ws-story .demohand.fresco .dh-f{animation:handturn 2.2s linear infinite}
 .ws-story .bi.canfit{animation:fitpulse 1.1s ease-in-out infinite; filter:drop-shadow(0 0 7px rgba(46,158,91,.85))}
@@ -681,68 +682,56 @@ html,body{height:100%;background:var(--bg);overflow-x:hidden}
 .ws-prof .rulen{flex:none;width:26px;height:26px;border-radius:50%;background:var(--acc);color:#fff;font-weight:900;font-size:14px;display:flex;align-items:center;justify-content:center}
 
 /* ═══════════════════════════════════════════════════════════════════
-   ОБЛИК МАСТЕРСКИХ = облик курса (games/game.html)
+   ОБЛИК МАСТЕРСКИХ — тёплая светлая мастерская
 
-   Мастерские рисовались как бумажная мастерская: светлый фон, коричневые
-   линии, жёлтая кнопка. Рядом с игрой курса это выглядело чужой страницей.
-   Здесь весь корпус страницы переведён на язык курса — фиолетовый космос,
-   объёмные карточки со светлой гранью, сиреневая главная кнопка, —
-   а рисованные детали остаются тёплыми: они внутри рамки, как картина
-   на тёмной стене. Ломать механики при этом не требуется: меняется
-   только оформление.
+   Мастерская — это стол с бумагой, деталями и лампой, а не ночной космос:
+   всё, что ребёнок собирает, нарисовано тёплыми красками, и на светлом
+   столе оно живёт, а на тёмном висело случайными пятнами. Поэтому палитра
+   здесь своя, светлая, а от дизайн-системы курса берутся форма и объём:
+   круглые углы, мягкая тень, крупная кнопка, плашка-представление.
    ═══════════════════════════════════════════════════════════════════ */
 
-/* ── палитра: та же, что в хабе игры ── */
+/* ── палитра: бумага, дерево, тёплый оранжевый ── */
 .ws{
-  --bg:#0A0714;
-  --card:rgba(255,255,255,.055);
-  --card-2:rgba(255,255,255,.085);
-  --ink:#F3EEFF;--ink2:#A896C9;--ink3:#6E5C90;
-  --acc:#A98BFF;--acc-d:#7B4FF2;--accbg:rgba(169,139,255,.15);
-  --ok:#4ED99B;--okbg:rgba(78,217,155,.15);--bad:#FF6B6B;
-  --sun:#FFD84D;
-  --line:rgba(255,255,255,.1);
-  --pic:#8FC2FF;--snd:#C9A8FF;--num:#4ED99B;--txt:#FFD84D;
+  --bg:#FFF6E8;
+  --card:#FFFDF8;
+  --card-2:#FFF3E2;
+  --ink:#2B2118;--ink2:#5C4A38;--ink3:#8E7C68;
+  --acc:#E65C00;--acc-d:#C44D00;--accbg:#FFEEDC;
+  --ok:#2E9E5B;--okbg:#E4F6EA;--bad:#D93030;
+  --sun:#F5B700;
+  --line:rgba(150,110,60,.18);
+  --pic:#2F7FD0;--snd:#8A4FE0;--num:#2E9E5B;--txt:#C98A00;
   --brand:'Unbounded','Nunito',system-ui,sans-serif;
-  --sh:inset 0 0 0 1px rgba(255,255,255,.08),0 18px 38px -22px rgba(0,0,0,.9);
-  color-scheme:dark;
+  --sh:0 1px 0 rgba(150,110,60,.1),0 10px 24px -14px rgba(120,80,30,.45);
+  color-scheme:light;
 }
 
-/* ── фон: фиолетовая туманность и звёздная пыль, как на карте игры ── */
+/* ── фон: тёплая бумага со светом лампы сверху ── */
 html,body.ws{overflow:visible;overflow-x:clip;height:auto;min-height:100%}
 body.ws{
   background:
-    radial-gradient(1200px 600px at 50% -10%,rgba(123,79,242,.28),transparent 62%),
-    radial-gradient(700px 420px at 88% 18%,rgba(78,217,155,.10),transparent 60%),
-    linear-gradient(180deg,#141026 0%,#0D0A1A 46%,#08060F 100%) #0A0714;
+    radial-gradient(900px 420px at 50% -8%,rgba(255,226,170,.75),transparent 62%),
+    radial-gradient(600px 360px at 92% 24%,rgba(255,206,150,.35),transparent 60%),
+    linear-gradient(180deg,#FFF9F0 0%,#FFF6E8 46%,#FBEFDE 100%) #FFF6E8;
   background-attachment:fixed;
 }
-body.ws::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.5;
-  background-image:
-    radial-gradient(1.4px 1.4px at 12% 14%,#fff,transparent),
-    radial-gradient(1.2px 1.2px at 74% 8%,#fff,transparent),
-    radial-gradient(1.6px 1.6px at 33% 42%,#E9DFFF,transparent),
-    radial-gradient(1.1px 1.1px at 88% 55%,#fff,transparent),
-    radial-gradient(1.3px 1.3px at 58% 76%,#FFE9B8,transparent),
-    radial-gradient(1px 1px at 22% 88%,#fff,transparent),
-    radial-gradient(1.5px 1.5px at 95% 88%,#D9CCFF,transparent);}
 .ws .root{background:none;position:relative;z-index:1;max-width:520px}
 
 /* ── шапка ── */
-.ws .hdr{height:56px;padding:0 14px;background:rgba(10,7,20,.72);
+.ws .hdr{height:56px;padding:0 14px;background:rgba(255,246,232,.82);
   -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
-  box-shadow:0 1px 0 rgba(255,255,255,.07)}
+  box-shadow:0 1px 0 rgba(150,110,60,.14)}
 .ws .hdr-back{width:36px;height:36px;border-radius:50%;font-size:17px;
-  background:rgba(255,255,255,.07);color:#E9DFFF;
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+  background:#FFFDF8;color:var(--acc);box-shadow:0 1px 0 rgba(150,110,60,.18),inset 0 0 0 1px rgba(150,110,60,.14)}
 .ws .hdr-back:active{transform:scale(.94)}
 .ws .hdr-t{font-family:var(--brand);font-weight:700;font-size:15px;color:var(--ink);letter-spacing:-.01em}
 .ws .hdr-r{color:var(--ink3);font-size:12.5px}
-.ws .prog{height:3px;top:56px;background:rgba(255,255,255,.08)}
-.ws .prog i{height:3px;background:linear-gradient(90deg,#7B4FF2,#A98BFF 60%,#C9A8FF)}
+.ws .prog{height:3px;top:56px;background:rgba(150,110,60,.14)}
+.ws .prog i{height:3px;background:linear-gradient(90deg,#F5B700,#E65C00)}
 .ws .body{padding:4px 14px 10px}
 .ws .foot{padding:10px 14px calc(14px + env(safe-area-inset-bottom));
-  background:linear-gradient(180deg,rgba(10,7,20,0),#0A0714 42%)}
+  background:linear-gradient(180deg,rgba(255,246,232,0),#FFF6E8 42%)}
 
 /* ── заголовки и текст ── */
 .ws .h1{font-family:var(--brand);font-weight:700;font-size:25px;line-height:1.16;
@@ -750,12 +739,14 @@ body.ws::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .ws .lead{color:var(--ink2);font-size:15px;line-height:1.5}
 .ws .lead b,.ws .progline b,.ws .need-t b{color:var(--acc);font-weight:900}
 .ws .mini,.ws .note,.ws .pzgoal-t,.ws .cmp-cap{color:var(--ink3)}
-.ws .rowlbl,.ws .need-t,.ws .shelf-t,.ws .dial-l,.ws .tbl-title span{
+.ws .rowlbl,.ws .need-t,.ws .shelf-t,.ws .dial-l,.ws .patch-t{
   font-size:11.5px;font-weight:900;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3)}
-.ws .st-n,.ws .sumv,.ws .dk-v,.ws .mn-v{color:var(--ink)}
-.ws .st-s,.ws .sumk,.ws .dk-l,.ws .mn-k,.ws .rail-lbl,.ws .bw,.ws .ask-sub{color:var(--ink2)}
-.ws-prof .floor-t{color:var(--ink)}
-.ws-prof .floor-t span,.ws-story .tbl-title span{color:var(--ink3)}
+
+/* ── плашка-представление на входе ── */
+.ws .kick{display:inline-flex;align-items:center;gap:8px;margin-bottom:12px;
+  padding:6px 13px;border-radius:999px;font-weight:800;font-size:11.5px;
+  letter-spacing:.04em;text-transform:uppercase;color:var(--acc);
+  background:var(--accbg);box-shadow:inset 0 0 0 1px rgba(230,92,0,.18)}
 
 /* ── Нейро говорит ── */
 .ws .say-b{background:var(--card);border-radius:18px;padding:12px 14px;color:var(--ink2);
@@ -764,124 +755,94 @@ body.ws::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 
 /* ── карточки ── */
 .ws .card,.ws .pcard,.ws .pzgoal,.ws .result,.ws .abcard,.ws .howp,.ws .minep,.ws .lastp,
-.ws .bench-res,.ws .ab-res,.ws .gait-read,.ws .explain,.ws .pz,.ws .live,.ws .duo,.ws .tally{
+.ws .bench-res,.ws .ab-res,.ws .gait-read,.ws .explain,.ws .pz,.ws .live,.ws .duo,.ws .tally,
+.ws .passport,.ws .bookwrap{
   background:var(--card);border-radius:20px;box-shadow:var(--sh);color:var(--ink)}
-.ws .pcard{font-size:15px;line-height:1.45;padding:13px 15px;color:var(--ink)}
-.ws .result-big{font-family:var(--brand);font-weight:700;color:var(--ink)}
+.ws .pcard{font-size:15px;line-height:1.45;padding:13px 15px}
+.ws .result-big,.ws .pp-title,.ws .cover-t,.ws .sumttl{font-family:var(--brand);font-weight:700;color:var(--ink)}
 .ws .result-sub{color:var(--ink2)}
 .ws .hintbar{background:var(--accbg);color:var(--acc);border-radius:999px;
   padding:11px 16px;text-align:center;font-weight:800;font-size:14px}
 
 /* ── выбор: плитки, чипы, варианты ── */
-.ws .cell,.ws .opt,.ws .fork,.ws .chip,.ws .tool,.ws .f5,.ws .szb,.ws .dk,.ws .patch,.ws .nd,.ws .seat{
+.ws .cell,.ws .opt,.ws .fork,.ws .chip,.ws .tool,.ws .f5,.ws .szb,.ws .dk,.ws .seat{
   background:var(--card);color:var(--ink);border:none;border-radius:16px;
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);transition:transform .12s,box-shadow .18s,background .18s}
+  box-shadow:0 1px 0 rgba(150,110,60,.14),inset 0 0 0 1.5px rgba(150,110,60,.14);
+  transition:transform .12s,box-shadow .18s,background .18s}
 .ws .cell:active,.ws .opt:active,.ws .fork:active,.ws .chip:active,.ws .tool:active,.ws .dk:active{transform:scale(.97)}
-.ws .cell-n,.ws .opt-n,.ws .fork,.ws .chip{color:var(--ink)}
-.ws .cell.on,.ws .opt.on,.ws .fork.on,.ws .chip.on,.ws .tool.on,.ws .f5.on,.ws .szb.on,.ws .nd.has,.ws .seat.on{
-  background:linear-gradient(180deg,rgba(169,139,255,.26),rgba(123,79,242,.14));
-  color:#fff;box-shadow:inset 0 0 0 1.5px rgba(169,139,255,.6),0 10px 26px -14px rgba(123,79,242,.9)}
-.ws .chip.on,.ws .opt.on{border-color:transparent}
-.ws .opt.rare{background:linear-gradient(180deg,rgba(255,216,77,.2),rgba(255,216,77,.07));
-  box-shadow:inset 0 0 0 1.5px rgba(255,216,77,.45)}
-.ws .slot{background:rgba(169,139,255,.16);color:var(--ink);border:none;border-radius:10px;
-  box-shadow:inset 0 0 0 1px rgba(169,139,255,.4);padding:3px 9px;min-height:34px}
-.ws .slot.todo{background:rgba(255,255,255,.06);color:var(--ink3);border:1.5px dashed rgba(255,255,255,.22);box-shadow:none}
+.ws .cell.on,.ws .opt.on,.ws .fork.on,.ws .chip.on,.ws .tool.on,.ws .f5.on,.ws .szb.on,.ws .seat.on{
+  background:var(--accbg);color:var(--acc);
+  box-shadow:inset 0 0 0 2.5px var(--acc),0 6px 16px -10px rgba(230,92,0,.7)}
+.ws .opt.rare{background:#FFF8E2;box-shadow:inset 0 0 0 2px rgba(245,183,0,.5)}
+.ws .slot{background:var(--accbg);color:var(--acc);border:none;border-radius:10px;
+  box-shadow:inset 0 0 0 1.5px rgba(230,92,0,.3);padding:3px 9px;min-height:34px}
+.ws .slot.todo{background:#FFF8F0;color:#B8895F;border:1.5px dashed rgba(184,137,95,.6);box-shadow:none}
 
 /* ── поля ввода ── */
-.ws .field{background:rgba(255,255,255,.05);color:var(--ink);border:none;border-radius:16px;
-  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.12);font-family:inherit}
-.ws .field::placeholder{color:var(--ink3)}
-.ws .field:focus{outline:none;box-shadow:inset 0 0 0 2px var(--acc),0 0 0 4px rgba(169,139,255,.18)}
+.ws .field{background:#fff;color:var(--ink);border:none;border-radius:16px;
+  box-shadow:inset 0 0 0 1.5px rgba(150,110,60,.25);font-family:inherit}
+.ws .field::placeholder{color:#B5A28C}
+.ws .field:focus{outline:none;box-shadow:inset 0 0 0 2px var(--acc),0 0 0 4px rgba(230,92,0,.14)}
 
 /* ── станции на столе и в цеху ── */
 .ws .st{background:var(--card);border-radius:20px;box-shadow:var(--sh);color:var(--ink)}
-.ws .st.next{box-shadow:inset 0 0 0 1.5px rgba(169,139,255,.6),0 16px 34px -18px rgba(123,79,242,.85)}
-.ws .st.done{background:linear-gradient(180deg,rgba(78,217,155,.14),rgba(78,217,155,.05));
-  box-shadow:inset 0 0 0 1px rgba(78,217,155,.35)}
+.ws .st.next{box-shadow:inset 0 0 0 2.5px var(--acc),0 12px 26px -16px rgba(230,92,0,.8)}
+.ws .st.done{background:#EFF9F2;box-shadow:inset 0 0 0 1.5px rgba(46,158,91,.35)}
 .ws .st.done::after{color:var(--ok)}
-.ws .st-num,.ws .rulen{color:#1B0F30;background:#CBB8FF}
-.ws .st-badge{background:rgba(255,255,255,.08);color:var(--ink2)}
+.ws .st-n{color:var(--ink)}
+.ws .st-s,.ws .sumk,.ws .dk-l,.ws .mn-k,.ws .rail-lbl,.ws .bw{color:var(--ink2)}
+.ws .st-num,.ws .rulen{background:var(--acc);color:#fff}
+.ws .st-badge{background:var(--accbg);color:var(--acc)}
 
-/* ── кнопки: главная — сиреневая, как «Играть» в игре ── */
+/* ── кнопки ── */
 .ws .btn{width:100%;min-height:54px;white-space:normal;line-height:1.15;padding:12px 18px}
 .ws .btn.nk-btn--sm{min-height:48px;font-size:15.5px;padding:10px 12px}
 .ws .btnrow .btn{flex:1}
 .ws .nk-btn{font-family:var(--brand);font-weight:700;letter-spacing:-.01em}
-.ws .nk-btn--cta{color:#fff;background:linear-gradient(180deg,#9B78FF,#7B4FF2 60%,#6E41E4);
-  box-shadow:0 6px 0 #3D2688,0 16px 30px -12px rgba(123,79,242,.75),inset 0 2px 0 rgba(255,255,255,.3)}
-.ws .nk-btn--cta:active{transform:translateY(4px);box-shadow:0 2px 0 #3D2688}
-.ws .nk-btn--soft{color:var(--ink);background:rgba(255,255,255,.07);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.13),0 5px 0 rgba(0,0,0,.35)}
-.ws .nk-btn--soft:active{transform:translateY(3px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.13),0 2px 0 rgba(0,0,0,.35)}
-.ws .nk-btn--ok{color:#06281C;background:linear-gradient(180deg,#77E9B3,#4ED99B 60%,#38C687);
-  box-shadow:0 6px 0 #1F7A58,0 16px 30px -12px rgba(78,217,155,.6),inset 0 2px 0 rgba(255,255,255,.45)}
-.ws .nk-btn:disabled{filter:saturate(.2) brightness(.8);opacity:.5}
+.ws .nk-btn--cta{color:#fff;background:linear-gradient(180deg,#FF8A3D,#E65C00 62%,#CF5100);
+  box-shadow:0 6px 0 #A84200,0 14px 26px -12px rgba(230,92,0,.6),inset 0 2px 0 rgba(255,255,255,.35)}
+.ws .nk-btn--cta:active{transform:translateY(4px);box-shadow:0 2px 0 #A84200}
+.ws .nk-btn--soft{color:var(--ink);background:linear-gradient(180deg,#fff,#FFF4E6);
+  box-shadow:0 5px 0 rgba(150,110,60,.18),inset 0 0 0 1.5px rgba(150,110,60,.16)}
+.ws .nk-btn--soft:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(150,110,60,.18),inset 0 0 0 1.5px rgba(150,110,60,.16)}
+.ws .nk-btn--ok{color:#fff;background:linear-gradient(180deg,#58D28C,#2E9E5B 62%,#248A4C);
+  box-shadow:0 6px 0 #1C6E3C,0 14px 26px -12px rgba(46,158,91,.5),inset 0 2px 0 rgba(255,255,255,.4)}
+.ws .nk-btn:disabled{filter:saturate(.25);opacity:.55}
 .ws .txtbtn{color:var(--acc)}
 
 /* ── шторка выбора ── */
-.ws .ovl{background:rgba(6,4,14,.66)}
-.ws .sheet{background:linear-gradient(180deg,#171230,#0D0A1A);border-radius:26px 26px 0 0;
-  box-shadow:0 -12px 44px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.1);overflow:hidden}
-.ws .sheet-h::before{background:rgba(255,255,255,.22)}
+.ws .ovl{background:rgba(70,45,20,.42)}
+.ws .sheet{background:linear-gradient(180deg,#FFFDF8,#FFF6E8);border-radius:26px 26px 0 0;
+  box-shadow:0 -12px 40px rgba(120,80,30,.25);overflow:hidden}
+.ws .sheet-h::before{background:rgba(150,110,60,.3)}
 .ws .sheet-t{font-family:var(--brand);font-weight:700;color:var(--ink)}
-.ws .sheet-x{background:rgba(255,255,255,.08);color:var(--ink2);border-radius:50%}
+.ws .sheet-x{background:var(--accbg);color:var(--acc);border-radius:50%}
 /* flex-элемент не ужимался ниже содержимого, и хвост шторки уходил под экран */
 .ws .sheet-l{min-height:0}
 /* шторка успевает выехать до того, как ребёнок тянется к нижнему ряду */
 .ws .sheet.on{animation-duration:.16s}
 
 /* ── плашка «что произошло» ── */
-.ws .toast{background:linear-gradient(180deg,#9B78FF,#7B4FF2);color:#fff;
-  box-shadow:0 14px 30px -12px rgba(123,79,242,.8)}
-
-/* ── рисованное: тёплая бумага в рамке, как картина на тёмной стене ──
-   Сами рисунки остаются светлыми (они так задуманы и так читаются),
-   но получают грань и тень, чтобы не висеть на фоне случайным пятном. */
-.ws .paper,.ws .ill,.ws .scene,.ws .cover,.ws .mini-scene,.ws .stage-wrap,.ws .charpv,
-.ws .numgrid,.ws .drum,.ws .dial,.ws .handbox,.ws .chair,.ws .shelf,.ws .bowl,.ws .bench,
-.ws .glasswrap,.ws .beltwrap,.ws .gaitwrap,.ws .memwrap,.ws .filmwrap,.ws .passwrap,.ws .arena-wrap canvas{
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.14),0 20px 44px -26px rgba(0,0,0,.95)}
-.ws .paper,.ws-story .scene,.ws-story .opt-ic,.ws-story .gst-b,.ws-story .cover,.ws-story .paw,.ws-story .nd,.ws-story .stage-wrap,
-.ws-story .rail-lbl,.ws-story .bowl,.ws-story .shelf,.ws-story .bi,.ws-story .bin,.ws-story .breath,.ws-story .hole,.ws-story .patch,.ws-story .mini-scene,.ws-story .sl,
-.ws-maze .pp-story,.ws-maze .gst-b,
-.ws-prof .numgrid,.ws-prof .drum,.ws-prof .dial,.ws-prof .tool,.ws-prof .handbox,.ws-prof .chair,.ws-prof .shelf,.ws-prof .mesrc,.ws-prof .charpv,.ws-prof .ill{
- --ink:#2B2118;--ink2:#5C4A38;--ink3:#8A7A68;--acc:#E65C00;--accbg:#FFF1E4;--line:rgba(180,110,40,.16);--ok:#2E9E5B;--okbg:#DFF5EA;--bad:#D93030;color:var(--ink)}
-.ws-prof .mesrc{background:#FFF1E4}
-.ws .filmwrap{background:#0D0A1A;border-radius:14px;padding:6px}
-.ws .film-bar{background:rgba(255,255,255,.12)}
-.ws .film-bar i{background:linear-gradient(90deg,#7B4FF2,#A98BFF)}
-
-/* ── паспорт и книжка ── */
-.ws .passport,.ws .bookwrap{background:var(--card);border-radius:22px;box-shadow:var(--sh)}
-.ws .pp-title,.ws .cover-t,.ws .sumttl{font-family:var(--brand);font-weight:700;color:var(--ink)}
-.ws .pp-by,.ws .cover-a,.ws .pp-foot,.ws .uniq-f,.ws .honest{color:var(--ink3)}
-.ws .pp-rule,.ws .sumrow,.ws .rulerow,.ws .mn{box-shadow:inset 0 -1px 0 rgba(255,255,255,.07)}
-.ws .pp-rule b{color:var(--ink3)}
-.ws .pp-own{box-shadow:inset 0 0 0 1.5px rgba(169,139,255,.45);border-radius:14px}
-.ws .pp-lesson,.ws .minep-f{color:var(--ink2)}
-.ws .pp-lesson b,.ws .minep-f b{color:var(--acc)}
-.ws .dot{background:rgba(255,255,255,.22)}
-.ws .dot.on{background:var(--acc)}
+.ws .toast{background:var(--ink);color:#FFF6E8;box-shadow:0 12px 26px -12px rgba(43,33,24,.7)}
 
 /* ── мелочи ── */
-.ws .rulebar{color:var(--ink3)}
-.ws .hud{color:var(--ink2)}
+.ws .filmwrap{background:#FFF8EE;border-radius:14px;padding:6px;box-shadow:var(--sh)}
+.ws .film-bar{background:rgba(150,110,60,.18)}
+.ws .film-bar i{background:var(--acc)}
+.ws .rulebar,.ws .hud{color:var(--ink3)}
 .ws .progline{color:var(--ink2)}
 .ws .mytag{background:var(--accbg);color:var(--acc)}
 .ws .gst.on .gst-b{background:var(--accbg);color:var(--acc)}
-.ws .gst.done .gst-b{background:var(--acc);color:#1B0F30}
+.ws .gst.done .gst-b{background:var(--acc);color:#fff}
 .ws .explbtn{background:var(--accbg);color:var(--acc)}
-.ws .askrow,.ws .ask-t{color:var(--ink)}
-
-/* ── плашка-представление на входе: та же, что в шапке игры курса ── */
-.ws .kick{display:inline-flex;align-items:center;gap:8px;margin-bottom:12px;
-  padding:6px 13px;border-radius:999px;font-weight:800;font-size:11.5px;
-  letter-spacing:.04em;text-transform:uppercase;color:#E9DFFF;
-  background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
+.ws .dot{background:rgba(150,110,60,.28)}
+.ws .dot.on{background:var(--acc)}
+.ws .pp-by,.ws .cover-a,.ws .pp-foot,.ws .uniq-f,.ws .honest{color:var(--ink3)}
+.ws .pp-own{box-shadow:inset 0 0 0 2px rgba(230,92,0,.4);border-radius:14px}
+.ws .pp-lesson,.ws .minep-f{color:var(--ink2)}
+.ws .pp-lesson b,.ws .minep-f b{color:var(--acc)}
 /* время, которое ребёнок ещё не выбирал, не выдаём за выбранное */
 .ws .rail-lbl.off{opacity:.55;font-weight:700}
-/* короткий экран не прижимается к шапке: пустота уходит поровну вверх и вниз,
-   длинный — просто листается, как раньше */
+/* короткий экран не прижимается к шапке: пустота уходит поровну вверх и вниз */
 .ws .body{display:flex;flex-direction:column}
 .ws .body>.center{margin:auto 0}
