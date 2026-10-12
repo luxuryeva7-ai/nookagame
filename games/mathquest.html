@@ -8,7 +8,7 @@
 <meta name="robots" content="noindex">
 <link href="../fonts/nooka-fonts.css" rel="stylesheet">
 <link rel="stylesheet" href="nooka-ui.css">
-<link rel="stylesheet" href="nooka-mq.css?v=8">
+<link rel="stylesheet" href="nooka-mq.css?v=10">
 <link rel="preload" as="image" href="mq/town.webp">
 </head>
 <body class="mq-body">
@@ -36,6 +36,7 @@
     </header>
     <p class="mq-note">Выбери ученика и дай ему имя.</p>
     <div class="mq-picks" id="heroes"></div>
+    <div class="mq-tune" id="hero-tune"></div>
     <div class="mq-foot">
       <label class="mq-field">
         <span>Имя</span>
@@ -53,6 +54,20 @@
     </header>
     <p class="mq-note">От этого зависят задачи. Потом можно поменять в Палате.</p>
     <div class="mq-grades" id="grades"></div>
+  </section>
+
+  <!-- 3.5 ВСТУПЛЕНИЕ -->
+  <section class="mq-sc mq-sc--tale" id="sc-tale" data-screen="tale" hidden>
+    <img class="mq-tale__bg" id="tale-bg" src="" alt="">
+    <div class="mq-tale__in">
+      <span class="mq-tale__dots" id="tale-dots"></span>
+      <h2 id="tale-title"></h2>
+      <p id="tale-text"></p>
+    </div>
+    <div class="mq-foot">
+      <button class="mq-btn mq-btn--big" id="tale-go" type="button">Дальше</button>
+      <button class="mq-btn mq-btn--ghost" id="tale-skip" type="button">Пропустить</button>
+    </div>
   </section>
 
   <!-- 4. ЧИСЛОГРАД -->
@@ -139,6 +154,7 @@
 
 </div>
 
-<script src="nooka-mq.js?v=8"></script>
+<script src="nooka-mq-fx.js?v=10"></script>
+<script src="nooka-mq.js?v=10"></script>
 </body>
 </html>
