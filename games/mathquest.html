@@ -8,100 +8,98 @@
 <meta name="robots" content="noindex">
 <link href="../fonts/nooka-fonts.css" rel="stylesheet">
 <link rel="stylesheet" href="nooka-ui.css">
-<link rel="stylesheet" href="nooka-mq.css?v=3">
-<link rel="preload" as="image" href="math/arena-bg.webp">
+<link rel="stylesheet" href="nooka-mq.css?v=6">
+<link rel="preload" as="image" href="mq/town.webp">
 </head>
 <body class="mq-body">
 
 <div class="mq" id="app">
 
-  <!-- ЭКРАН 1: заставка -->
+  <!-- 1. ЗАСТАВКА -->
   <section class="mq-sc mq-sc--intro" id="sc-intro" data-screen="intro">
-    <div class="mq-intro__art" aria-hidden="true">
-      <span class="mq-glyph mq-glyph--a">+</span>
-      <span class="mq-glyph mq-glyph--b">×</span>
-      <span class="mq-glyph mq-glyph--c">−</span>
-      <span class="mq-glyph mq-glyph--d">÷</span>
-      <img src="../mascot/hello.webp" alt="" class="mq-intro__neuro">
+    <img class="mq-intro__bg" src="mq/town.webp" alt="">
+    <div class="mq-intro__in">
+      <h1 class="mq-intro__title">Арифмагия</h1>
+      <p class="mq-intro__sub">Счётные Земли стоят на числах.<br>Безмер их стирает — и вещи исчезают.<br><b>Заклинание слушается того, кто назовёт верное число.</b></p>
     </div>
-    <h1 class="mq-intro__title">Арифмагия</h1>
-    <p class="mq-intro__sub">Магия работает на числах.<br>Чтобы заклинание сорвалось с посоха — назови верное число.</p>
     <div class="mq-foot">
       <button class="mq-btn mq-btn--big" id="go-start" type="button">Начать</button>
       <button class="mq-btn mq-btn--ghost" id="go-reset" type="button" hidden>Начать заново</button>
     </div>
   </section>
 
-  <!-- ЭКРАН 2: класс -->
-  <section class="mq-sc" id="sc-grade" data-screen="grade" hidden>
-    <header class="mq-head">
-      <button class="mq-back" data-back="intro" type="button" aria-label="Назад">←</button>
-      <h2>В каком ты классе?</h2>
-    </header>
-    <p class="mq-note">От этого зависят задачи. Потом можно поменять.</p>
-    <div class="mq-grades" id="grades"></div>
-  </section>
-
-  <!-- ЭКРАН 3: герой -->
+  <!-- 2. ВЫБОР ГЕРОЯ -->
   <section class="mq-sc" id="sc-hero" data-screen="hero" hidden>
     <header class="mq-head">
-      <button class="mq-back" data-back="grade" type="button" aria-label="Назад">←</button>
-      <h2>Кто ты, счетомаг?</h2>
+      <button class="mq-back" data-back="intro" type="button" aria-label="Назад">←</button>
+      <h2>Кто пойдёт в Палату?</h2>
     </header>
-
-    <div class="mq-forge">
-      <div class="mq-forge__stage">
-        <div class="mq-avatar mq-avatar--xl" id="hero-preview"></div>
-      </div>
-      <div class="mq-forge__ctrl" id="hero-ctrl"></div>
+    <p class="mq-note">Выбери ученика и дай ему имя.</p>
+    <div class="mq-picks" id="heroes"></div>
+    <div class="mq-foot">
       <label class="mq-field">
         <span>Имя</span>
         <input id="hero-name" type="text" maxlength="14" placeholder="Напиши имя" autocomplete="off" spellcheck="false">
       </label>
-    </div>
-
-    <div class="mq-foot">
-      <button class="mq-btn mq-btn--big" id="hero-done" type="button">В Палату Счёта</button>
+      <button class="mq-btn mq-btn--big" id="hero-done" type="button">Дальше</button>
     </div>
   </section>
 
-  <!-- ЭКРАН 4: карта -->
-  <section class="mq-sc mq-sc--map" id="sc-map" data-screen="map" hidden>
-    <header class="mq-head mq-head--map">
-      <div class="mq-me" id="me-chip"></div>
-      <button class="mq-icobtn" id="open-book" type="button" aria-label="Посох и заклинания">✦</button>
+  <!-- 3. КЛАСС -->
+  <section class="mq-sc" id="sc-grade" data-screen="grade" hidden>
+    <header class="mq-head">
+      <button class="mq-back" data-back="hero" type="button" aria-label="Назад">←</button>
+      <h2>В каком ты классе?</h2>
     </header>
-    <div class="mq-map" id="map"></div>
-    <p class="mq-note mq-note--map" id="map-hint"></p>
+    <p class="mq-note">От этого зависят задачи. Потом можно поменять в Палате.</p>
+    <div class="mq-grades" id="grades"></div>
   </section>
 
-  <!-- ЭКРАН 5: локация -->
-  <section class="mq-sc mq-sc--place" id="sc-place" data-screen="place" hidden>
-    <img class="mq-place__bg" id="place-bg" src="" alt="">
+  <!-- 4. ЧИСЛОГРАД -->
+  <section class="mq-sc mq-sc--town" id="sc-town" data-screen="town" hidden>
+    <img class="mq-town__bg" src="mq/town.webp" alt="">
     <header class="mq-head mq-head--over">
-      <button class="mq-back" data-back="map" type="button" aria-label="На карту">←</button>
-      <h2 id="place-title"></h2>
+      <div class="mq-me" id="town-me"></div>
     </header>
-    <div class="mq-place__body">
-      <div class="mq-speech" id="place-speech"></div>
-      <div class="mq-spots" id="place-spots"></div>
+    <div class="mq-town__map" id="town-spots"></div>
+    <div class="mq-town__foot">
+      <div class="mq-speech" id="town-say"></div>
     </div>
   </section>
 
-  <!-- ЭКРАН 6: бой -->
+  <!-- 5. ЗЕМЛИ -->
+  <section class="mq-sc mq-sc--land" id="sc-land" data-screen="land" hidden>
+
+    <div class="mq-land__list" id="land-list">
+      <header class="mq-head">
+        <button class="mq-back" data-back="town" type="button" aria-label="В город">←</button>
+        <h2>Счётные Земли</h2>
+      </header>
+      <div class="mq-lands" id="lands"></div>
+    </div>
+
+    <div class="mq-land__place" id="land-place" hidden>
+      <img class="mq-place__bg" id="land-bg" src="" alt="">
+      <header class="mq-head mq-head--over">
+        <button class="mq-back" data-back="town" type="button" aria-label="В город">←</button>
+        <h2 id="land-title"></h2>
+      </header>
+      <div class="mq-place__body">
+        <div class="mq-speech" id="land-speech"></div>
+        <div class="mq-gos" id="land-fights"></div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- 6. БОЙ -->
   <section class="mq-sc mq-sc--fight" id="sc-fight" data-screen="fight" hidden>
-    <img class="mq-place__bg" id="fight-bg" src="math/arena-bg.webp" alt="">
-
+    <img class="mq-place__bg" id="fight-bg" src="" alt="">
     <div class="mq-fight__foes" id="foes"></div>
-
     <div class="mq-fight__fx" id="fx" aria-hidden="true"></div>
-
     <div class="mq-fight__mine" id="mine"></div>
-
     <div class="mq-fight__panel" id="panel">
-      <!-- выбор заклинания -->
       <div class="mq-spells" id="spells"></div>
-      <!-- задача -->
       <div class="mq-task" id="task" hidden>
         <div class="mq-task__head">
           <span class="mq-task__spell" id="task-spell"></span>
@@ -110,12 +108,11 @@
         <div class="mq-task__q" id="task-q"></div>
         <div class="mq-task__opts" id="task-opts"></div>
       </div>
-      <!-- лог/подсказка -->
       <div class="mq-tip" id="tip"></div>
     </div>
   </section>
 
-  <!-- ЭКРАН 7: итог боя -->
+  <!-- 7. ИТОГ -->
   <section class="mq-sc mq-sc--win" id="sc-win" data-screen="win" hidden>
     <div class="mq-win__art" id="win-art"></div>
     <h2 id="win-title"></h2>
@@ -126,11 +123,11 @@
     </div>
   </section>
 
-  <!-- ЛИСТ: посох и заклинания -->
+  <!-- ЛИСТ: Палата Счёта -->
   <div class="mq-sheet" id="sheet" hidden>
     <div class="mq-sheet__card">
       <header class="mq-head">
-        <h2>Твой посох</h2>
+        <h2>Палата Счёта</h2>
         <button class="mq-icobtn" id="sheet-close" type="button" aria-label="Закрыть">✕</button>
       </header>
       <div class="mq-sheet__body" id="sheet-body"></div>
@@ -142,6 +139,6 @@
 
 </div>
 
-<script src="nooka-mq.js?v=3"></script>
+<script src="nooka-mq.js?v=6"></script>
 </body>
 </html>
