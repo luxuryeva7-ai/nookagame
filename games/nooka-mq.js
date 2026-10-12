@@ -61,28 +61,30 @@
   /* ========================================================
      2. ГЕРОИ — шесть учеников Палаты
      ======================================================== */
+  /* _full — фигура вырезана с прозрачным фоном и стоит на земле;
+     круглые портреты остались только для мелких мест вроде шапки */
   var HEROES = [
-    { id: 1, art: 'hero_1.webp', name: 'Фиалка',  tint: '#9B6BE0', about: 'посох со звездой' },
-    { id: 2, art: 'hero_2.webp', name: 'Мята',    tint: '#3FBF8A', about: 'посох с шаром' },
-    { id: 3, art: 'hero_3.webp', name: 'Янтарь',  tint: '#E08A2E', about: 'посох с кристаллом' },
-    { id: 4, art: 'hero_4.webp', name: 'Небо',    tint: '#3E9FD6', about: 'посох с листом' },
-    { id: 5, art: 'hero_5.webp', name: 'Солнце',  tint: '#E0B32E', about: 'посох с солнцем' },
-    { id: 6, art: 'hero_6.webp', name: 'Заря',    tint: '#D64F8A', about: 'посох с самоцветом' }
+    { id: 1, art: 'hero_1_full.webp', face: 'hero_1.webp', name: 'Фиалка', tint: '#9B6BE0', about: 'посох со звездой' },
+    { id: 2, art: 'hero_2_full.webp', face: 'hero_2.webp', name: 'Мята',   tint: '#3FBF8A', about: 'посох с шаром' },
+    { id: 3, art: 'hero_3_full.webp', face: 'hero_3.webp', name: 'Янтарь', tint: '#E08A2E', about: 'посох с кристаллом' },
+    { id: 4, art: 'hero_4_full.webp', face: 'hero_4.webp', name: 'Небо',   tint: '#3E9FD6', about: 'посох с листом' },
+    { id: 5, art: 'hero_5_full.webp', face: 'hero_5.webp', name: 'Солнце', tint: '#E0B32E', about: 'посох с солнцем' },
+    { id: 6, art: 'hero_6_full.webp', face: 'hero_6.webp', name: 'Заря',   tint: '#D64F8A', about: 'посох с самоцветом' }
   ];
 
   /* ========================================================
      3. ВРАГИ — кляксы, то что осталось от стёртых чисел
      ======================================================== */
   var FOES = {
-    blot:  { name: 'Клякса',     art: 'foe_blot.webp', hp: 26, pow: 4, weak: 'add',
+    blot:  { name: 'Клякса',     art: 'ink_blot_full.webp', hp: 26, pow: 4, weak: 'add',
              was: 'была числом окон в доме' },
-    mix:   { name: 'Путаник',    art: 'foe_mix.webp',  hp: 34, pow: 5, weak: 'sub',
+    mix:   { name: 'Путаник',    art: 'ink_mix_full.webp',  hp: 34, pow: 5, weak: 'sub',
              was: 'был ценой на вывеске' },
-    zero:  { name: 'Нулик',      art: 'foe_zero.webp', hp: 38, pow: 5, weak: 'mul',
+    zero:  { name: 'Нулик',      art: 'ink_zero_full.webp', hp: 38, pow: 5, weak: 'mul',
              was: 'был счётом пустых корзин' },
-    half:  { name: 'Половинник', art: 'foe_half.webp', hp: 46, pow: 6, weak: 'div',
+    half:  { name: 'Половинник', art: 'ink_half_full.webp', hp: 46, pow: 6, weak: 'div',
              was: 'был числом пролётов моста' },
-    bezmer:{ name: 'Безмер',     art: 'boss.webp',     hp: 100, pow: 7, weak: 'top', boss: true,
+    bezmer:{ name: 'Безмер',     art: 'boss_full.webp', hp: 100, pow: 7, weak: 'top', boss: true,
              was: 'был первым счетомагом' }
   };
 
@@ -105,8 +107,8 @@
       who: 'Наставница Бусина',
       say: 'Правило у нас одно: <b>заклинание слушается того, кто назовёт верное число</b>. Назвал — посох выстрелил. Ошибся — ход ушёл, но тебя за это никто не ударит. Попробуй на кляксе: она не злая, она просто забыла, чем была.',
       cast: [
-        { art: 'npc_elder.webp', name: 'Наставница Бусина', x: 22 },
-        { art: 'npc_kid.webp', name: 'Малыш Тюк', x: 82, side: 'right' }
+        { art: 'npc_elder_full.webp', name: 'Наставница Бусина', x: 22 },
+        { art: 'npc_kid_full.webp', name: 'Малыш Тюк', x: 82, side: 'right' }
       ],
       talk: [
         [0, 'Посох не слушается крика. Он слушается числа.'],
@@ -123,8 +125,8 @@
       who: 'Торговец Семик',
       say: 'Безмер стёр цены на половине лавок — люди ходят и не знают, сколько платить. А у прилавка топчется <b>Путаник</b>: он был ценой на вывеске, а теперь путает числа местами. Верни ему число, и он успокоится.',
       cast: [
-        { art: 'npc_merchant.webp', name: 'Торговец Семик', x: 20 },
-        { art: 'npc_baker.webp', name: 'Пекарь Крупа', x: 58 }
+        { art: 'npc_merchant_full.webp', name: 'Торговец Семик', x: 20 },
+        { art: 'npc_baker_full.webp', name: 'Пекарь Крупа', x: 58 }
       ],
       talk: [
         [0, 'Крупа, ты почём булки отдаёшь?'],
@@ -142,8 +144,8 @@
       who: 'Нейро',
       say: 'Мост был <b>на двенадцать пролётов, по четыре на опору</b>. Это число стёрли — и мост расплылся. Под ним сидит Половинник: он и есть то самое число, только забывшее себя. Против него нужен <b>Раскол</b>.',
       cast: [
-        { art: 'npc_guard.webp', name: 'Стражник Пика', x: 22 },
-        { art: 'npc_elder.webp', name: 'Нейро', x: 84, side: 'right' }
+        { art: 'npc_guard_full.webp', name: 'Стражник Пика', x: 22 },
+        { art: 'npc_elder_full.webp', name: 'Нейро', x: 84, side: 'right' }
       ],
       talk: [
         [0, 'Дальше не пущу: мост поплыл.'],
@@ -159,7 +161,7 @@
       who: 'Нейро',
       say: 'Было четыре дерева, стало четыре по шесть, а теперь никто не скажет сколько. Когда число потеряно, роща растёт без счёта. Тут силён <b>Вихрь</b> — он бьёт столько раз, сколько скажет твой ответ.',
       cast: [
-        { art: 'npc_kid.webp', name: 'Малыш Тюк', x: 24 }
+        { art: 'npc_kid_full.webp', name: 'Малыш Тюк', x: 24 }
       ],
       talk: [
         [0, 'Я считал деревья и сбился на сорока!'],
@@ -175,7 +177,7 @@
       who: 'Безмер',
       say: 'Ещё один с посохом. Я считал дольше всех вас вместе взятых и устал. Без чисел спокойнее: не надо помнить, не надо сверять, не надо отвечать. Я стёр мост — и никто по нему больше не бегает. Сотру и тебя... если не назовёшь <b>моё число</b>.',
       cast: [
-        { art: 'boss.webp', name: 'Безмер', x: 26 }
+        { art: 'boss_full.webp', name: 'Безмер', x: 26 }
       ],
       talk: [
         [0, 'Зачем вам числа? Без них спокойнее.'],
@@ -485,7 +487,7 @@
   function drawTown() {
     var h = hero();
     $('town-me').innerHTML =
-      '<span class="mq-me__art" style="--tint:' + auraColor() + '"><img src="' + ART + h.art + '" alt=""></span>' +
+      '<span class="mq-me__art" style="--tint:' + auraColor() + '"><img src="' + ART + h.face + '" alt=""></span>' +
       '<span class="mq-me__txt"><span class="mq-me__name">' + esc(S.name || h.name) + '</span>' +
       '<span class="mq-me__lv">' + S.lv + ' уровень · ' + S.grade + ' класс · вернул чисел: ' + S.solved + '</span></span>';
 
@@ -730,12 +732,22 @@
 
   function askTask() {
     var k = B.spell, e = ELEM[k];
-    B.task = TASK[k](S.grade || 1);
+    /* сперва пробуем настоящую школьную задачу из банка — она привязана
+       и к классу, и к месту: у моста спрашивают про пролёты, на рынке —
+       про цену. Нет подходящей (5–8 класс) — падаем в числовой пример. */
+    var word = null;
+    try {
+      if (window.nookaTasks) word = window.nookaTasks.word(k, S.grade || 1, LANDS[B.li] && LANDS[B.li].id);
+    } catch (err) { word = null; }
+    B.task = word || TASK[k](S.grade || 1);
+    B.task.isWord = !!word;
     $('spells').hidden = true; $('task').hidden = false;
     var sp = $('task-spell');
     sp.textContent = e.sign + ' ' + e.name;
     sp.style.background = 'var(--' + k + '-bg)'; sp.style.color = 'var(--' + k + ')';
-    $('task-q').innerHTML = B.task.q + (B.task.sub ? '<small>' + B.task.sub + '</small>' : '');
+    var qEl = $('task-q');
+    qEl.classList.toggle('mq-task__q--word', !!B.task.isWord);
+    qEl.innerHTML = B.task.q + (B.task.sub ? '<small>' + B.task.sub + '</small>' : '');
     var box = $('task-opts');
     box.innerHTML = '';
     options(B.task.answer).forEach(function (v) {
@@ -897,7 +909,7 @@
           rows.push(['🤝', c.name + ' пошёл за тобой', 'один осколок уцелел и вспомнил себя: ' + c.was]);
         }
       }
-      $('win-art').innerHTML = '<img src="' + ART + hero().art + '" alt="">';
+      $('win-art').innerHTML = '<img class="mq-win__full" src="' + ART + hero().art + '" alt="">';
       $('win-title').textContent = B.foes[0].boss ? 'Безмер повержен' : 'Победа';
       $('win-sub').textContent = B.foes[0].boss
         ? 'Он рассыпался, и все числа разом вернулись в книгу. Мир снова твёрдый.'
@@ -908,7 +920,7 @@
     } else {
       rows.push(['💤', 'Силы кончились', 'ничего не потеряно — числа остались у тебя в голове']);
       rows.push(['↻', 'Попробуй ещё', B.wrong > B.solved ? 'возьми заклинание, к которому клякса слаба' : 'почти получилось']);
-      $('win-art').innerHTML = '<img src="' + ART + hero().art + '" alt="">';
+      $('win-art').innerHTML = '<img class="mq-win__full" src="' + ART + hero().art + '" alt="">';
       $('win-title').textContent = 'Посох погас';
       $('win-sub').textContent = 'Отдохни и возвращайся.';
       $('win-go').textContent = 'В Числоград';
