@@ -208,7 +208,7 @@ html, body { overflow-x: clip; }
 .mq-me__name { display: block; font-size: 16px; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 62vw; }
 .mq-me__lv { display: block; font-size: 12px; font-weight: 700; opacity: .85; }
 
-.mq-town__map { position: relative; z-index: 2; flex: 1 1 auto; min-height: 0; margin: 0 14px; }
+.mq-town__map { position: relative; z-index: 2; flex: 1 1 auto; min-height: 0; margin: 0 8px; }
 .mq-town__inner { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); aspect-ratio: 900 / 522; }
 .mq-pin {
   position: absolute; transform: translate(-50%, -50%);
@@ -292,17 +292,27 @@ html, body { overflow-x: clip; }
   content: ''; position: absolute; inset: 0; z-index: 1;
   background: linear-gradient(to bottom, rgba(20,10,30,.5) 0 18%, rgba(20,10,30,.05) 42%, rgba(20,10,30,.62) 100%);
 }
-/* фон и слой эффектов остаются absolute: иначе встают в поток флекса —
-   фон выталкивает шапку за край, а у канваса эффектов высота падает в 0 */
-.mq-land__place > *:not(.mq-place__bg),
+/* Слои, которые ОБЯЗАНЫ лежать поверх сцены и не влиять на поток.
+   Правило «> *» ниже делает relative всё подряд, и каждый новый слой
+   ломался об него: фон выталкивал шапку за край, у канваса эффектов
+   высота падала в 0, актёры исчезали. Поэтому слои перечислены здесь
+   и получают absolute явно — добавляешь новый слой, добавь сюда класс. */
+.mq-place__bg,
+.mq-fight__fx,
+.mq-actors,
+.mq-stagewrap { position: absolute !important; }
+
+.mq-land__place > *:not(.mq-place__bg):not(.mq-actors):not(.mq-stagewrap),
 .mq-sc--fight > *:not(.mq-place__bg):not(.mq-fight__fx) { position: relative; z-index: 2; }
 .mq-land__place > .mq-head { margin: max(14px, env(safe-area-inset-top)) 16px 0; }
 
+/* шапка сверху, сцена в середине, речь прижата к низу через margin-top:auto —
+   justify-content: flex-end на родителе утаскивал вниз и саму шапку */
 .mq-place__body {
-  flex: 1 1 auto; min-height: 0;
-  display: flex; flex-direction: column; justify-content: flex-end; gap: 10px;
-  padding: 12px 16px max(14px, env(safe-area-inset-bottom));
-  overflow-y: auto;
+  flex: 0 0 auto; margin-top: auto;
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 10px 16px max(12px, env(safe-area-inset-bottom));
+  max-height: 48dvh; overflow-y: auto;
 }
 .mq-gos { display: grid; gap: 9px; flex: 0 0 auto; }
 .mq-go {
@@ -685,4 +695,231 @@ html, body { overflow-x: clip; }
   .mq-chip--dot i { width: 19px; height: 19px; }
   .mq-tale__in p { font-size: 14px; line-height: 1.5; }
   .mq-tale__in h2 { font-size: 22px; }
+}
+
+/* ============================================================
+   ЖИВОЙ ЧИСЛОГРАД
+   Карта была картинкой с жёлтыми кружками — мёртвой. Теперь это
+   сцена: тлеют окна, идёт дым, летают птицы, ходят горожане и
+   переговариваются между собой. Вход — светящаяся вывеска, и по
+   нажатию сцена ПРИБЛИЖАЕТСЯ к ней, а не сменяется рывком.
+   ============================================================ */
+
+.mq-town__scene {
+  position: absolute; left: 0; right: 0; top: 50%;
+  transform: translateY(-50%);
+  aspect-ratio: 900 / 522;
+  border-radius: 16px; overflow: hidden;
+  box-shadow: 0 12px 34px rgba(20,10,30,.55);
+  transition: transform .42s cubic-bezier(.4,0,.2,1), filter .42s ease;
+  will-change: transform;
+}
+.mq-town__bg2 { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.mq-town__fx  { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+
+/* приближение к выбранному месту */
+.mq-town__scene.mq-zoom { transform: translateY(-50%) scale(2.6); filter: brightness(.7) blur(1px); }
+@media (prefers-reduced-motion: reduce) {
+  .mq-town__scene { transition: none; }
+  .mq-town__scene.mq-zoom { transform: translateY(-50%); filter: brightness(.8); }
+}
+
+/* ---------- горожане ходят по площади ---------- */
+.mq-town__folk { position: absolute; inset: 0; pointer-events: none; }
+.mq-folk {
+  position: absolute; top: var(--y); left: 0;
+  transform: translate(-50%, -50%);
+  animation: mq-stroll var(--dur, 24s) ease-in-out var(--delay, 0s) infinite alternate;
+}
+@keyframes mq-stroll {
+  from { left: var(--from, 10%); }
+  to   { left: var(--to, 70%); }
+}
+.mq-folk__art {
+  display: block; width: 34px; height: 34px; border-radius: 50%;
+  overflow: hidden; background: rgba(255,255,255,.16);
+  box-shadow: 0 0 0 2px rgba(255,255,255,.4), 0 3px 8px rgba(20,10,30,.5);
+  animation: mq-bobwalk .5s ease-in-out infinite;
+}
+.mq-folk__art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+@keyframes mq-bobwalk { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-3px) } }
+
+.mq-folk__say, .mq-actor__say {
+  position: absolute; left: 50%; bottom: calc(100% + 7px);
+  max-width: min(150px, 38vw); white-space: normal; text-align: center;
+  transform: translateX(-50%) translateY(5px) scale(.9);
+  background: #FFF8EC; color: #2D1B45;
+  border-radius: 11px; padding: 5px 9px;
+  font-size: 11px; font-weight: 800; line-height: 1.25;
+  box-shadow: 0 3px 10px rgba(20,10,30,.4);
+  opacity: 0; pointer-events: none;
+  transition: opacity .22s ease, transform .22s cubic-bezier(.34,1.56,.64,1);
+}
+.mq-folk__say.on, .mq-actor__say.on { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+.mq-folk__say::after, .mq-actor__say::after {
+  content: ''; position: absolute; left: 50%; top: 100%;
+  transform: translateX(-50%);
+  border: 5px solid transparent; border-top-color: #FFF8EC;
+}
+
+/* ---------- места входа: вывеска, а не кружок ---------- */
+.mq-town__places { position: absolute; inset: 0; }
+/* у краёв карты вывеска прижимается внутрь, иначе половина уходит за рамку */
+.mq-place[style*="left: 9"] .mq-place__sign,
+.mq-place[style*="left: 8"] .mq-place__sign { transform: translateX(-18%); }
+.mq-place[style*="left: 1"] .mq-place__sign { transform: translateX(14%); }
+.mq-place {
+  position: absolute; transform: translate(-50%, -50%);
+  border: 0; background: transparent; padding: 3px;
+  font-family: inherit; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  min-width: 44px; min-height: 44px;
+}
+.mq-place__glow {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--star);
+  box-shadow: 0 0 10px 3px rgba(255,198,63,.65), 0 0 0 3px rgba(255,198,63,.22);
+  animation: mq-beat 2.4s ease-in-out infinite;
+}
+@keyframes mq-beat {
+  0%,100% { transform: scale(1);   box-shadow: 0 0 10px 3px rgba(255,198,63,.65), 0 0 0 3px rgba(255,198,63,.22); }
+  50%     { transform: scale(1.25); box-shadow: 0 0 16px 5px rgba(255,198,63,.5),  0 0 0 8px rgba(255,198,63,.10); }
+}
+.mq-place__sign {
+  background: linear-gradient(180deg, #FFF8EC, #FFEFD4);
+  color: #2D1B45; border-radius: 9px; padding: 4px 10px;
+  font-size: 12px; font-weight: 900; line-height: 1.15; white-space: nowrap;
+  box-shadow: 0 3px 0 rgba(120,80,30,.35), 0 6px 14px rgba(20,10,30,.45);
+  display: flex; flex-direction: column; align-items: center;
+  transition: transform .16s ease;
+}
+.mq-place__sign small { font-size: 9.5px; font-weight: 700; color: #8A7A62; }
+.mq-place:active .mq-place__sign { transform: translateY(2px); box-shadow: 0 1px 0 rgba(120,80,30,.35); }
+@media (hover: hover) { .mq-place:hover .mq-place__sign { transform: translateY(-2px); } }
+
+/* ---------- живые NPC в локации ---------- */
+.mq-actors { position: absolute; left: 0; right: 0; bottom: 34%; height: 0; z-index: 2; pointer-events: none; }
+.mq-actor {
+  position: absolute; left: var(--x, 50%); bottom: 0;
+  transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.mq-actor__art {
+  display: block; width: 62px; height: 62px; border-radius: 50%;
+  overflow: hidden; background: rgba(255,255,255,.14);
+  box-shadow: 0 0 0 2px rgba(255,255,255,.5), 0 6px 16px rgba(20,10,30,.5);
+  animation: mq-breathe 3.4s ease-in-out var(--d, 0s) infinite;
+}
+.mq-actor__art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.mq-actor--right .mq-actor__art { animation-duration: 3.9s; }
+@keyframes mq-breathe {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-4px) scale(1.03); }
+}
+.mq-actor--talk .mq-actor__art {
+  box-shadow: 0 0 0 2px var(--star), 0 0 16px 2px rgba(255,198,63,.5), 0 6px 16px rgba(20,10,30,.5);
+}
+.mq-actor__name {
+  font-size: 10.5px; font-weight: 800; color: #fff;
+  text-shadow: 0 1px 6px rgba(20,10,30,.9); white-space: nowrap;
+}
+.mq-actor__say { font-size: 11.5px; max-width: min(170px, 44vw); }
+
+@media (max-height: 660px) {
+  .mq-actor__art { width: 46px; height: 46px; opacity: .92; }
+  .mq-folk__art { width: 28px; height: 28px; }
+  .mq-place__sign { font-size: 11px; padding: 3px 8px; }
+  .mq-actors { bottom: 38%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mq-folk, .mq-folk__art, .mq-actor__art, .mq-place__glow { animation: none; }
+}
+
+/* ============================================================
+   СЦЕНА ЛОКАЦИИ: герой ходит, кляксы стоят в комнате
+   Список кнопок «что сделать» ушёл — ребёнок водит героя сам.
+   ============================================================ */
+/* передний план: герой и кляксы стоят ниже и крупнее NPC — так читается глубина.
+   Слой сцены — свой, на всю локацию: внутри .mq-actors (высота 0) он схлопывался,
+   герой пропадал, а тапы по кляксам не доходили. */
+.mq-stagewrap { inset: 0; z-index: 3; }
+.mq-stage { position: absolute; inset: 0; }
+
+.mq-player {
+  position: absolute; bottom: 30%; left: 16%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  display: flex; flex-direction: column; align-items: center;
+}
+.mq-player__art {
+  display: block; width: 78px; height: 78px; border-radius: 50%;
+  overflow: hidden; background: rgba(255,255,255,.14);
+  box-shadow: 0 0 0 3px rgba(255,255,255,.6),
+              0 0 18px 2px var(--tint, #9B6BE0),
+              0 7px 18px rgba(20,10,30,.55);
+}
+.mq-player__art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.mq-player--flip .mq-player__art img { transform: scaleX(-1); }
+.mq-player--walk .mq-player__art { animation: mq-bobwalk .42s ease-in-out infinite; }
+.mq-player__dust {
+  width: 46px; height: 8px; border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(255,255,255,.26), rgba(255,255,255,0) 72%);
+  opacity: 0; transition: opacity .2s ease;
+}
+.mq-player--walk .mq-player__dust { opacity: 1; }
+
+/* клякса ждёт в своей точке */
+.mq-spot-foe {
+  position: absolute; bottom: 31%;
+  transform: translateX(-50%);
+  border: 0; background: transparent; padding: 2px;
+  font-family: inherit; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  min-width: 44px; min-height: 44px;
+}
+.mq-spot-foe__art {
+  width: 70px; height: 70px; border-radius: 50%;
+  overflow: hidden; background: rgba(255,255,255,.12);
+  box-shadow: 0 0 0 2px rgba(255,255,255,.45), 0 6px 16px rgba(20,10,30,.55);
+  animation: mq-lurk 2.8s ease-in-out infinite;
+}
+.mq-spot-foe__art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+@keyframes mq-lurk {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-5px) scale(1.04); }
+}
+.mq-spot-foe__lbl {
+  font-size: 10.5px; font-weight: 800; color: #fff;
+  text-shadow: 0 1px 6px rgba(20,10,30,.9); white-space: nowrap;
+  background: rgba(30,18,46,.5); border-radius: 999px; padding: 2px 8px;
+}
+.mq-spot-foe--done { opacity: .45; }
+.mq-spot-foe--done .mq-spot-foe__art { animation: none; }
+.mq-spot-foe:active .mq-spot-foe__art { transform: translateY(2px); }
+
+/* подсказка — отдельной плашкой, а не поверх персонажей */
+.mq-hint {
+  margin: 0 0 8px; font-size: 12.5px; font-weight: 800;
+  color: #fff; text-align: center; line-height: 1.35;
+  background: rgba(30,18,46,.55);
+  border-radius: 999px; padding: 6px 12px;
+  align-self: center;
+}
+
+/* актёры-NPC стоят выше героя, чтобы не слипались */
+/* задний план: NPC стоят выше и мельче — так читается глубина,
+   а герой с кляксами не слипаются с ними в одну полосу */
+.mq-actors { bottom: 46%; }
+.mq-actor__art { width: 46px; height: 46px; opacity: .92; }
+.mq-actor__name { font-size: 9.5px; opacity: .85; }
+
+@media (max-height: 660px) {
+  .mq-player__art { width: 62px; height: 62px; }
+  .mq-spot-foe__art { width: 56px; height: 56px; }
+  .mq-actor__art { width: 40px; height: 40px; }
+  .mq-actors { bottom: 48%; }
+  .mq-player, .mq-spot-foe { bottom: 33%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mq-player--walk .mq-player__art, .mq-spot-foe__art { animation: none; }
 }
