@@ -218,8 +218,20 @@
   /* ========================================================
      6. СОСТОЯНИЕ
      ======================================================== */
+  /* цвет магии и знак — то, что ребёнок выбирает сам поверх ученика:
+     аура в бою, рамка портрета, свет на карте города */
+  var AURA = [
+    { id: 0, c: '#9B6BE0', n: 'Сирень' },
+    { id: 1, c: '#3FBF8A', n: 'Мята' },
+    { id: 2, c: '#E8732E', n: 'Пламя' },
+    { id: 3, c: '#3E9FD6', n: 'Лазурь' },
+    { id: 4, c: '#E8C32E', n: 'Солнце' },
+    { id: 5, c: '#D64F8A', n: 'Заря' }
+  ];
+  var MARK = ['✦', '✶', '❉', '✧', '✵', '❧'];
+
   function fresh() {
-    return { made: false, grade: 0, hero: 1, name: '',
+    return { made: false, grade: 0, hero: 1, name: '', aura: 0, mark: 0,
              lv: 1, xp: 0, done: {}, pets: [], solved: 0, wrong: 0, seen: {} };
   }
   var S = (function () {
@@ -229,6 +241,8 @@
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 
   function hero() { return HEROES[(S.hero - 1) % HEROES.length]; }
+  function auraColor() { return (AURA[S.aura || 0] || AURA[0]).c; }
+  function markGlyph() { return MARK[S.mark || 0] || MARK[0]; }
   function openElems() { return ORDER.filter(function (k) { return ELEM[k].grade <= Math.max(1, S.grade); }); }
   function spellPow(k) { return Math.max(1, Math.round(ELEM[k].pow * (1 + (S.lv - 1) * 0.3))); }
   function needXP(lv) { return 40 + (lv - 1) * 35; }
@@ -247,9 +261,31 @@
   /* ========================================================
      7. ЭКРАНЫ
      ======================================================== */
-  var SCREENS = ['intro', 'hero', 'grade', 'town', 'land', 'fight', 'win'];
+  var SCREENS = ['intro', 'hero', 'grade', 'tale', 'town', 'land', 'fight', 'win'];
+
+  /* вступление: куда мы отправляемся и зачем — три кадра, листаются */
+  var TALE = [
+    { bg: 'town.webp',
+      t: 'Счётные Земли',
+      p: 'В этот раз мы отправляемся в страну, которая держится на числах. Пока у моста записано, сколько в нём пролётов, — мост стоит. Пока у года записано четыре времени — зима приходит вовремя. Все числа хранит <b>Великий Счёт</b>, живая книга под Палатой Счёта.' },
+    { bg: 'loc_tower.webp',
+      t: 'Безмер',
+      p: 'Он был первым счетомагом и считал дольше всех. А потом устал и решил: без чисел спокойнее — не надо помнить, не надо сверять, не надо отвечать. И начал стирать числа из книги. Мост через Делимую реку уже поплыл. Часы на башне встали.' },
+    { bg: 'loc_academy.webp',
+      t: 'Твой посох',
+      p: 'Стёртые числа не исчезают совсем — они сбиваются в <b>кляксы</b> и бродят по землям, забыв, чем были. Победишь кляксу — число вернётся в книгу, и вещь встанет на место. Правило простое: <b>заклинание слушается того, кто назовёт верное число</b>.' }
+  ];
+  var taleStep = 0;
   function show(name) {
+    if (name !== 'fight' && window.nookaFX) window.nookaFX.off();
     SCREENS.forEach(function (n) { var el = $('sc-' + n); if (el) el.hidden = (n !== name); });
+    /* канвас эффектов меряется только когда экран уже показан: пока он
+       скрыт, размеры нулевые и рисовать не на чем */
+    if (name === 'fight' && window.nookaFX) {
+      window.nookaFX.ready();
+      requestAnimationFrame(function () { window.nookaFX.resize(); });
+      setTimeout(function () { window.nookaFX.resize(); }, 120);
+    }
     window.scrollTo(0, 0);
     if (name === 'town') drawTown();
   }
@@ -278,7 +314,7 @@
       b.type = 'button';
       b.className = 'mq-pick' + (S.hero === h.id ? ' mq-pick--on' : '');
       b.innerHTML =
-        '<span class="mq-pick__art" style="--tint:' + h.tint + '"><img src="' + ART + h.art + '" alt="" loading="lazy"></span>' +
+        '<span class="mq-pick__art" style="--tint:' + auraColor() + '"><img src="' + ART + h.art + '" alt="" loading="lazy"></span>' +
         '<span class="mq-pick__name">' + h.name + '</span>' +
         '<span class="mq-pick__sub">' + h.about + '</span>';
       b.addEventListener('click', function () {
@@ -291,6 +327,48 @@
     });
   }
   drawHeroes();
+
+  /* ---------- цвет магии и знак ---------- */
+  (function () {
+    var box = $('hero-tune');
+    if (!box) return;
+    var row1 = document.createElement('div'); row1.className = 'mq-row';
+    row1.innerHTML = '<span class="mq-row__lbl">Цвет магии</span>';
+    var c1 = document.createElement('div'); c1.className = 'mq-chips';
+    AURA.forEach(function (a, i) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'mq-chip mq-chip--dot';
+      b.setAttribute('aria-pressed', (S.aura || 0) === i ? 'true' : 'false');
+      b.setAttribute('aria-label', a.n);
+      b.innerHTML = '<i style="background:' + a.c + '"></i>';
+      b.addEventListener('click', function () {
+        S.aura = i; save();
+        Array.prototype.forEach.call(c1.children, function (x) { x.setAttribute('aria-pressed', 'false'); });
+        b.setAttribute('aria-pressed', 'true');
+        drawHeroes();
+      });
+      c1.appendChild(b);
+    });
+    row1.appendChild(c1); box.appendChild(row1);
+
+    var row2 = document.createElement('div'); row2.className = 'mq-row';
+    row2.innerHTML = '<span class="mq-row__lbl">Знак на посохе</span>';
+    var c2 = document.createElement('div'); c2.className = 'mq-chips';
+    MARK.forEach(function (m, i) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'mq-chip mq-chip--mark';
+      b.setAttribute('aria-pressed', (S.mark || 0) === i ? 'true' : 'false');
+      b.textContent = m;
+      b.addEventListener('click', function () {
+        S.mark = i; save();
+        Array.prototype.forEach.call(c2.children, function (x) { x.setAttribute('aria-pressed', 'false'); });
+        b.setAttribute('aria-pressed', 'true');
+      });
+      c2.appendChild(b);
+    });
+    row2.appendChild(c2); box.appendChild(row2);
+  })();
+
   $('hero-name').value = S.name || '';
   $('hero-name').addEventListener('input', function () { S.name = this.value.trim(); save(); });
   $('hero-done').addEventListener('click', function () {
@@ -316,11 +394,31 @@
         S.grade = g; S.made = true; save();
         Array.prototype.forEach.call(box.children, function (c) { c.setAttribute('aria-pressed', 'false'); });
         b.setAttribute('aria-pressed', 'true');
-        setTimeout(function () { show('town'); }, 150);
+        setTimeout(function () {
+          if (!S.seen.tale) { taleStep = 0; drawTale(); show('tale'); }
+          else show('town');
+        }, 150);
       });
       box.appendChild(b);
     })(g);
   })();
+
+  /* ---------- вступление ---------- */
+  function drawTale() {
+    var t = TALE[taleStep];
+    $('tale-bg').src = ART + t.bg;
+    $('tale-title').textContent = t.t;
+    $('tale-text').innerHTML = t.p;
+    $('tale-dots').innerHTML = TALE.map(function (_, i) {
+      return '<i class="' + (i === taleStep ? 'on' : '') + '"></i>';
+    }).join('');
+    $('tale-go').textContent = taleStep < TALE.length - 1 ? 'Дальше' : 'В Числоград';
+  }
+  $('tale-go').addEventListener('click', function () {
+    if (taleStep < TALE.length - 1) { taleStep++; drawTale(); }
+    else { S.seen.tale = true; save(); show('town'); }
+  });
+  $('tale-skip').addEventListener('click', function () { S.seen.tale = true; save(); show('town'); });
 
   /* ========================================================
      8. ЧИСЛОГРАД
@@ -337,7 +435,7 @@
   function drawTown() {
     var h = hero();
     $('town-me').innerHTML =
-      '<span class="mq-me__art" style="--tint:' + h.tint + '"><img src="' + ART + h.art + '" alt=""></span>' +
+      '<span class="mq-me__art" style="--tint:' + auraColor() + '"><img src="' + ART + h.art + '" alt=""></span>' +
       '<span class="mq-me__txt"><span class="mq-me__name">' + esc(S.name || h.name) + '</span>' +
       '<span class="mq-me__lv">' + S.lv + ' уровень · ' + S.grade + ' класс · вернул чисел: ' + S.solved + '</span></span>';
 
@@ -430,7 +528,7 @@
         '<span class="mq-go__art"><img src="' + ART + FOES[f.foes[0]].art + '" alt="" loading="lazy"></span>' +
         '<span class="mq-go__txt"><span class="mq-go__name">' + f.label + (fin ? ' · возвращено' : '') + '</span>' +
         '<span class="mq-go__sub">' + f.sub + '</span></span>';
-      b.addEventListener('click', function () { startFight(f.foes, curLand, fi); });
+      b.addEventListener('click', function () { walkThen(f.foes, curLand, fi); });
       box.appendChild(b);
     });
     var back = document.createElement('button');
@@ -438,6 +536,19 @@
     back.textContent = 'К другим землям';
     back.addEventListener('click', function () { drawLands(); $('land-place').hidden = true; $('land-list').hidden = false; });
     box.appendChild(back);
+  }
+
+  /* ---------- дорога до места боя ----------
+     без неё бой начинался рывком: только что был диалог — и сразу драка */
+  function walkThen(keys, li, fi) {
+    var h = hero(), place = $('land-place');
+    var w = document.createElement('div');
+    w.className = 'mq-walk';
+    w.innerHTML = '<span class="mq-walk__hero" style="--tint:' + auraColor() + '"><img src="' + ART + h.art + '" alt=""></span>' +
+                  '<span class="mq-walk__dust"></span>';
+    place.appendChild(w);
+    requestAnimationFrame(function () { w.classList.add('mq-walk--go'); });
+    setTimeout(function () { w.remove(); startFight(keys, li, fi); }, 1150);
   }
 
   /* ========================================================
@@ -460,6 +571,7 @@
     };
     $('fight-bg').src = ART + LANDS[li].bg;
     drawFoes(); drawMine(); showSpells();
+
     tip('Выбери заклинание. <b>Подсвечено</b> то, к чему клякса слаба.');
     show('fight');
   }
@@ -488,8 +600,8 @@
     var h = hero(), pet = S.pets.length ? S.pets[S.pets.length - 1] : null;
     $('mine').innerHTML =
       '<span class="mq-unit" id="u-me">' +
-        '<span class="mq-unit__art" style="--tint:' + h.tint + '"><img src="' + ART + h.art + '" alt=""></span>' +
-        '<span class="mq-unit__name">' + esc(S.name || h.name) + '</span>' +
+        '<span class="mq-unit__art mq-unit__art--me" style="--tint:' + auraColor() + '"><img src="' + ART + h.art + '" alt=""></span>' +
+        '<span class="mq-unit__name"><em class="mq-mark" style="color:' + auraColor() + '">' + markGlyph() + '</em> ' + esc(S.name || h.name) + '</span>' +
         '<span class="mq-bar"><i style="width:' + Math.max(0, B.hp / B.max * 100) + '%;background:' + hpColor(B.hp / B.max) + '"></i></span>' +
       '</span>' +
       (pet ? '<span class="mq-unit mq-unit--pet"><span class="mq-unit__art"><img src="' + ART + (pet.art || 'foe_blot.webp') + '" alt=""></span>' +
@@ -580,6 +692,7 @@
       S.wrong++; B.wrong++; save();
       tip('Не то число. Верное — <b>' + B.task.answer + '</b>. Ход ушёл, но тебя не задело.');
       pop($('u-me'), 'мимо', 'miss');
+      if (window.nookaFX) window.nookaFX.miss($('u-me'));
       setTimeout(function () { endTurn(true); }, 1100);
     }
   }
@@ -588,13 +701,17 @@
     var k = B.spell, e = ELEM[k], P = spellPow(k);
     var me = $('u-me');
     if (me) { me.classList.add('mq-cast'); setTimeout(function () { me.classList.remove('mq-cast'); }, 330); }
+    var FX = window.nookaFX;
+    if (FX) FX.castStart(me, k);
     var aim = B.foes[B.aim], weak = aim && aim.weak === k, x2 = weak ? 2 : 1;
+    function foeEl(f) { return $('foes').children[f.i]; }
 
     if (e.mode === 'heal') {
       var cut = P * x2, heal = Math.round(P * 1.2);
       B.hp = Math.min(B.max, B.hp + heal);
-      if (aim && aim.hp > 0) hurt(aim, cut);
-      drawMine(); pop($('u-me'), '+' + heal, 'heal');
+      if (FX && aim) FX.drain(me, foeEl(aim), k);
+      setTimeout(function () { if (aim && aim.hp > 0) hurt(aim, cut); drawMine(); }, 430);
+      pop($('u-me'), '+' + heal, 'heal');
       tip('<b>Убыль</b>: отняла ' + cut + ' и вернула тебе ' + heal + '.' + (weak ? ' Вдвое — он к этому слаб.' : ''));
     }
     else if (e.mode === 'multi') {
@@ -606,28 +723,35 @@
           tip('<b>Вихрь</b>: ' + times + ' ' + plural(times, 'удар', 'удара', 'ударов') + ' по ' + per + '.');
           return;
         }
-        hurt(aim, per); n++; setTimeout(step, 150);
+        if (FX) FX.zap(me, foeEl(aim), k, n);
+        hurt(aim, per); n++; setTimeout(step, 190);
       })();
     }
     else if (e.mode === 'all') {
       var list = alive();
       var each = Math.max(1, Math.round(P * 1.3 / Math.max(1, Math.sqrt(list.length))));
+      if (FX) FX.ring(me, list.map(foeEl), k);
       list.forEach(function (f, i) {
-        setTimeout(function () { hurt(f, f.weak === k ? each * 2 : each); }, i * 140);
+        setTimeout(function () { hurt(f, f.weak === k ? each * 2 : each); }, 140 + i * 140);
       });
       tip('<b>Раскол</b>: удар поделён на ' + list.length + ' — по ' + each + ' каждому.');
     }
     else if (e.mode === 'part') {
       var part = Math.max(4, Math.round(aim.max * .25)) * x2;
-      hurt(aim, part);
+      if (FX) FX.strike(me, foeEl(aim), k, 'medium');
+      setTimeout(function () { hurt(aim, part); }, 310);
       tip('<b>Доля</b>: срезала четверть здоровья — ' + part + '.');
     }
     else if (e.mode === 'crit') {
-      var d2 = P * 2 * x2; hurt(aim, d2);
+      var d2 = P * 2 * x2;
+      if (FX) FX.strike(me, foeEl(aim), k, 'large');
+      setTimeout(function () { hurt(aim, d2); }, 310);
       tip('<b>Тайна</b>: неизвестное найдено — ' + d2 + ' в слабое место.');
     }
     else {
-      var d = P * x2; hurt(aim, d);
+      var d = P * x2;
+      if (FX) FX.strike(me, foeEl(aim), k, weak ? 'large' : 'medium');
+      setTimeout(function () { hurt(aim, d); }, 310);
       tip('<b>Рост</b>: удар на ' + d + (weak ? ' — вдвое, он к этому слаб.' : '.'));
     }
 
@@ -636,6 +760,7 @@
   }
 
   function hurt(f, dmg) {
+    var wasAlive = f.hp > 0;
     f.hp = Math.max(0, f.hp - dmg);
     drawFoes();
     var u = $('foes').children[f.i];
@@ -644,7 +769,9 @@
       if (art) { art.classList.add('mq-hit'); setTimeout(function () { art.classList.remove('mq-hit'); }, 250); }
       pop(u, '−' + dmg);
     }
-    shake(dmg >= 20 ? 'm' : 's');
+    /* повержено — рассыпается, а не просто гаснет */
+    if (wasAlive && f.hp <= 0 && window.nookaFX) window.nookaFX.slay(u, B.spell || 'add');
+    else if (!window.nookaFX) shake(dmg >= 20 ? 'm' : 's');
   }
 
   function endTurn(fumbled) {
@@ -662,14 +789,14 @@
       var f = foes[i++], dmg = f.pow + Math.round(Math.random() * 3);
       B.hp = Math.max(0, B.hp - dmg);
       drawMine();
-      var me = $('u-me');
-      if (me) {
-        var art = me.querySelector('.mq-unit__art');
-        if (art) { art.classList.add('mq-hit'); setTimeout(function () { art.classList.remove('mq-hit'); }, 250); }
-        pop(me, '−' + dmg);
+      var me2 = $('u-me');
+      if (me2) {
+        var art2 = me2.querySelector('.mq-unit__art');
+        if (art2) { art2.classList.add('mq-hit'); setTimeout(function () { art2.classList.remove('mq-hit'); }, 250); }
+        pop(me2, '−' + dmg);
       }
-      shake('s');
-      setTimeout(next, 540);
+      if (window.nookaFX) window.nookaFX.hurtMe(me2); else shake('s');
+      setTimeout(next, 560);
     })();
   }
 
@@ -679,7 +806,7 @@
       S.done[B.li + ':' + B.fi] = true;
       var xp = 12 + B.solved * 6 + B.foes.length * 5;
       S.xp += xp;
-      rows.push(['✦', 'Опыт +' + xp, 'чисел возвращено: ' + B.solved + (B.wrong ? ', промахов: ' + B.wrong : ', без промахов')]);
+      rows.push(['✦', 'Опыт +' + xp, 'заклинаний прошло: ' + B.solved + (B.wrong ? ', промахов: ' + B.wrong : ', без промахов')]);
       var up = false;
       while (S.xp >= needXP(S.lv)) { S.xp -= needXP(S.lv); S.lv++; up = true; }
       if (up) rows.push(['⬆', S.lv + ' уровень', 'здоровья теперь ' + hpMax()]);
@@ -690,14 +817,16 @@
         var c = cand[0];
         if (!S.pets.some(function (p) { return p.name === c.name; })) {
           S.pets.push({ name: c.name, art: c.art });
-          rows.push(['🫧', c.name + ' вспомнил себя', c.was + ' — число вернулось, и теперь он идёт с тобой']);
+          rows.push(['🤝', c.name + ' пошёл за тобой', 'один осколок уцелел и вспомнил себя: ' + c.was]);
         }
       }
       $('win-art').innerHTML = '<img src="' + ART + hero().art + '" alt="">';
-      $('win-title').textContent = B.foes[0].boss ? 'Великий Счёт полон' : 'Числа на месте';
+      $('win-title').textContent = B.foes[0].boss ? 'Безмер повержен' : 'Победа';
       $('win-sub').textContent = B.foes[0].boss
-        ? 'Безмер ушёл. Числа вернулись в книгу, и мир снова твёрдый.'
-        : (B.foes.length > 1 ? 'Кляксы вспомнили, чем были.' : 'Клякса вспомнила, чем была.');
+        ? 'Он рассыпался, и все числа разом вернулись в книгу. Мир снова твёрдый.'
+        : (B.foes.length > 1
+            ? 'Кляксы рассыпались — числа вернулись в Великий Счёт.'
+            : B.foes[0].name + ' рассыпался. Число вернулось в книгу: ' + B.foes[0].was + '.');
       $('win-go').textContent = 'В Числоград';
     } else {
       rows.push(['💤', 'Силы кончились', 'ничего не потеряно — числа остались у тебя в голове']);
