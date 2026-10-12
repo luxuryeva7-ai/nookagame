@@ -8,7 +8,7 @@
 <meta name="robots" content="noindex">
 <link href="../fonts/nooka-fonts.css" rel="stylesheet">
 <link rel="stylesheet" href="nooka-ui.css">
-<link rel="stylesheet" href="nooka-mq.css?v=10">
+<link rel="stylesheet" href="nooka-mq.css?v=13">
 <link rel="preload" as="image" href="mq/town.webp">
 </head>
 <body class="mq-body">
@@ -99,7 +99,10 @@
         <button class="mq-back" data-back="town" type="button" aria-label="В город">←</button>
         <h2 id="land-title"></h2>
       </header>
+      <div class="mq-actors" id="land-actors"></div>
+      <div class="mq-stagewrap" id="land-stage"></div>
       <div class="mq-place__body">
+        <p class="mq-hint" id="land-hint"></p>
         <div class="mq-speech" id="land-speech"></div>
         <div class="mq-gos" id="land-fights"></div>
       </div>
@@ -154,7 +157,8 @@
 
 </div>
 
-<script src="nooka-mq-fx.js?v=10"></script>
-<script src="nooka-mq.js?v=10"></script>
+<script src="nooka-mq-fx.js?v=13"></script>
+<script src="nooka-mq-world.js?v=13"></script>
+<script src="nooka-mq.js?v=13"></script>
 </body>
 </html>
