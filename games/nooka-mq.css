@@ -846,7 +846,7 @@ html, body { overflow-x: clip; }
 .mq-stage { position: absolute; inset: 0; }
 
 .mq-player {
-  position: absolute; bottom: 30%; left: 16%;
+  position: absolute; bottom: 40%; left: 16%;
   transform: translateX(-50%);
   pointer-events: none;
   display: flex; flex-direction: column; align-items: center;
@@ -870,7 +870,7 @@ html, body { overflow-x: clip; }
 
 /* клякса ждёт в своей точке */
 .mq-spot-foe {
-  position: absolute; bottom: 31%;
+  position: absolute; bottom: 41%;
   transform: translateX(-50%);
   border: 0; background: transparent; padding: 2px;
   font-family: inherit; cursor: pointer;
@@ -909,7 +909,7 @@ html, body { overflow-x: clip; }
 /* актёры-NPC стоят выше героя, чтобы не слипались */
 /* задний план: NPC стоят выше и мельче — так читается глубина,
    а герой с кляксами не слипаются с ними в одну полосу */
-.mq-actors { bottom: 46%; }
+.mq-actors { bottom: 58%; }
 .mq-actor__art { width: 46px; height: 46px; opacity: .92; }
 .mq-actor__name { font-size: 9.5px; opacity: .85; }
 
@@ -917,9 +917,170 @@ html, body { overflow-x: clip; }
   .mq-player__art { width: 62px; height: 62px; }
   .mq-spot-foe__art { width: 56px; height: 56px; }
   .mq-actor__art { width: 40px; height: 40px; }
-  .mq-actors { bottom: 48%; }
-  .mq-player, .mq-spot-foe { bottom: 33%; }
+  .mq-actors { bottom: 60%; }
+  .mq-player, .mq-spot-foe { bottom: 42%; }
 }
 @media (prefers-reduced-motion: reduce) {
   .mq-player--walk .mq-player__art, .mq-spot-foe__art { animation: none; }
+}
+
+/* ============================================================
+   ФИГУРЫ В ПОЛНЫЙ РОСТ
+   Персонажи были круглыми иконками и висели в воздухе. Теперь
+   это вырезанные фигуры: стоят на земле, под каждой — мягкая
+   тень, которая и «ставит» их на поверхность.
+   ============================================================ */
+
+.mq-fig {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center;
+}
+.mq-fig img {
+  display: block; width: 100%; height: 100%;
+  object-fit: contain; object-position: bottom center;
+  filter: drop-shadow(0 6px 10px rgba(20,10,30,.45));
+}
+/* тень на земле — без неё фигура «висит» */
+.mq-fig::after {
+  content: ''; position: absolute; left: 50%; bottom: -5px;
+  transform: translateX(-50%);
+  width: 62%; height: 11px; border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(20,10,30,.45), rgba(20,10,30,0) 72%);
+  z-index: -1;
+}
+
+/* ---------- герой на сцене ---------- */
+.mq-player__art {
+  width: auto !important; height: 112px !important;
+  border-radius: 0 !important; overflow: visible !important;
+  background: none !important; box-shadow: none !important;
+  position: relative;
+}
+.mq-player__art img {
+  width: auto; height: 100%; object-fit: contain; object-position: bottom center;
+  filter: drop-shadow(0 0 14px var(--tint, #9B6BE0)) drop-shadow(0 7px 12px rgba(20,10,30,.5));
+}
+.mq-player__art::after {
+  content: ''; position: absolute; left: 50%; bottom: -3px;
+  transform: translateX(-50%);
+  width: 64px; height: 12px; border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(20,10,30,.5), rgba(20,10,30,0) 72%);
+}
+
+/* ---------- кляксы стоят в комнате ---------- */
+.mq-spot-foe__art {
+  width: auto !important; height: 94px !important;
+  border-radius: 0 !important; overflow: visible !important;
+  background: none !important; box-shadow: none !important;
+  position: relative;
+}
+.mq-spot-foe__art img {
+  width: auto; height: 100%; object-fit: contain; object-position: bottom center;
+  filter: drop-shadow(0 7px 12px rgba(20,10,30,.55));
+}
+.mq-spot-foe__art::after {
+  content: ''; position: absolute; left: 50%; bottom: -3px;
+  transform: translateX(-50%);
+  width: 56px; height: 11px; border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(20,10,30,.5), rgba(20,10,30,0) 72%);
+}
+
+/* ---------- NPC на заднем плане ---------- */
+.mq-actor__art {
+  width: auto !important; height: 84px !important;
+  border-radius: 0 !important; overflow: visible !important;
+  background: none !important; box-shadow: none !important; opacity: 1 !important;
+  position: relative;
+}
+.mq-actor__art img {
+  width: auto; height: 100%; object-fit: contain; object-position: bottom center;
+  filter: drop-shadow(0 6px 10px rgba(20,10,30,.45));
+}
+.mq-actor__art::after {
+  content: ''; position: absolute; left: 50%; bottom: -3px;
+  transform: translateX(-50%);
+  width: 48px; height: 9px; border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(20,10,30,.42), rgba(20,10,30,0) 72%);
+}
+.mq-actor--talk .mq-actor__art { box-shadow: none !important; }
+.mq-actor--talk .mq-actor__art img { filter: drop-shadow(0 0 12px var(--star)) drop-shadow(0 6px 10px rgba(20,10,30,.45)); }
+
+/* ---------- бойцы в бою ---------- */
+.mq-unit__art {
+  width: auto !important; height: 120px !important;
+  border-radius: 0 !important; overflow: visible !important;
+  background: none !important; box-shadow: none !important;
+  position: relative;
+}
+.mq-unit__art img {
+  width: auto; height: 100%; object-fit: contain; object-position: bottom center;
+  filter: drop-shadow(0 8px 14px rgba(20,10,30,.55));
+}
+.mq-unit__art::after {
+  content: ''; position: absolute; left: 50%; bottom: -4px;
+  transform: translateX(-50%);
+  width: 68px; height: 13px; border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(20,10,30,.5), rgba(20,10,30,0) 72%);
+}
+.mq-unit__art--me img { filter: drop-shadow(0 0 16px var(--tint, #9B6BE0)) drop-shadow(0 8px 14px rgba(20,10,30,.55)); }
+.mq-unit--boss .mq-unit__art { height: 146px !important; }
+.mq-unit--pet .mq-unit__art { height: 74px !important; }
+
+/* ---------- горожане на карте ---------- */
+.mq-folk__art {
+  width: auto !important; height: 44px !important;
+  border-radius: 0 !important; overflow: visible !important;
+  background: none !important; box-shadow: none !important;
+}
+.mq-folk__art img {
+  width: auto; height: 100%; object-fit: contain; object-position: bottom center;
+  filter: drop-shadow(0 3px 5px rgba(20,10,30,.5));
+}
+
+/* ---------- выбор героя: фигуры, а не кружки ---------- */
+.mq-pick__art {
+  aspect-ratio: 3 / 4; border-radius: 14px !important;
+  background: linear-gradient(180deg, rgba(255,255,255,.5), rgba(255,244,228,.8)) !important;
+  box-shadow: 0 0 0 2px var(--card), 0 4px 12px rgba(45,27,69,.12) !important;
+  display: flex; align-items: flex-end; justify-content: center;
+  overflow: hidden;
+}
+.mq-pick__art img { width: 100%; height: 94%; object-fit: contain; object-position: bottom center; }
+.mq-pick--on .mq-pick__art {
+  box-shadow: 0 0 0 2px var(--card), 0 0 0 4px var(--tint, var(--star)), 0 6px 16px rgba(45,27,69,.18) !important;
+}
+
+/* ---------- итог: фигура целиком ---------- */
+.mq-win__full {
+  width: auto !important; height: 150px !important; border-radius: 0 !important;
+  object-fit: contain; object-position: bottom center;
+  box-shadow: none !important;
+  filter: drop-shadow(0 8px 16px rgba(45,27,69,.3));
+}
+
+@media (max-height: 700px) {
+  .mq-player__art { height: 92px !important; }
+  .mq-spot-foe__art { height: 78px !important; }
+  .mq-actor__art { height: 68px !important; }
+  .mq-unit__art { height: 96px !important; }
+  .mq-unit--boss .mq-unit__art { height: 118px !important; }
+  .mq-win__full { height: 110px !important; }
+  .mq-folk__art { height: 36px !important; }
+}
+
+/* текстовая задача из учебника — это абзац, а не формула:
+   меньше кегль, живая высота строки, выравнивание по левому краю */
+.mq-task__q--word {
+  font-size: 15.5px !important;
+  font-weight: 800;
+  line-height: 1.45;
+  letter-spacing: 0;
+  text-align: left;
+  padding: 2px 2px 10px;
+}
+.mq-task__q--word small {
+  text-align: left; font-size: 12px; margin-top: 5px;
+}
+@media (max-height: 660px) {
+  .mq-task__q--word { font-size: 14px !important; line-height: 1.38; }
 }
