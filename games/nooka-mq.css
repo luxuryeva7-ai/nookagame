@@ -1,27 +1,20 @@
 /* ============================================================
-   АРИФМАГИЯ — облик математической RPG Nooka
-   Светлый тёплый мир Nooka (бумага #FFF4E4, чернила #2D1B45),
-   Nunito, крупные формы. Возраст 1–8 класс: тепло, но не малышово.
+   АРИФМАГИЯ — облик. Мир Nooka: тёплая бумага, Nunito,
+   крупные формы. Персонажи и земли — рисованный арт, а не
+   фигуры из кода: кружки из SVG для 1–8 класса читались убого.
 
-   Правила проекта, зашитые тут намеренно:
+   Зашито намеренно:
    · на html/body только overflow-x: clip — hidden ломает липкий футер
-   · в каждом скролл-флексе min-height: 0, иначе контент уезжает
-   · на каждом экране есть достижимая кнопка (липкий футер)
-   · тапабельная зона не меньше 44px
-   · проверено на 360 × 600
+   · экран держит height + overflow:hidden, скроллится внутренний блок
+   · [hidden] с !important — display:grid иначе его перебивает
+   · на каждом экране есть достижимая кнопка
+   · проверено на 360×600 и на ноутбуке
    ============================================================ */
 
 html, body { overflow-x: clip; }
-
-/* display:grid/flex в своих правилах перебивает атрибут hidden — без этого
-   заклинания остаются на экране под задачей. Чинит сразу все такие блоки. */
 .mq [hidden], .mq-sheet[hidden] { display: none !important; }
 
 .mq-body {
-  /* nooka-ui.css переопределяет --nk-* тёмными в :root без условия (стр. 116):
-     сайт по умолчанию тёмный, а светлые страницы красятся своим классом
-     оболочки (как .mhub-body у «Чисел-друзей»). Делаем так же: палитра
-     объявлена прямо здесь и фон задан явно, а не через --nk-bg. */
   margin: 0;
   background: #FFF4E4;
   color: #2D1B45;
@@ -29,561 +22,374 @@ html, body { overflow-x: clip; }
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
 
-  /* стихии = действия. Цвет не украшение: по нему ребёнок узнаёт тип задачи */
-  --add:   #2E9D6B;  --add-bg:   #C9F4DE;
-  --sub:   #D8552F;  --sub-bg:   #FFD9CC;
-  --mul:   #6B4BE0;  --mul-bg:   #E6DEFF;
-  --div:   #1F7FB8;  --div-bg:   #CFE6F2;
-  --frac:  #B07400;  --frac-bg:  #FFEFB8;
-  --eq:    #A32F86;  --eq-bg:    #FFDDF2;
+  /* стихии = действия: по цвету ребёнок узнаёт тип задачи */
+  --add:  #2E9D6B;  --add-bg:  #C9F4DE;
+  --sub:  #D8552F;  --sub-bg:  #FFD9CC;
+  --mul:  #6B4BE0;  --mul-bg:  #E6DEFF;
+  --div:  #1F7FB8;  --div-bg:  #CFE6F2;
+  --frac: #B07400;  --frac-bg: #FFEFB8;
+  --eq:   #A32F86;  --eq-bg:   #FFDDF2;
 
-  --ink:   #2D1B45;
-  --ink-2: #6B5B80;
-  --paper: #FFF4E4;
-  --card:  #FFFFFF;
-  --line:  #EADFCB;
-  --hp:    #E04A3C;
-  --star:  #FFC63F;
-
-  --r: 18px;
-  --r-s: 12px;
+  --ink: #2D1B45;  --ink-2: #6B5B80;
+  --paper: #FFF4E4; --card: #FFFFFF; --line: #EADFCB;
+  --star: #FFC63F;
+  --r: 18px; --r-s: 12px;
   --shadow: 0 2px 0 rgba(45,27,69,.10), 0 10px 24px rgba(45,27,69,.08);
 }
 
-.mq {
-  position: relative;
-  height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
+.mq { position: relative; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
 
-/* ---------- экран ----------
-   height + overflow:hidden, а не min-height: иначе экран растёт под контент,
-   скроллится весь документ, и липкий футер уезжает под нижний край
-   (кнопку «В Палату Счёта» так и потеряли — правило #73). Высоту держит
-   экран, скроллится только внутренний блок с min-height: 0. */
 .mq-sc {
   position: relative;
   flex: 1 1 auto;
-  height: 100dvh;
-  max-height: 100dvh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
+  height: 100dvh; max-height: 100dvh; overflow: hidden;
+  display: flex; flex-direction: column;
   padding: max(14px, env(safe-area-inset-top)) 16px 0;
   box-sizing: border-box;
 }
-.mq-sc[hidden] { display: none; }
 
-.mq-head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 44px;
-  flex: 0 0 auto;
-}
-.mq-head h2 {
-  margin: 0;
-  font-size: 21px;
-  font-weight: 800;
-  letter-spacing: -.2px;
-  flex: 1 1 auto;
-}
-.mq-head--over {
-  position: relative;
-  z-index: 2;
-  color: #fff;
-  text-shadow: 0 2px 10px rgba(20,10,30,.5);
-}
-.mq-head--map { justify-content: space-between; }
+.mq-head { display: flex; align-items: center; gap: 10px; min-height: 44px; flex: 0 0 auto; }
+.mq-head h2 { margin: 0; font-size: 21px; font-weight: 800; letter-spacing: -.2px; flex: 1 1 auto; }
+.mq-head--over { position: relative; z-index: 3; color: #fff; text-shadow: 0 2px 12px rgba(20,10,30,.6); }
 
 .mq-back, .mq-icobtn {
-  flex: 0 0 auto;
-  width: 44px; height: 44px;
+  flex: 0 0 auto; width: 44px; height: 44px;
   display: grid; place-items: center;
-  border: 0;
-  border-radius: 50%;
-  background: var(--card);
-  color: var(--ink);
-  font-size: 20px;
-  font-weight: 800;
-  box-shadow: var(--shadow);
-  cursor: pointer;
+  border: 0; border-radius: 50%;
+  background: var(--card); color: var(--ink);
+  font-size: 20px; font-weight: 800;
+  box-shadow: var(--shadow); cursor: pointer;
 }
 .mq-back:active, .mq-icobtn:active { transform: translateY(1px); }
 
-.mq-note {
-  margin: 8px 0 14px;
-  color: var(--ink-2);
-  font-size: 15px;
-  line-height: 1.45;
-  flex: 0 0 auto;
-}
+.mq-note { margin: 8px 0 14px; color: var(--ink-2); font-size: 15px; line-height: 1.45; flex: 0 0 auto; }
 
-/* ---------- липкий футер ---------- */
 .mq-foot {
-  margin-top: auto;
-  flex: 0 0 auto;
-  position: sticky;
-  bottom: 0;
+  margin-top: auto; flex: 0 0 auto;
+  position: sticky; bottom: 0;
   padding: 12px 0 max(14px, env(safe-area-inset-bottom));
-  background: linear-gradient(to top, var(--paper) 55%, rgba(255,244,228,0));
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  background: linear-gradient(to top, var(--paper) 58%, rgba(255,244,228,0));
+  display: flex; flex-direction: column; gap: 8px;
 }
 
 .mq-btn {
-  min-height: 52px;
-  border: 0;
-  border-radius: var(--r);
-  background: var(--ink);
-  color: #FFF8EC;
-  font-family: inherit;
-  font-size: 17px;
-  font-weight: 800;
-  letter-spacing: -.1px;
-  box-shadow: 0 3px 0 rgba(45,27,69,.35);
-  cursor: pointer;
-  padding: 0 18px;
+  min-height: 52px; border: 0; border-radius: var(--r);
+  background: var(--ink); color: #FFF8EC;
+  font-family: inherit; font-size: 17px; font-weight: 800; letter-spacing: -.1px;
+  box-shadow: 0 3px 0 rgba(45,27,69,.35); cursor: pointer; padding: 0 18px;
 }
 .mq-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(45,27,69,.35); }
 .mq-btn--big { font-size: 19px; min-height: 58px; }
-.mq-btn--ghost {
-  background: transparent;
-  color: var(--ink-2);
-  box-shadow: none;
-  font-size: 15px;
-  min-height: 44px;
-  font-weight: 700;
-}
+.mq-btn--ghost { background: transparent; color: var(--ink-2); box-shadow: none; font-size: 15px; min-height: 44px; font-weight: 700; }
 
 /* ============================================================
    ЗАСТАВКА
    ============================================================ */
-.mq-sc--intro { align-items: center; text-align: center; overflow-y: auto; }
-.mq-sc--intro .mq-foot { width: 100%; max-width: 420px; }
-.mq-sc--intro .mq-btn, .mq-sc--win .mq-btn { width: 100%; }
-
-.mq-intro__art {
-  position: relative;
-  width: 100%;
-  max-width: 340px;
-  aspect-ratio: 1 / .82;
-  margin-top: auto;
-  display: grid;
-  place-items: center;
+.mq-sc--intro { padding-left: 0; padding-right: 0; justify-content: flex-end; }
+.mq-intro__bg {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; z-index: 0;
 }
-.mq-intro__neuro {
-  width: 56%;
-  max-width: 190px;
-  filter: drop-shadow(0 10px 22px rgba(45,27,69,.18));
+.mq-sc--intro::after {
+  content: ''; position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(to bottom, rgba(20,10,30,.25) 0 30%, rgba(26,14,38,.72) 72%, #1A0E26 100%);
 }
-.mq-glyph {
-  position: absolute;
-  font-size: 46px;
-  font-weight: 900;
-  line-height: 1;
-  opacity: .9;
-  animation: mq-float 4.2s ease-in-out infinite;
-}
-.mq-glyph--a { color: var(--add); left: 4%;  top: 10%; }
-.mq-glyph--b { color: var(--mul); right: 2%; top: 22%; animation-delay: -1.1s; }
-.mq-glyph--c { color: var(--sub); left: 12%; bottom: 14%; animation-delay: -2.2s; font-size: 62px; }
-.mq-glyph--d { color: var(--div); right: 8%; bottom: 6%; animation-delay: -3.3s; }
-@keyframes mq-float {
-  0%, 100% { transform: translateY(0) rotate(-4deg); }
-  50%      { transform: translateY(-12px) rotate(5deg); }
-}
-@media (prefers-reduced-motion: reduce) { .mq-glyph { animation: none; } }
-
+.mq-intro__in { position: relative; z-index: 2; margin-top: auto; padding: 0 20px; text-align: center; color: #fff; }
 .mq-intro__title {
-  margin: 10px 0 6px;
-  font-size: clamp(34px, 11vw, 46px);
-  font-weight: 900;
-  letter-spacing: -1px;
+  margin: 0 0 10px;
+  font-size: clamp(38px, 12vw, 52px);
+  font-weight: 900; letter-spacing: -1.2px;
+  text-shadow: 0 4px 22px rgba(0,0,0,.55);
 }
 .mq-intro__sub {
-  margin: 0 0 8px;
-  max-width: 330px;
-  color: var(--ink-2);
-  font-size: 16px;
-  line-height: 1.5;
+  margin: 0 auto; max-width: 360px;
+  font-size: 16px; line-height: 1.55;
+  color: rgba(255,255,255,.9);
+  text-shadow: 0 2px 10px rgba(0,0,0,.5);
 }
+.mq-intro__sub b { color: var(--star); }
+.mq-sc--intro .mq-foot {
+  position: relative; z-index: 2;
+  background: none; padding: 20px 20px max(18px, env(safe-area-inset-bottom));
+}
+.mq-sc--intro .mq-btn { background: var(--star); color: #2D1B45; box-shadow: 0 4px 0 rgba(0,0,0,.35); }
+.mq-sc--intro .mq-btn--ghost { background: none; color: rgba(255,255,255,.7); box-shadow: none; }
+
+/* ============================================================
+   ВЫБОР ГЕРОЯ
+   ============================================================ */
+.mq-picks {
+  flex: 1 1 auto; min-height: 0; overflow-y: auto;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+  align-content: start; padding-bottom: 8px;
+}
+.mq-pick {
+  border: 0; background: transparent; padding: 4px 2px 8px;
+  font-family: inherit; color: var(--ink); cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+}
+.mq-pick__art {
+  width: 100%; aspect-ratio: 1; border-radius: 50%;
+  overflow: hidden; position: relative;
+  background: #F6EDDD;
+  box-shadow: 0 0 0 3px var(--card), 0 4px 14px rgba(45,27,69,.14);
+  transition: box-shadow .16s ease, transform .16s ease;
+}
+.mq-pick__art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.mq-pick--on .mq-pick__art {
+  box-shadow: 0 0 0 3px var(--card), 0 0 0 6px var(--tint, var(--star)), 0 6px 18px rgba(45,27,69,.2);
+  transform: translateY(-2px);
+}
+.mq-pick__name { font-size: 14px; font-weight: 900; }
+.mq-pick__sub { font-size: 10.5px; font-weight: 700; color: var(--ink-2); text-align: center; line-height: 1.25; }
+
+.mq-field { display: block; }
+.mq-field span {
+  display: block; font-size: 12px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: .06em;
+  color: var(--ink-2); margin: 0 0 6px;
+}
+.mq-field input {
+  width: 100%; box-sizing: border-box; min-height: 50px;
+  border: 2px solid var(--line); border-radius: var(--r-s);
+  background: var(--card); color: var(--ink);
+  font-family: inherit; font-size: 18px; font-weight: 700; padding: 0 14px;
+}
+.mq-field input:focus { outline: none; border-color: var(--ink); }
 
 /* ============================================================
    КЛАСС
    ============================================================ */
 .mq-grades {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  align-content: start;
-  padding-bottom: 20px;
+  flex: 1 1 auto; min-height: 0; overflow-y: auto;
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
+  align-content: start; padding-bottom: 20px;
 }
 .mq-grade {
-  min-height: 88px;
-  border: 2px solid var(--line);
-  border-radius: var(--r);
-  background: var(--card);
-  color: var(--ink);
-  font-family: inherit;
-  text-align: left;
-  padding: 12px 14px;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  box-shadow: var(--shadow);
+  min-height: 84px; border: 2px solid var(--line); border-radius: var(--r);
+  background: var(--card); color: var(--ink); font-family: inherit;
+  text-align: left; padding: 12px 14px; cursor: pointer;
+  display: flex; flex-direction: column; gap: 3px; box-shadow: var(--shadow);
 }
 .mq-grade b { font-size: 19px; font-weight: 900; }
 .mq-grade span { font-size: 13px; color: var(--ink-2); line-height: 1.35; }
-.mq-grade[aria-pressed="true"] {
-  border-color: var(--ink);
-  background: var(--add-bg);
-}
+.mq-grade[aria-pressed="true"] { border-color: var(--ink); background: var(--add-bg); }
 .mq-grade:active { transform: translateY(1px); }
 
 /* ============================================================
-   КУЗНИЦА ГЕРОЯ
+   ЧИСЛОГРАД
    ============================================================ */
-.mq-forge {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto;
-  padding-bottom: 16px;
+.mq-sc--town { padding-left: 0; padding-right: 0; }
+.mq-town__bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+/* точки стоят в процентах от картинки, поэтому сама картинка внутри карты
+   показывается целиком — иначе кадрирование уводит метки с домов в небо */
+.mq-town__map::before {
+  content: ''; position: absolute; left: 0; right: 0; top: 50%;
+  transform: translateY(-50%);
+  aspect-ratio: 900 / 522;
+  background: url(mq/town.webp) center/cover no-repeat;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(20,10,30,.5);
 }
-.mq-forge__stage {
-  display: grid;
-  place-items: center;
-  padding: 6px 0 14px;
+.mq-sc--town::after {
+  content: ''; position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(to bottom, rgba(20,10,30,.5) 0 16%, rgba(20,10,30,.06) 40%, rgba(20,10,30,.72) 100%);
 }
+.mq-sc--town > .mq-head { margin: 0 16px; }
 
-.mq-avatar {
-  position: relative;
-  width: 112px; height: 132px;
-  flex: 0 0 auto;
+.mq-me { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.mq-me__art {
+  width: 46px; height: 46px; border-radius: 50%; overflow: hidden; flex: 0 0 auto;
+  box-shadow: 0 0 0 2px rgba(255,255,255,.85), 0 0 0 4px var(--tint, var(--star));
+  background: #F6EDDD;
 }
-.mq-avatar--xl { width: 168px; height: 198px; }
-.mq-avatar svg { width: 100%; height: 100%; display: block; overflow: visible; }
-
-.mq-forge__ctrl { display: grid; gap: 14px; }
-.mq-row { }
-.mq-row__lbl {
-  display: block;
-  font-size: 13px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: .06em;
-  color: var(--ink-2);
-  margin-bottom: 7px;
-}
-.mq-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.mq-chip {
-  min-height: 44px;
-  padding: 0 14px;
-  border: 2px solid var(--line);
-  border-radius: 999px;
-  background: var(--card);
-  color: var(--ink);
-  font-family: inherit;
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
-}
-.mq-chip[aria-pressed="true"] { border-color: var(--ink); background: var(--mul-bg); }
-.mq-chip--dot {
-  width: 46px; padding: 0;
-  display: grid; place-items: center;
-}
-.mq-chip--dot i {
-  width: 24px; height: 24px; border-radius: 50%;
-  display: block;
-  box-shadow: inset 0 0 0 2px rgba(255,255,255,.55);
-}
-
-.mq-field { display: block; }
-.mq-field span {
-  display: block;
-  font-size: 13px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: .06em;
-  color: var(--ink-2);
-  margin: 2px 0 7px;
-}
-.mq-field input {
-  width: 100%;
-  box-sizing: border-box;
-  min-height: 52px;
-  border: 2px solid var(--line);
-  border-radius: var(--r-s);
-  background: var(--card);
-  color: var(--ink);
-  font-family: inherit;
-  font-size: 18px;
-  font-weight: 700;
-  padding: 0 14px;
-}
-.mq-field input:focus { outline: none; border-color: var(--ink); }
-
-/* ============================================================
-   КАРТА
-   ============================================================ */
-.mq-sc--map { padding-bottom: 0; }
-
-.mq-me {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  min-width: 0;
-}
-.mq-me .mq-avatar { width: 40px; height: 47px; }
+.mq-me__art img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .mq-me__txt { min-width: 0; }
-.mq-me__name {
-  display: block;
-  font-size: 16px; font-weight: 900;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  max-width: 44vw;
-}
-.mq-me__lv { display: block; font-size: 12px; color: var(--ink-2); font-weight: 700; }
+.mq-me__name { display: block; font-size: 16px; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 62vw; }
+.mq-me__lv { display: block; font-size: 12px; font-weight: 700; opacity: .85; }
 
-.mq-map {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto;
-  display: grid;
-  gap: 12px;
-  align-content: start;
-  padding: 12px 0 8px;
+.mq-town__map { position: relative; z-index: 2; flex: 1 1 auto; min-height: 0; margin: 0 14px; }
+.mq-town__inner { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); aspect-ratio: 900 / 522; }
+.mq-pin {
+  position: absolute; transform: translate(-50%, -50%);
+  border: 0; background: transparent; padding: 4px;
+  font-family: inherit; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  min-width: 44px; min-height: 44px;
 }
-.mq-node {
-  position: relative;
-  display: flex;
-  align-items: stretch;
-  gap: 0;
-  border: 0;
-  padding: 0;
-  border-radius: var(--r);
-  background: var(--card);
-  box-shadow: var(--shadow);
-  overflow: hidden;
-  text-align: left;
-  font-family: inherit;
-  color: var(--ink);
-  cursor: pointer;
-  min-height: 94px;
+.mq-pin__dot {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--star);
+  box-shadow: 0 0 0 4px rgba(255,198,63,.3), 0 2px 8px rgba(0,0,0,.4);
+  animation: mq-pulse 2.2s ease-in-out infinite;
 }
-.mq-node:active { transform: translateY(1px); }
-.mq-node__pic {
-  flex: 0 0 96px;
-  background: var(--line) center/cover no-repeat;
+@keyframes mq-pulse {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(255,198,63,.3), 0 2px 8px rgba(0,0,0,.4); }
+  50%      { box-shadow: 0 0 0 9px rgba(255,198,63,.14), 0 2px 8px rgba(0,0,0,.4); }
 }
-.mq-node__txt { padding: 12px 14px; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-.mq-node__name { font-size: 18px; font-weight: 900; letter-spacing: -.2px; }
-.mq-node__sub { font-size: 13px; color: var(--ink-2); line-height: 1.35; }
-.mq-node__tag {
-  align-self: flex-start;
-  margin-top: 3px;
-  font-size: 12px; font-weight: 800;
-  padding: 3px 9px;
-  border-radius: 999px;
-  background: var(--add-bg);
-  color: var(--add);
+@media (prefers-reduced-motion: reduce) { .mq-pin__dot { animation: none; } }
+.mq-pin__lbl {
+  background: rgba(255,248,236,.95); color: var(--ink);
+  border-radius: 999px; padding: 5px 11px;
+  font-size: 13px; font-weight: 900; white-space: nowrap;
+  box-shadow: 0 3px 10px rgba(20,10,30,.3);
+  display: flex; flex-direction: column; align-items: center; line-height: 1.15;
 }
-.mq-node--locked { opacity: .6; cursor: default; }
-.mq-node--locked .mq-node__tag { background: var(--line); color: var(--ink-2); }
-.mq-node--done .mq-node__tag { background: var(--frac-bg); color: var(--frac); }
+.mq-pin__lbl small { font-size: 10px; font-weight: 700; color: var(--ink-2); }
+.mq-pin:active .mq-pin__lbl { transform: translateY(1px); }
 
-.mq-note--map { margin: 0 0 max(14px, env(safe-area-inset-bottom)); }
-
-/* ============================================================
-   ЛОКАЦИЯ
-   ============================================================ */
-.mq-sc--place, .mq-sc--fight { padding-left: 0; padding-right: 0; overflow: hidden; }
-.mq-sc--place > .mq-head, .mq-sc--fight > .mq-head { margin: 0 16px; }
-
-.mq-place__bg {
-  position: absolute;
-  inset: 0;
-  width: 100%; height: 100%;
-  object-fit: cover;
-  z-index: 0;
-}
-.mq-sc--place::after, .mq-sc--fight::after {
-  content: '';
-  position: absolute; inset: 0;
-  background: linear-gradient(to bottom, rgba(20,10,30,.42) 0 22%, rgba(20,10,30,.06) 45%, rgba(20,10,30,.55) 100%);
-  z-index: 1;
-}
-/* фон остаётся absolute: правило ниже не должно его трогать, иначе он
-   встаёт в поток флекса и выталкивает шапку с телом за нижний край */
-.mq-sc--place > *:not(.mq-place__bg),
-.mq-sc--fight > *:not(.mq-place__bg) { position: relative; z-index: 2; }
-
-.mq-place__body {
-  flex: 1 1 auto;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  gap: 10px;
-  padding: 12px 16px max(14px, env(safe-area-inset-bottom));
-  overflow-y: auto;
+.mq-town__foot {
+  position: relative; z-index: 2; flex: 0 0 auto;
+  padding: 0 16px max(14px, env(safe-area-inset-bottom));
 }
 
 .mq-speech {
-  background: var(--card);
-  border-radius: var(--r);
-  padding: 13px 15px;
-  font-size: 16px;
-  line-height: 1.5;
-  box-shadow: var(--shadow);
-  flex: 0 0 auto;
+  background: var(--card); border-radius: var(--r);
+  padding: 13px 15px; font-size: 15.5px; line-height: 1.5;
+  box-shadow: var(--shadow); flex: 0 0 auto;
 }
 .mq-speech b { font-weight: 900; }
 .mq-speech__who {
-  display: block;
-  font-size: 12px; font-weight: 900;
+  display: block; font-size: 11.5px; font-weight: 900;
   text-transform: uppercase; letter-spacing: .07em;
-  color: var(--ink-2);
-  margin-bottom: 4px;
+  color: var(--ink-2); margin-bottom: 4px;
 }
 
-.mq-spots { display: grid; gap: 9px; flex: 0 0 auto; }
-.mq-spot {
-  min-height: 54px;
-  border: 0;
-  border-radius: var(--r-s);
-  background: var(--card);
-  color: var(--ink);
-  font-family: inherit;
-  font-size: 16px;
-  font-weight: 800;
-  text-align: left;
-  padding: 10px 14px;
-  box-shadow: var(--shadow);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+/* ============================================================
+   ЗЕМЛИ
+   ============================================================ */
+.mq-sc--land { padding: 0; }
+.mq-land__list { display: flex; flex-direction: column; height: 100%; padding: max(14px, env(safe-area-inset-top)) 16px 0; box-sizing: border-box; }
+.mq-lands {
+  flex: 1 1 auto; min-height: 0; overflow-y: auto;
+  display: grid; gap: 12px; align-content: start;
+  padding: 12px 0 max(16px, env(safe-area-inset-bottom));
 }
-.mq-spot:active { transform: translateY(1px); }
-.mq-spot__ico { font-size: 22px; flex: 0 0 auto; line-height: 1; }
-.mq-spot__sub { display: block; font-size: 12px; font-weight: 700; color: var(--ink-2); margin-top: 2px; }
-.mq-spot--fight { background: var(--ink); color: #FFF8EC; }
-.mq-spot--fight .mq-spot__sub { color: rgba(255,248,236,.72); }
-.mq-spot--done { opacity: .55; }
+.mq-land {
+  display: flex; border: 0; padding: 0; border-radius: var(--r);
+  background: var(--card); box-shadow: var(--shadow); overflow: hidden;
+  text-align: left; font-family: inherit; color: var(--ink);
+  cursor: pointer; min-height: 96px;
+}
+.mq-land:active { transform: translateY(1px); }
+.mq-land__pic { flex: 0 0 104px; background: var(--line) center/cover no-repeat; }
+.mq-land__txt { padding: 12px 14px; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.mq-land__name { font-size: 18px; font-weight: 900; letter-spacing: -.2px; }
+.mq-land__sub { font-size: 13px; color: var(--ink-2); line-height: 1.35; }
+.mq-land__tag {
+  align-self: flex-start; margin-top: 4px;
+  font-size: 12px; font-weight: 800; padding: 3px 9px; border-radius: 999px;
+  background: var(--add-bg); color: var(--add);
+}
+.mq-land--locked { opacity: .55; cursor: default; }
+.mq-land--locked .mq-land__tag { background: var(--line); color: var(--ink-2); }
+.mq-land--done .mq-land__tag { background: var(--frac-bg); color: var(--frac); }
+
+/* локация */
+.mq-land__place { position: relative; height: 100%; display: flex; flex-direction: column; }
+.mq-place__bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+.mq-land__place::after, .mq-sc--fight::after {
+  content: ''; position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(to bottom, rgba(20,10,30,.5) 0 18%, rgba(20,10,30,.05) 42%, rgba(20,10,30,.62) 100%);
+}
+.mq-land__place > *:not(.mq-place__bg),
+.mq-sc--fight > *:not(.mq-place__bg) { position: relative; z-index: 2; }
+.mq-land__place > .mq-head { margin: max(14px, env(safe-area-inset-top)) 16px 0; }
+
+.mq-place__body {
+  flex: 1 1 auto; min-height: 0;
+  display: flex; flex-direction: column; justify-content: flex-end; gap: 10px;
+  padding: 12px 16px max(14px, env(safe-area-inset-bottom));
+  overflow-y: auto;
+}
+.mq-gos { display: grid; gap: 9px; flex: 0 0 auto; }
+.mq-go {
+  display: flex; align-items: center; gap: 11px;
+  min-height: 62px; border: 0; border-radius: var(--r-s);
+  background: var(--card); color: var(--ink);
+  font-family: inherit; text-align: left; padding: 8px 13px 8px 8px;
+  box-shadow: var(--shadow); cursor: pointer;
+}
+.mq-go:active { transform: translateY(1px); }
+.mq-go__art {
+  flex: 0 0 auto; width: 46px; height: 46px; border-radius: 50%;
+  overflow: hidden; background: #F3EBDC;
+}
+.mq-go__art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.mq-go__name { font-size: 15.5px; font-weight: 900; display: block; }
+.mq-go__sub { font-size: 12px; font-weight: 700; color: var(--ink-2); display: block; margin-top: 1px; }
+.mq-go--done { opacity: .55; }
 
 /* ============================================================
    БОЙ
    ============================================================ */
+.mq-sc--fight { padding-left: 0; padding-right: 0; }
 .mq-fight__foes {
-  flex: 0 0 auto;
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  gap: 10px;
-  padding: 4px 12px 0;
-  min-height: 150px;
+  flex: 0 0 auto; display: flex; justify-content: center; align-items: flex-end;
+  gap: 12px; padding: max(14px, env(safe-area-inset-top)) 12px 0; min-height: 168px;
 }
 .mq-fight__mine {
-  flex: 0 0 auto;
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  gap: 12px;
-  padding: 0 12px 8px;
-  margin-top: auto;
+  flex: 0 0 auto; display: flex; justify-content: center; align-items: flex-end;
+  gap: 14px; padding: 0 12px 10px;
 }
+/* герой стоит в нижней трети сцены: прижмёшь к врагу — слипаются,
+   отпустишь в auto — уезжает к самой панели */
+.mq-fight__mine { margin-top: clamp(24px, 14vh, 120px); }
+.mq-fight__panel { margin-top: auto; }
 
 .mq-unit {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-  border: 0;
-  background: transparent;
-  padding: 2px;
-  font-family: inherit;
-  color: #fff;
-  cursor: default;
-  transition: transform .14s ease;
+  position: relative; display: flex; flex-direction: column; align-items: center; gap: 5px;
+  border: 0; background: transparent; padding: 2px;
+  font-family: inherit; color: #fff; cursor: default;
+  transition: transform .14s ease, opacity .3s ease;
 }
+.mq-unit__art {
+  width: 96px; height: 96px; border-radius: 50%; overflow: hidden;
+  background: rgba(255,255,255,.12);
+  box-shadow: 0 0 0 3px rgba(255,255,255,.55), 0 8px 20px rgba(20,10,30,.45);
+}
+.mq-unit__art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.mq-unit--foe .mq-unit__art { box-shadow: 0 0 0 3px rgba(255,255,255,.4), 0 8px 20px rgba(20,10,30,.5); }
+.mq-unit--boss .mq-unit__art { width: 116px; height: 116px; box-shadow: 0 0 0 3px var(--eq), 0 10px 26px rgba(20,10,30,.6); }
+.mq-unit--pet .mq-unit__art { width: 64px; height: 64px; }
+
 .mq-unit--pick { cursor: pointer; }
 .mq-unit--pick::after {
-  content: '';
-  position: absolute;
-  left: 50%; top: -9px;
-  transform: translateX(-50%);
-  border: 7px solid transparent;
-  border-top-color: var(--star);
+  content: ''; position: absolute; left: 50%; top: -10px; transform: translateX(-50%);
+  border: 7px solid transparent; border-top-color: var(--star);
   animation: mq-bob .9s ease-in-out infinite;
 }
-@keyframes mq-bob { 0%,100% { top: -9px; } 50% { top: -3px; } }
-.mq-unit--aim { transform: scale(1.06); }
-.mq-unit--gone { opacity: 0; transform: scale(.6) translateY(10px); pointer-events: none; }
-
-.mq-unit__art {
-  width: 92px; height: 92px;
-  display: grid; place-items: center;
-  filter: drop-shadow(0 6px 12px rgba(20,10,30,.4));
-}
-.mq-unit__art img { width: 100%; height: 100%; object-fit: contain; }
-.mq-unit__art .mq-avatar { width: 84px; height: 99px; }
-.mq-unit--foe .mq-unit__art { width: 92px; height: 92px; }
+@keyframes mq-bob { 0%,100% { top: -10px; } 50% { top: -4px; } }
+.mq-unit--gone { opacity: 0; transform: scale(.7) translateY(8px); pointer-events: none; }
 
 .mq-unit__name {
-  font-size: 12px; font-weight: 900;
-  text-shadow: 0 1px 5px rgba(20,10,30,.7);
-  max-width: 92px;
-  text-align: center;
-  line-height: 1.2;
+  font-size: 12.5px; font-weight: 900;
+  text-shadow: 0 1px 6px rgba(20,10,30,.8);
+  max-width: 104px; text-align: center; line-height: 1.2;
 }
 .mq-bar {
-  width: 78px; height: 8px;
-  border-radius: 999px;
-  background: rgba(20,10,30,.5);
-  overflow: hidden;
+  width: 84px; height: 8px; border-radius: 999px;
+  background: rgba(20,10,30,.55); overflow: hidden;
   box-shadow: inset 0 0 0 1px rgba(255,255,255,.22);
 }
-.mq-bar i {
-  display: block; height: 100%;
-  background: var(--hp);
-  border-radius: 999px;
-  transition: width .35s cubic-bezier(.2,.7,.3,1);
-}
-.mq-unit__weak {
-  font-size: 11px; font-weight: 900;
-  padding: 2px 8px;
-  border-radius: 999px;
-  white-space: nowrap;
-}
+.mq-bar i { display: block; height: 100%; border-radius: 999px; transition: width .35s cubic-bezier(.2,.7,.3,1); }
+.mq-unit__weak { font-size: 11px; font-weight: 900; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
 
-/* всплывающие числа урона */
 .mq-fight__fx { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
 .mq-pop {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  font-size: 30px; font-weight: 900;
-  color: #fff;
-  text-shadow: 0 2px 8px rgba(20,10,30,.8);
-  animation: mq-pop .75s cubic-bezier(.2,.8,.3,1) forwards;
+  position: absolute; transform: translate(-50%, -50%);
+  font-size: 31px; font-weight: 900; color: #fff;
+  text-shadow: 0 2px 10px rgba(20,10,30,.9);
+  animation: mq-pop .78s cubic-bezier(.2,.8,.3,1) forwards;
 }
 .mq-pop--heal { color: #7BF0B8; }
 .mq-pop--miss { font-size: 20px; color: #FFE49E; }
 @keyframes mq-pop {
   0%   { opacity: 0; transform: translate(-50%, -50%) scale(.5); }
-  25%  { opacity: 1; transform: translate(-50%, -80%) scale(1.25); }
-  100% { opacity: 0; transform: translate(-50%, -170%) scale(1); }
+  25%  { opacity: 1; transform: translate(-50%, -82%) scale(1.25); }
+  100% { opacity: 0; transform: translate(-50%, -175%) scale(1); }
 }
 
-/* тряска экрана, hit-stop и вспышка — юс по важности события */
 .mq-shake--s { animation: mq-shake .18s ease-in-out 1; }
 .mq-shake--m { animation: mq-shake .3s ease-in-out 2; }
 @keyframes mq-shake {
@@ -591,276 +397,167 @@ html, body { overflow-x: clip; }
   25%     { transform: translate(-4px, 2px); }
   75%     { transform: translate(4px, -2px); }
 }
-.mq-hit { animation: mq-hit .22s ease-out 1; }
+.mq-hit { animation: mq-hit .24s ease-out 1; }
 @keyframes mq-hit {
-  0%   { filter: drop-shadow(0 6px 12px rgba(20,10,30,.4)) brightness(2.4); transform: scale(1.1); }
-  100% { filter: drop-shadow(0 6px 12px rgba(20,10,30,.4)) brightness(1); transform: scale(1); }
+  0%   { filter: brightness(2.2) saturate(.4); transform: scale(1.1); }
+  100% { filter: none; transform: scale(1); }
 }
 .mq-cast { animation: mq-cast .3s cubic-bezier(.3,1.5,.4,1) 1; }
 @keyframes mq-cast {
   0%   { transform: scale(1) translateY(0); }
-  40%  { transform: scale(1.12) translateY(-7px); }
+  40%  { transform: scale(1.1) translateY(-8px); }
   100% { transform: scale(1) translateY(0); }
 }
 
-/* ---------- панель боя ---------- */
 .mq-fight__panel {
-  flex: 0 0 auto;
-  background: var(--card);
+  flex: 0 0 auto; background: var(--card);
   border-radius: var(--r) var(--r) 0 0;
-  box-shadow: 0 -8px 26px rgba(20,10,30,.22);
+  box-shadow: 0 -8px 26px rgba(20,10,30,.28);
   padding: 12px 14px max(12px, env(safe-area-inset-bottom));
   color: var(--ink);
 }
 
 .mq-spells { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
 .mq-spell {
-  position: relative;
-  min-height: 62px;
-  border: 2px solid var(--line);
-  border-radius: var(--r-s);
-  background: var(--card);
-  color: var(--ink);
-  font-family: inherit;
-  text-align: left;
-  padding: 8px 10px 8px 48px;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 1px;
+  position: relative; min-height: 62px;
+  border: 2px solid var(--line); border-radius: var(--r-s);
+  background: var(--card); color: var(--ink);
+  font-family: inherit; text-align: left; padding: 8px 10px 8px 48px;
+  cursor: pointer; display: flex; flex-direction: column; justify-content: center; gap: 1px;
 }
 .mq-spell:active { transform: translateY(1px); }
 .mq-spell__sign {
-  position: absolute;
-  left: 8px; top: 50%;
-  transform: translateY(-50%);
-  width: 32px; height: 32px;
-  display: grid; place-items: center;
-  border-radius: 10px;
-  font-size: 19px; font-weight: 900;
-  line-height: 1;
+  position: absolute; left: 8px; top: 50%; transform: translateY(-50%);
+  width: 32px; height: 32px; display: grid; place-items: center;
+  border-radius: 10px; font-size: 19px; font-weight: 900; line-height: 1;
 }
 .mq-spell__name { font-size: 15px; font-weight: 900; letter-spacing: -.1px; }
 .mq-spell__how { font-size: 11.5px; font-weight: 700; color: var(--ink-2); line-height: 1.25; }
 .mq-spell--cool { opacity: .45; cursor: default; }
-.mq-spell__cool {
-  position: absolute; right: 8px; top: 7px;
-  font-size: 11px; font-weight: 900; color: var(--ink-2);
-}
+.mq-spell__cool { position: absolute; right: 8px; top: 7px; font-size: 11px; font-weight: 900; color: var(--ink-2); }
 .mq-spell--best { border-color: var(--star); box-shadow: 0 0 0 3px rgba(255,198,63,.26); }
 
-/* ---------- задача ---------- */
-.mq-task__head {
-  display: flex; align-items: center; gap: 8px;
-  margin-bottom: 8px;
-}
-.mq-task__spell {
-  font-size: 13px; font-weight: 900;
-  padding: 4px 10px; border-radius: 999px;
-  flex: 1 1 auto;
-}
+.mq-task__head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.mq-task__spell { font-size: 13px; font-weight: 900; padding: 4px 10px; border-radius: 999px; flex: 1 1 auto; }
 .mq-task__drop {
-  border: 0; background: transparent;
-  color: var(--ink-2);
+  border: 0; background: transparent; color: var(--ink-2);
   font-family: inherit; font-size: 13px; font-weight: 800;
-  min-height: 34px;
-  cursor: pointer;
-  text-decoration: underline;
-  flex: 0 0 auto;
+  min-height: 34px; cursor: pointer; text-decoration: underline; flex: 0 0 auto;
 }
 .mq-task__q {
-  text-align: center;
-  font-size: clamp(27px, 9vw, 36px);
-  font-weight: 900;
-  letter-spacing: -.5px;
-  padding: 2px 0 11px;
-  line-height: 1.15;
+  text-align: center; font-size: clamp(27px, 9vw, 36px); font-weight: 900;
+  letter-spacing: -.5px; padding: 2px 0 11px; line-height: 1.15;
 }
 .mq-task__q small { display: block; font-size: 14px; font-weight: 700; color: var(--ink-2); letter-spacing: 0; margin-top: 4px; }
 .mq-task__opts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
 .mq-opt {
-  min-height: 56px;
-  border: 2px solid var(--line);
-  border-radius: var(--r-s);
-  background: var(--card);
-  color: var(--ink);
-  font-family: inherit;
-  font-size: 22px; font-weight: 900;
-  cursor: pointer;
+  min-height: 56px; border: 2px solid var(--line); border-radius: var(--r-s);
+  background: var(--card); color: var(--ink);
+  font-family: inherit; font-size: 22px; font-weight: 900; cursor: pointer;
 }
 .mq-opt:active { transform: translateY(1px); }
-.mq-opt--ok   { border-color: var(--add); background: var(--add-bg); color: var(--add); }
-.mq-opt--no   { border-color: var(--sub); background: var(--sub-bg); color: var(--sub); }
-.mq-opt--dim  { opacity: .4; }
+.mq-opt--ok  { border-color: var(--add); background: var(--add-bg); color: var(--add); }
+.mq-opt--no  { border-color: var(--sub); background: var(--sub-bg); color: var(--sub); }
+.mq-opt--dim { opacity: .4; }
 
-.mq-tip {
-  margin-top: 9px;
-  min-height: 20px;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--ink-2);
-  text-align: center;
-  line-height: 1.35;
-}
+.mq-tip { margin-top: 9px; min-height: 20px; font-size: 14px; font-weight: 700; color: var(--ink-2); text-align: center; line-height: 1.35; }
 .mq-tip b { color: var(--ink); }
 
 /* ============================================================
    ИТОГ
    ============================================================ */
 .mq-sc--win { align-items: center; text-align: center; overflow-y: auto; }
-.mq-sc--win .mq-foot { width: 100%; max-width: 420px; }
-.mq-win__art {
-  margin-top: auto;
-  display: grid; place-items: center;
-  min-height: 170px;
+.mq-win__art { margin-top: auto; display: grid; place-items: center; min-height: 150px; }
+.mq-win__art img {
+  width: 150px; height: 150px; border-radius: 50%; object-fit: cover;
+  box-shadow: 0 0 0 4px var(--card), 0 10px 26px rgba(45,27,69,.22);
 }
-.mq-win__art img { width: 170px; filter: drop-shadow(0 10px 22px rgba(45,27,69,.2)); }
-.mq-sc--win h2 { margin: 12px 0 4px; font-size: 27px; font-weight: 900; letter-spacing: -.5px; }
-.mq-win__rows { display: grid; gap: 8px; width: 100%; max-width: 360px; margin: 10px 0 0; }
+.mq-sc--win h2 { margin: 14px 0 4px; font-size: 27px; font-weight: 900; letter-spacing: -.5px; }
+.mq-win__rows { display: grid; gap: 8px; width: 100%; max-width: 380px; margin: 10px 0 0; }
 .mq-wrow {
   display: flex; align-items: center; gap: 10px;
-  background: var(--card);
-  border-radius: var(--r-s);
-  padding: 11px 13px;
-  box-shadow: var(--shadow);
-  text-align: left;
+  background: var(--card); border-radius: var(--r-s);
+  padding: 11px 13px; box-shadow: var(--shadow); text-align: left;
 }
 .mq-wrow__ico { font-size: 21px; flex: 0 0 auto; }
 .mq-wrow__txt { font-size: 15px; font-weight: 800; flex: 1 1 auto; }
 .mq-wrow__txt small { display: block; font-size: 12.5px; font-weight: 700; color: var(--ink-2); margin-top: 1px; }
+.mq-sc--win .mq-foot { width: 100%; max-width: 420px; }
+.mq-sc--win .mq-btn { width: 100%; }
 
 /* ============================================================
-   ЛИСТ «ТВОЙ ПОСОХ»
+   ЛИСТ «ПАЛАТА СЧЁТА»
    ============================================================ */
-.mq-sheet {
-  position: fixed; inset: 0; z-index: 30;
-  background: rgba(30,18,46,.5);
-  display: flex; align-items: flex-end;
-  padding: 0;
-}
-.mq-sheet[hidden] { display: none; }
+.mq-sheet { position: fixed; inset: 0; z-index: 30; background: rgba(30,18,46,.55); display: flex; align-items: flex-end; }
 .mq-sheet__card {
-  background: var(--paper);
-  width: 100%;
-  max-height: 86dvh;
-  border-radius: var(--r) var(--r) 0 0;
-  padding: 14px 16px 0;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
+  background: var(--paper); width: 100%; max-height: 86dvh;
+  border-radius: var(--r) var(--r) 0 0; padding: 14px 16px 0;
+  box-sizing: border-box; display: flex; flex-direction: column;
   animation: mq-up .22s cubic-bezier(.2,.8,.3,1);
 }
 @keyframes mq-up { from { transform: translateY(26px); } to { transform: translateY(0); } }
 .mq-sheet__body {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto;
-  display: grid;
-  gap: 9px;
-  padding: 4px 0 8px;
-  align-content: start;
+  flex: 1 1 auto; min-height: 0; overflow-y: auto;
+  display: grid; gap: 9px; padding: 4px 0 8px; align-content: start;
 }
+.mq-lore {
+  margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--ink-2);
+  background: var(--card); border-radius: var(--r-s); padding: 12px 14px; box-shadow: var(--shadow);
+}
+.mq-lore b { color: var(--ink); font-weight: 900; }
 .mq-scard {
   display: flex; align-items: flex-start; gap: 11px;
-  background: var(--card);
-  border-radius: var(--r-s);
-  padding: 11px 13px;
-  box-shadow: var(--shadow);
+  background: var(--card); border-radius: var(--r-s);
+  padding: 11px 13px; box-shadow: var(--shadow);
 }
-.mq-scard__sign {
-  flex: 0 0 auto;
-  width: 36px; height: 36px;
-  display: grid; place-items: center;
-  border-radius: 11px;
-  font-size: 20px; font-weight: 900;
-}
-.mq-scard__txt { min-width: 0; }
+.mq-scard__sign { flex: 0 0 auto; width: 36px; height: 36px; display: grid; place-items: center; border-radius: 11px; font-size: 20px; font-weight: 900; }
 .mq-scard__name { font-size: 16px; font-weight: 900; }
 .mq-scard__how { font-size: 13px; font-weight: 700; color: var(--ink-2); line-height: 1.4; margin-top: 2px; }
 .mq-scard--locked { opacity: .55; }
 
-/* ---------- узкие телефоны: 360 × 600 ---------- */
-@media (max-height: 640px) {
-  .mq-fight__foes { min-height: 118px; }
-  .mq-unit__art { width: 68px; height: 68px; }
-  .mq-unit--foe .mq-unit__art { width: 76px; height: 76px; }
-  .mq-unit__art .mq-avatar { width: 68px; height: 80px; }
+/* ---------- узкие телефоны 360×600 ---------- */
+@media (max-height: 660px) {
+  .mq-fight__foes { min-height: 128px; }
+  .mq-unit__art { width: 76px; height: 76px; }
+  .mq-unit--boss .mq-unit__art { width: 92px; height: 92px; }
+  .mq-unit--pet .mq-unit__art { width: 54px; height: 54px; }
   .mq-task__q { font-size: 25px; padding-bottom: 8px; }
   .mq-spell { min-height: 56px; }
   .mq-opt { min-height: 50px; font-size: 20px; }
-  .mq-intro__art { max-width: 250px; }
-  /* кузница на 360×600: аватар и отступы меньше, чтобы скроллить почти не пришлось */
-  .mq-avatar--xl { width: 118px; height: 140px; }
-  .mq-forge__stage { padding: 2px 0 8px; }
-  .mq-forge__ctrl { gap: 10px; }
-  .mq-chip { min-height: 42px; padding: 0 12px; font-size: 14px; }
-  .mq-row__lbl { margin-bottom: 5px; font-size: 12px; }
-  .mq-field input { min-height: 46px; font-size: 17px; }
-  .mq-grade { min-height: 76px; }
-  .mq-win__art { min-height: 120px; }
-  .mq-win__art img { width: 120px; }
+  .mq-win__art { min-height: 110px; }
+  .mq-win__art img { width: 110px; height: 110px; }
+  .mq-grade { min-height: 74px; }
+  .mq-pick__sub { display: none; }
+  .mq-speech { font-size: 14.5px; padding: 11px 13px; }
 }
 @media (max-width: 370px) {
   .mq-spell { padding-left: 44px; }
   .mq-spell__name { font-size: 14px; }
   .mq-spell__how { font-size: 11px; }
-  .mq-node__pic { flex-basis: 80px; }
+  .mq-land__pic { flex-basis: 86px; }
+  .mq-pin__lbl { font-size: 12px; padding: 4px 9px; }
 }
-
-/* ---------- тёмная тема: мир тот же, бумага приглушена ---------- */
-@media (prefers-color-scheme: dark) {
-  .mq-body {
-    --ink: #F2ECFF;
-    --ink-2: #A99CC0;
-    --paper: #171426;
-    --card: #221E38;
-    --line: #342E4F;
-  }
-  .mq-body { background: #171426; color: #F2ECFF; }
-  .mq-foot { background: linear-gradient(to top, #171426 55%, rgba(23,20,38,0)); }
-  .mq-btn { background: var(--star); color: #2D1B45; box-shadow: 0 3px 0 rgba(0,0,0,.45); }
-  .mq-grade[aria-pressed="true"], .mq-chip[aria-pressed="true"] { background: #2C3A33; }
-  .mq-spot--fight { background: var(--star); color: #2D1B45; }
-  .mq-spot--fight .mq-spot__sub { color: rgba(45,27,69,.7); }
-}
-
 
 /* ============================================================
-   ШИРОКИЙ ЭКРАН (ноутбук)
-   Игра свёрстана под телефон. На десктопе не растягиваем её на
-   1280px — ставим колонку по центру на тёплом фоне, как делают
-   мобильные игры в вебе: компоновка одна, проверять надо одно.
+   НОУТБУК: колонка по центру, игра свёрстана под телефон
    ============================================================ */
 @media (min-width: 720px) {
   .mq-body {
-    display: grid;
-    place-items: center;
-    min-height: 100dvh;
-    background:
-      radial-gradient(1200px 600px at 50% -10%, #FFE9CF 0%, rgba(255,233,207,0) 60%),
-      #FBEFDC;
+    display: grid; place-items: center; min-height: 100dvh;
+    background: radial-gradient(1200px 600px at 50% -10%, #FFE9CF 0%, rgba(255,233,207,0) 60%), #FBEFDC;
   }
   .mq {
-    width: 420px;
-    max-width: 100vw;
-    height: min(860px, calc(100dvh - 52px));
-    border-radius: 26px;
-    overflow: hidden;
-    box-shadow: 0 10px 40px rgba(45,27,69,.16), 0 2px 8px rgba(45,27,69,.08);
+    width: 420px; max-width: 100vw;
+    height: min(880px, calc(100dvh - 52px));
+    border-radius: 26px; overflow: hidden;
+    box-shadow: 0 10px 40px rgba(45,27,69,.18), 0 2px 8px rgba(45,27,69,.08);
     background: var(--paper);
   }
   .mq-sc { height: 100%; max-height: 100%; }
-  /* подпись за рамкой: чтобы на ноутбуке было понятно, что это телефонная игра */
   .mq-body::after {
     content: 'Арифмагия · Nooka — игра сделана для телефона';
-    position: fixed;
-    left: 0; right: 0; bottom: 14px;
-    text-align: center;
-    font-size: 13px;
-    font-weight: 700;
-    color: #9A8AA8;
-    pointer-events: none;
+    position: fixed; left: 0; right: 0; bottom: 12px;
+    text-align: center; font-size: 13px; font-weight: 700; color: #9A8AA8; pointer-events: none;
   }
 }
 @media (min-width: 720px) and (prefers-color-scheme: dark) {
