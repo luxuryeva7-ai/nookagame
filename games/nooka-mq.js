@@ -104,38 +104,86 @@
       sub: 'Здесь учат держать число.',
       who: 'Наставница Бусина',
       say: 'Правило у нас одно: <b>заклинание слушается того, кто назовёт верное число</b>. Назвал — посох выстрелил. Ошибся — ход ушёл, но тебя за это никто не ударит. Попробуй на кляксе: она не злая, она просто забыла, чем была.',
+      cast: [
+        { art: 'npc_elder.webp', name: 'Наставница Бусина', x: 22 },
+        { art: 'npc_kid.webp', name: 'Малыш Тюк', x: 82, side: 'right' }
+      ],
+      talk: [
+        [0, 'Посох не слушается крика. Он слушается числа.'],
+        [1, 'А если я ошибусь?'],
+        [0, 'Тогда ход уйдёт. Но тебя никто не ударит за ошибку.'],
+        [1, 'Тогда я попробую!'],
+        [0, 'Кляксы не злые. Они просто забыли, чем были.']
+      ],
       fights: [
-        { label: 'Учебная клякса', sub: 'первый бой, тут не страшно', foes: ['blot'] }
+        { label: 'Учебная клякса', sub: 'первый бой, тут не страшно', foes: ['blot'], x: 62 }
       ] },
     { id: 'market', name: 'Торговый ряд',      bg: 'loc_market.webp',
       sub: 'Цены стёрты, торговля встала.',
       who: 'Торговец Семик',
       say: 'Безмер стёр цены на половине лавок — люди ходят и не знают, сколько платить. А у прилавка топчется <b>Путаник</b>: он был ценой на вывеске, а теперь путает числа местами. Верни ему число, и он успокоится.',
+      cast: [
+        { art: 'npc_merchant.webp', name: 'Торговец Семик', x: 20 },
+        { art: 'npc_baker.webp', name: 'Пекарь Крупа', x: 58 }
+      ],
+      talk: [
+        [0, 'Крупа, ты почём булки отдаёшь?'],
+        [1, 'Да кто ж знает — ценник стёрли.'],
+        [0, 'Вот и у меня. Торгуем на глазок, стыдно.'],
+        [1, 'Счетомаг пришёл. Может, вернёт число?'],
+        [0, 'Верни, милок. Путаник у прилавка всё перепутал.']
+      ],
       fights: [
-        { label: 'Путаник у прилавка', sub: 'слаб к Убыли', foes: ['mix'] },
-        { label: 'Два Нулика на складе', sub: 'их двое — пригодится Раскол', foes: ['zero', 'zero'] }
+        { label: 'Путаник у прилавка', sub: 'слаб к Убыли', foes: ['mix'], x: 40 },
+        { label: 'Два Нулика на складе', sub: 'их двое — пригодится Раскол', foes: ['zero', 'zero'], x: 76 }
       ] },
     { id: 'bridge', name: 'Делимая река',      bg: 'loc_bridge.webp',
       sub: 'Мост поплыл: стёрли число пролётов.',
       who: 'Нейро',
       say: 'Мост был <b>на двенадцать пролётов, по четыре на опору</b>. Это число стёрли — и мост расплылся. Под ним сидит Половинник: он и есть то самое число, только забывшее себя. Против него нужен <b>Раскол</b>.',
+      cast: [
+        { art: 'npc_guard.webp', name: 'Стражник Пика', x: 22 },
+        { art: 'npc_elder.webp', name: 'Нейро', x: 84, side: 'right' }
+      ],
+      talk: [
+        [0, 'Дальше не пущу: мост поплыл.'],
+        [1, 'Он не поплыл. У него стёрли число пролётов.'],
+        [0, 'А это разве не одно и то же?'],
+        [1, 'Для моста — одно. Вернём число — вернётся и мост.']
+      ],
       fights: [
-        { label: 'Половинник под мостом', sub: 'слаб к Расколу', foes: ['half', 'blot'] }
+        { label: 'Половинник под мостом', sub: 'слаб к Расколу', foes: ['half', 'blot'], x: 66 }
       ] },
     { id: 'grove', name: 'Умножальная роща',   bg: 'loc_grove.webp',
       sub: 'Деревья множатся и уже не помнят, сколько их.',
       who: 'Нейро',
       say: 'Было четыре дерева, стало четыре по шесть, а теперь никто не скажет сколько. Когда число потеряно, роща растёт без счёта. Тут силён <b>Вихрь</b> — он бьёт столько раз, сколько скажет твой ответ.',
+      cast: [
+        { art: 'npc_kid.webp', name: 'Малыш Тюк', x: 24 }
+      ],
+      talk: [
+        [0, 'Я считал деревья и сбился на сорока!'],
+        [0, 'Они множатся! Четыре по шесть, потом ещё!'],
+        [0, 'Их надо бить тем же — умножением!']
+      ],
       fights: [
-        { label: 'Нулик в чаще', sub: 'слаб к Вихрю', foes: ['zero'] },
-        { label: 'Нулик и Клякса', sub: 'вдвоём', foes: ['zero', 'blot'] }
+        { label: 'Нулик в чаще', sub: 'слаб к Вихрю', foes: ['zero'], x: 44 },
+        { label: 'Нулик и Клякса', sub: 'вдвоём', foes: ['zero', 'blot'], x: 80 }
       ] },
     { id: 'tower', name: 'Башня Безмера',      bg: 'loc_tower.webp',
       sub: 'Отсюда стирают числа.',
       who: 'Безмер',
       say: 'Ещё один с посохом. Я считал дольше всех вас вместе взятых и устал. Без чисел спокойнее: не надо помнить, не надо сверять, не надо отвечать. Я стёр мост — и никто по нему больше не бегает. Сотру и тебя... если не назовёшь <b>моё число</b>.',
+      cast: [
+        { art: 'boss.webp', name: 'Безмер', x: 26 }
+      ],
+      talk: [
+        [0, 'Зачем вам числа? Без них спокойнее.'],
+        [0, 'Я стёр мост — и стало тихо.'],
+        [0, 'Это не тишина, счетомаг. Это пусто.']
+      ],
       fights: [
-        { label: 'Безмер', sub: 'он прячет число за тем, что ты уже умеешь', foes: ['bezmer'] }
+        { label: 'Безмер', sub: 'он прячет число за тем, что ты уже умеешь', foes: ['bezmer'], x: 60 }
       ] }
   ];
 
@@ -278,6 +326,8 @@
   var taleStep = 0;
   function show(name) {
     if (name !== 'fight' && window.nookaFX) window.nookaFX.off();
+    if (name !== 'town' && window.nookaWorld) window.nookaWorld.stopMap();
+    if (name !== 'land' && window.nookaWorld) window.nookaWorld.stopScene();
     SCREENS.forEach(function (n) { var el = $('sc-' + n); if (el) el.hidden = (n !== name); });
     /* канвас эффектов меряется только когда экран уже показан: пока он
        скрыт, размеры нулевые и рисовать не на чем */
@@ -440,17 +490,28 @@
       '<span class="mq-me__lv">' + S.lv + ' уровень · ' + S.grade + ' класс · вернул чисел: ' + S.solved + '</span></span>';
 
     var box = $('town-spots');
-    box.innerHTML = '<div class="mq-town__inner" id="town-inner"></div>';
-    box = $('town-inner');
+    box.innerHTML =
+      '<div class="mq-town__scene" id="town-scene">' +
+        '<img class="mq-town__bg2" src="' + ART + TOWN.bg + '" alt="">' +
+        '<div class="mq-town__folk" id="town-folk"></div>' +
+        '<div class="mq-town__places" id="town-places"></div>' +
+      '</div>';
+    var places = $('town-places');
     TOWN.spots.forEach(function (sp) {
       var b = document.createElement('button');
       b.type = 'button';
-      b.className = 'mq-pin mq-pin--' + sp.id;
+      b.className = 'mq-place mq-place--' + sp.id;
       b.style.left = sp.x + '%'; b.style.top = sp.y + '%';
-      b.innerHTML = '<span class="mq-pin__dot"></span><span class="mq-pin__lbl">' + sp.label + '<small>' + sp.hint + '</small></span>';
-      b.addEventListener('click', function () { townSpot(sp.id); });
-      box.appendChild(b);
+      b.innerHTML =
+        '<span class="mq-place__glow"></span>' +
+        '<span class="mq-place__sign">' + sp.label + '<small>' + sp.hint + '</small></span>';
+      b.addEventListener('click', function () {
+        if (window.nookaWorld) window.nookaWorld.zoomTo($('town-scene'), sp.x, sp.y, function () { townSpot(sp.id); });
+        else townSpot(sp.id);
+      });
+      places.appendChild(b);
     });
+    if (window.nookaWorld) window.nookaWorld.liveMap($('town-scene'), $('town-folk'));
 
     var nxt = -1;
     for (var i = 0; i < LANDS.length; i++) if (landOpen(i) && !landDone(i)) { nxt = i; break; }
@@ -514,27 +575,43 @@
     drawFights();
     $('land-list').hidden = true; $('land-place').hidden = false;
     show('land');
+    buildLandStage(l, i);
+  }
+
+  /* сцена локации: NPC стоят и говорят, кляксы ждут в своих точках,
+     герой ходит по тапу — список кнопок «что сделать» больше не нужен */
+  function buildLandStage(l, li) {
+    var W = window.nookaWorld;
+    if (!W) return;
+    var host = $('land-actors');
+    /* NPC, кроме самого игрока — он теперь ходит отдельно */
+    W.scene(host, (l.cast || []).filter(function (c) { return !c.me; }), l.talk);
+
+    var stage = W.stage($('land-stage'), { art: hero().art, tint: auraColor(), startX: 16 });
+    l.fights.forEach(function (f, fi) {
+      W.foe(stage, {
+        x: f.x || (30 + fi * 26),
+        art: FOES[f.foes[0]].art,
+        label: f.label,
+        done: !!S.done[li + ':' + fi]
+      }, function () { startFight(f.foes, li, fi); });
+    });
+    var left = l.fights.filter(function (_, fi) { return !S.done[li + ':' + fi]; }).length;
+    $('land-hint').textContent = left
+      ? 'Нажми на кляксу — подойдёшь и начнётся бой. Осталось: ' + left
+      : 'Здесь все числа возвращены. Можно идти дальше.';
   }
 
   function drawFights() {
-    var l = LANDS[curLand], box = $('land-fights');
+    var box = $('land-fights');
     box.innerHTML = '';
-    l.fights.forEach(function (f, fi) {
-      var fin = !!S.done[curLand + ':' + fi];
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'mq-go' + (fin ? ' mq-go--done' : '');
-      b.innerHTML =
-        '<span class="mq-go__art"><img src="' + ART + FOES[f.foes[0]].art + '" alt="" loading="lazy"></span>' +
-        '<span class="mq-go__txt"><span class="mq-go__name">' + f.label + (fin ? ' · возвращено' : '') + '</span>' +
-        '<span class="mq-go__sub">' + f.sub + '</span></span>';
-      b.addEventListener('click', function () { walkThen(f.foes, curLand, fi); });
-      box.appendChild(b);
-    });
     var back = document.createElement('button');
     back.type = 'button'; back.className = 'mq-btn mq-btn--ghost';
     back.textContent = 'К другим землям';
-    back.addEventListener('click', function () { drawLands(); $('land-place').hidden = true; $('land-list').hidden = false; });
+    back.addEventListener('click', function () {
+      if (window.nookaWorld) window.nookaWorld.stopScene();
+      drawLands(); $('land-place').hidden = true; $('land-list').hidden = false;
+    });
     box.appendChild(back);
   }
 
