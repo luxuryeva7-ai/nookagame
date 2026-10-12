@@ -292,8 +292,10 @@ html, body { overflow-x: clip; }
   content: ''; position: absolute; inset: 0; z-index: 1;
   background: linear-gradient(to bottom, rgba(20,10,30,.5) 0 18%, rgba(20,10,30,.05) 42%, rgba(20,10,30,.62) 100%);
 }
+/* фон и слой эффектов остаются absolute: иначе встают в поток флекса —
+   фон выталкивает шапку за край, а у канваса эффектов высота падает в 0 */
 .mq-land__place > *:not(.mq-place__bg),
-.mq-sc--fight > *:not(.mq-place__bg) { position: relative; z-index: 2; }
+.mq-sc--fight > *:not(.mq-place__bg):not(.mq-fight__fx) { position: relative; z-index: 2; }
 .mq-land__place > .mq-head { margin: max(14px, env(safe-area-inset-top)) 16px 0; }
 
 .mq-place__body {
@@ -580,4 +582,107 @@ html, body { overflow-x: clip; }
 }
 @media (min-width: 720px) and (prefers-color-scheme: dark) {
   .mq-body { background: radial-gradient(1200px 600px at 50% -10%, #221E38 0%, rgba(34,30,56,0) 60%), #12101F; }
+}
+
+/* ============================================================
+   ЭФФЕКТЫ, ВСТУПЛЕНИЕ, ХОДЬБА, ПЕРСОНАЛИЗАЦИЯ
+   ============================================================ */
+
+/* канвас эффектов поверх сцены боя */
+.mq-fxc { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+
+/* свечение цвета магии вокруг героя в бою */
+.mq-unit__art--me {
+  box-shadow: 0 0 0 3px rgba(255,255,255,.6),
+              0 0 22px 2px var(--tint, #9B6BE0),
+              0 8px 20px rgba(20,10,30,.45);
+}
+.mq-mark { font-style: normal; font-size: 13px; text-shadow: 0 0 8px currentColor; }
+
+/* ---------- вступление ---------- */
+.mq-sc--tale { padding-left: 0; padding-right: 0; justify-content: flex-end; }
+.mq-tale__bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+.mq-sc--tale::after {
+  content: ''; position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(to bottom, rgba(20,10,30,.3) 0 26%, rgba(24,13,36,.8) 64%, #180D24 100%);
+}
+.mq-tale__in { position: relative; z-index: 2; margin-top: auto; padding: 0 20px; color: #fff; }
+.mq-tale__in h2 { margin: 6px 0 8px; font-size: 26px; font-weight: 900; letter-spacing: -.5px; }
+.mq-tale__in p {
+  margin: 0; font-size: 15px; line-height: 1.6;
+  color: rgba(255,255,255,.9);
+  max-width: 380px;
+  animation: mq-fade .5s ease both;
+}
+.mq-tale__in p b { color: var(--star); font-weight: 900; }
+@keyframes mq-fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.mq-tale__dots { display: flex; gap: 6px; }
+.mq-tale__dots i {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: rgba(255,255,255,.35); transition: all .2s ease;
+}
+.mq-tale__dots i.on { background: var(--star); width: 20px; border-radius: 4px; }
+.mq-sc--tale .mq-foot { position: relative; z-index: 2; background: none; padding: 16px 20px max(16px, env(safe-area-inset-bottom)); }
+.mq-sc--tale .mq-btn { background: var(--star); color: #2D1B45; }
+.mq-sc--tale .mq-btn--ghost { background: none; color: rgba(255,255,255,.65); }
+
+/* ---------- дорога до боя ---------- */
+.mq-walk {
+  position: absolute; inset: 0; z-index: 6; pointer-events: none;
+  display: flex; align-items: flex-end; justify-content: flex-start;
+  padding: 0 0 22% 6%;
+}
+.mq-walk__hero {
+  display: block; width: 86px; height: 86px; border-radius: 50%;
+  overflow: hidden; background: #F3EBDC;
+  box-shadow: 0 0 0 3px rgba(255,255,255,.6), 0 0 20px 2px var(--tint, #9B6BE0), 0 8px 18px rgba(20,10,30,.5);
+  transform: translateX(0) scale(.9);
+  transition: transform 1.05s cubic-bezier(.4,.1,.5,1);
+  animation: mq-step .32s ease-in-out infinite;
+}
+.mq-walk__hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.mq-walk--go .mq-walk__hero { transform: translateX(min(62vw, 240px)) scale(1.04); }
+@keyframes mq-step {
+  0%, 100% { margin-bottom: 0; }
+  50%      { margin-bottom: 7px; }
+}
+.mq-walk__dust {
+  position: absolute; left: 6%; bottom: 21%;
+  width: 70px; height: 10px; border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(255,255,255,.3), rgba(255,255,255,0) 70%);
+  transition: transform 1.05s cubic-bezier(.4,.1,.5,1); 
+}
+.mq-walk--go .mq-walk__dust { transform: translateX(min(62vw, 240px)); }
+@media (prefers-reduced-motion: reduce) {
+  .mq-walk__hero { animation: none; transition: none; }
+}
+
+/* ---------- персонализация ---------- */
+.mq-tune { flex: 0 0 auto; display: grid; gap: 8px; padding: 2px 0 6px; }
+.mq-row__lbl {
+  display: block; font-size: 11.5px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: .06em;
+  color: var(--ink-2); margin-bottom: 5px;
+}
+.mq-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+.mq-chip {
+  min-height: 40px; min-width: 40px; padding: 0 12px;
+  border: 2px solid var(--line); border-radius: 999px;
+  background: var(--card); color: var(--ink);
+  font-family: inherit; font-size: 15px; font-weight: 800; cursor: pointer;
+  display: grid; place-items: center;
+}
+.mq-chip[aria-pressed="true"] { border-color: var(--ink); }
+.mq-chip--dot { width: 40px; padding: 0; }
+.mq-chip--dot i { width: 22px; height: 22px; border-radius: 50%; display: block; box-shadow: inset 0 0 0 2px rgba(255,255,255,.55); }
+.mq-chip--dot[aria-pressed="true"] { box-shadow: 0 0 0 3px rgba(45,27,69,.14); }
+.mq-chip--mark { font-size: 19px; }
+
+@media (max-height: 700px) {
+  .mq-tune { gap: 5px; }
+  .mq-chip { min-height: 36px; min-width: 36px; }
+  .mq-chip--dot { width: 36px; }
+  .mq-chip--dot i { width: 19px; height: 19px; }
+  .mq-tale__in p { font-size: 14px; line-height: 1.5; }
+  .mq-tale__in h2 { font-size: 22px; }
 }
